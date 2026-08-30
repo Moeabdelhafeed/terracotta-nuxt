@@ -1,0 +1,185 @@
+/* Kufam is the face the whole app is drawn in (splash, onboarding, home) — 600 for
+   headings, 900 for prices. It carries Arabic and Latin, so one family covers both. */
+@import url("https://fonts.googleapis.com/css2?family=Kufam:wght@400;500;600;700;900&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+@plugin 'tailwind-scrollbar';
+
+@theme inline {
+  --font-sans: "Kufam", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Kufam", ui-sans-serif, system-ui, sans-serif;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-terracotta: var(--brand-terracotta);
+  --color-brand-rust: var(--brand-rust);
+  --color-brand-forest: var(--brand-forest);
+  --color-brand-green: var(--brand-green);
+  --color-brand-mist: var(--brand-mist);
+  --color-brand-blush: var(--brand-blush);
+}
+
+:root {
+  --radius: 0.625rem;
+
+  /* Terracotta brand palette, taken from the splash + onboarding frames:
+     ink #290802 · terracotta #81341a · rust #72291b · forest #1d2917
+     green #345a4a · mist #e4e6e1 · blush #f8b6b6 */
+  --brand-ink: oklch(0.193 0.058 36.2);
+  --brand-terracotta: oklch(0.428 0.113 38.5);
+  --brand-rust: oklch(0.386 0.106 32.8);
+  --brand-forest: oklch(0.264 0.036 135.6);
+  --brand-green: oklch(0.434 0.051 165.4);
+  --brand-mist: oklch(0.922 0.007 124.5);
+  --brand-blush: oklch(0.837 0.077 18.8);
+
+  --background: oklch(1 0 0);
+  --foreground: var(--brand-ink);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--brand-ink);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--brand-ink);
+  /* The onboarding CTA: terracotta fill, white label. */
+  --primary: var(--brand-terracotta);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: var(--brand-mist);
+  --secondary-foreground: var(--brand-ink);
+  --muted: oklch(0.965 0.006 60);
+  --muted-foreground: oklch(0.505 0.043 38);
+  /* The confirmed/booking green from the home screen. */
+  --accent: var(--brand-green);
+  --accent-foreground: oklch(1 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: var(--brand-mist);
+  --input: var(--brand-mist);
+  --ring: var(--brand-terracotta);
+  --chart-1: var(--brand-terracotta);
+  --chart-2: var(--brand-green);
+  --chart-3: var(--brand-rust);
+  --chart-4: var(--brand-forest);
+  --chart-5: var(--brand-blush);
+  --sidebar: oklch(0.985 0.003 60);
+  --sidebar-foreground: var(--brand-ink);
+  --sidebar-primary: var(--brand-terracotta);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: var(--brand-mist);
+  --sidebar-accent-foreground: var(--brand-ink);
+  --sidebar-border: var(--brand-mist);
+  --sidebar-ring: var(--brand-terracotta);
+}
+
+.dark {
+  /* Same hues, flipped: clay-dark grounds, lifted terracotta so it still reads on them. */
+  --background: oklch(0.175 0.022 40);
+  --foreground: oklch(0.962 0.008 70);
+  --card: oklch(0.223 0.028 40);
+  --card-foreground: oklch(0.962 0.008 70);
+  --popover: oklch(0.223 0.028 40);
+  --popover-foreground: oklch(0.962 0.008 70);
+  --primary: oklch(0.556 0.132 38.5);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.278 0.028 40);
+  --secondary-foreground: oklch(0.962 0.008 70);
+  --muted: oklch(0.278 0.028 40);
+  --muted-foreground: oklch(0.742 0.026 55);
+  --accent: oklch(0.522 0.058 165.4);
+  --accent-foreground: oklch(1 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.556 0.132 38.5);
+  --chart-1: oklch(0.556 0.132 38.5);
+  --chart-2: oklch(0.522 0.058 165.4);
+  --chart-3: oklch(0.386 0.106 32.8);
+  --chart-4: oklch(0.404 0.046 135.6);
+  --chart-5: oklch(0.837 0.077 18.8);
+  --sidebar: oklch(0.223 0.028 40);
+  --sidebar-foreground: oklch(0.962 0.008 70);
+  --sidebar-primary: oklch(0.556 0.132 38.5);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.278 0.028 40);
+  --sidebar-accent-foreground: oklch(0.962 0.008 70);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.556 0.132 38.5);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Scrollbars, everywhere: thin, rounded, terracotta on a mist track. Firefox reads the
+     two standard properties; WebKit/Blink needs the pseudo-elements, so both are set. */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--brand-terracotta) color-mix(in oklch, var(--brand-mist) 60%, transparent);
+  }
+
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: color-mix(in oklch, var(--brand-mist) 60%, transparent);
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: color-mix(in oklch, var(--brand-terracotta) 70%, transparent);
+    border-radius: 9999px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--brand-terracotta);
+  }
+
+  /* Where a scroller sits on the ink ground (the gallery band, the hero strip on dark),
+     the same terracotta would disappear — lift the track instead. */
+  .dark *::-webkit-scrollbar-track,
+  .bg-brand-ink *::-webkit-scrollbar-track {
+    background: color-mix(in oklch, white 12%, transparent);
+  }
+
+  .dark html,
+  .dark *::-webkit-scrollbar-thumb {
+    background: color-mix(in oklch, var(--brand-terracotta) 85%, white);
+  }
+}
