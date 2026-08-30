@@ -34,28 +34,13 @@ export default defineNuxtPlugin(async (nuxtApp) => {
       })
       const languages = res?.data ?? res ?? []
 
-      // Prefer what the visitor's browser asks for, when the project actually has it.
-      // `Accept-Language` is ranked — `ar,en;q=0.8` means Arabic first — so the list is
-      // sorted by q and then walked in *that* order. Searching the project's languages
-      // instead would hand an Arabic speaker whichever locale the backend happens to
-      // list first, since their header mentions English too.
-      const preferred = (import.meta.server ? useRequestHeaders(['accept-language'])['accept-language'] : navigator.language)
-      const wanted = String(preferred ?? '')
-        .split(',')
-        .map((part) => {
-          const [tag, ...params] = part.split(';')
-          const q = params.map((p) => p.trim()).find((p) => p.startsWith('q='))
-          return { code: tag.trim().split('-')[0].toLowerCase(), q: q ? Number(q.slice(2)) : 1 }
-        })
-        .filter((entry) => entry.code && !Number.isNaN(entry.q))
-        .sort((a, b) => b.q - a.q)
-
-      const fallback = wanted
-        .map(({ code }) => languages.find((l) => String(l.code).toLowerCase() === code))
-        .find(Boolean)
-        ?? languages.find((l) => l.is_default)
-        ?? languages[0]
-        ?? null
+      // The backend's default language wins a first visit, and the browser's
+      // `Accept-Language` is deliberately not consulted: phones here are routinely set to
+      // English by people who read Arabic, so the header is a poor guess at what a visitor
+      // wants, and guessing wrong hands a local the wrong site. The switcher in the bottom
+      // bar is one tap away and its choice persists in the `lang` cookie, which this whole
+      // block is skipped for on every later visit.
+      const fallback = languages.find((l) => l.is_default) ?? languages[0] ?? null
 
       if (fallback) {
         lang.value = fallback
