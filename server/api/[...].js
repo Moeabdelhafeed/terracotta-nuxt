@@ -41,6 +41,19 @@ const fetchPublic = defineCachedFunction(
   },
 )
 
+/**
+ * Laravel reads `Accept-Language` literally: it matches the whole header against a
+ * language code, so `en` resolves to English while `en-US,en;q=0.9` — what a browser
+ * actually sends — matches nothing and silently falls back to the default language.
+ * Everything upstream therefore leaves here as a bare primary code.
+ */
+const primaryLanguage = (header) => String(header ?? '')
+  .split(',')[0]
+  .split(';')[0]
+  .trim()
+  .split('-')[0]
+  .toLowerCase()
+
 export default defineEventHandler(async (event) => {
   const { xApiToken, apiBaseUrl } = useRuntimeConfig(event)
   const clientIp = getRequestIP(event, { xForwardedFor: true })
@@ -66,11 +79,14 @@ export default defineEventHandler(async (event) => {
     ...(clientIp ? { 'X-Forwarded-For': clientIp } : {}),
   }
 
+  const language = primaryLanguage(incomingHeaders['accept-language'])
+  if (language) incomingHeaders['accept-language'] = language
+
   if (event.method === 'GET' && CACHED_PATHS.some((re) => re.test(event.path.split('?')[0]))) {
     const incoming = getRequestHeaders(event)
     return fetchPublic(apiBaseUrl + event.path, {
       ...headers,
-      'Accept-Language': incoming['accept-language'] ?? '',
+      'Accept-Language': language,
       'X-Device-Id': incoming['x-device-id'] ?? '',
       'X-Platform': incoming['x-platform'] ?? '',
     })
