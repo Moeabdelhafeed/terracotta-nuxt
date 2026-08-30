@@ -21,16 +21,7 @@ export default defineNuxtConfig({
     },
   },
 
-  echo: {
-    key: process.env.NUXT_PUBLIC_PUSHER_APP_KEY,
-    cluster: process.env.NUXT_PUBLIC_PUSHER_APP_CLUSTER,
-    broadcaster: 'pusher', // available: reverb, pusher
-    authentication: {
-      mode: 'token',
-      baseUrl: '', // own origin → /api/broadcasting/auth proxied to Laravel
-      authEndpoint: '/api/broadcasting/auth',
-    },
-  },
+
 
   css: [
     "~/assets/css/main.css",
@@ -66,7 +57,6 @@ export default defineNuxtConfig({
         'reka-ui',
         'clsx',
         'tailwind-merge',
-        'nuxt-laravel-echo > pusher-js'
       ]
     },
     plugins: [
@@ -133,6 +123,6 @@ export default defineNuxtConfig({
     '@nuxtjs/seo',
     'v-gsap-nuxt',
     'nuxt-auth-sanctum',
-    'nuxt-laravel-echo',
+  
   ],
 })
