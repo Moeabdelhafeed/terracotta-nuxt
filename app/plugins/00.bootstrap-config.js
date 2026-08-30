@@ -35,13 +35,24 @@ export default defineNuxtPlugin(async (nuxtApp) => {
       const languages = res?.data ?? res ?? []
 
       // Prefer what the visitor's browser asks for, when the project actually has it.
+      // `Accept-Language` is ranked — `ar,en;q=0.8` means Arabic first — so the list is
+      // sorted by q and then walked in *that* order. Searching the project's languages
+      // instead would hand an Arabic speaker whichever locale the backend happens to
+      // list first, since their header mentions English too.
       const preferred = (import.meta.server ? useRequestHeaders(['accept-language'])['accept-language'] : navigator.language)
       const wanted = String(preferred ?? '')
         .split(',')
-        .map((part) => part.split(';')[0].trim().split('-')[0].toLowerCase())
-        .filter(Boolean)
+        .map((part) => {
+          const [tag, ...params] = part.split(';')
+          const q = params.map((p) => p.trim()).find((p) => p.startsWith('q='))
+          return { code: tag.trim().split('-')[0].toLowerCase(), q: q ? Number(q.slice(2)) : 1 }
+        })
+        .filter((entry) => entry.code && !Number.isNaN(entry.q))
+        .sort((a, b) => b.q - a.q)
 
-      const fallback = languages.find((l) => wanted.includes(String(l.code).toLowerCase()))
+      const fallback = wanted
+        .map(({ code }) => languages.find((l) => String(l.code).toLowerCase() === code))
+        .find(Boolean)
         ?? languages.find((l) => l.is_default)
         ?? languages[0]
         ?? null
