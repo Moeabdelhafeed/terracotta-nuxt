@@ -54,6 +54,31 @@ const primaryLanguage = (header) => String(header ?? '')
   .split('-')[0]
   .toLowerCase()
 
+/**
+ * The visitor's language, from the `lang` cookie the app writes, falling back to the
+ * request header. The cookie comes first because the host's CDN rewrites
+ * `Accept-Language` on the way in — every request reaches us as English, so trusting the
+ * header served the whole site in one locale no matter what the switcher was set to. An
+ * SSR self-call carries no cookie but sets the header itself, which is what the fallback
+ * is for.
+ */
+const requestLanguage = (event) => {
+  const cookieLocale = getCookie(event, 'i18n_locale')
+  if (cookieLocale) return primaryLanguage(cookieLocale)
+
+  const langCookie = getCookie(event, 'lang')
+  if (langCookie) {
+    try {
+      const parsed = JSON.parse(decodeURIComponent(langCookie))
+      if (parsed?.code) return primaryLanguage(parsed.code)
+    } catch {
+      // A malformed cookie is not worth failing the request over — fall through.
+    }
+  }
+
+  return primaryLanguage(getRequestHeader(event, 'accept-language'))
+}
+
 export default defineEventHandler(async (event) => {
   const { xApiToken, apiBaseUrl } = useRuntimeConfig(event)
   const clientIp = getRequestIP(event, { xForwardedFor: true })
@@ -79,7 +104,7 @@ export default defineEventHandler(async (event) => {
     ...(clientIp ? { 'X-Forwarded-For': clientIp } : {}),
   }
 
-  const language = primaryLanguage(incomingHeaders['accept-language'])
+  const language = requestLanguage(event)
   if (language) incomingHeaders['accept-language'] = language
 
   if (event.method === 'GET' && CACHED_PATHS.some((re) => re.test(event.path.split('?')[0]))) {
