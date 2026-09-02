@@ -65,6 +65,13 @@ const primaryLanguage = (header) => String(header ?? '')
  * is for.
  */
 const requestLanguage = (event) => {
+  // The query string first, because it is the only carrier a CDN cannot touch. The host
+  // in front of this app rewrites `Accept-Language` and drops cookies on /api/* requests,
+  // so every visitor was served one fixed locale no matter what they asked for — and a
+  // cached response then pinned that locale for everyone else too.
+  const asked = getQuery(event).locale
+  if (asked) return primaryLanguage(asked)
+
   const cookieLocale = getCookie(event, 'i18n_locale')
   if (cookieLocale) return primaryLanguage(cookieLocale)
 
