@@ -110,8 +110,8 @@
 
 
   <AppMedia
-          v-if="heroVideo"
-          :src="heroVideo"
+          v-if="heroVideoAsset"
+          :src="heroVideoAsset"
           :alt="hero.title"
           :controls="false"
           autoplay
@@ -120,6 +120,16 @@
           playsinline
           preload="metadata"
           class=" h-full w-full absolute object-cover"
+        />
+        <video
+          v-else-if="heroVideoFile"
+          :src="heroVideoFile"
+          autoplay
+          loop
+          muted
+          playsinline
+          preload="metadata"
+          class="absolute h-full w-full object-cover"
         />
         <AppImage
           v-else-if="hero.image?.image_api"
@@ -241,9 +251,20 @@ const studioTiles = computed(() =>
 const rest = computed(() => banners.value.slice(1, 6))
 
 
-const heroVideo = computed(() => {
+/**
+ * The uploaded video, or the /public file it seeds itself from. `mediaAsset` hands back a
+ * `{ type: 'video', video }` wrapper once the key exists and a plain path until then —
+ * only the wrapper goes to AppMedia, so the path is kept separately for a bare <video>.
+ * Without this the hero showed no video at all on a backend with nothing uploaded.
+ */
+const heroVideoAsset = computed(() => {
   const asset = mediaAsset('hero_video', '/seed/hero-video.mp4')
   return asset?.type === 'video' && asset.video?.video_api ? asset : null
+})
+
+const heroVideoFile = computed(() => {
+  const asset = mediaAsset('hero_video', '/seed/hero-video.mp4')
+  return typeof asset === 'string' ? asset : null
 })
 </script>
 

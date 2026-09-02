@@ -81,7 +81,6 @@ export const useMedia = (group = 'web', subGroup = 'general') => {
     const guardId = `${group}:${effectiveSubGroup}:${key}`
     if (seededMedia.has(guardId) || seededRecently(guardId)) return
     seededMedia.add(guardId)
-    rememberSeed(guardId)
     try {
       const res = await fetch(defaultPath)
       if (!res.ok) throw new Error(`could not load ${defaultPath}`)
@@ -89,6 +88,9 @@ export const useMedia = (group = 'web', subGroup = 'general') => {
       const ext = (defaultPath.split(/[?#]/)[0].split('.').pop() || 'bin').toLowerCase()
       const file = new File([blob], `${key}.${ext}`, { type: blob.type || undefined })
       await uploadMedia(key, file, { subGroup: effectiveSubGroup })
+      // Remembered only on success. Recording the attempt up front meant a failed upload —
+      // or a key deleted from the CMS — could not be retried until the window expired.
+      rememberSeed(guardId)
     } catch {
       // Allow a later retry if the seed failed.
       seededMedia.delete(guardId)
