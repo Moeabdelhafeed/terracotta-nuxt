@@ -1,7 +1,7 @@
 <template>
   <!-- A client-side navigation lands here before the fetch resolves; the skeleton keeps
        the page's shape instead of flashing an empty screen. -->
-  <main v-if="pending && !product" class="mx-auto max-w-6xl px-6 py-16" aria-busy="true">
+  <main v-if="status !== 'success' && !product" class="mx-auto max-w-6xl px-6 py-16" aria-busy="true">
     <div class="grid gap-10 lg:grid-cols-2 lg:items-start">
       <div>
         <AppSkeleton class="aspect-square w-full !rounded-3xl" />
@@ -114,15 +114,20 @@
 
 <script setup>
 const route = useRoute()
-const { product, pending, error } = useProduct(() => route.params.id)
+const { product, error, status } = useProduct(() => route.params.id)
 
 // A record that does not exist, or a lookup that failed, hands over to the site's error
 // page — the markup's `v-if` would otherwise match nothing and leave a blank screen.
+//
+// Keyed on `status`, not on `pending`: a client-side navigation arrives with the fetch not
+// yet started, where `pending` is still false and the record still null — reading that as
+// "not found" 404s a product that exists, until you refresh.
 watchEffect(() => {
-  if (!pending.value && (error.value || !product.value)) {
+  if (status.value === 'error' || (status.value === 'success' && !product.value)) {
     showError({ statusCode: error.value?.statusCode ?? 404, statusMessage: 'Product not found' })
   }
 })
+
 const { t } = useLang('web', 'home')
 const { format } = usePrice()
 

@@ -1,5 +1,5 @@
 <template>
-  <main v-if="pending && !category" class="mx-auto max-w-6xl px-5 py-12" aria-busy="true">
+  <main v-if="status !== 'success' && !category" class="mx-auto max-w-6xl px-5 py-12" aria-busy="true">
     <AppSkeleton class="h-9 w-56" />
     <AppSkeleton class="mt-3 h-4 w-40" />
     <ul class="mt-8 columns-2 gap-1.5 lg:columns-3 [&>li]:mb-1.5">
@@ -36,15 +36,20 @@
 
 <script setup>
 const route = useRoute()
-const { category, pending, error } = useGalleryCategory(() => route.params.id)
+const { category, error, status } = useGalleryCategory(() => route.params.id)
 
 // A record that does not exist, or a lookup that failed, hands over to the site's error
 // page — the markup's `v-if` would otherwise match nothing and leave a blank screen.
+//
+// Keyed on `status`, not on `pending`: a client-side navigation arrives with the fetch not
+// yet started, where `pending` is still false and the record still null — reading that as
+// "not found" 404s a product that exists, until you refresh.
 watchEffect(() => {
-  if (!pending.value && (error.value || !category.value)) {
+  if (status.value === 'error' || (status.value === 'success' && !category.value)) {
     showError({ statusCode: error.value?.statusCode ?? 404, statusMessage: 'Album not found' })
   }
 })
+
 const { t } = useLang('web', 'home')
 
 // The album endpoint returns no cover of its own — only the list carries one — so the

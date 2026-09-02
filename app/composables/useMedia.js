@@ -1,38 +1,12 @@
 const uploadingKeys = new Set()
-// Persists across renders so a missing key is only seeded once per (group:subGroup:key).
+/**
+ * One seed per key per page, so a render cannot fire the same upload twice. Deliberately
+ * *not* persisted: a key deleted from the CMS has to seed itself again on the next visit,
+ * with no storage to clear and no hard refresh. Duplicate uploads across loads are
+ * prevented by the media list being uncached, so the page after a seed already knows the
+ * key exists — see CACHED_PATHS in server/api/[...].js.
+ */
 const seededMedia = new Set()
-
-// ...and across reloads. The media list is cached (by the Nitro proxy in production, and
-// by the backend's own storage lag either way), so a page loaded moments after a seed can
-// still be told the key is missing — without this it uploads the same file again, and the
-// key's URL changes under the browser every time.
-const SEED_MEMORY = 'seeded-media'
-const SEED_TTL = 10 * 60 * 1000
-
-const seedMemory = () => {
-  if (!import.meta.client) return {}
-  try {
-    return JSON.parse(window.localStorage.getItem(SEED_MEMORY) ?? '{}')
-  } catch {
-    return {}
-  }
-}
-
-const seededRecently = (guardId) => {
-  const at = seedMemory()[guardId]
-  return typeof at === 'number' && Date.now() - at < SEED_TTL
-}
-
-const rememberSeed = (guardId) => {
-  if (!import.meta.client) return
-  try {
-    const memory = seedMemory()
-    memory[guardId] = Date.now()
-    window.localStorage.setItem(SEED_MEMORY, JSON.stringify(memory))
-  } catch {
-    // A browser refusing storage just means the in-memory guard has to do on its own.
-  }
-}
 
 /**
  * Dynamic storage client — keyed media (image/video/file) by group + sub_group + key.
@@ -79,7 +53,7 @@ export const useMedia = (group = 'web', subGroup = 'general') => {
    */
   const seedMedia = async (key, defaultPath, effectiveSubGroup) => {
     const guardId = `${group}:${effectiveSubGroup}:${key}`
-    if (seededMedia.has(guardId) || seededRecently(guardId)) return
+    if (seededMedia.has(guardId)) return
     seededMedia.add(guardId)
     try {
       const res = await fetch(defaultPath)

@@ -19,9 +19,9 @@ export const useWorkshop = (id) => {
     watch: [() => toValue(id), ...localeKeys()],
   })
 
-  const { data, pending, error } = request
+  const { data, pending, error, status } = request
 
-  return { workshop: computed(() => data.value), pending, error }
+  return { workshop: computed(() => data.value), pending, error, status }
 }
 
 export const useShopCategories = () => {
@@ -84,9 +84,9 @@ export const useProduct = (id) => {
     watch: [() => toValue(id), ...localeKeys()],
   })
 
-  const { data, pending, error } = request
+  const { data, pending, error, status } = request
 
-  return { product: computed(() => data.value), pending, error }
+  return { product: computed(() => data.value), pending, error, status }
 }
 
 export const useGalleryCategory = (id) => {
@@ -102,7 +102,7 @@ export const useGalleryCategory = (id) => {
     watch: [() => toValue(id), ...localeKeys()],
   })
 
-  const { data, pending, error } = request
+  const { data, pending, error, status } = request
 
-  return { category: computed(() => data.value), pending, error }
+  return { category: computed(() => data.value), pending, error, status }
 }

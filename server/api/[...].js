@@ -28,9 +28,9 @@
 // asked for. Correctness first; the translated endpoints are cheap and go straight
 // through.
 const CACHED_PATHS = [
-  /^\/api\/media$/,
-  // Cached per locale — see fetchPublic. Excluded in dev, where the client seeds missing
-  // keys and refreshes: a stale entry would hide the new key and it would seed twice.
+  // Deliberately not `/api/media`: the client seeds a missing key by uploading it, and a
+  // cached list would still report it missing on the next load — so the same file uploads
+  // again and again, each time under a new URL.
   ...(import.meta.dev ? [] : [/^\/api\/translations$/, /^\/api\/app-settings$/, /^\/api\/pages(\/[^/]+)?$/]),
 ]
 

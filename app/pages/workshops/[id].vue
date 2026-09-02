@@ -1,5 +1,5 @@
 <template>
-  <main v-if="pending && !workshop" class="mx-auto max-w-6xl px-6 py-16" aria-busy="true">
+  <main v-if="status !== 'success' && !workshop" class="mx-auto max-w-6xl px-6 py-16" aria-busy="true">
     <div class="grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-start">
       <div>
         <AppSkeleton class="aspect-[16/10] w-full !rounded-3xl" />
@@ -166,15 +166,20 @@
 
 <script setup>
 const route = useRoute()
-const { workshop, pending, error } = useWorkshop(() => route.params.id)
+const { workshop, error, status } = useWorkshop(() => route.params.id)
 
 // A record that does not exist, or a lookup that failed, hands over to the site's error
 // page — the markup's `v-if` would otherwise match nothing and leave a blank screen.
+//
+// Keyed on `status`, not on `pending`: a client-side navigation arrives with the fetch not
+// yet started, where `pending` is still false and the record still null — reading that as
+// "not found" 404s a product that exists, until you refresh.
 watchEffect(() => {
-  if (!pending.value && (error.value || !workshop.value)) {
+  if (status.value === 'error' || (status.value === 'success' && !workshop.value)) {
     showError({ statusCode: error.value?.statusCode ?? 404, statusMessage: 'Workshop not found' })
   }
 })
+
 const { t } = useLang('web', 'home')
 const { format } = usePrice()
 
