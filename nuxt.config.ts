@@ -12,6 +12,10 @@ export default defineNuxtConfig({
     public: {
       baseUrl: '',        // own origin (relative). Client fetches hit Nitro proxy, not Laravel directly.
       translationsMode: process.env.NUXT_PUBLIC_TRANSLATIONS_MODE, // 'remote' | 'local'
+      // Baked in at build time. Passenger (Hostinger's Node host) runs several worker
+      // processes and spawns them lazily, so several PIDs is normal — several *builds* is
+      // not, and that is what /api/_build compares.
+      buildId: process.env.NUXT_PUBLIC_BUILD_ID || String(Date.now()),
       firebase: {
         apiKey: '',
         authDomain: '',

@@ -25,34 +25,16 @@ const cachedForKey = (key, nuxtApp, ctx) =>
  * @type {typeof import('#app').useFetch}
  */
 export const useApiFetch = (url, options = {}) => {
-  const lang = useCookie('lang')
-  const i18nLocale = useCookie('i18n_locale')
-  const { translationsMode } = useRuntimeConfig().public
-
-  const locale = computed(() => (translationsMode === 'local'
-    ? (i18nLocale.value ?? lang.value?.code ?? 'en')
-    : (lang.value?.code ?? 'en')))
-
-  /**
-   * Every call carries its locale in the query string as well as in `Accept-Language`.
-   * The header is the one the API actually reads, but a CDN in front of this app rewrites
-   * it and drops cookies on /api/* requests — the query survives that, and the proxy
-   * turns it back into a header. It also keys the proxy's cache, so one visitor's locale
-   * can no longer be served to the next.
-   */
-  const shared = {
-    dedupe: 'defer',
-    getCachedData: cachedForKey,
-    ...options,
-    query: computed(() => ({ ...(toValue(options.query) ?? {}), locale: locale.value })),
-  }
+  const shared = { dedupe: 'defer', getCachedData: cachedForKey, ...options }
 
   const { appUsers } = useAuthConfig()
   if (appUsers.value) {
     return useSanctumFetch(url, shared)
   }
-  const { baseUrl } = useRuntimeConfig().public
+  const { baseUrl, translationsMode } = useRuntimeConfig().public
   const { deviceId, platform, fcmToken } = useDevice()
+  const lang = useCookie('lang')
+  const i18nLocale = useCookie('i18n_locale')
   return useFetch(url, {
     baseURL: baseUrl,
     onRequest({ options: opts }) {
@@ -62,7 +44,12 @@ export const useApiFetch = (url, options = {}) => {
       if (fcmToken.value && (platform.value === 'ios' || platform.value === 'android')) {
         headers.set('X-FCM-Token', fcmToken.value)
       }
-      if (!headers.has('Accept-Language')) headers.set('Accept-Language', locale.value)
+      if (!headers.has('Accept-Language')) {
+        const code = translationsMode === 'local'
+          ? (i18nLocale.value ?? lang.value?.code ?? 'en')
+          : (lang.value?.code ?? 'en')
+        headers.set('Accept-Language', code)
+      }
       opts.headers = headers
     },
     ...shared,

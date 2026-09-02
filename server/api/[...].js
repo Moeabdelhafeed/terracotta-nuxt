@@ -19,35 +19,46 @@
  * this catch-all, so dev-only endpoints stay local.
  */
 
-// Public, read-only, locale-scoped content: identical for every visitor, so one
-// upstream call per locale per minute is enough. Keeps a page refresh (7 API
-// calls per render) from eating Laravel's 60/min throttle. `/api/translations`
-// is cached in production only: in dev the client seeds missing keys and calls
-// refreshTranslations(), which a stale cache would hide for up to a minute.
+// Only what is identical for every visitor in every language, so one upstream call a
+// minute keeps a page refresh from eating Laravel's throttle.
+//
+// Nothing the API translates is cached here. The cached function returned one locale's
+// answer for every key it was given — in production only, the one place this cache was
+// active — which served Arabic copy to English readers no matter how the locale was
+// asked for. Correctness first; the translated endpoints are cheap and go straight
+// through.
 const CACHED_PATHS = [
-  /^\/api\/app-settings$/,
-  /^\/api\/languages$/,
-  /^\/api\/pages(\/[^/]+)?$/,
-  // `/api/media` and `/api/translations` are cached in production only: in dev the client
-  // seeds missing keys and refreshes, and a stale cache hides the new key long enough for
-  // the seeder to upload it a second time on the next load.
-  ...(import.meta.dev ? [] : [/^\/api\/translations$/, /^\/api\/media$/]),
+  /^\/api\/media$/,
+  // Cached per locale — see fetchPublic. Excluded in dev, where the client seeds missing
+  // keys and refreshes: a stale entry would hide the new key and it would seed twice.
+  ...(import.meta.dev ? [] : [/^\/api\/translations$/, /^\/api\/app-settings$/, /^\/api\/pages(\/[^/]+)?$/]),
 ]
 
+/**
+ * One cached upstream call per path *per locale*.
+ *
+ * The locale is an explicit argument rather than something read back out of the headers,
+ * so the cache key is derived from the same value the request is made with — nothing can
+ * drift between what is fetched and what it is filed under. That drift is what served
+ * Arabic copy to English readers in production, where this cache is the only thing that
+ * differed from local.
+ */
 const fetchPublic = defineCachedFunction(
-  (url, headers) => $fetch(url, { headers }),
+  (url, locale, headers) => $fetch(url, { headers }),
   {
     name: 'public-api',
     maxAge: 60,
-    getKey: (url, headers) => `${url}|${headers['Accept-Language'] ?? ''}`,
+    // Nitro writes each entry as a file path, so a key holding a URL — `?`, `&`, `=` and
+    // all — gets mangled, and two locales of the same endpoint collapse onto one entry.
+    // That is what served English copy to Arabic readers. A plain slug cannot collide.
+    getKey: (url, locale) => `${url.replace(/[^a-z0-9]+/gi, '-')}-${locale}`,
   },
 )
 
 /**
- * Laravel reads `Accept-Language` literally: it matches the whole header against a
- * language code, so `en` resolves to English while `en-US,en;q=0.9` — what a browser
- * actually sends — matches nothing and silently falls back to the default language.
- * Everything upstream therefore leaves here as a bare primary code.
+ * Laravel matches `Accept-Language` literally against a language code, so `en` resolves to
+ * English while `en-US,en;q=0.9` — what a browser actually sends — matches nothing and
+ * falls back to the default language. Everything upstream leaves here as a bare code.
  */
 const primaryLanguage = (header) => String(header ?? '')
   .split(',')[0]
@@ -55,38 +66,6 @@ const primaryLanguage = (header) => String(header ?? '')
   .trim()
   .split('-')[0]
   .toLowerCase()
-
-/**
- * The visitor's language, from the `lang` cookie the app writes, falling back to the
- * request header. The cookie comes first because the host's CDN rewrites
- * `Accept-Language` on the way in — every request reaches us as English, so trusting the
- * header served the whole site in one locale no matter what the switcher was set to. An
- * SSR self-call carries no cookie but sets the header itself, which is what the fallback
- * is for.
- */
-const requestLanguage = (event) => {
-  // The query string first, because it is the only carrier a CDN cannot touch. The host
-  // in front of this app rewrites `Accept-Language` and drops cookies on /api/* requests,
-  // so every visitor was served one fixed locale no matter what they asked for — and a
-  // cached response then pinned that locale for everyone else too.
-  const asked = getQuery(event).locale
-  if (asked) return primaryLanguage(asked)
-
-  const cookieLocale = getCookie(event, 'i18n_locale')
-  if (cookieLocale) return primaryLanguage(cookieLocale)
-
-  const langCookie = getCookie(event, 'lang')
-  if (langCookie) {
-    try {
-      const parsed = JSON.parse(decodeURIComponent(langCookie))
-      if (parsed?.code) return primaryLanguage(parsed.code)
-    } catch {
-      // A malformed cookie is not worth failing the request over — fall through.
-    }
-  }
-
-  return primaryLanguage(getRequestHeader(event, 'accept-language'))
-}
 
 export default defineEventHandler(async (event) => {
   const { xApiToken, apiBaseUrl } = useRuntimeConfig(event)
@@ -113,16 +92,14 @@ export default defineEventHandler(async (event) => {
     ...(clientIp ? { 'X-Forwarded-For': clientIp } : {}),
   }
 
-  // Reads only. A write carries its locale on purpose — the translation seeder POSTs the
-  // same key once per locale with a forced `Accept-Language` — so overriding it from the
-  // visitor's cookie would file every seeded value under whatever they happen to be
-  // reading the site in.
-  const language = requestLanguage(event)
+  // Reads only: a write carries its locale on purpose — the translation seeder POSTs the
+  // same key once per locale with a forced header.
+  const language = primaryLanguage(incomingHeaders['accept-language'])
   if (language && event.method === 'GET') incomingHeaders['accept-language'] = language
 
   if (event.method === 'GET' && CACHED_PATHS.some((re) => re.test(event.path.split('?')[0]))) {
     const incoming = getRequestHeaders(event)
-    return fetchPublic(apiBaseUrl + event.path, {
+    return fetchPublic(apiBaseUrl + event.path, language, {
       ...headers,
       'Accept-Language': language,
       'X-Device-Id': incoming['x-device-id'] ?? '',

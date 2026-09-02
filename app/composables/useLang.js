@@ -54,6 +54,7 @@ export const useLang = (group = 'web', subGroup = 'general') => {
     const payload = transData.value?.data ?? {}
     return payload.translations ?? payload ?? {}
   })
+
   // Default slice for this composable's sub_group (a per-call override can pick another).
   const translations = computed(() => groupTranslations.value?.[subGroup] ?? {})
 
