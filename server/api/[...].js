@@ -27,9 +27,11 @@
 const CACHED_PATHS = [
   /^\/api\/app-settings$/,
   /^\/api\/languages$/,
-  /^\/api\/media$/,
   /^\/api\/pages(\/[^/]+)?$/,
-  ...(import.meta.dev ? [] : [/^\/api\/translations$/]),
+  // `/api/media` and `/api/translations` are cached in production only: in dev the client
+  // seeds missing keys and refreshes, and a stale cache hides the new key long enough for
+  // the seeder to upload it a second time on the next load.
+  ...(import.meta.dev ? [] : [/^\/api\/translations$/, /^\/api\/media$/]),
 ]
 
 const fetchPublic = defineCachedFunction(
@@ -104,8 +106,12 @@ export default defineEventHandler(async (event) => {
     ...(clientIp ? { 'X-Forwarded-For': clientIp } : {}),
   }
 
+  // Reads only. A write carries its locale on purpose — the translation seeder POSTs the
+  // same key once per locale with a forced `Accept-Language` — so overriding it from the
+  // visitor's cookie would file every seeded value under whatever they happen to be
+  // reading the site in.
   const language = requestLanguage(event)
-  if (language) incomingHeaders['accept-language'] = language
+  if (language && event.method === 'GET') incomingHeaders['accept-language'] = language
 
   if (event.method === 'GET' && CACHED_PATHS.some((re) => re.test(event.path.split('?')[0]))) {
     const incoming = getRequestHeaders(event)

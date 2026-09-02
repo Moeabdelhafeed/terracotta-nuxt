@@ -2,13 +2,33 @@
   <main>
     <PageHero
       media-key="hero_workshops"
+      fallback="/seed/hero-workshops.webp"
+      :crumbs="[
+        { to: '/', label: t('nav_home', 'Home', 'الرئيسية', { subGroup: 'general' }) },
+        { label: t('nav_workshops', 'Workshops', 'الورشات', { subGroup: 'general' }) },
+      ]"
       :title="t('workshops_title', 'The workshop experience', 'تجربة الورشة')"
       :subtitle="t('workshops_subtitle', 'Hands-on sessions with an instructor — shape or paint your piece step by step in the studio.', 'جلسات عملية بإشراف مدرّبين تصنع أو تلوّن قطعتك خطوة بخطوة داخل الاستوديو')"
     />
 
     <div class="mx-auto max-w-6xl px-6 py-16">
 
-      <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <ul v-if="pending" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" aria-busy="true">
+        <li v-for="n in 3" :key="n" class="overflow-hidden rounded-3xl border bg-card">
+          <AppSkeleton class="aspect-[4/3] w-full !rounded-none" />
+          <div class="flex flex-col gap-3 p-6">
+            <AppSkeleton class="h-6 w-2/3" />
+            <AppSkeleton class="h-4 w-full" />
+            <AppSkeleton class="h-4 w-4/5" />
+            <div class="mt-4 flex gap-4">
+              <AppSkeleton class="h-4 w-20" />
+              <AppSkeleton class="h-4 w-20" />
+            </div>
+          </div>
+        </li>
+      </ul>
+
+      <ul v-else class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       <li v-for="workshop in workshops" :key="workshop.id">
         <NuxtLink
           :to="`/workshops/${workshop.id}`"
@@ -50,7 +70,7 @@
 </template>
 
 <script setup>
-const { workshops } = useWorkshops()
+const { workshops, pending } = useWorkshops()
 const { t } = useLang('web', 'home')
 
 const typeLabel = (type) => ({
@@ -59,5 +79,23 @@ const typeLabel = (type) => ({
   make_your_candle: t('type_make_candle', 'Make your candle', 'اصنع شمعتك'),
 }[type] ?? type)
 
-useSeoMeta({ title: () => t('workshops_title', 'Workshops', 'الورشات') })
+const { media: heroMedia } = useMedia('web', 'heroes')
+
+// A page with no picture of its own still gets a card, not a blank one.
+const fallbackCard = `${useSiteConfig().url}/og-default.png`
+
+useSeoMeta({
+  title: () => t('workshops_title', 'Workshops', 'الورشات'),
+  description: () => t('workshops_subtitle', 'Hands-on sessions with an instructor — shape or paint your piece step by step in the studio.', 'جلسات عملية بإشراف مدرّبين تصنع أو تلوّن قطعتك خطوة بخطوة داخل الاستوديو'),
+  ogImage: () => heroMedia('hero_workshops') ?? fallbackCard,
+})
+
+useSchemaOrg([
+  defineBreadcrumb({
+    itemListElement: [
+      { name: t('nav_home', 'Home', 'الرئيسية', { subGroup: 'general' }), item: '/' },
+      { name: t('nav_workshops', 'Workshops', 'الورشات', { subGroup: 'general' }), item: '/workshops' },
+    ],
+  }),
+])
 </script>

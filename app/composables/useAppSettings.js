@@ -23,5 +23,12 @@ export const useAppSettings = () => {
   const googlePlay = computed(() => blocks.value.google_play ?? [])
   const appGallery = computed(() => blocks.value.app_gallery ?? [])
 
-  return { blocks, social, contact, appStore, googlePlay, appGallery, pending, error, refresh }
+  /**
+   * The legal identifiers a Saudi storefront has to display: `{ cr_number, vat_number,
+   * business_center_url, vat_rate }`. The API returns only the fields that are filled in,
+   * so an empty object means the business is not registered and nothing should render.
+   */
+  const business = computed(() => blocks.value.business ?? {})
+
+  return { blocks, social, contact, appStore, googlePlay, appGallery, business, pending, error, refresh }
 }

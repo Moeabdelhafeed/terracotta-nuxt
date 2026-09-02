@@ -7,8 +7,9 @@
         </Button>
       </div>
 
-      <div v-if="pending" class="text-sm text-muted-foreground">
-        {{ t('loading', 'Loading...', 'جارٍ التحميل...') }}
+      <div v-if="pending" class="flex flex-col gap-3" aria-busy="true">
+        <AppSkeleton class="h-8 w-1/2" />
+        <AppSkeleton v-for="n in 6" :key="n" class="h-4" :class="n % 3 === 0 ? 'w-2/3' : 'w-full'" />
       </div>
 
       <div v-else-if="!page" class="flex flex-col items-center gap-3 py-16 text-center">
@@ -45,4 +46,20 @@ definePageMeta({ name: 'page' })
 const route = useRoute()
 const { t } = useLang()
 const { page, pending } = usePage(() => route.params.slug)
+
+// The CMS page's own content is HTML; the description is the first readable line of it.
+const summary = computed(() => String(page.value?.content ?? '')
+  .replace(/<[^>]*>/g, ' ')
+  .replace(/\s+/g, ' ')
+  .trim()
+  .slice(0, 160))
+
+// A page with no picture of its own still gets a card, not a blank one.
+const fallbackCard = `${useSiteConfig().url}/og-default.png`
+
+useSeoMeta({
+  title: () => page.value?.name ?? '',
+  description: () => summary.value,
+  ogImage: () => page.value?.image?.image_api ?? fallbackCard,
+})
 </script>

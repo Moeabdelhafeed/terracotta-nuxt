@@ -183,3 +183,47 @@
     background: color-mix(in oklch, var(--brand-terracotta) 85%, white);
   }
 }
+@layer components {
+  /* Placeholder blocks while a fetch is in flight. The sweep is a pseudo-element rather
+     than an animated background-position so it composites on the GPU and costs nothing
+     when a page shows two dozen of them at once. */
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background: color-mix(in oklch, var(--brand-mist) 70%, white);
+  }
+
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklch, white 65%, transparent),
+      transparent
+    );
+    animation: skeleton-shimmer 1.4s infinite;
+  }
+
+  /* RTL reads right-to-left, so the sweep travels that way too. */
+  [dir="rtl"] .skeleton::after {
+    animation-name: skeleton-shimmer-rtl;
+  }
+
+  @keyframes skeleton-shimmer {
+    100% { transform: translateX(100%); }
+  }
+
+  @keyframes skeleton-shimmer-rtl {
+    from { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+
+  /* A moving highlight is exactly what reduced-motion asks us to drop; the flat block
+     still reads as "loading". */
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton::after { animation: none; }
+  }
+}

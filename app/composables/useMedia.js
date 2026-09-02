@@ -2,6 +2,38 @@ const uploadingKeys = new Set()
 // Persists across renders so a missing key is only seeded once per (group:subGroup:key).
 const seededMedia = new Set()
 
+// ...and across reloads. The media list is cached (by the Nitro proxy in production, and
+// by the backend's own storage lag either way), so a page loaded moments after a seed can
+// still be told the key is missing — without this it uploads the same file again, and the
+// key's URL changes under the browser every time.
+const SEED_MEMORY = 'seeded-media'
+const SEED_TTL = 10 * 60 * 1000
+
+const seedMemory = () => {
+  if (!import.meta.client) return {}
+  try {
+    return JSON.parse(window.localStorage.getItem(SEED_MEMORY) ?? '{}')
+  } catch {
+    return {}
+  }
+}
+
+const seededRecently = (guardId) => {
+  const at = seedMemory()[guardId]
+  return typeof at === 'number' && Date.now() - at < SEED_TTL
+}
+
+const rememberSeed = (guardId) => {
+  if (!import.meta.client) return
+  try {
+    const memory = seedMemory()
+    memory[guardId] = Date.now()
+    window.localStorage.setItem(SEED_MEMORY, JSON.stringify(memory))
+  } catch {
+    // A browser refusing storage just means the in-memory guard has to do on its own.
+  }
+}
+
 /**
  * Dynamic storage client — keyed media (image/video/file) by group + sub_group + key.
  * Mirrors `useLang`: one fetch per group returns every asset nested by sub_group; each
@@ -47,8 +79,9 @@ export const useMedia = (group = 'web', subGroup = 'general') => {
    */
   const seedMedia = async (key, defaultPath, effectiveSubGroup) => {
     const guardId = `${group}:${effectiveSubGroup}:${key}`
-    if (seededMedia.has(guardId)) return
+    if (seededMedia.has(guardId) || seededRecently(guardId)) return
     seededMedia.add(guardId)
+    rememberSeed(guardId)
     try {
       const res = await fetch(defaultPath)
       if (!res.ok) throw new Error(`could not load ${defaultPath}`)

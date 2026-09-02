@@ -15,6 +15,7 @@
       anchor="offers"
     />
     <HomeGallery />
+    <HomeApp />
     <HomeVisit />
   </main>
 </template>
@@ -28,4 +29,15 @@ definePageMeta({
 
 const { featuredProducts, offers } = useHome()
 const { t } = useLang('web', 'home')
+const { media } = useMedia('web', 'heroes')
+
+// The front door had no meta of its own, so it inherited the bare site defaults.
+// A page with no picture of its own still gets a card, not a blank one.
+const fallbackCard = `${useSiteConfig().url}/og-default.png`
+
+useSeoMeta({
+  title: () => t('home_meta_title', 'Handmade pottery, workshops and pieces', 'فخار مصنوع يدويًا، ورشات وقطع'),
+  description: () => t('home_meta_description', 'A pottery studio in Amman: book a workshop, shape your own piece, and browse what our guests have made.', 'استوديو فخار في عمّان: احجز ورشة، اصنع قطعتك بيديك، وتصفح ما صنعه ضيوفنا.'),
+  ogImage: () => media('hero_shop') ?? fallbackCard,
+})
 </script>

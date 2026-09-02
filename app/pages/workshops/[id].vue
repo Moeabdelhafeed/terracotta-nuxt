@@ -1,10 +1,25 @@
 <template>
-  <main v-if="workshop">
+  <main v-if="pending && !workshop" class="mx-auto max-w-6xl px-6 py-16" aria-busy="true">
+    <div class="grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-start">
+      <div>
+        <AppSkeleton class="aspect-[16/10] w-full !rounded-3xl" />
+        <AppSkeleton class="mt-8 h-9 w-2/3" />
+        <AppSkeleton class="mt-4 h-5 w-full" />
+        <AppSkeleton class="mt-2 h-5 w-4/5" />
+      </div>
+
+      <div class="rounded-3xl border bg-card p-6">
+        <AppSkeleton v-for="n in 4" :key="n" class="mb-4 h-16 !rounded-2xl last:mb-0" />
+      </div>
+    </div>
+  </main>
+
+  <main v-else-if="workshop">
     <PageBar :crumbs="crumbs" />
 
     <div class="mx-auto max-w-6xl px-6 py-16">
       <div class="grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-start">
-        <div>
+        <div ref="content">
           <div class="relative aspect-[16/10] overflow-hidden rounded-3xl bg-brand-mist">
             <AppImage
               v-if="workshop.image?.image_api"
@@ -114,7 +129,9 @@
 
         <!-- Stays in view while the catalogue below scrolls past: the price, the length of
              a session and the seat count are what a visitor keeps referring back to. -->
-        <aside class="lg:sticky lg:top-8">
+        <!-- Pinned rather than `position: sticky`: ScrollSmoother transforms
+             #smooth-content, and a transformed ancestor makes sticky behave like static. -->
+        <aside ref="aside">
           <div class="rounded-3xl border bg-card p-6">
             <dl class="grid gap-px overflow-hidden rounded-2xl bg-border">
               <div v-for="fact in facts" :key="fact.label" class="bg-card px-6 py-5">
@@ -135,6 +152,12 @@
               </a>
             </Button>
           </div>
+
+          <AppDownloadCta
+            class="mt-4"
+            :title="t('book_in_app_title', 'Book this workshop in the app', 'احجز هذه الورشة من التطبيق')"
+            :note="t('book_in_app_note', 'Pick a date, choose your seats and pay in the Terracotta app — this site is for browsing.', 'اختر التاريخ والمقاعد وادفع عبر تطبيق تيراكوتا — هذا الموقع للتصفح فقط.')"
+          />
         </aside>
       </div>
     </div>
@@ -143,12 +166,26 @@
 
 <script setup>
 const route = useRoute()
-const { workshop } = useWorkshop(() => route.params.id)
+const { workshop, pending, error } = useWorkshop(() => route.params.id)
+
+// A record that does not exist, or a lookup that failed, hands over to the site's error
+// page — the markup's `v-if` would otherwise match nothing and leave a blank screen.
+watchEffect(() => {
+  if (!pending.value && (error.value || !workshop.value)) {
+    showError({ statusCode: error.value?.statusCode ?? 404, statusMessage: 'Workshop not found' })
+  }
+})
 const { t } = useLang('web', 'home')
 const { format } = usePrice()
 
+const content = ref(null)
+const aside = ref(null)
+
+useStickyAside(aside, content, workshop)
+
 const crumbs = computed(() => [
-  { to: '/workshops', label: t('nav_workshops', 'Workshops', 'الورشات') },
+  { to: '/', label: t('nav_home', 'Home', 'الرئيسية', { subGroup: 'general' }) },
+  { to: '/workshops', label: t('nav_workshops', 'Workshops', 'الورشات', { subGroup: 'general' }) },
   { label: workshop.value?.title ?? '' },
 ])
 
@@ -185,8 +222,29 @@ const facts = computed(() => {
   return rows
 })
 
+// A page with no picture of its own still gets a card, not a blank one.
+const fallbackCard = `${useSiteConfig().url}/og-default.png`
+
 useSeoMeta({
   title: () => workshop.value?.title ?? '',
   description: () => workshop.value?.short_description ?? '',
+  ogImage: () => workshop.value?.image?.image_api ?? fallbackCard,
 })
+
+// A workshop is something offered rather than something sold off a shelf, so Service
+// rather than Product — the price is the seat, and the studio is the provider.
+useSchemaOrg([
+  defineProduct({
+    '@type': 'Service',
+    name: () => workshop.value?.title ?? '',
+    description: () => workshop.value?.short_description ?? '',
+    image: () => workshop.value?.image?.image_api,
+    offers: () => (Number(workshop.value?.price) > 0
+      ? [{ price: Number(workshop.value.price), priceCurrency: 'SAR', availability: 'https://schema.org/InStock' }]
+      : []),
+  }),
+  defineBreadcrumb({
+    itemListElement: () => crumbs.value.map((crumb) => ({ name: crumb.label, item: crumb.to })),
+  }),
+])
 </script>

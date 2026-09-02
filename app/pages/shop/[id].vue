@@ -1,10 +1,35 @@
 <template>
-  <main v-if="product">
+  <!-- A client-side navigation lands here before the fetch resolves; the skeleton keeps
+       the page's shape instead of flashing an empty screen. -->
+  <main v-if="pending && !product" class="mx-auto max-w-6xl px-6 py-16" aria-busy="true">
+    <div class="grid gap-10 lg:grid-cols-2 lg:items-start">
+      <div>
+        <AppSkeleton class="aspect-square w-full !rounded-3xl" />
+        <div class="mt-3 flex gap-3">
+          <AppSkeleton v-for="n in 4" :key="n" class="size-20 !rounded-xl" />
+        </div>
+      </div>
+
+      <div class="rounded-3xl border bg-card p-6 sm:p-8">
+        <AppSkeleton class="h-4 w-32" />
+        <AppSkeleton class="mt-3 h-9 w-3/4" />
+        <AppSkeleton class="mt-5 h-8 w-32" />
+        <AppSkeleton class="mt-6 h-4 w-full" />
+        <AppSkeleton class="mt-2 h-4 w-5/6" />
+        <AppSkeleton class="mt-2 h-4 w-2/3" />
+        <div class="mt-8 grid gap-4 sm:grid-cols-3">
+          <AppSkeleton v-for="n in 3" :key="n" class="h-16 !rounded-2xl" />
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <main v-else-if="product">
     <PageBar :crumbs="crumbs" />
 
     <div class="mx-auto max-w-6xl px-6 py-16">
       <div class="grid gap-10 lg:grid-cols-2 lg:items-start">
-        <div>
+        <div ref="content">
           <div class="overflow-hidden rounded-3xl border bg-card">
             <AppImage v-if="active" :src="active" :alt="product.title" class="aspect-square w-full object-cover" />
           </div>
@@ -23,49 +48,56 @@
           </ul>
         </div>
 
-        <div>
-          <!-- The API sends these as plain localized strings, not objects. -->
-          <p v-if="product.category" class="text-sm uppercase tracking-[0.18em] text-muted-foreground">
-            {{ product.category }}<template v-if="product.sub_category"> · {{ product.sub_category }}</template>
-          </p>
+        <!-- Pinned rather than `position: sticky`: ScrollSmoother transforms
+             #smooth-content, and a transformed ancestor makes sticky behave like static. -->
+        <aside ref="aside">
+          <div class="rounded-3xl border bg-card p-6 sm:p-8">
+            <!-- The API sends these as plain localized strings, not objects. -->
+            <p v-if="product.category" class="text-sm uppercase tracking-[0.18em] text-muted-foreground">
+              {{ product.category }}<template v-if="product.sub_category"> · {{ product.sub_category }}</template>
+            </p>
 
-          <h1 class="mt-2 font-display text-3xl font-semibold sm:text-4xl">{{ product.title }}</h1>
+            <h1 class="mt-2 font-display text-3xl font-semibold sm:text-4xl">{{ product.title }}</h1>
 
-          <p class="mt-4 flex items-baseline gap-3">
-            <span class="font-display text-3xl font-black text-primary">{{ format(product.sale_price ?? product.price) }}</span>
-            <span v-if="product.sale_price" class="text-lg text-muted-foreground line-through">{{ format(product.price) }}</span>
-          </p>
+            <p class="mt-4 flex items-baseline gap-3">
+              <span class="font-display text-3xl font-black text-primary">{{ format(product.sale_price ?? product.price) }}</span>
+              <span v-if="product.sale_price" class="text-lg text-muted-foreground line-through">{{ format(product.price) }}</span>
+            </p>
 
-          <div
-            v-if="product.description"
-            class="prose prose-sm mt-6 max-w-none dark:prose-invert [&_li]:my-1 [&_p]:my-3 [&_ul]:list-disc [&_ul]:ps-6"
-            v-html="product.description"
+            <div
+              v-if="product.description"
+              class="prose prose-sm mt-6 max-w-none dark:prose-invert [&_li]:my-1 [&_p]:my-3 [&_ul]:list-disc [&_ul]:ps-6"
+              v-html="product.description"
+            />
+
+            <ul v-if="colours.length" class="mt-6 flex items-center gap-2">
+              <li v-for="colour in colours" :key="colour.hex" class="group/colour relative">
+                <span
+                  class="block size-7 rounded-full border transition-transform group-hover/colour:scale-110"
+                  :style="{ backgroundColor: colour.hex }"
+                  :aria-label="colour.name"
+                />
+                <span
+                  class="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-brand-ink px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover/colour:opacity-100"
+                >{{ colour.name }}</span>
+              </li>
+            </ul>
+
+            <dl v-if="dimensions.length" class="mt-8 grid gap-px overflow-hidden rounded-2xl bg-border sm:grid-cols-3">
+              <div v-for="dimension in dimensions" :key="dimension.label" class="bg-card px-5 py-4">
+                <dt class="text-xs uppercase tracking-[0.2em] text-muted-foreground">{{ dimension.label }}</dt>
+                <dd class="mt-1 font-display text-lg font-semibold">{{ dimension.value }}</dd>
+              </div>
+            </dl>
+
+          </div>
+
+          <AppDownloadCta
+            class="mt-4"
+            :title="t('buy_in_app_title', 'Buy this piece in the app', 'اشترِ هذه القطعة من التطبيق')"
+            :note="t('buy_in_app_note', 'Ordering, delivery and payment all happen in the Terracotta app — this site is for browsing.', 'الطلب والتوصيل والدفع تتم جميعها عبر تطبيق تيراكوتا — هذا الموقع للتصفح فقط.')"
           />
-
-          <ul v-if="colours.length" class="mt-6 flex items-center gap-2">
-            <li v-for="colour in colours" :key="colour.hex" class="group/colour relative">
-              <span
-                class="block size-7 rounded-full border transition-transform group-hover/colour:scale-110"
-                :style="{ backgroundColor: colour.hex }"
-                :aria-label="colour.name"
-              />
-              <span
-                class="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-brand-ink px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover/colour:opacity-100"
-              >{{ colour.name }}</span>
-            </li>
-          </ul>
-
-          <dl v-if="dimensions.length" class="mt-8 grid gap-px overflow-hidden rounded-2xl bg-border sm:grid-cols-3">
-            <div v-for="dimension in dimensions" :key="dimension.label" class="bg-card px-5 py-4">
-              <dt class="text-xs uppercase tracking-[0.2em] text-muted-foreground">{{ dimension.label }}</dt>
-              <dd class="mt-1 font-display text-lg font-semibold">{{ dimension.value }}</dd>
-            </div>
-          </dl>
-
-          <p class="mt-8 text-sm text-muted-foreground">
-            {{ t('visit_to_buy', 'Pieces are sold in the studio — come and see them in person.', 'تُباع القطع في الاستوديو — تعال وشاهدها على الطبيعة.') }}
-          </p>
-        </div>
+        </aside>
       </div>
 
       <section v-if="product.related_products?.length" class="mt-16">
@@ -82,12 +114,26 @@
 
 <script setup>
 const route = useRoute()
-const { product } = useProduct(() => route.params.id)
+const { product, pending, error } = useProduct(() => route.params.id)
+
+// A record that does not exist, or a lookup that failed, hands over to the site's error
+// page — the markup's `v-if` would otherwise match nothing and leave a blank screen.
+watchEffect(() => {
+  if (!pending.value && (error.value || !product.value)) {
+    showError({ statusCode: error.value?.statusCode ?? 404, statusMessage: 'Product not found' })
+  }
+})
 const { t } = useLang('web', 'home')
 const { format } = usePrice()
 
+const content = ref(null)
+const aside = ref(null)
+
+useStickyAside(aside, content, product)
+
 const crumbs = computed(() => [
-  { to: '/shop', label: t('nav_shop', 'Shop', 'المتجر') },
+  { to: '/', label: t('nav_home', 'Home', 'الرئيسية', { subGroup: 'general' }) },
+  { to: '/shop', label: t('nav_shop', 'Shop', 'المتجر', { subGroup: 'general' }) },
   ...(product.value?.category ? [{ label: product.value.category }] : []),
   { label: product.value?.title ?? '' },
 ])
@@ -165,6 +211,33 @@ const dimensions = computed(() => {
     { label: t('length', 'Length', 'الطول') , value: cm(p.length) },
   ].filter((row) => row.value)
 })
+// The API's description is HTML; meta tags and schema both want plain text.
+const stripTags = (html) => String(html ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
 
-useSeoMeta({ title: () => product.value?.title ?? '' })
+// A page with no picture of its own still gets a card, not a blank one.
+const fallbackCard = `${useSiteConfig().url}/og-default.png`
+
+useSeoMeta({
+  title: () => product.value?.title ?? '',
+  description: () => stripTags(product.value?.description) || t('shop_subtitle', 'Every piece is thrown, glazed and fired in our studio.', 'كل قطعة تُصنع وتُطلى وتُحرق في الاستوديو.'),
+  ogImage: () => product.value?.image?.image_api ?? fallbackCard,
+  ogType: 'product',
+})
+
+// The piece itself, as a shopping result: name, picture, price and whether it can be had.
+useSchemaOrg([
+  defineProduct({
+    name: () => product.value?.title ?? '',
+    description: () => stripTags(product.value?.description),
+    image: () => product.value?.image?.image_api,
+    offers: () => [{
+      price: Number(product.value?.sale_price ?? product.value?.price ?? 0),
+      priceCurrency: 'SAR',
+      availability: 'https://schema.org/InStock',
+    }],
+  }),
+  defineBreadcrumb({
+    itemListElement: () => crumbs.value.map((crumb) => ({ name: crumb.label, item: crumb.to })),
+  }),
+])
 </script>

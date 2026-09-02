@@ -33,16 +33,18 @@
         </div>
 
         <div class="grid flex-1 gap-10 sm:grid-cols-3 lg:max-w-2xl">
-          <nav v-if="pages.length" class="flex flex-col gap-3">
+          <!-- The site's own sections, the same set the bottom bar navigates. The CMS
+               pages are legal copy, so they sit in the bottom row instead. -->
+          <nav class="flex flex-col gap-3">
             <h2 class="text-xs uppercase tracking-[0.2em] text-white/50">
               {{ t('footer_pages', 'Pages', 'الصفحات') }}
             </h2>
             <NuxtLink
-              v-for="page in pages"
-              :key="page.id"
-              :to="`/${page.slug}`"
+              v-for="item in sections"
+              :key="item.to"
+              :to="item.to"
               class="text-sm text-white/85 transition-colors hover:text-white"
-            >{{ page.name }}</NuxtLink>
+            >{{ item.label }}</NuxtLink>
           </nav>
 
           <div v-if="contact.length" class="flex flex-col gap-3">
@@ -110,8 +112,42 @@
         </div>
       </div>
 
-      <div class="mt-16 flex flex-col gap-3 border-t border-white/15 pt-6 text-sm text-white/60 sm:flex-row sm:items-center sm:justify-between">
+      <!-- Saudi law requires a storefront trading there to display its commercial
+           registration and VAT numbers. The API omits whichever is not configured, so
+           outside Saudi — or before the business is registered — the row does not exist. -->
+      <div v-if="registration.length" class="mt-16 flex flex-wrap gap-3 border-t border-white/15 pt-8">
+        <component
+          :is="entry.url ? 'a' : 'div'"
+          v-for="entry in registration"
+          :key="entry.label"
+          :href="entry.url || undefined"
+          :target="entry.url ? '_blank' : undefined"
+          :rel="entry.url ? 'noopener noreferrer' : undefined"
+          class="flex items-center gap-3.5 rounded-xl bg-white/10 py-2.5 pe-5 ps-3.5 transition-colors"
+          :class="entry.url ? 'hover:bg-white/20' : ''"
+        >
+          <img :src="entry.icon" :alt="entry.label" draggable="false" class="h-12 w-auto shrink-0 object-contain" />
+          <span class="flex min-w-0 flex-col gap-0.5">
+            <span class="text-[11px] uppercase leading-none text-white/50">{{ entry.label }}</span>
+            <span class="text-sm font-semibold leading-tight text-white" dir="ltr">{{ entry.value }}</span>
+          </span>
+        </component>
+      </div>
+
+      <div class="mt-10 flex flex-col gap-3 border-t border-white/15 pt-6 text-sm text-white/60 sm:flex-row sm:items-center sm:justify-between">
         <p>&copy; {{ year }} {{ t('brand_name', 'Terracotta', 'تيراكوتا') }}</p>
+
+        <!-- Terms, privacy and the rest: CMS pages, kept close to the copyright line
+             where legal copy is looked for. -->
+        <nav v-if="pages.length" class="flex flex-wrap gap-x-4 gap-y-1">
+          <NuxtLink
+            v-for="page in pages"
+            :key="page.id"
+            :to="`/${page.slug}`"
+            class="underline-offset-4 transition-colors hover:text-white hover:underline"
+          >{{ page.name }}</NuxtLink>
+        </nav>
+
         <p>{{ t('footer_made', 'Handmade in Amman', 'مصنوع يدويًا في عمّان') }}</p>
       </div>
     </div>
@@ -119,10 +155,37 @@
 </template>
 
 <script setup>
-const { social, contact, appStore, googlePlay, appGallery } = useAppSettings()
+const { social, contact, appStore, googlePlay, appGallery, business } = useAppSettings()
+
+// The commercial-registration entry carries the Business Center link when the CMS has one,
+// since that is the page the number is verified on.
+const registration = computed(() => [
+  business.value.cr_number && {
+    label: t('footer_cr_number', 'Commercial registration', 'السجل التجاري'),
+    value: business.value.cr_number,
+    url: business.value.business_center_url,
+    icon: '/reg.png',
+  },
+  business.value.vat_number && {
+    label: t('footer_vat_number', 'VAT number', 'الرقم الضريبي'),
+    value: business.value.vat_number,
+    url: null,
+    icon: '/vat.png',
+  },
+].filter(Boolean))
+
 const { pages } = usePages()
 const { mediaAsset } = useMedia('web', 'branding')
 const { t } = useLang('web', 'general')
+
+// Same destinations, and the same translation keys, as the floating bottom bar.
+const sections = computed(() => [
+  { to: '/', label: t('nav_home', 'Home', 'الرئيسية') },
+  { to: '/workshops', label: t('nav_workshops', 'Workshops', 'الورشات') },
+  { to: '/shop', label: t('nav_shop', 'Shop', 'المتجر') },
+  { to: '/gallery', label: t('nav_gallery', 'Gallery', 'المعرض') },
+  { to: '/about', label: t('nav_about', 'About', 'عن تيراكوتا') },
+])
 
 const storeBadges = computed(() => [
   ...appStore.value.map((i) => ({ ...i, block: 'app_store' })),

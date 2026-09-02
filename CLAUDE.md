@@ -215,6 +215,39 @@ The backend now allows disabling **both** `app_users` and `app_guests` — a pur
 
 When adding auth-gated pages/UI, gate on `appUsers`/`appGuests` (or `hasAuthSystem`) so the no-auth-system build stays coherent.
 
+## Provisioning a fresh backend
+
+Point `NUXT_API_BASE_URL` at an empty install and the site fills it in as pages are
+loaded — no fixtures, no manual uploads.
+
+**Translations** seed themselves: `t('key', 'English', 'العربية')` posts the key to
+`/api/translations` once per locale the first time it renders missing. Every string on the
+site carries its defaults, so browsing the pages creates the whole `web` group.
+
+**Dynamic storage** seeds the same way, but only where the call names a `/public` file to
+upload — `mediaAsset(key, defaultPath)`. Every call site does; the seeds live in
+[public/seed/](public/seed/) and [public/](public/):
+
+| Key | Seed file |
+|---|---|
+| `web/branding/logo`, `logo_light`, `logo_mark` | `/logo.png`, `/logo-light.png`, `/logo-mark.png` |
+| `web/heroes/hero_shop`, `hero_gallery`, `hero_workshops` | `/seed/hero-*.webp`, passed as `PageHero`'s `fallback` |
+| `web/studio/studio_1…4` | `/seed/studio-N.webp` |
+| `web/home/hero_video` | `/seed/hero-video.mp4` |
+| `web/app/app_screen_1`, `app_screen_2` | `/app-screen-N.png` |
+
+Adding a key means adding its seed file, or it can never provision itself — a
+`mediaAsset(key)` with no default renders nothing on a backend that has never seen it.
+
+**Both seeders are client-side and write-gated.** They fire from the browser, so a page
+has to actually be visited, and they post to endpoints the backend only exposes when
+`IS_TESTING=true`. A production install with writes closed will not provision itself:
+either open them for the first pass, or seed against dev and copy the rows over.
+
+**Watch the locale on a fronted host.** Seeds post with a forced `Accept-Language`, and a
+CDN that rewrites that header (Hostinger does) files them under the wrong locale. Seed
+from local against the target API rather than through the deployed site.
+
 ## Env vars
 
 `.env` is gitignored. Required (or defaults exist in `runtimeConfig.public`):

@@ -107,7 +107,22 @@ export default defineNuxtConfig({
   },
 
   seo: {
-    automaticDefaults: false
+    // The module's own defaults (canonical, og:url, title template fallbacks) are wanted;
+    // app.vue sets the site-wide values and each page overrides what it knows better.
+    automaticDefaults: true,
+  },
+
+  robots: {
+    // Nothing behind a login, and nothing addressed to one person, belongs in an index.
+    // A gift link in particular is an entitlement: it must never become findable.
+    disallow: ['/login', '/register', '/verify', '/verify-login', '/forgot-password', '/profile', '/devices', '/gift/'],
+  },
+
+  sitemap: {
+    exclude: ['/login', '/register', '/verify', '/verify-login', '/forgot-password/**', '/profile', '/devices', '/gift/**'],
+    // Products, workshops, albums and CMS pages are only known at runtime — see
+    // server/api/_sitemap-urls.get.js.
+    sources: ['/api/_sitemap-urls'],
   },
 
 

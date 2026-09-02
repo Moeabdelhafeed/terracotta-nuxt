@@ -226,9 +226,14 @@ const STUDIO_KEYS = ['studio_1', 'studio_2', 'studio_3', 'studio_4']
 // Top-left and bottom-right: the two that overhang the grid.
 const TALL_TILES = [0, 3]
 
+// Each key carries the /public file it seeds itself from, so a backend with nothing
+// uploaded fills in on the first render instead of dropping the grid.
 const studioTiles = computed(() =>
   STUDIO_KEYS
-    .map((key) => ({ key, asset: mediaAsset(key, { subGroup: 'studio' }) }))
+    .map((key, index) => ({
+      key,
+      asset: mediaAsset(key, `/seed/studio-${index + 1}.webp`, { subGroup: 'studio' }),
+    }))
     .filter((tile) => tile.asset),
 )
 
@@ -237,7 +242,7 @@ const rest = computed(() => banners.value.slice(1, 6))
 
 
 const heroVideo = computed(() => {
-  const asset = mediaAsset('hero_video')
+  const asset = mediaAsset('hero_video', '/seed/hero-video.mp4')
   return asset?.type === 'video' && asset.video?.video_api ? asset : null
 })
 </script>

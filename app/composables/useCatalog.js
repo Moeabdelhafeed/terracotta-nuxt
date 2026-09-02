@@ -7,12 +7,19 @@
 const localeKeys = () => [useCookie('lang'), useCookie('i18n_locale')]
 
 export const useWorkshop = (id) => {
-  const { data, pending, error } = useApiFetch(() => `/api/workshops/${toValue(id)}`, {
+  const request = useApiFetch(() => `/api/workshops/${toValue(id)}`, {
     key: () => `workshop-${toValue(id)}`,
+    // Client-side only: a click navigates at once and the page shows its skeleton rather
+    // than freezing on the previous screen. On the server it still blocks, so the render
+    // knows whether the record exists — a lazy SSR fetch resolves after the component has
+    // already rendered, and Vue does not flush watchers there to catch up.
+    lazy: import.meta.client,
     transform: (res) => res?.data ?? null,
     default: () => null,
     watch: [() => toValue(id), ...localeKeys()],
   })
+
+  const { data, pending, error } = request
 
   return { workshop: computed(() => data.value), pending, error }
 }
@@ -65,23 +72,37 @@ export const useProducts = (query = {}) => {
 }
 
 export const useProduct = (id) => {
-  const { data, pending, error } = useApiFetch(() => `/api/shop/products/${toValue(id)}`, {
+  const request = useApiFetch(() => `/api/shop/products/${toValue(id)}`, {
     key: () => `product-${toValue(id)}`,
+    // Client-side only: a click navigates at once and the page shows its skeleton rather
+    // than freezing on the previous screen. On the server it still blocks, so the render
+    // knows whether the record exists — a lazy SSR fetch resolves after the component has
+    // already rendered, and Vue does not flush watchers there to catch up.
+    lazy: import.meta.client,
     transform: (res) => res?.data ?? null,
     default: () => null,
     watch: [() => toValue(id), ...localeKeys()],
   })
+
+  const { data, pending, error } = request
 
   return { product: computed(() => data.value), pending, error }
 }
 
 export const useGalleryCategory = (id) => {
-  const { data, pending, error } = useApiFetch(() => `/api/gallery/${toValue(id)}`, {
+  const request = useApiFetch(() => `/api/gallery/${toValue(id)}`, {
     key: () => `gallery-${toValue(id)}`,
+    // Client-side only: a click navigates at once and the page shows its skeleton rather
+    // than freezing on the previous screen. On the server it still blocks, so the render
+    // knows whether the record exists — a lazy SSR fetch resolves after the component has
+    // already rendered, and Vue does not flush watchers there to catch up.
+    lazy: import.meta.client,
     transform: (res) => res?.data ?? null,
     default: () => null,
     watch: [() => toValue(id), ...localeKeys()],
   })
+
+  const { data, pending, error } = request
 
   return { category: computed(() => data.value), pending, error }
 }

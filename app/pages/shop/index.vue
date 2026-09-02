@@ -2,6 +2,11 @@
   <main>
     <PageHero
       media-key="hero_shop"
+      fallback="/seed/hero-shop.webp"
+      :crumbs="[
+        { to: '/', label: t('nav_home', 'Home', 'الرئيسية', { subGroup: 'general' }) },
+        { label: t('nav_shop', 'Shop', 'المتجر', { subGroup: 'general' }) },
+      ]"
       :title="t('shop_title', 'The shop', 'المتجر')"
       :subtitle="t('shop_subtitle', 'Every piece is thrown, glazed and fired in our studio.', 'كل قطعة تُصنع وتُطلى وتُحرق في الاستوديو.')"
     />
@@ -103,13 +108,20 @@
       >{{ t('clear_filters', 'Clear', 'مسح') }}</Button>
     </div>
 
-    <ul v-if="products.length" class="grid grid-cols-2 gap-5 lg:grid-cols-4">
+    <!-- Skeletons hold the grid's shape while a filter or a page change is in flight, so
+         the layout does not collapse and jump back. -->
+    <ul v-if="pending" class="grid grid-cols-2 gap-5 lg:grid-cols-4" aria-busy="true">
+      <li v-for="n in PER_PAGE" :key="n">
+        <ProductCardSkeleton />
+      </li>
+    </ul>
+
+    <ul v-else-if="products.length" class="grid grid-cols-2 gap-5 lg:grid-cols-4">
       <li v-for="product in products" :key="product.id">
         <ProductCard :product="product" />
       </li>
     </ul>
 
-    <p v-else-if="pending" class="text-muted-foreground">{{ t('loading', 'Loading…', 'جارٍ التحميل…') }}</p>
     <p v-else class="text-muted-foreground">{{ t('nothing_here', 'Nothing here yet.', 'لا يوجد شيء بعد.') }}</p>
 
     <!-- Real links, so a page is shareable and crawlable rather than a click handler. -->
@@ -228,5 +240,23 @@ watch(currentPage, async () => {
   ScrollSmoother.get?.()?.scrollTo(0, true)
 })
 
-useSeoMeta({ title: () => t('shop_title', 'The shop', 'المتجر') })
+const { media: heroMedia } = useMedia('web', 'heroes')
+
+// A page with no picture of its own still gets a card, not a blank one.
+const fallbackCard = `${useSiteConfig().url}/og-default.png`
+
+useSeoMeta({
+  title: () => t('shop_title', 'The shop', 'المتجر'),
+  description: () => t('shop_subtitle', 'Every piece is thrown, glazed and fired in our studio.', 'كل قطعة تُصنع وتُطلى وتُحرق في الاستوديو.'),
+  ogImage: () => heroMedia('hero_shop') ?? fallbackCard,
+})
+
+useSchemaOrg([
+  defineBreadcrumb({
+    itemListElement: [
+      { name: t('nav_home', 'Home', 'الرئيسية', { subGroup: 'general' }), item: '/' },
+      { name: t('nav_shop', 'Shop', 'المتجر', { subGroup: 'general' }), item: '/shop' },
+    ],
+  }),
+])
 </script>
