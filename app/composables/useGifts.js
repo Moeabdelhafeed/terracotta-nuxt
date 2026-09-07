@@ -25,8 +25,18 @@ export const useGifts = () => {
   // Unknown until the call lands: `false` before then would flash the "gifting is off" state.
   const packageActive = computed(() => giftPackage.value?.is_active !== false)
 
-  /** Buyer's own gifts, newest first. Paginated only when `per_page` is sent. */
-  const list = (query = {}) => useApiList('/api/gifts', { key: 'gifts', query })
+  /**
+   * Buyer's own gifts, newest first. Paginated only when `per_page` is sent.
+   *
+   * The key carries the page: the list screen asks for one page and the detail screen
+   * asks for all of them, and a shared key would hand whichever mounted first — data and
+   * refresh handler alike — to the other. That is how buying a gift from page two ended
+   * on "gift not found".
+   */
+  const list = (query = {}) => useApiList('/api/gifts', {
+    key: () => `gifts-${toValue(query.per_page) ?? 'all'}-${toValue(query.page) ?? 1}`,
+    query,
+  })
 
   const quote = (body) => api('/api/gifts/quote', { method: 'POST', body })
   const create = (body) => api('/api/gifts', { method: 'POST', body })

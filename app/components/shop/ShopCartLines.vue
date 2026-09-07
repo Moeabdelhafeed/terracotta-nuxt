@@ -8,7 +8,13 @@
       :data-line="line.id"
     >
       <div class="flex gap-4" :class="{ 'opacity-60': line.in_stock === false }">
-        <NuxtLink :to="`/shop/${line.product?.id}`" class="block size-24 shrink-0 overflow-hidden rounded-xl border bg-brand-mist sm:size-28">
+        <!-- An order line outlives its product: the row stays, but it must not become a
+             link to `/shop/undefined`. -->
+        <component
+          :is="line.product ? NuxtLink : 'span'"
+          :to="line.product ? `/shop/${line.product.id}` : undefined"
+          class="block size-24 shrink-0 overflow-hidden rounded-xl border bg-brand-mist sm:size-28"
+        >
           <AppImage
             v-if="line.product?.image?.image_api"
             :src="line.product.image"
@@ -16,14 +22,20 @@
             class="size-full object-cover"
             :class="{ grayscale: line.in_stock === false }"
           />
-        </NuxtLink>
+          <span v-else class="flex size-full items-center justify-center text-muted-foreground"><LucidePackage class="size-6" /></span>
+        </component>
 
         <div class="flex min-w-0 flex-1 flex-col gap-2">
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
-              <NuxtLink :to="`/shop/${line.product?.id}`" class="block truncate font-medium text-foreground hover:underline">
+              <component
+                :is="line.product ? NuxtLink : 'span'"
+                :to="line.product ? `/shop/${line.product.id}` : undefined"
+                class="block truncate font-medium text-foreground"
+                :class="{ 'hover:underline': line.product }"
+              >
                 {{ line.product?.title ?? t('product_unavailable', 'Product no longer available', 'المنتج لم يعد متاحًا') }}
-              </NuxtLink>
+              </component>
               <p class="mt-1 flex items-baseline gap-2">
                 <span class="font-display text-lg font-black text-primary">{{ format(line.unit_price) }}</span>
                 <span v-if="line.product?.sale_price" class="text-sm text-muted-foreground line-through">{{ format(line.product.price) }}</span>
@@ -71,6 +83,8 @@
  * The basket's lines with their steppers. A line that can no longer be fulfilled stays on
  * screen, greyed and explained — hiding it would hide the reason checkout is blocked.
  */
+import { NuxtLink } from '#components'
+
 const { t } = useLang('web', 'shop')
 const { format } = usePrice()
 const { items, update, remove } = useCart()

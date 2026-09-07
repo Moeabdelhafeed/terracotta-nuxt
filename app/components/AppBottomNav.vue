@@ -55,12 +55,11 @@
 const route = useRoute()
 const { t } = useLang('web', 'general')
 const { appUsers } = useAuthConfig()
-const { user, isAuthenticated } = useSanctumAuth()
 
-// Everyone gets a guest identity automatically, so `isAuthenticated` alone is not "has an
-// account" — check `is_guest` too, or a browsing guest would see "Profile" and land on a
-// page gated to registered users only.
-const isRegistered = computed(() => isAuthenticated.value && !user.value?.data?.is_guest)
+// Everyone gets a guest identity automatically, so being authenticated is not "has an
+// account" — a browsing guest would otherwise see "Profile" and land on a page gated to
+// registered users only.
+const { isRegistered } = useIsRegistered()
 
 // The cart only exists for a registered account, so the badge rides on the same guard.
 const { count: cartCount } = useCart()

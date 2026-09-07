@@ -36,6 +36,13 @@
         <AppSkeleton v-for="n in 6" :key="n" class="h-24 w-24 shrink-0 !rounded-2xl" />
       </div>
 
+      <div v-else-if="loadError" class="mt-4 flex flex-col items-start gap-3 rounded-2xl border border-destructive/30 p-4">
+        <p class="text-sm text-destructive" data-test="availability-error">{{ loadError }}</p>
+        <Button type="button" size="sm" variant="outline" class="rounded-full" @click="reload">
+          {{ t('try_again', 'Try again', 'حاول مرة أخرى') }}
+        </Button>
+      </div>
+
       <ul v-else class="mt-4 flex gap-3 overflow-x-auto pb-2" data-test="date-strip">
         <li v-for="day in days" :key="day.ymd" class="shrink-0">
           <button
@@ -123,6 +130,7 @@ const blocked = ref([])
 const slots = ref([])
 const loadingCalendar = ref(true)
 const loadingSlots = ref(false)
+const loadError = ref('')
 
 const peopleCap = computed(() => Math.min(props.workshop.max_people_per_booking ?? 1, maxSeats.value))
 const peopleOptions = computed(() => Array.from({ length: Math.max(peopleCap.value, 1) }, (_, i) => i + 1))
@@ -135,10 +143,17 @@ const days = computed(() => dateRange(todayInStudio(), props.days).map((ymd) => 
 
 const loadCalendar = async () => {
   loadingCalendar.value = true
+  loadError.value = ''
   try {
     const data = await availability.calendar({ people_count: people.value, days: props.days })
     maxSeats.value = data.max_available_seats ?? 0
     blocked.value = data.blocked_dates ?? []
+  } catch (err) {
+    // Without this the strip just renders empty, which reads as "no dates" rather than
+    // "we could not ask".
+    loadError.value = normalizeApiError(err).message
+      || t('availability_failed', 'Could not load available dates. Please try again.', 'تعذّر تحميل المواعيد المتاحة. حاول مرة أخرى.')
+    return
   } finally {
     loadingCalendar.value = false
   }
@@ -163,16 +178,23 @@ watch([slotId, slots], () => {
   slot.value = slots.value.find((candidate) => candidate.workshop_slot_id === slotId.value) ?? null
 })
 
+// `loadCalendar` picks the first open date, and that assignment is what triggers the slot
+// fetch — calling `loadSlots` alongside it would put two identical requests in flight and
+// let the loser answer last. The one case the watcher misses is the date surviving a
+// party-size change unchanged, so reload it explicitly then.
 watch(people, async () => {
+  const previous = date.value
   await loadCalendar()
-  await loadSlots()
+  if (date.value === previous) await loadSlots()
 })
 watch(date, loadSlots)
 
-onMounted(async () => {
+const reload = async () => {
   await loadCalendar()
-  await loadSlots()
-})
+  if (!date.value) slots.value = []
+}
+
+onMounted(reload)
 
 // The create call checks capacity under a row lock, so a 422 means the day changed under
 // us — the page re-renders the real slots instead of showing a toast.

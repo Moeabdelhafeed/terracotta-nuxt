@@ -196,12 +196,11 @@ const notFound = computed(() => error.value?.statusCode === 404)
  * `deep_link` stays unused: the app does not register the scheme yet, so tapping it would
  * raise "cannot open page". The store links below are the way to the app.
  */
-const { user } = useSanctumAuth()
 const { redeem } = useGifts()
 
 // A guest session is an anonymous device, not an account with a ledger — it cannot hold
 // wallet credit, so it is sent through sign-in like a visitor with no session at all.
-const canRedeem = computed(() => !!user.value && user.value?.data?.is_guest !== true)
+const { isRegistered: canRedeem } = useIsRegistered()
 
 const redeeming = ref(false)
 const redeemError = ref('')
