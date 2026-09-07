@@ -119,11 +119,19 @@ export default defineNuxtConfig({
   robots: {
     // Nothing behind a login, and nothing addressed to one person, belongs in an index.
     // A gift link in particular is an entitlement: it must never become findable.
-    disallow: ['/login', '/register', '/verify', '/verify-login', '/forgot-password', '/profile', '/devices', '/gift/'],
+    disallow: [
+      '/login', '/register', '/verify', '/verify-login', '/forgot-password', '/profile', '/devices', '/gift/',
+      '/wallet', '/my-gallery', '/bookings', '/cart', '/checkout', '/orders', '/favorites', '/addresses',
+      '/notifications', '/gifts', '/workshops/*/book',
+    ],
   },
 
   sitemap: {
-    exclude: ['/login', '/register', '/verify', '/verify-login', '/forgot-password/**', '/profile', '/devices', '/gift/**'],
+    exclude: [
+      '/login', '/register', '/verify', '/verify-login', '/forgot-password/**', '/profile', '/devices', '/gift/**',
+      '/wallet', '/my-gallery', '/bookings/**', '/cart', '/checkout', '/orders/**', '/favorites', '/addresses',
+      '/notifications', '/gifts/**', '/workshops/*/book',
+    ],
     // Products, workshops, albums and CMS pages are only known at runtime — see
     // server/api/_sitemap-urls.get.js.
     sources: ['/api/_sitemap-urls'],
