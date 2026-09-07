@@ -20,6 +20,7 @@
       </div>
 
       <AppBottomNav />
+      <AppToaster />
     </Body>
   </Html>
 </template>

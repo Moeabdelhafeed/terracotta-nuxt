@@ -1,0 +1,18 @@
+<template>
+  <!-- Route stub: replaced by the domain builder. Keeps the path reserved so links resolve. -->
+  <main class="min-h-svh bg-background pb-28">
+    <div class="mx-auto max-w-6xl px-6 py-16">
+      <h1 class="font-display text-3xl font-semibold sm:text-4xl">{{ t('complaints_title', 'Complaints', 'الشكاوى') }}</h1>
+      <p class="mt-3 text-muted-foreground">{{ t('coming_soon', 'Coming soon.', 'قريبًا.') }}</p>
+    </div>
+  </main>
+</template>
+
+<script setup>
+definePageMeta({
+  middleware: [],
+  name: 'complaints',
+})
+
+const { t } = useLang('web', 'general')
+</script>

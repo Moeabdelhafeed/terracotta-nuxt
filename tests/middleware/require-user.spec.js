@@ -30,7 +30,13 @@ beforeEach(() => {
 })
 
 describe('require-user', () => {
-  it('anon → redirect /login', async () => {
+  it('anon with guests enabled → pass (a guest identity is minted client-side)', async () => {
+    await middleware()
+    expect(navigateTo).not.toHaveBeenCalled()
+  })
+
+  it('anon with guests disabled → redirect /login', async () => {
+    authConfig.appGuests.value = false
     await middleware()
     expect(navigateTo).toHaveBeenCalledWith({ name: 'login' })
   })
