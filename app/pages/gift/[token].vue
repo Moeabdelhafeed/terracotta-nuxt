@@ -60,31 +60,54 @@
 
         <div class="my-8 h-px bg-border" />
 
+        <!-- Just claimed, by this visitor. Shown before the "already claimed" branch on
+             purpose: the API now says the gift is spent, and telling the person who spent
+             it that somebody else got there first would be a lie. -->
+        <div v-if="credited" class="flex flex-col gap-4">
+          <p class="rounded-2xl bg-brand-green/10 px-4 py-4 text-sm font-medium text-brand-green">
+            {{ t('gift_redeem_done', ':amount has been added to your wallet.', 'تمت إضافة :amount إلى محفظتك.', { amount: format(credited.amount) }) }}
+          </p>
+          <p class="font-display text-3xl font-black text-foreground">{{ format(credited.wallet_balance) }}</p>
+          <p class="text-xs text-muted-foreground">{{ t('gift_wallet_balance', 'Your wallet balance', 'رصيد محفظتك') }}</p>
+          <Button as-child size="lg" class="h-14 w-full rounded-2xl bg-[#FC8B8B] text-base text-white hover:bg-[#fb7a7a]">
+            <NuxtLink to="/wallet">{{ t('gift_go_wallet', 'Go to my wallet', 'الذهاب إلى محفظتي') }}</NuxtLink>
+          </Button>
+        </div>
+
         <!-- Claimed: say so plainly and drop the buttons. Who claimed it is not in the
              response, deliberately. -->
         <p
-          v-if="!gift.is_claimable"
+          v-else-if="!gift.is_claimable"
           class="rounded-2xl bg-brand-mist px-4 py-4 text-sm font-medium text-brand-rust"
         >
           {{ t('gift_claimed', 'This gift has already been claimed.', 'تم استلام هذه الهدية بالفعل.') }}
         </p>
 
         <template v-else>
-          <!--
-            Points at the store, not at `deep_link`: the app does not handle the scheme
-            yet, and a button that opens an error dialog is worse than one that installs
-            the thing it needs. Swap `redeemHref` back to the deep link once it works.
-          -->
+          <!-- The credit lands in a wallet, so there has to be a wallet: a signed-in
+               registered account. A guest session has no ledger of its own. -->
           <Button
-            v-if="redeemHref"
-            as-child
+            v-if="canRedeem"
             size="lg"
             class="h-14 w-full rounded-2xl bg-[#FC8B8B] text-base text-white hover:bg-[#fb7a7a]"
+            :disabled="redeeming"
+            @click="claim"
           >
-            <a :href="redeemHref" target="_blank" rel="noopener noreferrer">
-              {{ t('gift_redeem', 'Redeem your gift', 'استرد هديتك') }}
-            </a>
+            {{ redeeming ? t('please_wait', 'Please wait...', 'يرجى الانتظار...') : t('gift_redeem', 'Claim your gift', 'استلام الهدية') }}
           </Button>
+
+          <Button
+            v-else
+            size="lg"
+            class="h-14 w-full rounded-2xl bg-[#FC8B8B] text-base text-white hover:bg-[#fb7a7a]"
+            @click="goSignIn"
+          >
+            {{ t('gift_redeem_sign_in', 'Sign in to claim your gift', 'سجّل الدخول لاستلام الهدية') }}
+          </Button>
+
+          <!-- The server's own words: it is the only thing that knows whether this gift is
+               already spent, unpaid, or the buyer's own. -->
+          <p v-if="redeemError" class="mt-4 text-sm text-destructive">{{ redeemError }}</p>
 
           <div v-if="gift.store_links?.length" class="mt-6">
             <p class="text-xs text-muted-foreground">
@@ -166,19 +189,58 @@ const { data: gift, error, refresh } = await useFetch(() => `/api/gift/${route.p
 const notFound = computed(() => error.value?.statusCode === 404)
 
 /**
- * Where "redeem" sends someone. The gift is claimed in the app, so on a phone that means
- * the right store for that phone; anywhere else, whichever store the CMS lists first.
+ * Claiming. The face amount lands in the redeemer's wallet — not what the buyer paid,
+ * which this page never sees — and it happens exactly once, so the button is disabled for
+ * the duration of the call and the server is the authority on every refusal.
  *
- * `deep_link` is deliberately unused for now — the app does not register the scheme yet,
- * so tapping it would raise "cannot open page" and the recipient would be stuck.
+ * `deep_link` stays unused: the app does not register the scheme yet, so tapping it would
+ * raise "cannot open page". The store links below are the way to the app.
  */
-const { platform } = useDevice()
+const { user } = useSanctumAuth()
+const { redeem } = useGifts()
 
-const redeemHref = computed(() => {
-  const links = gift.value?.store_links ?? []
-  const wanted = { ios: 'app_store', android: 'google_play' }[platform.value]
+// A guest session is an anonymous device, not an account with a ledger — it cannot hold
+// wallet credit, so it is sent through sign-in like a visitor with no session at all.
+const canRedeem = computed(() => !!user.value && user.value?.data?.is_guest !== true)
 
-  return (wanted && links.find((link) => link.type === wanted)?.url) ?? links[0]?.url ?? null
+const redeeming = ref(false)
+const redeemError = ref('')
+const credited = ref(null)
+
+const claim = async () => {
+  if (redeeming.value) return
+  redeeming.value = true
+  redeemError.value = ''
+  try {
+    const res = await redeem(route.params.token)
+    credited.value = res?.data ?? null
+    celebrate.value = true
+  } catch (err) {
+    const normalized = normalizeApiError(err)
+    // `errors.gift` carries all four refusals — already redeemed, not paid, your own
+    // gift, gifting switched off — already localized.
+    redeemError.value = fieldError(normalized, 'gift') || normalized.message
+    // Someone else may have claimed it in the meantime; let the server's fresh answer
+    // redraw the page rather than leaving a live-looking button under the error.
+    await refresh()
+  } finally {
+    redeeming.value = false
+  }
+}
+
+/**
+ * Login has no `redirect` of its own — it lands on the home page — so the intent is
+ * parked in `sessionStorage` against this exact token and picked up the next time this
+ * same link is opened with a session. The `redirect` query is sent anyway, so it starts
+ * working the day login honours it.
+ */
+const goSignIn = () => {
+  rememberPendingGift(route.params.token)
+  return navigateTo({ path: '/login', query: { redirect: `/gift/${route.params.token}` } })
+}
+
+onMounted(() => {
+  if (canRedeem.value && gift.value?.is_claimable && takePendingGift(route.params.token)) claim()
 })
 
 const storeLabel = (type) => ({
