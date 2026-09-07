@@ -40,10 +40,7 @@
             >
               <h2 class="font-display text-xl font-semibold drop-shadow-sm sm:text-2xl">{{ category.title }}</h2>
               <p class="text-sm text-white/90 drop-shadow-sm">
-                {{ t('gallery_counts', ':images photos · :videos videos', ':images صورة · :videos فيديو', {
-                  images: category.images_count,
-                  videos: category.videos_count,
-                }) }}
+                {{ galleryCounts(category, t) }}
               </p>
             </div>
           </NuxtLink>

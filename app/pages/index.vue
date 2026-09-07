@@ -2,8 +2,11 @@
   <main>
     <HomeSplash />
     <HomeHero />
+    <HomeIntro />
+    <HomeBooking />
     <HomeWorkshops />
     <HomeCategories />
+    <HomeBanners />
     <HomeProductGrid
       :products="featuredProducts"
       :title="t('featured_pieces', 'Featured pieces', 'القطع المميزة')"
