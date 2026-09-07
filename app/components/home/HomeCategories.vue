@@ -18,14 +18,14 @@
       >
         <li v-for="category in categories" :key="category.id">
           <NuxtLink :to="`/shop?category=${category.id}`" class="group block text-center">
-            <!-- Category cut-outs arrive as transparent PNGs, so the disc is the colour
-                 and the piece sits centred inside it rather than filling it. -->
-            <div class="flex aspect-square items-center justify-center overflow-hidden rounded-full bg-brand-terracotta p-6">
+            <!-- A real photo per category, uploaded whole — it fills the circle rather
+                 than sitting on a colour disc. -->
+            <div class="aspect-square overflow-hidden rounded-full bg-brand-mist">
               <AppImage
                 v-if="category.image?.image_api"
                 :src="category.image"
                 :alt="category.title"
-                class="size-full object-contain transition-transform duration-500 group-hover:scale-110"
+                class="size-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
             </div>
             <p class="mt-3 text-sm font-medium text-brand-rust">{{ category.title }}</p>

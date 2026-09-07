@@ -1,65 +1,73 @@
 <template>
-  <div class="flex min-h-svh items-center justify-center bg-muted/40 p-6">
-    <Card class="w-full max-w-sm">
-      <CardHeader>
-        <CardTitle class="text-2xl">{{ t('forgot_password_title', 'Forgot password', 'نسيت كلمة المرور') }}</CardTitle>
-        <CardDescription>{{ t('forgot_password_description', 'Enter your identifier to receive an OTP.', 'أدخل المعرّف لتلقي الرمز.') }}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form class="flex flex-col gap-4" @submit.prevent="onSubmit">
-          <div v-if="identifierTypes.length > 1" class="flex gap-2">
-            <Button
-              v-for="kind in identifierTypes"
-              :key="kind"
-              type="button"
-              size="sm"
-              :variant="form.type === kind ? 'default' : 'outline'"
-              @click="form.type = kind"
-            >{{ labelFor(kind) }}</Button>
-          </div>
+  <AuthScreen
+    back="/login"
+    :title="t('forgot_password_title', 'Enter your phone number', 'أدخل رقم هاتفك')"
+    :subtitle="t('forgot_password_description', 'We will send a code to it to reset your password.', 'سنرسل لك رمزًا عليه لإعادة تعيين كلمة المرور.')"
+  >
+    <form class="flex flex-col gap-5" @submit.prevent="onSubmit">
+      <div v-if="identifierTypes.length > 1" class="flex gap-2">
+        <Button
+          v-for="kind in identifierTypes"
+          :key="kind"
+          type="button"
+          size="sm"
+          class="rounded-full"
+          :variant="form.type === kind ? 'default' : 'outline'"
+          @click="form.type = kind"
+        >{{ labelFor(kind) }}</Button>
+      </div>
 
-          <div class="grid gap-2">
-            <Label for="identifier">{{ identifierLabel }}</Label>
-            <Input
-              id="identifier"
-              v-model="form.identifier"
-              :type="identifierInputType"
-              :placeholder="identifierPlaceholder"
-              required
-            />
-            <span v-if="checking" class="text-xs text-muted-foreground">{{ t('checking', 'Checking...', 'جارٍ التحقق...') }}</span>
-            <span v-else-if="exists === false" class="text-xs text-red-500">{{ t('no_account_with_identifier_generic', 'No account with this identifier.', 'لا يوجد حساب بهذا المعرّف.') }}</span>
-            <span v-else-if="exists === true && availableChannels.length === 0" class="text-xs text-red-500">{{ t('no_delivery_channel', 'No delivery channel available.', 'لا توجد قناة إرسال متاحة.') }}</span>
-            <span v-if="errors.identifier" class="text-xs text-red-500">{{ errors.identifier[0] }}</span>
-          </div>
+      <div class="grid gap-2">
+        <Label for="identifier">{{ identifierLabel }}</Label>
+        <AuthPhoneInput
+          v-if="identifierInputType === 'tel'"
+          id="identifier"
+          v-model="form.identifier"
+          :allowed="allowedPhoneCountries"
+        />
+        <Input
+          v-else
+          id="identifier"
+          v-model="form.identifier"
+          :type="identifierInputType"
+          :placeholder="identifierPlaceholder"
+          class="h-12 rounded-xl text-base"
+          required
+        />
+        <span v-if="checking" class="text-xs text-muted-foreground">{{ t('checking', 'Checking...', 'جارٍ التحقق...') }}</span>
+        <span v-else-if="exists === false" class="text-xs text-destructive">{{ t('no_account_with_identifier_generic', 'No account with this identifier.', 'لا يوجد حساب بهذا المعرّف.') }}</span>
+        <span v-else-if="exists === true && availableChannels.length === 0" class="text-xs text-destructive">{{ t('no_delivery_channel', 'No delivery channel available.', 'لا توجد قناة إرسال متاحة.') }}</span>
+        <span v-if="errors.identifier" class="text-xs text-destructive">{{ errors.identifier[0] }}</span>
+      </div>
 
-          <div v-if="exists && availableChannels.length > 1" class="grid gap-2">
-            <Label>{{ t('send_otp_via', 'Send OTP via', 'إرسال الرمز عبر') }}</Label>
-            <div class="flex gap-2">
-              <Button
-                v-for="ch in availableChannels"
-                :key="ch"
-                type="button"
-                size="sm"
-                :variant="form.channel === ch ? 'default' : 'outline'"
-                @click="form.channel = ch"
-              >
-                {{ t(`channel_${ch}`, ch) }}
-              </Button>
-            </div>
-            <span v-if="errors.type" class="text-xs text-red-500">{{ errors.type[0] }}</span>
-          </div>
-
-          <Button type="submit" class="w-full" :disabled="loading || checking || exists === false || (exists && availableChannels.length === 0)">
-            {{ loading ? t('sending', 'Sending...', 'جارٍ الإرسال...') : t('send_otp', 'Send OTP', 'إرسال الرمز') }}
+      <div v-if="exists && availableChannels.length > 1" class="grid gap-2">
+        <Label>{{ t('send_otp_via', 'Send OTP via', 'إرسال الرمز عبر') }}</Label>
+        <div class="flex gap-2">
+          <Button
+            v-for="ch in availableChannels"
+            :key="ch"
+            type="button"
+            size="sm"
+            class="rounded-full"
+            :variant="form.channel === ch ? 'default' : 'outline'"
+            @click="form.channel = ch"
+          >
+            {{ t(`channel_${ch}`, ch) }}
           </Button>
-        </form>
-      </CardContent>
-      <CardFooter class="justify-center text-sm">
-        <NuxtLink to="/login" class="font-medium underline-offset-4 hover:underline">{{ t('back_to_login', 'Back to login', 'العودة لتسجيل الدخول') }}</NuxtLink>
-      </CardFooter>
-    </Card>
-  </div>
+        </div>
+        <span v-if="errors.type" class="text-xs text-destructive">{{ errors.type[0] }}</span>
+      </div>
+
+      <Button
+        type="submit"
+        size="lg"
+        class="h-13 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+        :disabled="loading || checking || exists === false || (exists && availableChannels.length === 0)"
+      >
+        {{ loading ? t('sending', 'Sending...', 'جارٍ الإرسال...') : t('send_otp', 'Verify', 'تحقق') }}
+      </Button>
+    </form>
+  </AuthScreen>
 </template>
 
 <script setup>
@@ -68,7 +76,7 @@ definePageMeta({
   name: 'forgot-password'
 })
 
-const { identifierLabel, identifierInputType, identifierPlaceholder, identifierTypes, defaultIdentifierType, labelFor } = useAuthConfig()
+const { identifierLabel, identifierInputType, identifierPlaceholder, identifierTypes, defaultIdentifierType, labelFor, allowedPhoneCountries } = useAuthConfig()
 const { t } = useLang('web', 'auth')
 
 const errors = ref({})

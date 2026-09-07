@@ -1,37 +1,33 @@
 <template>
-  <div class="flex min-h-svh items-center justify-center bg-muted/40 p-6">
-    <Card class="w-full max-w-sm">
-      <CardHeader>
-        <CardTitle class="text-2xl">{{ t('verify_otp', 'Verify OTP', 'تأكيد الرمز') }}</CardTitle>
-        <CardDescription>
-          {{ t('enter_otp_sent_to', 'Enter the OTP sent to :target.', 'أدخل الرمز المرسل إلى :target.', { target: form.identifier }) }}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form class="flex flex-col gap-4" @submit.prevent="onSubmit">
-          <div class="grid gap-2">
-            <Label for="otp">{{ t('otp', 'OTP', 'الرمز') }}</Label>
-            <Input id="otp" v-model="form.otp" type="text" inputmode="numeric" placeholder="123456" required />
-            <span v-if="errors.otp" class="text-red-500">{{ errors.otp[0] }}</span>
-            <span v-if="errors.identifier" class="text-red-500">{{ errors.identifier[0] }}</span>
-          </div>
-          <Button type="submit" class="w-full" :disabled="loading || resending">
-            {{ loading ? t('verifying', 'Verifying...', 'جارٍ التحقق...') : t('verify', 'Verify', 'تحقق') }}
-          </Button>
-        </form>
-      </CardContent>
-      <CardFooter class="justify-center text-sm">
-        <button
-          type="button"
-          class="font-medium underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
-          :disabled="cooldown > 0 || resending || loading"
-          @click="resend"
-        >
-          {{ resending ? t('sending', 'Sending...', 'جارٍ الإرسال...') : (cooldown > 0 ? t('resend_in_seconds', 'Resend in :seconds s', 'إعادة الإرسال خلال :seconds ث', { seconds: cooldown }) : t('resend_otp', 'Resend OTP', 'إعادة إرسال الرمز')) }}
-        </button>
-      </CardFooter>
-    </Card>
-  </div>
+  <AuthScreen
+    back="/forgot-password"
+    :title="t('verify_otp', 'Enter the verification code', 'أدخل رمز التحقق')"
+    :subtitle="t('enter_otp_sent_to', 'We sent a code to :target.', 'أرسلنا رمزًا إلى :target.', { target: form.identifier })"
+  >
+    <form class="flex flex-col gap-6" @submit.prevent="onSubmit">
+      <div class="flex flex-col items-center gap-2">
+        <AuthOtpInput v-model="form.otp" />
+        <span v-if="errors.otp" class="text-xs text-destructive">{{ errors.otp[0] }}</span>
+        <span v-if="errors.identifier" class="text-xs text-destructive">{{ errors.identifier[0] }}</span>
+      </div>
+      <Button
+        type="submit"
+        size="lg"
+        class="h-13 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+        :disabled="loading || resending || form.otp.length < 6"
+      >
+        {{ loading ? t('verifying', 'Verifying...', 'جارٍ التحقق...') : t('verify', 'Verify', 'تحقق') }}
+      </Button>
+      <button
+        type="button"
+        class="mx-auto rounded-full bg-brand-mist px-4 py-2 text-sm font-medium text-brand-rust transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+        :disabled="cooldown > 0 || resending || loading"
+        @click="resend"
+      >
+        {{ resending ? t('sending', 'Sending...', 'جارٍ الإرسال...') : (cooldown > 0 ? t('resend_in_seconds', 'Resend in :seconds s', 'إعادة الإرسال خلال :seconds ث', { seconds: cooldown }) : t('resend_otp', 'Resend OTP', 'إعادة إرسال الرمز')) }}
+      </button>
+    </form>
+  </AuthScreen>
 </template>
 
 <script setup>

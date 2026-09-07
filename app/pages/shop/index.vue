@@ -14,9 +14,9 @@
     <div class="mx-auto max-w-6xl px-6 py-16">
 
     <!--
-      Browsing only: filters, no basket. The top level is picked by picture — the cut-outs
-      are transparent PNGs, so each sits on a terracotta disc as it does on the home page,
-      and the row scrolls sideways rather than wrapping into an uneven block.
+      Browsing only: filters, no basket. The top level is picked by picture — a real photo
+      per category, same as the home page — and the row scrolls sideways rather than
+      wrapping into an uneven block.
     -->
     <div class="mb-6 -mx-6 overflow-x-auto px-6 pb-2 pt-2">
       <ul class="flex w-max gap-4 sm:gap-5">
@@ -38,16 +38,16 @@
         <li v-for="category in categories" :key="category.id">
           <button type="button" class="group w-16 sm:w-20" @click="pick(category.id)">
             <span
-              class="flex aspect-square items-center justify-center overflow-hidden rounded-full bg-brand-terracotta p-3 ring-2 ring-offset-2 ring-offset-background transition"
+              class="flex aspect-square items-center justify-center overflow-hidden rounded-full bg-brand-mist ring-2 ring-offset-2 ring-offset-background transition"
               :class="categoryId === category.id ? 'ring-primary' : 'ring-transparent opacity-80 group-hover:opacity-100'"
             >
               <AppImage
                 v-if="category.image?.image_api"
                 :src="category.image"
                 :alt="category.title"
-                class="size-full object-contain transition-transform duration-500 group-hover:scale-110"
+                class="size-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
-              <LucideShapes v-else class="size-6 text-white/80" />
+              <LucideShapes v-else class="size-6 text-brand-rust" />
             </span>
             <span
               class="mt-2 block truncate text-xs font-medium transition-colors"

@@ -26,14 +26,21 @@
 
 <script setup>
 /**
- * The site's primary navigation, as a floating bar. Every destination is public — this
- * build is for exploring, so nothing here leads to booking, checkout or an account.
+ * The site's primary navigation, as a floating bar. The last item is the account entry
+ * point — Login for a guest, Profile once signed in — so it moves as the session does.
  *
  * It lives outside `#smooth-content` (see the layout): `position: fixed` inside an
  * element that ScrollSmoother transforms behaves like `absolute` and scrolls away.
  */
 const route = useRoute()
 const { t } = useLang('web', 'general')
+const { appUsers } = useAuthConfig()
+const { user, isAuthenticated } = useSanctumAuth()
+
+// Everyone gets a guest identity automatically, so `isAuthenticated` alone is not "has an
+// account" — check `is_guest` too, or a browsing guest would see "Profile" and land on a
+// page gated to registered users only.
+const isRegistered = computed(() => isAuthenticated.value && !user.value?.data?.is_guest)
 
 const items = computed(() => [
   { to: '/', label: t('nav_home', 'Home', 'الرئيسية') },
@@ -41,6 +48,11 @@ const items = computed(() => [
   { to: '/shop', label: t('nav_shop', 'Shop', 'المتجر') },
   { to: '/gallery', label: t('nav_gallery', 'Gallery', 'المعرض') },
   { to: '/about', label: t('nav_about', 'About', 'عن تيراكوتا') },
+  ...(appUsers.value
+    ? [isRegistered.value
+      ? { to: '/profile', label: t('nav_profile', 'Profile', 'حسابي') }
+      : { to: '/login', label: t('nav_login', 'Login', 'تسجيل الدخول') }]
+    : []),
 ])
 
 const isActive = (to) => (to === '/' ? route.path === '/' : route.path.startsWith(to))

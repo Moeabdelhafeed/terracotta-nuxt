@@ -72,8 +72,12 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     ? (i18nLocale.value ?? lang.value?.code ?? 'en')
     : (lang.value?.code ?? 'en')
 
-  const sanctumAppCfg = useSanctumAppConfig()
-  const bearer = await sanctumAppCfg?.tokenStorage?.get?.(nuxtApp).catch(() => null)
+  // nuxt-auth-sanctum's own tokenStorage only gets wired up on the router's
+  // `page:loading:start` hook, which fires after plugins run — so on every SSR render
+  // (first load or a full navigation) `useSanctumAppConfig().tokenStorage` is still
+  // undefined here, and this fetch would silently go out unauthenticated even for a
+  // logged-in visitor. Read the same cookie the module itself stores the token in.
+  const bearer = useCookie('sanctum.token.cookie', { readonly: true }).value
 
   const headers = buildHeaders(deviceId.value, platform.value, fcmToken.value, code, bearer)
 
