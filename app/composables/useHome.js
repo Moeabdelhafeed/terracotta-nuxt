@@ -72,3 +72,45 @@ export const usePrice = () => {
 
   return { format, currency }
 }
+
+/**
+ * Where a home banner sends the visitor, from its `link_type` (Part IV §2):
+ * a site path, an absolute URL for `external`, or `null` when it is decorative —
+ * `none`, an unknown type, `external` without a URL, or a `page` whose id is not in
+ * `pages` (the API hands back the numeric page id; the route wants the slug).
+ */
+export const bannerRoute = (banner, pages = []) => {
+  const id = banner?.link_target_id
+  switch (banner?.link_type) {
+    case 'external': return banner.link || null
+    case 'shop_home': return '/shop'
+    case 'shop_category': return `/shop?category=${id}`
+    case 'shop_product': return `/shop/${id}`
+    case 'workshops': return '/workshops'
+    case 'workshop': return `/workshops/${id}`
+    case 'gallery_home': return '/gallery'
+    case 'gallery_category': return `/gallery/${id}`
+    case 'page': {
+      const page = pages.find((p) => p.id === id)
+      return page ? `/${page.slug}` : null
+    }
+    default: return null
+  }
+}
+
+export const isExternalRoute = (route) => /^https?:\/\//.test(route ?? '')
+
+/**
+ * A banner that resolved to nothing is still shown — it is simply not tappable. The one
+ * exception is a `page` banner whose page is gone: that is an orphaned promo, not a
+ * decorative picture, so it drops out rather than teasing a destination that vanished.
+ */
+export const isBannerRenderable = (banner, route) => banner?.link_type !== 'page' || !!route
+
+/** "10 photos · 11 videos" for an album, from whichever counts the API sent. */
+export const galleryCounts = (category, t) => t(
+  'gallery_counts',
+  ':images photos · :videos videos',
+  ':images صورة · :videos فيديو',
+  { images: category?.images_count ?? 0, videos: category?.videos_count ?? 0 },
+)

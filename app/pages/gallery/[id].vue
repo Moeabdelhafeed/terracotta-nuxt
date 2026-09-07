@@ -16,10 +16,7 @@
       :image="cover"
       :crumbs="crumbs"
       :title="category.title"
-      :subtitle="t('gallery_counts', ':images photos · :videos videos', ':images صورة · :videos فيديو', {
-        images: category.images_count,
-        videos: category.videos_count,
-      })"
+      :subtitle="galleryCounts(category, t)"
     />
 
     <div class="mx-auto max-w-6xl px-5 py-12">

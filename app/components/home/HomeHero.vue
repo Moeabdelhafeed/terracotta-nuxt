@@ -148,6 +148,25 @@
           <p v-if="hero.label" class="max-w-xl text-lg text-white/85 drop-shadow">
             {{ hero.label }}
           </p>
+
+          <!-- The overlay itself ignores the pointer so the film underneath keeps its own
+               hover; only the call to action takes a tap. -->
+          <a
+            v-if="heroRoute && heroExternal"
+            :href="heroRoute"
+            target="_blank"
+            rel="noopener"
+            class="pointer-events-auto rounded-full bg-white/95 px-6 py-2.5 text-sm font-semibold text-brand-ink transition-colors hover:bg-white"
+          >
+            {{ hero.cta_text || t('discover', 'Discover', 'اكتشف') }}
+          </a>
+          <NuxtLink
+            v-else-if="heroRoute"
+            :to="heroRoute"
+            class="pointer-events-auto rounded-full bg-white/95 px-6 py-2.5 text-sm font-semibold text-brand-ink transition-colors hover:bg-white"
+          >
+            {{ hero.cta_text || t('discover', 'Discover', 'اكتشف') }}
+          </NuxtLink>
         </div>
 
     </div>
@@ -248,7 +267,11 @@ const studioTiles = computed(() =>
 )
 
 
-const rest = computed(() => banners.value.slice(1, 6))
+// The hero is a banner like any other, so its own `link_type` decides where the call to
+// action goes. The rest of the set is `HomeBanners`.
+const { pages } = usePages()
+const heroRoute = computed(() => bannerRoute(hero.value, pages.value))
+const heroExternal = computed(() => isExternalRoute(heroRoute.value))
 
 
 /**
