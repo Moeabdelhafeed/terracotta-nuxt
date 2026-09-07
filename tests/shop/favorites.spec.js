@@ -39,6 +39,8 @@ beforeEach(() => {
   api.$fetch.mockClear()
   toast.error.mockClear()
   navigate.mockClear()
+  // A registered session again for every test — the guest case must not leak forward.
+  sanctum.user.value = { data: { id: 1, name: 'Test', is_guest: false, wallet_balance: '100.00' } }
 })
 
 describe('useFavorites', () => {
@@ -108,7 +110,6 @@ describe('useFavorites', () => {
 
     expect(navigate).toHaveBeenCalledWith({ path: '/login', query: { redirect: '/shop/11' } })
     expect(api.calls.some((c) => c.url === '/api/shop/favorites/15')).toBe(false)
-    sanctum.user.value = { data: { id: 1, is_guest: false, wallet_balance: '100.00' } }
   })
 })
 

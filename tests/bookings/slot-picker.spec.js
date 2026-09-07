@@ -62,7 +62,10 @@ describe('BookingSlotPicker', () => {
     const blocked = wrapper.find(`[data-date="${plusDays(1)}"]`)
     expect(blocked.attributes('disabled')).toBeDefined()
     expect(wrapper.find(`[data-date="${plusDays(2)}"]`).attributes('disabled')).toBeUndefined()
-    expect(wrapper.props()).toBeTruthy()
+    // The first open day is the one selected, not the first day in the strip.
+    expect(wrapper.find(`[data-date="${plusDays(2)}"]`).classes()).toContain('bg-brand-rust')
+    expect(wrapper.find(`[data-date="${plusDays(0)}"]`).classes()).not.toContain('bg-brand-rust')
+    expect(wrapper.emitted('update:date').at(-1)).toEqual([plusDays(2)])
   })
 
   it('refetches the calendar when the party size changes', async () => {

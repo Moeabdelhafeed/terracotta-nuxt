@@ -70,11 +70,30 @@ describe('/gift/[token] — public preview', () => {
   })
 
   it('renders the gift without a single buyer money field', async () => {
+    // A payload carrying everything the buyer's own order would: if the page leaked any of
+    // it, these numbers would show up. `server/api/gift/[token].get.js` allow-lists the
+    // public fields, but the page must not render them even when handed them.
+    giftRef.value = preview({
+      subtotal: '250.00',
+      discount_amount: '50.00',
+      discount_code: 'FRIEND50',
+      total_price: '250.00',
+      wallet_applied: '110.00',
+      amount_due: '140.00',
+      vat_amount: '32.61',
+      buyer_name: 'Nour Al-Otaibi',
+      buyer_phone: '+966501234567',
+      payment_status: 'paid',
+    })
+
     const wrapper = await mount()
     const text = wrapper.text()
     expect(text).toContain('200.00 SAR')
     expect(text).toContain('Happy birthday!')
-    // What the buyer paid is never on this page — no total, wallet, discount or due.
+
+    for (const leak of ['250.00', '50.00', '110.00', '140.00', '32.61', 'FRIEND50', 'Nour Al-Otaibi', '+966501234567']) {
+      expect(text).not.toContain(leak)
+    }
     expect(text).not.toMatch(/total|wallet applied|discount|amount due/i)
     expect(wrapper.html()).not.toContain('total_price')
   })

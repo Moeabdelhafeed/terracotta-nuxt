@@ -1,8 +1,41 @@
 // @vitest-environment nuxt
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
+import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { createLang } from '../helpers/mockApi'
 
-const { bannerRoute, isExternalRoute, isBannerRenderable, galleryCounts } = await import('~/composables/useHome')
+// Every other spec stubs `usePrice` as `v => `${v} SAR``; this is the one place the real
+// formatter runs, so those "contains 145.00 SAR" assertions rest on something.
+const locale = await vi.hoisted(async () => {
+  const { createLang: make } = await import('../helpers/mockApi')
+  return { en: make('en'), ar: make('ar'), current: 'en' }
+})
+mockNuxtImport('useLang', () => () => locale[locale.current])
+
+const { bannerRoute, isExternalRoute, isBannerRenderable, galleryCounts, usePrice } = await import('~/composables/useHome')
+
+describe('usePrice', () => {
+  it('drops the decimals on a whole amount and keeps them otherwise', () => {
+    const { format } = usePrice()
+    expect(format('45.00')).toBe('45 SAR')
+    expect(format('145.50')).toBe('145.50 SAR')
+    expect(format('0.05')).toBe('0.05 SAR')
+    expect(format('1200')).toBe('1200 SAR')
+  })
+
+  it('reads a missing amount as nothing owed', () => {
+    const { format } = usePrice()
+    expect(format(null)).toBe('0 SAR')
+    expect(format(undefined)).toBe('0 SAR')
+  })
+
+  it('takes the currency word from the current locale', () => {
+    locale.current = 'ar'
+    const { format, currency } = usePrice()
+    expect(currency.value).toBe('ريال')
+    expect(format('45.00')).toBe('45 ريال')
+    locale.current = 'en'
+  })
+})
 
 const banner = (link_type, extra = {}) => ({ id: 1, title: 'Promo', link_type, link_target_id: null, link: null, ...extra })
 
