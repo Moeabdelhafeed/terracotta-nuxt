@@ -1,5 +1,5 @@
 // @vitest-environment nuxt
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 
 const NO_HTML = 'HTML tags are not allowed here.'
@@ -18,7 +18,6 @@ const { api, lang, sanctum } = await vi.hoisted(async () => {
       },
     }),
     lang: createLang('en'),
-    // Starts signed in; individual tests flip `user` to exercise the guest branch.
     sanctum: createSanctumState(),
   }
 })
@@ -33,6 +32,12 @@ const { COMPLAINT_TYPES, complaintStatusLabel } = await import('~/composables/us
 
 const mount = () => mountSuspended(ComplaintsPage, {
   global: { stubs: { PageBar: true, AppSkeleton: true, NuxtLink: { template: '<a><slot /></a>' } } },
+})
+
+// Signed in again for every test, so one that signs out cannot bleed into the next.
+beforeEach(() => {
+  api.calls.length = 0
+  sanctum.user.value = { data: { id: 1, name: 'Test', is_guest: false, wallet_balance: '100.00' } }
 })
 
 describe('/complaints', () => {
@@ -64,7 +69,6 @@ describe('/complaints', () => {
       const post = api.calls.filter((c) => c.method === 'POST' && c.url === '/api/complaints').at(-1)
       expect(post.body).toMatchObject({ type: 'order', name: 'Sara', contact: 'sara@example.com' })
     })
-    sanctum.user.value = { data: { id: 1, name: 'Test', is_guest: false } }
   })
 
   it("renders the server's NoHtml message under the message field", async () => {

@@ -14,7 +14,7 @@ const shopQuote = {
 }
 
 describe('CheckoutSummary', () => {
-  it('renders the seven fields exactly as quoted — delivery is never discounted', async () => {
+  it('renders the seven quoted fields exactly as they arrived', async () => {
     const wrapper = await mountSuspended(CheckoutSummary, { props: { quote: shopQuote } })
     const text = wrapper.text()
     expect(text).toContain('200.00 SAR')
@@ -25,6 +25,17 @@ describe('CheckoutSummary', () => {
     expect(text).toContain('−50.00 SAR')
     expect(text).toContain('145.00 SAR')
     expect(text).toContain('Includes VAT 25.43 SAR (15%)')
+  })
+
+  it('shows the delivery fee the server quoted, never one netted against the discount', async () => {
+    const wrapper = await mountSuspended(CheckoutSummary, {
+      props: { quote: { ...shopQuote, discount_amount: '100.00', total_price: '115.00', wallet_applied: '0.00', amount_due: '115.00' } },
+    })
+    const rows = wrapper.findAll('div').map((row) => row.text())
+    expect(rows.some((row) => row.startsWith('Discount TEN−100.00 SAR'))).toBe(true)
+    // A 100 discount against a 15 fee: the delivery line is still the quoted 15, not 0 or free.
+    expect(rows.some((row) => row.startsWith('Delivery (Riyadh)15.00 SAR'))).toBe(true)
+    expect(wrapper.text()).not.toContain('Free')
   })
 
   it('hides delivery for a workshop quote and VAT when the rate is zero', async () => {
