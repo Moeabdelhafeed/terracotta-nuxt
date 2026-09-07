@@ -1,28 +1,20 @@
 <template>
-  <div class="relative flex min-h-svh items-center justify-center bg-muted/40 p-6 pb-20">
-    <Card class="w-full max-w-sm">
-      <CardHeader>
-        <AppMedia
-          v-if="logo"
-          :src="logo"
-          alt="Logo"
-          class="mb-2 h-12 w-auto self-start object-contain"
-        />
-        <CardTitle class="text-2xl">{{ appUsers ? t('login_title', 'Login', 'تسجيل الدخول') : t('welcome', 'Welcome', 'مرحبًا') }}</CardTitle>
-        <CardDescription>
-          {{ appUsers
-            ? t('login_description', 'Enter your :field below to sign in.', 'أدخل :field للدخول.', { field: identifierLabel.toLowerCase() })
-            : t('guest_only_description', 'You are browsing as a guest.', 'أنت تتصفح كزائر.') }}
-        </CardDescription>
-      </CardHeader>
-      <CardContent v-if="appUsers">
-        <form class="flex flex-col gap-4" @submit.prevent="onSubmit">
+  <div>
+    <AuthScreen
+      :title="appUsers ? t('login_welcome_title', 'Welcome back', 'اهلا بعودتك') : t('welcome', 'Welcome', 'مرحبًا')"
+      :subtitle="appUsers
+        ? t('login_description', 'Enter your :field below to sign in.', 'أدخل :field للدخول.', { field: identifierLabel.toLowerCase() })
+        : t('guest_only_description', 'You are browsing as a guest.', 'أنت تتصفح كزائر.')"
+    >
+      <template v-if="appUsers">
+        <form class="flex flex-col gap-5" @submit.prevent="onSubmit">
           <div v-if="identifierTypes.length > 1" class="flex gap-2">
             <Button
               v-for="kind in identifierTypes"
               :key="kind"
               type="button"
               size="sm"
+              class="rounded-full"
               :variant="identifierType === kind ? 'default' : 'outline'"
               @click="identifierType = kind"
             >{{ labelFor(kind) }}</Button>
@@ -30,11 +22,19 @@
 
           <div class="grid gap-2">
             <Label for="identifier">{{ identifierLabel }}</Label>
+            <AuthPhoneInput
+              v-if="identifierInputType === 'tel'"
+              id="identifier"
+              v-model="form.identifier"
+              :allowed="allowedPhoneCountries"
+            />
             <Input
+              v-else
               id="identifier"
               v-model="form.identifier"
               :type="identifierInputType"
               :placeholder="identifierPlaceholder"
+              class="h-12 rounded-xl text-base"
               required
             />
             <span
@@ -43,11 +43,11 @@
             >{{ t('checking', 'Checking...', 'جارٍ التحقق...') }}</span>
             <span
               v-else-if="identifierStatus === 'missing'"
-              class="text-xs text-red-500"
+              class="text-xs text-destructive"
             >{{ t('no_account_with_identifier', 'No account with this :field.', 'لا يوجد حساب بهذا الـ:field.', { field: identifierLabel.toLowerCase() }) }}</span>
             <span
               v-else-if="identifierStatus === 'suspended'"
-              class="text-xs text-red-500"
+              class="text-xs text-destructive"
             >{{ t('account_suspended', 'Account suspended. Contact support.', 'الحساب موقوف. تواصل مع الدعم.') }}</span>
             <span
               v-else-if="identifierStatus === 'pending_deletion'"
@@ -55,7 +55,7 @@
             >{{ t('account_pending_deletion_hint', 'Account scheduled for deletion. Log in to restore.', 'الحساب مجدول للحذف. سجّل الدخول لاستعادته.') }}</span>
             <span
               v-else-if="identifierStatus === 'active'"
-              class="text-xs text-green-600"
+              class="text-xs text-brand-green"
             >{{ t('account_found', 'Account found.', 'تم العثور على الحساب.') }}</span>
             <span
               v-if="identifierStatus === 'active' && linkedProviders.length"
@@ -69,57 +69,70 @@
             >
               {{ t('no_password_use_social', 'No password set. Use a social provider below.', 'لا توجد كلمة مرور. استخدم مزوّدًا اجتماعيًا أدناه.') }}
             </span>
-            <span v-if="errors.identifier" class="text-xs text-red-500">{{ errors.identifier[0] }}</span>
+            <span v-if="errors.identifier" class="text-xs text-destructive">{{ errors.identifier[0] }}</span>
           </div>
           <div v-if="isOtpMode && identifierStatus === 'missing'" class="grid gap-2">
             <Label for="name">{{ t('name', 'Name', 'الاسم') }}</Label>
-            <Input id="name" v-model="form.name" type="text" :placeholder="t('placeholder_name', 'John Doe', 'محمد أحمد')" required />
-            <span v-if="errors.name" class="text-xs text-red-500">{{ errors.name[0] }}</span>
+            <Input id="name" v-model="form.name" type="text" class="h-12 rounded-xl text-base" :placeholder="t('placeholder_name', 'John Doe', 'محمد أحمد')" required />
+            <span v-if="errors.name" class="text-xs text-destructive">{{ errors.name[0] }}</span>
           </div>
-          <p v-if="errors.device_id" class="text-xs text-red-500">{{ errors.device_id[0] }}</p>
-          <p v-if="errors.platform" class="text-xs text-red-500">{{ errors.platform[0] }}</p>
-          <p v-if="errors.fcm_token" class="text-xs text-red-500">{{ errors.fcm_token[0] }}</p>
+          <p v-if="errors.device_id" class="text-xs text-destructive">{{ errors.device_id[0] }}</p>
+          <p v-if="errors.platform" class="text-xs text-destructive">{{ errors.platform[0] }}</p>
+          <p v-if="errors.fcm_token" class="text-xs text-destructive">{{ errors.fcm_token[0] }}</p>
           <div v-if="!isOtpMode" class="grid gap-2">
             <div class="flex items-center justify-between">
               <Label for="password">{{ t('password', 'Password', 'كلمة المرور') }}</Label>
               <NuxtLink
                 to="/forgot-password"
-                class="text-xs text-muted-foreground underline-offset-4 hover:underline"
+                class="text-xs font-medium text-brand-rust underline-offset-4 hover:underline"
               >{{ t('forgot_password', 'Forgot password?', 'نسيت كلمة المرور؟') }}</NuxtLink>
             </div>
-            <Input id="password" v-model="form.password" type="password" required />
-            <span v-if="errors.password" class="text-xs text-red-500">{{ errors.password[0] }}</span>
+            <AuthPasswordInput id="password" v-model="form.password" required />
+            <span v-if="errors.password" class="text-xs text-destructive">{{ errors.password[0] }}</span>
           </div>
           <Button
             type="submit"
-            class="w-full"
+            size="lg"
+            class="h-13 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
             :disabled="submitDisabled"
           >{{ submitLabel }}</Button>
         </form>
-      </CardContent>
-      <CardContent v-if="appUsers && socialAuthAvailable && socialProviders.length" class="flex flex-col gap-3">
-        <div class="flex items-center gap-2">
+      </template>
+      <template v-if="appUsers && socialAuthAvailable && socialProviders.length">
+        <div class="my-6 flex items-center gap-2">
           <span class="h-px flex-1 bg-border" />
           <span class="text-xs text-muted-foreground">
             {{ t('or_continue_with', 'Or continue with', 'أو المتابعة عبر') }}
           </span>
           <span class="h-px flex-1 bg-border" />
         </div>
-        <SocialAuthButtons
-          :providers="socialProviders"
-          :loading="loading"
-          @select="onSocial"
-        />
-        <span v-if="socialError" class="text-xs text-red-500">{{ socialError }}</span>
-      </CardContent>
-      <CardFooter v-if="appUsers && !isOtpMode" class="justify-center text-sm">
+        <div class="flex flex-col gap-3">
+          <SocialAuthButtons
+            :providers="socialProviders"
+            :loading="loading"
+            @select="onSocial"
+          />
+          <span v-if="socialError" class="text-xs text-destructive">{{ socialError }}</span>
+        </div>
+      </template>
+      <p v-if="appUsers && !isOtpMode" class="mt-6 text-center text-sm">
         <span class="text-muted-foreground">{{ t('no_account', 'No account?', 'ليس لديك حساب؟') }}&nbsp;</span>
         <NuxtLink
           to="/register"
-          class="font-medium underline-offset-4 hover:underline"
+          class="font-medium text-brand-rust underline-offset-4 hover:underline"
         >{{ t('register', 'Register', 'إنشاء حساب') }}</NuxtLink>
-      </CardFooter>
-    </Card>
+      </p>
+      <p class="mt-4 text-center text-xs text-muted-foreground">
+        {{ t('login_terms_prefix', 'By signing in you accept our', 'بتسجيل الدخول فإنك توافق على') }}
+        <button
+          type="button"
+          data-test="open-terms"
+          class="text-brand-rust underline-offset-4 hover:underline"
+          @click="termsOpen = true"
+        >{{ t('terms_and_conditions', 'Terms & Conditions', 'الشروط والأحكام') }}</button>
+      </p>
+      <AccountTermsModal v-model:open="termsOpen" />
+    </AuthScreen>
 
     <Teleport to="body">
       <div
@@ -159,7 +172,7 @@ definePageMeta({
   name: 'login'
 })
 
-const { identifierLabel, identifierInputType, identifierPlaceholder, identifierTypes, defaultIdentifierType, labelFor, socialAuthAvailable, socialProviders, appUsers, isOtpMode } = useAuthConfig()
+const { identifierLabel, identifierInputType, identifierPlaceholder, identifierTypes, defaultIdentifierType, labelFor, socialAuthAvailable, socialProviders, appUsers, isOtpMode, allowedPhoneCountries } = useAuthConfig()
 
 // Which kind of identifier the box holds. Sent on every request — the API rejects a
 // value that does not match its declared type instead of guessing from the string.
@@ -169,9 +182,6 @@ watch(identifierTypes, (list) => {
 }, { immediate: true })
 const { t } = useLang('web', 'auth')
 
-const { mediaAsset } = useMedia('web', 'branding')
-const logo = computed(() => mediaAsset('logo', '/logo.png'))
-
 const errors = ref({})
 const loading = ref(false)
 const checking = ref(false)
@@ -179,6 +189,7 @@ const identifierStatus = ref(null) // 'missing' | 'active' | 'pending_deletion' 
 const identifierMeta = ref({ has_password: true, social_providers: [], verified: false, is_guest: false })
 const restoreDialogOpen = ref(false)
 const socialError = ref('')
+const termsOpen = ref(false)
 
 const linkedProviders = computed(() => identifierMeta.value.social_providers ?? [])
 const hasPasswordOnAccount = computed(() => identifierMeta.value.has_password !== false)
