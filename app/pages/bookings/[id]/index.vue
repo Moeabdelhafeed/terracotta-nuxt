@@ -69,7 +69,7 @@
       </dl>
 
       <!-- A held booking still needs paying; the countdown is the server's, not ours. -->
-      <PaymentHold
+      <CheckoutPaymentHold
         v-if="booking.status === 'pending_payment'"
         class="mt-6"
         :amount-due="booking.amount_due"

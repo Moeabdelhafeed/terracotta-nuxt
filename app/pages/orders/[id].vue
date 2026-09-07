@@ -31,7 +31,7 @@
 
           <!-- The pay step is a pre-step of the timeline, so it sits right above it. -->
           <template v-if="order.status === 'awaiting_payment'">
-            <PaymentHold
+            <CheckoutPaymentHold
               :amount-due="order.amount_due"
               :payment-status="order.payment_status"
               :expires-at="order.payment_expires_at"

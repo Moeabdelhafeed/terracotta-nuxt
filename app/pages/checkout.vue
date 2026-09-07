@@ -17,7 +17,7 @@
           <ShopOrderStatusBadge :status="order.status" />
         </div>
 
-        <PaymentHold
+        <CheckoutPaymentHold
           class="mt-5"
           :amount-due="order.amount_due"
           :payment-status="order.payment_status"
@@ -46,7 +46,7 @@
 
         <template v-else>
           <CheckoutSummary :quote="order" :title="t('summary_title', 'Your order', 'طلبك', { subGroup: 'checkout' })" />
-          <PaymentHold
+          <CheckoutPaymentHold
             :amount-due="order.amount_due"
             :payment-status="order.payment_status"
             :expires-at="order.payment_expires_at"
@@ -82,8 +82,8 @@
           <section class="rounded-3xl border bg-card p-6 sm:p-8">
             <h2 class="font-display text-xl font-semibold">{{ t('payment_title', 'Payment', 'الدفع') }}</h2>
             <div class="mt-5 flex flex-col gap-5">
-              <DiscountCodeInput v-model="discountCode" :errors="errors" :disabled="quoting || placing" />
-              <WalletToggle v-model="useWallet" :disabled="quoting || placing" />
+              <CheckoutDiscountCodeInput v-model="discountCode" :errors="errors" :disabled="quoting || placing" />
+              <CheckoutWalletToggle v-model="useWallet" :disabled="quoting || placing" />
             </div>
           </section>
 

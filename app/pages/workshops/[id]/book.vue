@@ -139,8 +139,8 @@
           </div>
 
           <aside class="flex flex-col gap-4">
-            <DiscountCodeInput v-if="!booking" v-model="discountCode" :errors="allErrors" :disabled="creating" />
-            <WalletToggle v-if="!booking" v-model="useWallet" :disabled="creating" />
+            <CheckoutDiscountCodeInput v-if="!booking" v-model="discountCode" :errors="allErrors" :disabled="creating" />
+            <CheckoutWalletToggle v-if="!booking" v-model="useWallet" :disabled="creating" />
 
             <CheckoutSummary :quote="quote ?? booking" :title="t('summary_title', 'Summary', 'الملخص')" />
 
@@ -148,7 +148,7 @@
             <span v-if="createError" class="text-xs text-destructive">{{ createError }}</span>
 
             <!-- The hold: `amount_due === "0.00"` never gets here, it goes straight to done. -->
-            <PaymentHold
+            <CheckoutPaymentHold
               v-if="booking"
               :amount-due="booking.amount_due"
               :payment-status="booking.payment_status"

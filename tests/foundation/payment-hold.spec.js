@@ -7,7 +7,7 @@ const lang = await vi.hoisted(async () => (await import('../helpers/mockApi')).c
 mockNuxtImport('useLang', () => () => lang)
 mockNuxtImport('usePrice', () => () => ({ format: (v) => `${v} SAR`, currency: 'SAR' }))
 
-const PaymentHold = (await import('~/components/checkout/PaymentHold.vue')).default
+const PaymentHold = (await import('~/components/checkout/CheckoutPaymentHold.vue')).default
 
 const inMinutes = (m) => new Date(Date.now() + m * 60000).toISOString()
 

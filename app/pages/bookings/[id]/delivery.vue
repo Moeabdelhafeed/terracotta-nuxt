@@ -51,7 +51,7 @@
           </div>
 
           <aside class="flex flex-col gap-4">
-            <WalletToggle v-if="method === 'delivery'" v-model="useWallet" :disabled="saving" />
+            <CheckoutWalletToggle v-if="method === 'delivery'" v-model="useWallet" :disabled="saving" />
 
             <CheckoutSummary v-if="method === 'delivery'" :quote="quote" :title="t('delivery_summary', 'Delivery', 'التوصيل')" />
 

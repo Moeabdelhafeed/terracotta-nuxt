@@ -163,7 +163,7 @@
  * and they mean different things, so the one field is split into two here.
  *
  * There is no payment gateway: the frame's Apple Pay / G Pay / VISA tiles have nothing
- * behind them, and `POST /api/gifts/{id}/pay` settles on its own. `<PaymentHold>` is the
+ * behind them, and `POST /api/gifts/{id}/pay` settles on its own. `<CheckoutPaymentHold>` is the
  * whole pay step.
  */
 definePageMeta({
