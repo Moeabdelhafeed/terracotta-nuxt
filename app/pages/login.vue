@@ -122,6 +122,16 @@
           class="font-medium text-brand-rust underline-offset-4 hover:underline"
         >{{ t('register', 'Register', 'إنشاء حساب') }}</NuxtLink>
       </p>
+      <p class="mt-4 text-center text-xs text-muted-foreground">
+        {{ t('login_terms_prefix', 'By signing in you accept our', 'بتسجيل الدخول فإنك توافق على') }}
+        <button
+          type="button"
+          data-test="open-terms"
+          class="text-brand-rust underline-offset-4 hover:underline"
+          @click="termsOpen = true"
+        >{{ t('terms_and_conditions', 'Terms & Conditions', 'الشروط والأحكام') }}</button>
+      </p>
+      <AccountTermsModal v-model:open="termsOpen" />
     </AuthScreen>
 
     <Teleport to="body">
@@ -179,6 +189,7 @@ const identifierStatus = ref(null) // 'missing' | 'active' | 'pending_deletion' 
 const identifierMeta = ref({ has_password: true, social_providers: [], verified: false, is_guest: false })
 const restoreDialogOpen = ref(false)
 const socialError = ref('')
+const termsOpen = ref(false)
 
 const linkedProviders = computed(() => identifierMeta.value.social_providers ?? [])
 const hasPasswordOnAccount = computed(() => identifierMeta.value.has_password !== false)

@@ -41,14 +41,25 @@
       </div>
 
       <NuxtLink
-        to="/my-gallery"
+        v-for="row in hubRows"
+        :key="row.to"
+        :to="row.to"
+        :data-test="`hub-${row.to.slice(1)}`"
         class="group flex items-center justify-between rounded-2xl border bg-card p-4 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
       >
         <span class="flex items-center gap-3">
-          <LucideImages class="size-5 text-foreground/70 group-hover:text-accent-foreground" />
-          {{ t('my_gallery', 'My gallery', 'معرضي') }}
+          <component :is="row.icon" class="size-5 text-foreground/70 group-hover:text-accent-foreground" />
+          {{ row.label }}
         </span>
-        <LucideChevronRight class="size-4 text-muted-foreground rtl:-scale-x-100 group-hover:text-accent-foreground" />
+        <span class="flex items-center gap-2">
+          <span
+            v-if="row.badge"
+            data-test="unread-badge"
+            class="min-w-5 rounded-full bg-brand-rust px-1.5 py-0.5 text-center text-xs font-semibold text-white"
+            dir="ltr"
+          >{{ row.badge }}</span>
+          <LucideChevronRight class="size-4 text-muted-foreground rtl:-scale-x-100 group-hover:text-accent-foreground" />
+        </span>
       </NuxtLink>
 
       <NuxtLink
@@ -450,6 +461,19 @@ watch(identifiers, (list) => {
 }, { immediate: true })
 
 const identifierKindLabel = computed(() => labelFor(identifierKind.value))
+
+// Every account destination lives on this hub — nothing is reachable only by typing a URL.
+const { unreadCount } = useUnreadCount()
+const hubRows = computed(() => [
+  { to: '/orders', icon: 'LucideShoppingBag', label: t('my_orders', 'My orders', 'طلباتي') },
+  { to: '/bookings', icon: 'LucideCalendarDays', label: t('my_bookings', 'My workshops', 'ورشاتي') },
+  { to: '/my-gallery', icon: 'LucideImages', label: t('my_gallery', 'My gallery', 'معرضي') },
+  { to: '/favorites', icon: 'LucideHeart', label: t('my_favorites', 'My favourites', 'منتجاتي المفضلة') },
+  { to: '/gifts', icon: 'LucideGift', label: t('my_gifts', 'My gifts', 'هداياي') },
+  { to: '/addresses', icon: 'LucideMapPin', label: t('my_addresses', 'My addresses', 'عناويني') },
+  { to: '/notifications', icon: 'LucideBell', label: t('notifications_title', 'Notifications', 'الإشعارات'), badge: unreadCount.value || 0 },
+  { to: '/complaints', icon: 'LucideMessageSquareWarning', label: t('complaints_title', 'Complaints', 'الشكاوى') },
+])
 
 const profile = computed(() => user.value?.data ?? user.value ?? null)
 const initials = computed(() => (profile.value?.name || '').trim().charAt(0).toUpperCase() || '•')

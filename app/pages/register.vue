@@ -100,13 +100,12 @@
         <Checkbox id="policy" v-model="form.policy_agreed" required class="mt-0.5" />
         <Label for="policy" class="text-sm font-normal text-muted-foreground">
           {{ t('policy_agreement_prefix', 'I agree to the', 'أوافق على') }}
-          <NuxtLink
-            v-if="termsPage"
-            to="/terms"
-            target="_blank"
+          <button
+            type="button"
+            data-test="open-terms"
             class="text-brand-rust underline-offset-4 hover:underline"
-          >{{ termsPage.name }}</NuxtLink>
-          <span v-else>{{ t('terms_and_conditions', 'Terms & Conditions', 'الشروط والأحكام') }}</span>
+            @click.prevent="termsOpen = true"
+          >{{ termsPage?.name || t('terms_and_conditions', 'Terms & Conditions', 'الشروط والأحكام') }}</button>
           {{ t('and', 'and', 'و') }}
           <NuxtLink
             v-if="privacyPage"
@@ -133,6 +132,7 @@
         {{ t('sign_in', 'Sign in', 'تسجيل الدخول') }}
       </NuxtLink>
     </p>
+    <AccountTermsModal v-model:open="termsOpen" />
   </AuthScreen>
 </template>
 
@@ -148,6 +148,7 @@ const { t } = useLang('web', 'auth')
 const { bySlug } = usePages()
 const termsPage = computed(() => bySlug('terms'))
 const privacyPage = computed(() => bySlug('privacy'))
+const termsOpen = ref(false)
 
 const errors = ref({})
 const loading = ref(false)
@@ -234,7 +235,10 @@ const onSubmit = async () => {
     await client('/api/register', { method: 'POST', body })
     if (user.value?.data?.is_guest) user.value = null
     await login({ identifier: form.value.identifier, type: identifierKind.value, password: form.value.password })
-    navigateTo({ name: 'home' })
+    // A verification-required install hands back an unverified session plus an OTP —
+    // the code screen is the next step, not the home page.
+    const registered = user.value?.data ?? user.value ?? {}
+    navigateTo({ name: registered.verified_at || registered.is_verified ? 'home' : 'verify' })
   } catch (error) {
     errors.value = error.data?.errors ?? {}
   } finally {
