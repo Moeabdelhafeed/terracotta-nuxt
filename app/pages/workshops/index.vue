@@ -12,6 +12,20 @@
     />
 
     <div class="mx-auto max-w-6xl px-6 py-16">
+      <!-- Hub tabs (woLWX): browse the workshops, or jump to the bookings you already have. -->
+      <ul class="mb-8 flex gap-2">
+        <li>
+          <Button size="sm" class="rounded-full bg-brand-rust hover:bg-brand-rust/90">{{ t('tab_book', 'Book a workshop', 'حجز ورشة') }}</Button>
+        </li>
+        <li>
+          <Button as-child size="sm" variant="outline" class="rounded-full">
+            <NuxtLink to="/bookings">
+              {{ t('tab_mine', 'My workshops', 'ورشاتي') }}
+              <span v-if="activeCount" class="ms-2 rounded-full bg-brand-rust px-2 text-xs text-white">{{ activeCount }}</span>
+            </NuxtLink>
+          </Button>
+        </li>
+      </ul>
 
       <ul v-if="pending" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" aria-busy="true">
         <li v-for="n in 3" :key="n" class="overflow-hidden rounded-3xl border bg-card">
@@ -29,40 +43,50 @@
       </ul>
 
       <ul v-else class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      <li v-for="workshop in workshops" :key="workshop.id">
-        <NuxtLink
-          :to="`/workshops/${workshop.id}`"
-          class="group flex h-full flex-col overflow-hidden rounded-3xl border bg-card transition-shadow hover:shadow-lg"
-        >
-          <div class="relative aspect-[4/3] overflow-hidden bg-brand-mist">
-            <AppImage
-              v-if="workshop.image?.image_api"
-              :src="workshop.image"
-              :alt="workshop.title"
-              class="size-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <span
-              class="absolute top-4 rounded-full px-3 py-1 text-xs font-medium text-white ltr:left-4 rtl:right-4"
-              :style="{ backgroundColor: workshop.color || 'var(--brand-terracotta)' }"
-            >{{ typeLabel(workshop.type) }}</span>
-          </div>
-
-          <div class="flex flex-1 flex-col gap-2 p-6">
-            <h2 class="font-display text-xl font-semibold">{{ workshop.title }}</h2>
-            <p class="line-clamp-2 text-sm text-muted-foreground">{{ workshop.short_description }}</p>
-
-            <dl class="mt-auto flex items-center gap-4 pt-4 text-sm text-muted-foreground">
-              <div class="flex items-center gap-1.5">
-                <LucideClock class="size-4" />
-                <dd>{{ t('minutes', ':n min', ':n دقيقة', { n: workshop.duration_minutes }) }}</dd>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <LucideUsers class="size-4" />
-                <dd>{{ t('up_to_people', 'up to :n', 'حتى :n', { n: workshop.max_people_per_booking }) }}</dd>
-              </div>
-            </dl>
-          </div>
+      <li v-for="workshop in workshops" :key="workshop.id" class="group flex h-full flex-col overflow-hidden rounded-3xl border bg-card transition-shadow hover:shadow-lg">
+        <NuxtLink :to="`/workshops/${workshop.id}`" class="relative block aspect-[4/3] overflow-hidden bg-brand-mist">
+          <AppImage
+            v-if="workshop.image?.image_api"
+            :src="workshop.image"
+            :alt="workshop.title"
+            class="size-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+          <span
+            class="absolute top-4 rounded-full px-3 py-1 text-xs font-medium text-white ltr:left-4 rtl:right-4"
+            :style="{ backgroundColor: workshop.color || 'var(--brand-terracotta)' }"
+          >{{ typeLabel(workshop.type) }}</span>
         </NuxtLink>
+
+        <div class="flex flex-1 flex-col gap-2 p-6">
+          <NuxtLink :to="`/workshops/${workshop.id}`" class="font-display text-xl font-semibold">{{ workshop.title }}</NuxtLink>
+          <p class="line-clamp-2 text-sm text-muted-foreground">{{ workshop.short_description }}</p>
+
+          <!-- The three info tiles from the hub frames: price, seats per session, length. -->
+          <dl class="mt-auto grid grid-cols-3 gap-2 pt-4 text-center text-xs">
+            <div class="rounded-2xl bg-brand-mist/60 p-3">
+              <dd class="font-display text-sm font-semibold">
+                {{ isZeroMoney(workshop.price)
+                  ? t('price_from_pieces', 'By the pieces', 'حسب القطع')
+                  : t('price_per_person', ':price per person', ':price للشخص', { price: format(workshop.price) }) }}
+              </dd>
+            </div>
+            <div class="rounded-2xl bg-brand-mist/60 p-3">
+              <dd class="font-display text-sm font-semibold">{{ t('per_session_people', ':n people per session', ':n اشخاص بالجلسة', { n: workshop.capacity_per_session }) }}</dd>
+            </div>
+            <div class="rounded-2xl bg-brand-mist/60 p-3">
+              <dd class="font-display text-sm font-semibold">{{ t('minutes', ':n min', ':n دقيقة', { n: workshop.duration_minutes }) }}</dd>
+            </div>
+          </dl>
+
+          <div class="mt-4 flex gap-2">
+            <Button as-child class="h-12 flex-1 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90">
+              <NuxtLink :to="`/workshops/${workshop.id}/book`">{{ t('book_now', 'Book', 'احجز') }}</NuxtLink>
+            </Button>
+            <Button v-if="workshop.location_url" as-child variant="outline" class="h-12 flex-1 rounded-xl">
+              <a :href="workshop.location_url" target="_blank" rel="noopener noreferrer">{{ t('the_location', 'The location', 'الموقع') }}</a>
+            </Button>
+          </div>
+        </div>
       </li>
       </ul>
     </div>
@@ -72,6 +96,8 @@
 <script setup>
 const { workshops, pending } = useWorkshops()
 const { t } = useLang('web', 'home')
+const { format } = usePrice()
+const { activeCount } = useActiveBookingsCount()
 
 const typeLabel = (type) => ({
   make_your_piece: t('type_make_piece', 'Make your piece', 'اصنع قطعتك'),

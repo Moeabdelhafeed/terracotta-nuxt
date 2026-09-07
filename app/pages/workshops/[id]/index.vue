@@ -124,6 +124,11 @@
             <p v-else class="mt-4 text-sm text-muted-foreground">
               {{ t('own_pieces_empty', 'Pieces from your finished sessions show up here.', 'ستظهر هنا القطع من جلساتك المكتملة.') }}
             </p>
+
+            <!-- The pieces themselves are picked in step two of the booking flow. -->
+            <Button v-if="ownPieces.pieces?.length" as-child class="mt-5 h-12 rounded-xl bg-brand-rust px-8 text-base hover:bg-brand-rust/90">
+              <NuxtLink :to="`/workshops/${workshop.id}/book`">{{ t('book_with_own_piece', 'Book and bring this piece', 'احجز وأحضر قطعتك') }}</NuxtLink>
+            </Button>
           </section>
         </div>
 
@@ -140,12 +145,16 @@
               </div>
             </dl>
 
+            <Button as-child size="lg" class="mt-4 h-12 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90">
+              <NuxtLink :to="`/workshops/${workshop.id}/book`">{{ t('book_now', 'Book', 'احجز') }}</NuxtLink>
+            </Button>
+
             <Button
               v-if="workshop.location_url"
               as-child
               size="lg"
               variant="outline"
-              class="mt-4 h-12 w-full rounded-xl"
+              class="mt-3 h-12 w-full rounded-xl"
             >
               <a :href="workshop.location_url" target="_blank" rel="noopener noreferrer">
                 {{ t('get_directions', 'Get directions', 'الاتجاهات') }}
@@ -153,11 +162,6 @@
             </Button>
           </div>
 
-          <AppDownloadCta
-            class="mt-4"
-            :title="t('book_in_app_title', 'Book this workshop in the app', 'احجز هذه الورشة من التطبيق')"
-            :note="t('book_in_app_note', 'Pick a date, choose your seats and pay in the Terracotta app — this site is for browsing.', 'اختر التاريخ والمقاعد وادفع عبر تطبيق تيراكوتا — هذا الموقع للتصفح فقط.')"
-          />
         </aside>
       </div>
     </div>
