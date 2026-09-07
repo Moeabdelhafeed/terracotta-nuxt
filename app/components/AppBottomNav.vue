@@ -17,6 +17,22 @@
 
       <li aria-hidden="true" class="mx-1 h-5 w-px bg-white/15" />
 
+      <li v-if="isRegistered">
+        <NuxtLink
+          to="/cart"
+          class="relative flex size-9 items-center justify-center rounded-full transition-colors"
+          :class="isActive('/cart') ? 'bg-white text-brand-ink' : 'text-white/75 hover:text-white'"
+          :aria-label="t('nav_cart', 'Cart', 'عربيتي')"
+        >
+          <LucideShoppingCart class="size-4" />
+          <span
+            v-if="cartCount > 0"
+            class="absolute -top-0.5 -end-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-blush px-1 text-[10px] font-semibold text-brand-ink"
+            dir="ltr"
+          >{{ cartCount > 99 ? '99+' : cartCount }}</span>
+        </NuxtLink>
+      </li>
+
       <li>
         <NotificationBell />
       </li>
@@ -45,6 +61,9 @@ const { user, isAuthenticated } = useSanctumAuth()
 // account" — check `is_guest` too, or a browsing guest would see "Profile" and land on a
 // page gated to registered users only.
 const isRegistered = computed(() => isAuthenticated.value && !user.value?.data?.is_guest)
+
+// The cart only exists for a registered account, so the badge rides on the same guard.
+const { count: cartCount } = useCart()
 
 const items = computed(() => [
   { to: '/', label: t('nav_home', 'Home', 'الرئيسية') },
