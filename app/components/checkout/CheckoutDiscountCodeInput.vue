@@ -30,6 +30,23 @@
     </div>
 
     <span v-if="errorText" class="text-xs text-destructive">{{ errorText }}</span>
+
+    <!-- Only what this customer can still use; private codes are never listed, so an empty
+         list hides this strip and leaves the box to type one in. -->
+    <ul v-if="!applied && offers.length" class="flex flex-wrap gap-2" data-test="advertised-codes">
+      <li v-for="offer in offers" :key="offer.code">
+        <button
+          type="button"
+          class="flex items-center gap-2 rounded-full border border-dashed border-brand-rust/40 px-3 py-1.5 text-xs transition-colors hover:bg-brand-mist/60 disabled:opacity-50"
+          :disabled="disabled"
+          @click="use(offer.code)"
+        >
+          <LucideTicket class="size-3.5 text-brand-rust" />
+          <span class="font-medium uppercase text-brand-rust">{{ offer.code }}</span>
+          <span class="text-muted-foreground">{{ discountCodeSummary(offer, t, format) }}</span>
+        </button>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -48,6 +65,8 @@ const props = defineProps({
 
 const applied = defineModel({ type: String, default: '' })
 const { t } = useLang('web', 'checkout')
+const { format } = usePrice()
+const { codes: offers } = useDiscountCodes()
 
 const draft = ref('')
 
@@ -65,6 +84,12 @@ watch(errorText, (text) => {
 const apply = () => {
   const code = draft.value.trim().toUpperCase()
   if (!code) return
+  applied.value = code
+}
+
+/** Tapping an advertised code applies it straight away — the parent re-quotes on the change. */
+const use = (code) => {
+  draft.value = code
   applied.value = code
 }
 
