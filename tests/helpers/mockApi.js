@@ -42,8 +42,8 @@ const makeError = ({ status, body }) => {
   return err
 }
 
-const resolveEntry = (entry, opts) => {
-  const value = typeof entry === 'function' ? entry(opts) : entry
+const resolveEntry = async (entry, opts) => {
+  const value = typeof entry === 'function' ? await entry(opts) : entry
   if (value && typeof value === 'object' && 'error' in value) throw makeError(value.error)
   if (value && typeof value === 'object' && 'success' in value && 'data' in value) return value
   return envelope(value)
@@ -76,7 +76,7 @@ export const createApiMock = (table = {}) => {
     calls.push({ method, url, body: opts.body, query: opts.query })
     const entry = find(method, url)
     if (entry === undefined) throw makeError({ status: 404, body: { message: `No mock for ${method} ${url}` } })
-    return resolveEntry(entry, opts)
+    return await resolveEntry(entry, opts)
   })
 
   const useApi = () => $fetch
