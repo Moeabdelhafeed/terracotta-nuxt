@@ -1,9 +1,52 @@
 <template>
-  <!-- Route stub: replaced by the domain builder. Keeps the path reserved so links resolve. -->
   <main class="min-h-svh bg-background pb-28">
-    <div class="mx-auto max-w-6xl px-6 py-16">
+    <PageBar :crumbs="crumbs" />
+
+    <div class="mx-auto max-w-3xl px-6 py-16">
       <h1 class="font-display text-3xl font-semibold sm:text-4xl">{{ t('cart_title', 'My cart', 'عربيتي') }}</h1>
-      <p class="mt-3 text-muted-foreground">{{ t('coming_soon', 'Coming soon.', 'قريبًا.') }}</p>
+
+      <div v-if="pending && !items.length" class="mt-8 flex flex-col gap-4" aria-busy="true">
+        <AppSkeleton v-for="n in 3" :key="n" class="h-32 w-full rounded-2xl!" />
+      </div>
+
+      <div v-else-if="!items.length" class="mt-8 rounded-3xl border bg-card p-8 text-center sm:p-12">
+        <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-mist text-brand-rust">
+          <LucideShoppingBag class="size-6" />
+        </span>
+        <p class="mt-4 font-display text-xl font-semibold">{{ t('cart_empty_title', 'Your cart is empty', 'عربيتك فارغة') }}</p>
+        <p class="mt-2 text-sm text-muted-foreground">{{ t('cart_empty_body', 'Pick a piece from the shop and it will show up here.', 'اختر قطعة من المتجر وستظهر هنا.') }}</p>
+        <Button as-child class="mt-6 h-12 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90">
+          <NuxtLink to="/shop">{{ t('browse_shop', 'Browse the shop', 'تصفح المتجر') }}</NuxtLink>
+        </Button>
+      </div>
+
+      <template v-else>
+        <ShopCartLines class="mt-8" />
+
+        <div class="mt-8 rounded-3xl border bg-card p-6 sm:p-8">
+          <div class="flex items-center justify-between gap-4">
+            <span class="text-sm text-muted-foreground">{{ t('summary_total', 'Total', 'الإجمالي', { subGroup: 'checkout' }) }}</span>
+            <span class="font-display text-2xl font-black text-primary">{{ format(total) }}</span>
+          </div>
+          <p class="mt-1 text-xs text-muted-foreground">
+            {{ t('cart_total_note', 'Delivery, discounts and your wallet are applied at checkout.', 'يُحتسب التوصيل والخصومات والمحفظة عند الدفع.') }}
+          </p>
+
+          <p v-if="hasOutOfStock" class="mt-4 flex items-start gap-2 rounded-2xl bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            <LucideAlertCircle class="mt-0.5 size-4 shrink-0" />
+            <span>{{ t('cart_blocked', 'One of these pieces can no longer be fulfilled. Adjust or remove it to continue.', 'إحدى هذه القطع لم تعد متوفرة. عدّلها أو أزلها للمتابعة.') }}</span>
+          </p>
+
+          <Button
+            type="button"
+            :disabled="!canCheckout"
+            class="mt-6 h-12 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+            @click="navigateTo('/checkout')"
+          >
+            {{ t('pay_with_total', 'Pay :amount', 'الدفع :amount', { amount: format(total) }) }}
+          </Button>
+        </div>
+      </template>
     </div>
   </main>
 </template>
@@ -14,5 +57,20 @@ definePageMeta({
   name: 'cart',
 })
 
-const { t } = useLang('web', 'general')
+/**
+ * The basket. Lines that can no longer be fulfilled stay visible and greyed — they are
+ * the reason the pay button is dead, so hiding them would hide the fix. Totals here are
+ * goods only; delivery, discounts and the wallet are the checkout quote's business.
+ */
+const { t } = useLang('web', 'shop')
+const { format } = usePrice()
+const { items, total, hasOutOfStock, canCheckout, pending } = useCart()
+
+const crumbs = computed(() => [
+  { to: '/', label: t('nav_home', 'Home', 'الرئيسية', { subGroup: 'general' }) },
+  { to: '/shop', label: t('nav_shop', 'Shop', 'المتجر', { subGroup: 'general' }) },
+  { label: t('cart_title', 'My cart', 'عربيتي') },
+])
+
+useSeoMeta({ title: () => t('cart_title', 'My cart', 'عربيتي'), robots: 'noindex' })
 </script>
