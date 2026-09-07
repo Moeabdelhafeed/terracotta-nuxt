@@ -155,7 +155,7 @@
             v-if="heroRoute && heroExternal"
             :href="heroRoute"
             target="_blank"
-            rel="noopener"
+            rel="noopener noreferrer"
             class="pointer-events-auto rounded-full bg-white/95 px-6 py-2.5 text-sm font-semibold text-brand-ink transition-colors hover:bg-white"
           >
             {{ hero.cta_text || t('discover', 'Discover', 'اكتشف') }}

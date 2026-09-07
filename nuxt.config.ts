@@ -116,6 +116,22 @@ export default defineNuxtConfig({
     automaticDefaults: true,
   },
 
+  // In token mode the Sanctum bearer lives in a cookie the client has to read, so it
+  // cannot be httpOnly — one script execution would be an account takeover. These headers
+  // are the second line: nothing may frame us (every destructive action is one click:
+  // delete account, cancel an order, claim a gift), and a referrer never carries an
+  // order or gift path off-site.
+  routeRules: {
+    '/**': {
+      headers: {
+        'X-Frame-Options': 'DENY',
+        'Content-Security-Policy': "frame-ancestors 'none'",
+        'X-Content-Type-Options': 'nosniff',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+      },
+    },
+  },
+
   robots: {
     // Nothing behind a login, and nothing addressed to one person, belongs in an index.
     // A gift link in particular is an entitlement: it must never become findable.

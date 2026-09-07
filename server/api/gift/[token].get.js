@@ -13,6 +13,24 @@
  */
 const LOCALES = ['ar', 'en']
 
+/**
+ * What a link-holder is allowed to see. The API's public preview already omits the
+ * buyer's economics, but forwarding its payload wholesale would ship any field a future
+ * resource adds — and this response lands in the SSR payload of a page whose whole
+ * audience is people the link was forwarded to. Pick, never spread.
+ */
+const PUBLIC_GIFT_FIELDS = [
+  'token',
+  'recipient_name',
+  'message',
+  'amount',
+  'from',
+  'is_redeemed',
+  'redeemed_at',
+  'is_claimable',
+  'deep_link',
+  'store_links',
+]
 
 export default defineEventHandler(async (event) => {
   const { xApiToken, apiBaseUrl } = useRuntimeConfig(event)
@@ -34,7 +52,12 @@ export default defineEventHandler(async (event) => {
       },
     })
 
-    return res?.data ?? null
+    const gift = res?.data
+    if (!gift) return null
+
+    return Object.fromEntries(
+      PUBLIC_GIFT_FIELDS.filter((field) => field in gift).map((field) => [field, gift[field]]),
+    )
   } catch (err) {
     const status = err?.response?.status ?? err?.statusCode
 

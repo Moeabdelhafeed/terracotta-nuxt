@@ -83,7 +83,7 @@
               v-if="mapUrl"
               :href="mapUrl"
               target="_blank"
-              rel="noopener"
+              rel="noopener noreferrer"
               class="mt-4 flex items-center gap-2 text-sm font-medium text-brand-rust underline-offset-4 hover:underline"
             >
               <LucideMapPin class="size-4" />

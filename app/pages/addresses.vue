@@ -50,7 +50,7 @@
                   v-if="address.map_url"
                   :href="address.map_url"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                   class="flex size-9 items-center justify-center rounded-xl text-foreground/60 transition-colors hover:bg-brand-mist hover:text-foreground"
                   :aria-label="t('address_open_map', 'Open in maps', 'افتح في الخرائط')"
                 >

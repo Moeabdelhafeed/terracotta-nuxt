@@ -73,7 +73,7 @@ const items = computed(() => banners.value
       attrs: !route
         ? {}
         : external
-          ? { href: route, target: '_blank', rel: 'noopener' }
+          ? { href: route, target: '_blank', rel: 'noopener noreferrer' }
           : { to: route },
     }
   })
