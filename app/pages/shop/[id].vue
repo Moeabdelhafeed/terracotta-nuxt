@@ -57,7 +57,10 @@
               {{ product.category }}<template v-if="product.sub_category"> · {{ product.sub_category }}</template>
             </p>
 
-            <h1 class="mt-2 font-display text-3xl font-semibold sm:text-4xl">{{ product.title }}</h1>
+            <div class="mt-2 flex items-start gap-3">
+              <h1 class="min-w-0 flex-1 font-display text-3xl font-semibold sm:text-4xl">{{ product.title }}</h1>
+              <ShopFavoriteButton class="mt-1 shrink-0" size="lg" :product="product" />
+            </div>
 
             <p class="mt-4 flex items-baseline gap-3">
               <span class="font-display text-3xl font-black text-primary">{{ format(product.sale_price ?? product.price) }}</span>
@@ -90,13 +93,8 @@
               </div>
             </dl>
 
+            <ShopAddToCart class="mt-8" :product="product" />
           </div>
-
-          <AppDownloadCta
-            class="mt-4"
-            :title="t('buy_in_app_title', 'Buy this piece in the app', 'اشترِ هذه القطعة من التطبيق')"
-            :note="t('buy_in_app_note', 'Ordering, delivery and payment all happen in the Terracotta app — this site is for browsing.', 'الطلب والتوصيل والدفع تتم جميعها عبر تطبيق تيراكوتا — هذا الموقع للتصفح فقط.')"
-          />
         </aside>
       </div>
 
@@ -238,7 +236,7 @@ useSchemaOrg([
     offers: () => [{
       price: Number(product.value?.sale_price ?? product.value?.price ?? 0),
       priceCurrency: 'SAR',
-      availability: 'https://schema.org/InStock',
+      availability: product.value?.in_stock === false ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
     }],
   }),
   defineBreadcrumb({

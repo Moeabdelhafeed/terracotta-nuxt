@@ -1,0 +1,161 @@
+/**
+ * The basket (`/api/shop/cart`) and the quote → checkout → pay flow on top of it.
+ *
+ * One line per product, no colour, no variants. The cart is not a reservation: every
+ * fetch re-reads `line.in_stock` / `available_stock`, and checkout is blocked while any
+ * line cannot be fulfilled. Lines are kept through checkout — the server empties the cart
+ * only when the order is paid (or settled on creation), so that is when we refetch.
+ */
+export const HARD_MAX_QUANTITY = 100
+
+export const lineMax = (line) => Math.min(line?.product?.max_quantity ?? HARD_MAX_QUANTITY, HARD_MAX_QUANTITY)
+
+export const useCart = () => {
+  const api = useApi()
+  const { user } = useSanctumAuth()
+  const isRegistered = computed(() => !!user.value && !(user.value?.data?.is_guest ?? user.value?.is_guest))
+
+  const { data, pending, error, refresh } = useApiFetch('/api/shop/cart', {
+    key: 'cart',
+    transform: (res) => res?.data ?? { items: [], total_price: '0.00' },
+    default: () => ({ items: [], total_price: '0.00' }),
+    immediate: isRegistered.value,
+    watch: [isRegistered],
+  })
+
+  const items = computed(() => data.value?.items ?? [])
+  const total = computed(() => data.value?.total_price ?? '0.00')
+  const count = computed(() => items.value.reduce((sum, line) => sum + (line.quantity ?? 0), 0))
+  const hasOutOfStock = computed(() => items.value.some((line) => line.in_stock === false))
+  const canCheckout = computed(() => items.value.length > 0 && !hasOutOfStock.value)
+
+  /** `POST` increments an existing line; the server answers the line it touched. */
+  const add = async (productId, quantity = 1) => {
+    const res = await api('/api/shop/cart', { method: 'POST', body: { shop_product_id: productId, quantity } })
+    await refresh()
+    return res
+  }
+
+  /** `PUT` sets the quantity outright. */
+  const update = async (lineId, quantity) => {
+    const res = await api(`/api/shop/cart/${lineId}`, { method: 'PUT', body: { quantity } })
+    await refresh()
+    return res
+  }
+
+  const remove = async (lineId) => {
+    const res = await api(`/api/shop/cart/${lineId}`, { method: 'DELETE' })
+    await refresh()
+    return res
+  }
+
+  return { cart: data, items, total, count, hasOutOfStock, canCheckout, isRegistered, pending, error, refresh, add, update, remove }
+}
+
+/**
+ * Checkout state: the three inputs (`address_id`, `discount_code`, `use_wallet`), a quote
+ * that follows every change to them or to the cart, and the create/pay calls with the
+ * identical inputs. Whatever the server returns is rendered as-is — totals are never
+ * patched locally.
+ */
+export const useCheckout = () => {
+  const api = useApi()
+  const cart = useCart()
+
+  const addressId = ref(null)
+  const discountCode = ref('')
+  const useWallet = ref(false)
+
+  const quote = ref(null)
+  const quoting = ref(false)
+  const errors = ref({})
+  const error = ref('')
+
+  /** The order this session created, or the open hold found when checkout was refused. */
+  const order = ref(null)
+  const resumed = ref(false)
+
+  const body = () => ({
+    address_id: addressId.value ?? undefined,
+    use_wallet: useWallet.value,
+    discount_code: discountCode.value || undefined,
+  })
+
+  let sequence = 0
+  const requote = async () => {
+    const mine = ++sequence
+    if (!cart.items.value.length) { quote.value = null; return }
+    quoting.value = true
+    try {
+      const res = await api('/api/shop/cart/quote', { method: 'POST', body: body() })
+      if (mine !== sequence) return
+      quote.value = res?.data ?? null
+      // A refused coupon bounces back into the input, which requotes without it — keep the
+      // refusal on screen until another code is tried.
+      if (discountCode.value || !errors.value.discount_code) errors.value = {}
+      error.value = ''
+    } catch (err) {
+      if (mine !== sequence) return
+      const normalized = normalizeApiError(err)
+      errors.value = normalized.errors
+      error.value = normalized.message
+      quote.value = null
+    } finally {
+      if (mine === sequence) quoting.value = false
+    }
+  }
+
+  watch([addressId, discountCode, useWallet, () => cart.items.value], requote, { immediate: true })
+
+  const settled = computed(() => !!order.value && (order.value.payment_status === 'paid' || isZeroMoney(order.value.amount_due)))
+
+  const checkout = async () => {
+    errors.value = {}
+    error.value = ''
+    resumed.value = false
+    try {
+      const res = await api('/api/shop/cart/checkout', { method: 'POST', body: body() })
+      order.value = res?.data ?? null
+      // Covered in full by the wallet or a coupon: the server settled it and emptied the cart.
+      if (settled.value) await cart.refresh()
+      return order.value
+    } catch (err) {
+      const normalized = normalizeApiError(err)
+      errors.value = normalized.errors
+      error.value = normalized.message
+      if (normalized.errors.cart) {
+        const open = await findAwaitingPayment()
+        if (open) { order.value = open; resumed.value = true }
+      }
+      throw normalized
+    }
+  }
+
+  /** Only one hold is open at a time, so the newest page is enough to find it. */
+  const findAwaitingPayment = async () => {
+    try {
+      const res = await api('/api/shop/orders', { query: { per_page: 5 } })
+      return unwrapList(res?.data).items.find((candidate) => candidate.status === 'awaiting_payment') ?? null
+    } catch {
+      return null
+    }
+  }
+
+  const pay = async () => {
+    const res = await api(`/api/shop/orders/${order.value.id}/pay`, { method: 'POST' })
+    order.value = res?.data ?? order.value
+    await cart.refresh()
+    return res
+  }
+
+  /** After the open hold is cancelled the basket is untouched — back to a fresh quote. */
+  const reset = () => {
+    order.value = null
+    resumed.value = false
+    errors.value = {}
+    error.value = ''
+    return requote()
+  }
+
+  return { cart, addressId, discountCode, useWallet, quote, quoting, errors, error, order, resumed, settled, requote, checkout, pay, reset }
+}

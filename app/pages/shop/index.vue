@@ -13,6 +13,9 @@
 
     <div class="mx-auto max-w-6xl px-6 py-16">
 
+    <!-- Cart / favourites / orders, the three shortcuts the store home carries. -->
+    <ShopQuickTiles class="mb-10 sm:max-w-md" />
+
     <!--
       Browsing only: filters, no basket. The top level is picked by picture — a real photo
       per category, same as the home page — and the row scrolls sideways rather than
