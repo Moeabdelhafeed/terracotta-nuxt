@@ -23,3 +23,7 @@ logs
 .env.*
 !.env.example
 
+
+# Claude Code agent scratch — worktrees and temp files, never the settings
+.claude/worktrees/
+.claude/tmp/
