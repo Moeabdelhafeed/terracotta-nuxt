@@ -40,7 +40,7 @@
                 type="button"
                 class="size-20 shrink-0 overflow-hidden rounded-xl border transition-opacity"
                 :class="active === shot ? 'border-primary' : 'opacity-70 hover:opacity-100'"
-                @click="active = shot"
+                @click="chosen = shot"
               >
                 <AppImage :src="shot" :alt="product.title" class="size-full object-cover" />
               </button>
@@ -146,8 +146,15 @@ const shots = computed(() => {
   return gallery.length ? gallery : [product.value?.image].filter(Boolean)
 })
 
-const active = ref(null)
-watch(shots, (list) => { active.value = list[0] ?? null }, { immediate: true })
+/**
+ * Derived, not synced. An `immediate` watcher would set this during setup — while the
+ * SSR fetch is still in flight and `shots` is empty — and Vue does not flush watchers
+ * again before the server render, so the main photo was missing from the SSR HTML
+ * entirely and only appeared after hydration (a mismatch, and a late LCP).
+ * `chosen` holds a thumbnail the visitor picked; until then the first shot wins.
+ */
+const chosen = ref(null)
+const active = computed(() => (chosen.value && shots.value.includes(chosen.value) ? chosen.value : shots.value[0] ?? null))
 
 /**
  * Swatch names, since the API sends bare hex strings. The value is matched to the nearest
