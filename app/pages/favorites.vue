@@ -10,7 +10,7 @@
         </Button>
       </div>
 
-      <ul v-if="pending && !favorites.length" class="mt-10 grid grid-cols-2 gap-5 lg:grid-cols-4" aria-busy="true">
+      <ul v-if="(pending || !mounted) && !favorites.length" class="mt-10 grid grid-cols-2 gap-5 lg:grid-cols-4" aria-busy="true">
         <li v-for="n in 4" :key="n">
           <ProductCardSkeleton />
         </li>
@@ -38,7 +38,7 @@
 
 <script setup>
 definePageMeta({
-  middleware: ['auth-mode', 'require-registered'],
+  middleware: ['auth-mode'],
   name: 'favorites',
 })
 
@@ -48,9 +48,14 @@ definePageMeta({
  * detail page's / the cart's to report, rather than something to pre-empt here.
  * Unhearting removes the card at once: `favorites` reads the same optimistic overrides
  * the button writes.
+ *
+ * A visitor without an account gets the same list out of localStorage.
  */
 const { t } = useLang('web', 'shop')
 const { favorites, pending } = useFavorites()
+
+// The local list only exists after hydration; without this the empty panel flashes.
+const mounted = useMounted()
 
 const crumbs = computed(() => [
   { to: '/', label: t('nav_home', 'Home', 'الرئيسية', { subGroup: 'general' }) },

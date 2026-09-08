@@ -12,3 +12,10 @@ export const toHalalas = (value) => {
 
 /** `"0.00"` is settled — the create call already paid it, there is nothing to `/pay`. */
 export const isZeroMoney = (value) => toHalalas(value) === 0
+
+/** Back to the wire format: `12345` → `"123.45"`. */
+export const fromHalalas = (cents) => {
+  const rounded = Math.round(cents)
+  const abs = Math.abs(rounded)
+  return `${rounded < 0 ? '-' : ''}${Math.floor(abs / 100)}.${String(abs % 100).padStart(2, '0')}`
+}

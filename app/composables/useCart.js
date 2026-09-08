@@ -12,8 +12,8 @@ export const lineMax = (line) => Math.min(line?.product?.max_quantity ?? HARD_MA
 
 export const useCart = () => {
   const api = useApi()
-  const { user } = useSanctumAuth()
-  const isRegistered = computed(() => !!user.value && !(user.value?.data?.is_guest ?? user.value?.is_guest))
+  const { isRegistered } = useIsRegistered()
+  const local = useLocalCart()
 
   const { data, pending, error, refresh } = useApiFetch('/api/shop/cart', {
     key: 'cart',
@@ -23,14 +23,15 @@ export const useCart = () => {
     watch: [isRegistered],
   })
 
-  const items = computed(() => data.value?.items ?? [])
-  const total = computed(() => data.value?.total_price ?? '0.00')
-  const count = computed(() => items.value.reduce((sum, line) => sum + (line.quantity ?? 0), 0))
+  const items = computed(() => (isRegistered.value ? (data.value?.items ?? []) : local.items.value))
+  const total = computed(() => (isRegistered.value ? (data.value?.total_price ?? '0.00') : local.total.value))
+  const count = computed(() => (isRegistered.value ? items.value.reduce((sum, line) => sum + (line.quantity ?? 0), 0) : local.count.value))
   const hasOutOfStock = computed(() => items.value.some((line) => line.in_stock === false))
   const canCheckout = computed(() => items.value.length > 0 && !hasOutOfStock.value)
 
   /** `POST` increments an existing line; the server answers the line it touched. */
   const add = async (productId, quantity = 1) => {
+    if (!isRegistered.value) return local.add(productId, quantity)
     const res = await api('/api/shop/cart', { method: 'POST', body: { shop_product_id: productId, quantity } })
     await refresh()
     return res
@@ -38,18 +39,36 @@ export const useCart = () => {
 
   /** `PUT` sets the quantity outright. */
   const update = async (lineId, quantity) => {
+    if (!isRegistered.value) return local.update(lineId, quantity)
     const res = await api(`/api/shop/cart/${lineId}`, { method: 'PUT', body: { quantity } })
     await refresh()
     return res
   }
 
   const remove = async (lineId) => {
+    if (!isRegistered.value) return local.remove(lineId)
     const res = await api(`/api/shop/cart/${lineId}`, { method: 'DELETE' })
     await refresh()
     return res
   }
 
-  return { cart: data, items, total, count, hasOutOfStock, canCheckout, isRegistered, pending, error, refresh, add, update, remove }
+  const cart = computed(() => (isRegistered.value ? data.value : { items: local.items.value, total_price: local.total.value }))
+
+  return {
+    cart,
+    items,
+    total,
+    count,
+    hasOutOfStock,
+    canCheckout,
+    isRegistered,
+    pending: computed(() => (isRegistered.value ? pending.value : local.pending.value)),
+    error: computed(() => (isRegistered.value ? error.value : local.error.value)),
+    refresh: () => (isRegistered.value ? refresh() : local.refresh()),
+    add,
+    update,
+    remove,
+  }
 }
 
 /**

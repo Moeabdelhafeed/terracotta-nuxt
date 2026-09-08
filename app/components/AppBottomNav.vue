@@ -17,7 +17,7 @@
 
       <li aria-hidden="true" class="mx-1 h-5 w-px bg-white/15" />
 
-      <li v-if="isRegistered">
+      <li>
         <NuxtLink
           to="/cart"
           class="relative flex size-9 items-center justify-center rounded-full transition-colors"
@@ -61,7 +61,8 @@ const { appUsers } = useAuthConfig()
 // registered users only.
 const { isRegistered } = useIsRegistered()
 
-// The cart only exists for a registered account, so the badge rides on the same guard.
+// A visitor without an account has a cart too — it just lives in localStorage until they
+// sign in — so the entry and its badge are shown to everyone.
 const { count: cartCount } = useCart()
 
 const items = computed(() => [

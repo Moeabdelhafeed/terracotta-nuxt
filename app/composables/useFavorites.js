@@ -3,17 +3,21 @@
  * and the server call follows (`POST`/`DELETE /api/shop/favorites/{product}`). Overrides
  * are keyed by product id in shared state, so a card in the grid, the detail page and
  * the favorites list all agree without a refetch.
+ *
+ * A visitor with no account hearts into localStorage instead (`useLocalFavorites`); the
+ * pile is pushed to the server when they sign in.
  */
 export const useFavorites = () => {
   const api = useApi()
-  const route = useRoute()
   const toast = useToast()
-  const { user } = useSanctumAuth()
-  const isRegistered = computed(() => !!user.value && !(user.value?.data?.is_guest ?? user.value?.is_guest))
+  const { isRegistered } = useIsRegistered()
+  const local = useLocalFavorites()
 
   const overrides = useState('favorite-overrides', () => ({}))
 
-  const isFavorited = (product) => overrides.value[product?.id] ?? !!product?.is_favorited
+  const isFavorited = (product) => (isRegistered.value
+    ? (overrides.value[product?.id] ?? !!product?.is_favorited)
+    : local.isFavorited(product))
 
   const { data, pending, error, refresh } = useApiFetch('/api/shop/favorites', {
     key: 'favorites',
@@ -23,12 +27,12 @@ export const useFavorites = () => {
     watch: [isRegistered],
   })
 
-  const favorites = computed(() => (data.value ?? []).filter((product) => isFavorited(product)))
+  const favorites = computed(() => (isRegistered.value
+    ? (data.value ?? []).filter((product) => isFavorited(product))
+    : local.favorites.value))
 
   const toggle = async (product) => {
-    if (!isRegistered.value) {
-      return navigateTo({ path: '/login', query: { redirect: route.fullPath } })
-    }
+    if (!isRegistered.value) return local.toggle(product)
     const next = !isFavorited(product)
     overrides.value = { ...overrides.value, [product.id]: next }
     try {
@@ -44,5 +48,13 @@ export const useFavorites = () => {
     return next
   }
 
-  return { favorites, isFavorited, toggle, isRegistered, pending, error, refresh }
+  return {
+    favorites,
+    isFavorited,
+    toggle,
+    isRegistered,
+    pending: computed(() => (isRegistered.value ? pending.value : local.pending.value)),
+    error: computed(() => (isRegistered.value ? error.value : local.error.value)),
+    refresh: () => (isRegistered.value ? refresh() : local.refresh()),
+  }
 }

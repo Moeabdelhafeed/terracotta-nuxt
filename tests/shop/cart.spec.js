@@ -24,6 +24,7 @@ const { api, lang, sanctum } = await vi.hoisted(async () => {
     state,
     api: createApiMock({
       'GET /api/shop/cart': () => envelope(globalThis.__cart),
+      'GET /api/shop/products/{id}': () => envelope({ id: 11, title: 'Cup', price: '65.00', sale_price: null, in_stock: true, stock: 12, max_quantity: 12 }),
       'POST /api/shop/cart': (opts) => envelope({ id: 1, quantity: opts.body.quantity }, 'Added to cart.'),
       'PUT /api/shop/cart/{id}': (opts) => envelope({ id: 1, quantity: opts.body.quantity }, 'Cart updated.'),
       'DELETE /api/shop/cart/{id}': envelope(null, 'Removed.'),
@@ -45,6 +46,7 @@ mockNuxtImport('usePrice', () => () => ({ format: (v) => `${v} SAR`, currency: r
 mockNuxtImport('useToast', () => () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), toasts: ref([]), dismiss: vi.fn() }))
 
 const { useCart, useCheckout, lineMax, HARD_MAX_QUANTITY } = await import('~/composables/useCart')
+const { localCartIds } = await import('~/composables/useLocalShop')
 const ShopCartLines = (await import('~/components/shop/ShopCartLines.vue')).default
 const ShopQuantityStepper = (await import('~/components/shop/ShopQuantityStepper.vue')).default
 
@@ -52,6 +54,8 @@ beforeEach(() => {
   globalThis.__cart = { items: [], total_price: '0.00' }
   globalThis.__quote = { subtotal: '130.00', discount_amount: '0.00', discount_code: null, delivery_fee: '15.00', total_price: '145.00', vat_rate: '15.00', vat_amount: '18.91', wallet_applied: '0.00', amount_due: '145.00' }
   globalThis.__orders = []
+  localCartIds.value = []
+  sanctum.user.value = { data: { id: 1, name: 'Test', is_guest: false, wallet_balance: '100.00' } }
   globalThis.__checkout = () => ({ success: true, message: 'ok', errors: null, data: { id: 9, status: 'awaiting_payment', payment_status: 'unpaid', amount_due: '145.00', payment_expires_at: new Date(Date.now() + 900000).toISOString() } })
   api.$fetch.mockClear()
 })
@@ -102,6 +106,36 @@ describe('useCart', () => {
     await cart.refresh()
     expect(cart.canCheckout.value).toBe(true)
     expect(cart.count.value).toBe(2)
+  })
+})
+
+describe('useCart — the guest basket', () => {
+  it('a visitor with no account keeps the basket in the browser', async () => {
+    sanctum.user.value = null
+    const cart = useCart()
+    await flushPromises()
+    const before = api.calls.length
+
+    await cart.add(11, 2)
+    await flushPromises()
+
+    expect(api.calls.slice(before).some((c) => c.method !== 'GET')).toBe(false)
+    expect(localCartIds.value).toEqual([{ id: 11, quantity: 2 }])
+    expect(cart.count.value).toBe(2)
+    expect(cart.items.value[0]).toMatchObject({ id: 11, quantity: 2, unit_price: '65.00', line_total: '130.00' })
+    expect(cart.total.value).toBe('130.00')
+    expect(cart.canCheckout.value).toBe(true)
+  })
+
+  it('a signed-in customer reads the server basket, never the local one', async () => {
+    localCartIds.value = [{ id: 11, quantity: 9 }]
+    globalThis.__cart = { items: [line()], total_price: '130.00' }
+    const cart = useCart()
+    await cart.refresh()
+    await flushPromises()
+
+    expect(cart.count.value).toBe(2)
+    expect(cart.items.value[0].id).toBe(1)
   })
 })
 
@@ -159,7 +193,9 @@ describe('useCheckout', () => {
 
   it('a fully covered checkout settles on creation and clears the cart — no /pay', async () => {
     globalThis.__cart = { items: [line()], total_price: '130.00' }
-    globalThis.__checkout = () => ({ success: true, message: 'ok', errors: null, data: { id: 9, status: 'pending', payment_status: 'paid', amount_due: '0.00', payment_expires_at: null } })
+    localCartIds.value = []
+  sanctum.user.value = { data: { id: 1, name: 'Test', is_guest: false, wallet_balance: '100.00' } }
+  globalThis.__checkout = () => ({ success: true, message: 'ok', errors: null, data: { id: 9, status: 'pending', payment_status: 'paid', amount_due: '0.00', payment_expires_at: null } })
     const flow = useCheckout()
     await flow.cart.refresh()
     await flushPromises()

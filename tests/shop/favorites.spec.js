@@ -12,6 +12,7 @@ const { api, lang, sanctum, toast, navigate } = await vi.hoisted(async () => {
   return {
     api: createApiMock({
       'GET /api/shop/favorites': () => envelope(globalThis.__favorites),
+      'GET /api/shop/products/{id}': () => envelope({ id: 15, title: 'Jug', price: '80.00', sale_price: null, in_stock: true, stock: 3, max_quantity: 3 }),
       'POST /api/shop/favorites/{id}': envelope(null, 'Added to favorites.'),
       'DELETE /api/shop/favorites/{id}': () => globalThis.__unfavorite(),
     }),
@@ -31,6 +32,7 @@ mockNuxtImport('navigateTo', () => navigate)
 mockNuxtImport('useRoute', () => () => ({ fullPath: '/shop/11', params: {}, query: {} }))
 
 const { useFavorites } = await import('~/composables/useFavorites')
+const { localFavoriteIds } = await import('~/composables/useLocalShop')
 const ShopFavoriteButton = (await import('~/components/shop/ShopFavoriteButton.vue')).default
 
 beforeEach(() => {
@@ -39,6 +41,7 @@ beforeEach(() => {
   api.$fetch.mockClear()
   toast.error.mockClear()
   navigate.mockClear()
+  localFavoriteIds.value = []
   // A registered session again for every test — the guest case must not leak forward.
   sanctum.user.value = { data: { id: 1, name: 'Test', is_guest: false, wallet_balance: '100.00' } }
 })
@@ -101,15 +104,32 @@ describe('useFavorites', () => {
     expect(favorites.favorites.value).toHaveLength(0)
   })
 
-  it('a guest is sent to log in instead of hitting a 401', async () => {
+  it('a guest hearts into the browser rather than being sent to log in', async () => {
     sanctum.user.value = { data: { id: 2, is_guest: true } }
     const favorites = useFavorites()
     await flushPromises()
+    const cold = product({ id: 15, is_favorited: false })
 
-    await favorites.toggle(product({ id: 15, is_favorited: false }))
+    expect(await favorites.toggle(cold)).toBe(true)
+    await flushPromises()
 
-    expect(navigate).toHaveBeenCalledWith({ path: '/login', query: { redirect: '/shop/11' } })
+    expect(navigate).not.toHaveBeenCalled()
     expect(api.calls.some((c) => c.url === '/api/shop/favorites/15')).toBe(false)
+    expect(localFavoriteIds.value).toEqual([15])
+    expect(favorites.isFavorited(cold)).toBe(true)
+    expect(favorites.favorites.value.map((p) => p.id)).toEqual([15])
+  })
+
+  it('a guest un-hearts back out of the browser', async () => {
+    sanctum.user.value = null
+    const favorites = useFavorites()
+    const hot = product({ id: 15, is_favorited: false })
+
+    await favorites.toggle(hot)
+    expect(await favorites.toggle(hot)).toBe(false)
+
+    expect(localFavoriteIds.value).toEqual([])
+    expect(favorites.favorites.value).toHaveLength(0)
   })
 })
 

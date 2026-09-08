@@ -5,7 +5,7 @@
     <div class="mx-auto max-w-3xl px-6 py-16">
       <h1 class="font-display text-3xl font-semibold sm:text-4xl">{{ t('cart_title', 'My cart', 'عربيتي') }}</h1>
 
-      <div v-if="pending && !items.length" class="mt-8 flex flex-col gap-4" aria-busy="true">
+      <div v-if="(pending || !mounted) && !items.length" class="mt-8 flex flex-col gap-4" aria-busy="true">
         <AppSkeleton v-for="n in 3" :key="n" class="h-32 w-full rounded-2xl!" />
       </div>
 
@@ -41,9 +41,11 @@
             type="button"
             :disabled="!canCheckout"
             class="mt-6 h-12 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
-            @click="navigateTo('/checkout')"
+            @click="onPay"
           >
-            {{ t('pay_with_total', 'Pay :amount', 'الدفع :amount', { amount: format(total) }) }}
+            {{ isRegistered
+              ? t('pay_with_total', 'Pay :amount', 'الدفع :amount', { amount: format(total) })
+              : t('sign_in_to_check_out', 'Sign in to check out', 'سجّل الدخول لإتمام الشراء') }}
           </Button>
         </div>
       </template>
@@ -53,7 +55,7 @@
 
 <script setup>
 definePageMeta({
-  middleware: ['auth-mode', 'require-registered'],
+  middleware: ['auth-mode'],
   name: 'cart',
 })
 
@@ -61,10 +63,21 @@ definePageMeta({
  * The basket. Lines that can no longer be fulfilled stay visible and greyed — they are
  * the reason the pay button is dead, so hiding them would hide the fix. Totals here are
  * goods only; delivery, discounts and the wallet are the checkout quote's business.
+ *
+ * A visitor without an account gets the same basket out of localStorage, but paying still
+ * needs a real account — the button sends them to sign in and back to checkout.
  */
 const { t } = useLang('web', 'shop')
 const { format } = usePrice()
 const { items, total, hasOutOfStock, canCheckout, pending } = useCart()
+const { isRegistered } = useIsRegistered()
+
+// The local basket only exists after hydration; without this the empty panel flashes.
+const mounted = useMounted()
+
+const onPay = () => (isRegistered.value
+  ? navigateTo('/checkout')
+  : navigateTo({ path: '/login', query: { redirect: '/checkout' } }))
 
 const crumbs = computed(() => [
   { to: '/', label: t('nav_home', 'Home', 'الرئيسية', { subGroup: 'general' }) },

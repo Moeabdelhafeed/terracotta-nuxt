@@ -24,10 +24,11 @@
 /** The three shortcuts the store home carries: cart, favourites, orders. */
 const { t } = useLang('web', 'shop')
 const { count } = useCart()
+const { favorites } = useFavorites()
 
 const tiles = computed(() => [
   { key: 'cart', to: '/cart', label: t('cart_title', 'My cart', 'عربيتي'), badge: count.value },
-  { key: 'favorites', to: '/favorites', label: t('favorites_title', 'My favourites', 'منتجاتي المفضلة'), badge: 0 },
+  { key: 'favorites', to: '/favorites', label: t('favorites_title', 'My favourites', 'منتجاتي المفضلة'), badge: favorites.value.length },
   { key: 'orders', to: '/orders', label: t('orders_title', 'My orders', 'طلباتي'), badge: 0 },
 ])
 </script>

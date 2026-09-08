@@ -9,6 +9,9 @@ const { api, lang, sanctum, toast, navigate } = await vi.hoisted(async () => {
   return {
     api: createApiMock({
       'GET /api/shop/cart': () => envelope({ items: [], total_price: '0.00' }),
+      // The local basket refetches its products from the public catalogue; without this
+      // the mock 404s and the guest's line is pruned as "gone" the moment it is added.
+      'GET /api/shop/products/{id}': () => envelope({ id: 11, title: 'Cup', price: '45.00', in_stock: true, stock: 40, max_quantity: 40 }),
       'POST /api/shop/cart': () => globalThis.__add(),
     }),
     lang: createLang('en'),
@@ -28,6 +31,9 @@ mockNuxtImport('navigateTo', () => navigate)
 mockNuxtImport('useRoute', () => () => ({ params: { id: '11' }, query: {}, fullPath: '/shop/11' }))
 
 const ShopAddToCart = (await import('~/components/shop/ShopAddToCart.vue')).default
+// The storage ref is a module singleton and this env's `localStorage` is a stub whose
+// `clear` is not a function — the ref has to be emptied by hand between cases.
+const { localCartIds } = await import('~/composables/useLocalShop')
 
 const product = (over = {}) => ({ id: 11, title: 'Cup', in_stock: true, stock: 40, max_quantity: 40, ...over })
 
@@ -37,6 +43,7 @@ const addButton = (wrapper) => wrapper.findAll('button').find((b) => b.text() ==
 beforeEach(() => {
   api.calls.length = 0
   navigate.mockClear()
+  localCartIds.value = []
   sanctum.user.value = { data: { id: 1, name: 'Sara', is_guest: false } }
   globalThis.__add = () => ({ success: true, message: 'Added.', errors: null, data: { id: 1 } })
 })
@@ -70,25 +77,27 @@ describe('ShopAddToCart — what the stock says', () => {
 })
 
 describe('ShopAddToCart — who may add', () => {
-  it('sends a guest to log in rather than to a 401', async () => {
+  it('drops a guest\u2019s pick into the local basket instead of bouncing them to log in', async () => {
     sanctum.user.value = { data: { id: 2, is_guest: true } }
     const wrapper = await mount()
 
     await addButton(wrapper).trigger('click')
     await flushPromises()
 
-    expect(navigate).toHaveBeenCalledWith({ path: '/login', query: { redirect: '/shop/11' } })
+    expect(navigate).not.toHaveBeenCalled()
     expect(api.calls.some((call) => call.method === 'POST')).toBe(false)
+    expect(localCartIds.value).toEqual([{ id: 11, quantity: 1 }])
   })
 
-  it('sends an anonymous visitor to log in too', async () => {
+  it('does the same for an anonymous visitor', async () => {
     sanctum.user.value = null
     const wrapper = await mount()
 
     await addButton(wrapper).trigger('click')
     await flushPromises()
 
-    expect(navigate).toHaveBeenCalledWith({ path: '/login', query: { redirect: '/shop/11' } })
+    expect(navigate).not.toHaveBeenCalled()
+    expect(localCartIds.value).toEqual([{ id: 11, quantity: 1 }])
   })
 
   it('adds the chosen quantity for a registered customer, then offers the cart', async () => {

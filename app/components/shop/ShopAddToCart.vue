@@ -40,8 +40,7 @@ const props = defineProps({
 
 const { t } = useLang('web', 'shop')
 const toast = useToast()
-const route = useRoute()
-const { add, isRegistered } = useCart()
+const { add } = useCart()
 
 const quantity = ref(1)
 const pending = ref(false)
@@ -61,9 +60,6 @@ const stockNote = computed(() => {
 watch(() => props.product.id, () => { quantity.value = 1; added.value = false; error.value = '' })
 
 const onAdd = async () => {
-  if (!isRegistered.value) {
-    return navigateTo({ path: '/login', query: { redirect: route.fullPath } })
-  }
   pending.value = true
   error.value = ''
   try {
