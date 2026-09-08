@@ -33,9 +33,9 @@
           v-if="isBareImage"
           :src="image"
           :alt="title"
-          class="aspect-[16/5] w-full object-cover sm:aspect-[21/6]"
+          class="aspect-[16/9] w-full object-cover sm:aspect-[21/6]"
         />
-        <AppMedia v-else :src="image" :alt="title" class="aspect-[16/5] w-full object-cover sm:aspect-[21/6]" />
+        <AppMedia v-else :src="image" :alt="title" class="aspect-[16/9] w-full object-cover sm:aspect-[21/6]" />
 
         <div class="absolute inset-0 flex flex-col items-center justify-center px-6 text-center text-white">
           <h1 class="max-w-2xl font-display text-3xl font-semibold drop-shadow-lg sm:text-5xl">{{ title }}</h1>

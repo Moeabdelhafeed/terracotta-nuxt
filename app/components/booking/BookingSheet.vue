@@ -6,7 +6,7 @@
       <div class="relative flex max-h-[85vh] w-full flex-col overflow-hidden rounded-2xl border bg-background shadow-lg" :class="wide ? 'max-w-2xl' : 'max-w-md'">
         <div class="flex items-center justify-between gap-3 border-b p-6 pb-4">
           <div class="flex items-center gap-3">
-            <span v-if="$slots.icon" class="flex size-9 items-center justify-center rounded-xl bg-brand-mist text-brand-rust">
+            <span v-if="$slots.icon" class="flex size-9 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust">
               <slot name="icon" />
             </span>
             <h2 class="font-display text-lg font-semibold">{{ title }}</h2>

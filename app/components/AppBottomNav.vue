@@ -5,12 +5,12 @@
     :aria-hidden="!visible"
   >
     <ul
-      class="flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-white/10 bg-brand-ink/85 p-1.5 text-sm text-white shadow-lg backdrop-blur-md"
+      class="flex max-w-full items-center gap-1 overflow-x-auto scrollbar-none rounded-2xl border border-white/10 bg-brand-ink/85 p-1.5 text-sm text-white shadow-lg backdrop-blur-md"
     >
       <li v-for="item in items" :key="item.to">
         <NuxtLink
           :to="item.to"
-          class="block whitespace-nowrap rounded-full px-4 py-2 transition-colors"
+          class="block whitespace-nowrap rounded-xl px-4 py-2.5 transition-colors"
           :class="isActive(item.to) ? 'bg-white text-brand-ink' : 'text-white/75 hover:text-white'"
         >{{ item.label }}</NuxtLink>
       </li>
@@ -20,7 +20,7 @@
       <li>
         <NuxtLink
           to="/cart"
-          class="relative flex size-9 items-center justify-center rounded-full transition-colors"
+          class="relative flex size-10 items-center justify-center rounded-xl transition-colors"
           :class="isActive('/cart') ? 'bg-white text-brand-ink' : 'text-white/75 hover:text-white'"
           :aria-label="t('nav_cart', 'Cart', 'عربيتي')"
         >

@@ -5,7 +5,7 @@
       <div class="relative w-full max-w-lg rounded-2xl border bg-background p-6 shadow-lg">
         <div class="mb-5 flex items-center justify-between">
           <span class="flex items-center gap-3">
-            <span class="flex size-9 items-center justify-center rounded-xl bg-brand-mist text-brand-rust"><LucideFileText class="size-4" /></span>
+            <span class="flex size-9 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust"><LucideFileText class="size-4" /></span>
             <span class="font-display text-base font-semibold">{{ page?.name || t('terms_and_conditions', 'Terms & Conditions', 'الشروط والأحكام') }}</span>
           </span>
           <button type="button" class="text-muted-foreground transition-colors hover:text-foreground" :aria-label="t('close', 'Close', 'إغلاق')" @click="emit('update:open', false)">

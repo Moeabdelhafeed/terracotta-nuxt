@@ -5,12 +5,12 @@
     </Button>
 
     <Teleport to="body">
-      <div v-if="open" class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+      <div v-if="open" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4" role="dialog" aria-modal="true">
         <div class="absolute inset-0 bg-black/50" @click="pending || (open = false)" />
         <div class="relative w-full max-w-md rounded-2xl border bg-background p-6 shadow-lg">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <span class="flex size-9 items-center justify-center rounded-xl bg-brand-mist text-brand-rust">
+              <span class="flex size-9 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust">
                 <LucidePackageX class="size-4" />
               </span>
               <h2 class="font-display text-lg font-semibold text-foreground">{{ t('cancel_order', 'Cancel order', 'إلغاء الطلب') }}</h2>
@@ -32,7 +32,7 @@
 
           <span v-if="error" class="mt-3 block text-xs text-destructive">{{ error }}</span>
 
-          <div class="mt-6 flex gap-3">
+          <div class="mt-6 flex flex-col gap-3 sm:flex-row">
             <Button type="button" variant="outline" class="h-12 flex-1 rounded-xl" :disabled="pending" @click="open = false">
               {{ t('keep_order', 'Keep order', 'الاحتفاظ بالطلب') }}
             </Button>

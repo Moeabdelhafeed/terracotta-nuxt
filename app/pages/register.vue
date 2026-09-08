@@ -19,7 +19,7 @@
             :key="kind"
             type="button"
             size="sm"
-            class="rounded-full"
+            class="rounded-xl"
             :variant="identifierKind === kind ? 'default' : 'outline'"
             @click="identifierKind = kind"
           >

@@ -5,7 +5,7 @@
         <div class="flex items-center justify-between">
           <NuxtLink
             to="/profile"
-            class="flex size-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground ltr:-ms-2 rtl:-me-2 rtl:-scale-x-100"
+            class="flex size-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground -ms-2 rtl:-scale-x-100"
             :aria-label="t('back_to_profile', 'Back to profile', 'عودة للملف')"
           >
             <LucideArrowLeft class="size-5" />
@@ -64,7 +64,7 @@
 
           <ul v-else class="mt-4 flex flex-col gap-3" data-test="wallet-ledger">
             <li v-for="tx in transactions" :key="tx.id" class="flex items-start gap-3 rounded-xl border p-4 text-sm">
-              <span class="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-mist text-brand-rust">
+              <span class="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust">
                 <component :is="walletReasonIcon(tx.reason)" class="size-4" />
               </span>
               <div class="min-w-0 flex-1">
@@ -84,7 +84,7 @@
 
           <!-- Real links, so a page is shareable and crawlable rather than a click handler. -->
           <nav v-if="lastPage > 1" class="mt-6 flex flex-wrap items-center justify-center gap-2">
-            <Button v-if="currentPage > 1" as-child size="sm" variant="outline" class="rounded-full">
+            <Button v-if="currentPage > 1" as-child size="sm" variant="outline" class="rounded-xl">
               <NuxtLink :to="linkTo(currentPage - 1)" rel="prev">{{ t('previous', 'Previous', 'السابق') }}</NuxtLink>
             </Button>
             <Button
@@ -93,11 +93,11 @@
               as-child
               size="sm"
               :variant="number === currentPage ? 'default' : 'outline'"
-              class="min-w-10 rounded-full"
+              class="min-w-10 rounded-xl"
             >
               <NuxtLink :to="linkTo(number)" :aria-current="number === currentPage ? 'page' : undefined">{{ number }}</NuxtLink>
             </Button>
-            <Button v-if="currentPage < lastPage" as-child size="sm" variant="outline" class="rounded-full">
+            <Button v-if="currentPage < lastPage" as-child size="sm" variant="outline" class="rounded-xl">
               <NuxtLink :to="linkTo(currentPage + 1)" rel="next">{{ t('next', 'Next', 'التالي') }}</NuxtLink>
             </Button>
           </nav>

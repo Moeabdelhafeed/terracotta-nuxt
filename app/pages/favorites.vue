@@ -5,7 +5,7 @@
     <div class="mx-auto max-w-6xl px-6 py-16">
       <div class="flex items-center justify-between gap-4">
         <h1 class="font-display text-3xl font-semibold sm:text-4xl">{{ t('favorites_title', 'My favourites', 'منتجاتي المفضلة') }}</h1>
-        <Button as-child variant="outline" size="sm" class="rounded-full">
+        <Button as-child variant="outline" size="sm" class="rounded-xl">
           <NuxtLink to="/shop">{{ t('close', 'Close', 'اغلاق') }}</NuxtLink>
         </Button>
       </div>
@@ -17,7 +17,7 @@
       </ul>
 
       <div v-else-if="!favorites.length" class="mt-10 rounded-3xl border bg-card p-8 text-center sm:p-12">
-        <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-mist text-brand-rust">
+        <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-rust/10 text-brand-rust">
           <LucideHeart class="size-6" />
         </span>
         <p class="mt-4 font-display text-xl font-semibold">{{ t('favorites_empty_title', 'Nothing saved yet', 'لا توجد مفضلات بعد') }}</p>

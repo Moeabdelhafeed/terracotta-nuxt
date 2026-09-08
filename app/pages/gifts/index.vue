@@ -24,7 +24,7 @@
       </div>
 
       <section v-else-if="!items.length" class="mt-10 rounded-3xl border bg-card p-10 text-center">
-        <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-mist text-brand-rust">
+        <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-rust/10 text-brand-rust">
           <LucideGift class="size-6" />
         </span>
         <h2 class="mt-5 font-display text-xl font-semibold">
@@ -50,7 +50,7 @@
           :key="n"
           as-child
           size="sm"
-          class="rounded-full"
+          class="rounded-xl"
           :variant="n === page ? 'default' : 'outline'"
         >
           <NuxtLink :to="linkTo(n)">{{ n }}</NuxtLink>

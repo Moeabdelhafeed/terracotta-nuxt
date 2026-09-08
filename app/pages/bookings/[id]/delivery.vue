@@ -21,7 +21,7 @@
 
         <div class="mt-8 grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-start">
           <div>
-            <div class="flex gap-3">
+            <div class="flex flex-wrap gap-3">
               <Button
                 type="button"
                 class="h-12 flex-1 rounded-xl text-base"

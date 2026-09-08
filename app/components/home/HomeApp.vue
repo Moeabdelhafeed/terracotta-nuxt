@@ -7,8 +7,8 @@
     crawler, a script error — the phones simply sit at the edges where the layout puts
     them, which is a perfectly good static composition.
   -->
-  <section ref="root" id="get-app" class="relative flex items-center isolate h-[80svh] overflow-hidden bg-brand-mist/40">
-    <div class="relative -mt-20  z-10 mx-auto flex max-w-6xl flex-col items-center px-6 pt-[10svh] text-center">
+  <section ref="root" id="get-app" class="relative flex items-center isolate min-h-[80svh] overflow-hidden bg-brand-mist/40 py-16 sm:py-0">
+    <div class="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-6 text-center sm:-mt-20 sm:pt-[10svh]">
       <!-- AppMedia, not AppImage: `mediaAsset` hands back the `{ type, image }` wrapper
            (or the /public fallback path), which only AppMedia unwraps. -->
       <AppMedia v-if="logo" :src="logo" alt="" class="h-16 w-auto object-contain sm:h-20" />

@@ -1,7 +1,7 @@
 <template>
   <main class="min-h-svh bg-background pb-28">
     <div class="mx-auto max-w-6xl px-6 py-16">
-    <div class="mx-auto flex max-w-lg flex-col gap-3">
+    <div class="flex flex-col gap-3">
       <h1 class="font-display text-2xl font-bold text-foreground">{{ t('profile', 'My account', 'حسابي') }}</h1>
 
       <div class="rounded-2xl border bg-card p-5">
@@ -142,12 +142,12 @@
 
     <!-- Edit name (+ any other identifier extras the config still asks for) -->
     <Teleport to="body">
-      <div v-if="editNameOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+      <div v-if="editNameOpen" class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 py-10" role="dialog" aria-modal="true">
         <div class="absolute inset-0 bg-black/50" @click="profileLoading || (editNameOpen = false)" />
         <div class="relative w-full max-w-md rounded-2xl border bg-background p-6 shadow-lg">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <span class="flex size-9 items-center justify-center rounded-xl bg-brand-mist text-brand-rust">
+              <span class="flex size-9 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust">
                 <LucidePencil class="size-4" />
               </span>
               <h2 class="font-display text-lg font-semibold text-foreground">{{ t('edit_name', 'Edit name', 'تعديل الاسم') }}</h2>
@@ -205,12 +205,12 @@
 
     <!-- Change password -->
     <Teleport to="body">
-      <div v-if="changePasswordOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+      <div v-if="changePasswordOpen" class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 py-10" role="dialog" aria-modal="true">
         <div class="absolute inset-0 bg-black/50" @click="passwordLoading || (changePasswordOpen = false)" />
         <div class="relative w-full max-w-md rounded-2xl border bg-background p-6 shadow-lg">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <span class="flex size-9 items-center justify-center rounded-xl bg-brand-mist text-brand-rust">
+              <span class="flex size-9 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust">
                 <LucideLock class="size-4" />
               </span>
               <h2 class="font-display text-lg font-semibold text-foreground">{{ hasPassword ? t('change_password', 'Change password', 'تغيير كلمة المرور') : t('set_password', 'Set password', 'تعيين كلمة المرور') }}</h2>
@@ -253,12 +253,12 @@
 
     <!-- Change phone/email (identifier), OTP-protected -->
     <Teleport to="body">
-      <div v-if="changeIdentifierOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+      <div v-if="changeIdentifierOpen" class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 py-10" role="dialog" aria-modal="true">
         <div class="absolute inset-0 bg-black/50" @click="identifierLoading || identifierVerifying || (changeIdentifierOpen = false)" />
         <div class="relative w-full max-w-md rounded-2xl border bg-background p-6 shadow-lg">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <span class="flex size-9 items-center justify-center rounded-xl bg-brand-mist text-brand-rust">
+              <span class="flex size-9 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust">
                 <LucideSmartphone class="size-4" />
               </span>
               <h2 class="font-display text-lg font-semibold text-foreground">{{ t('change_kind', 'Change :kind', 'تغيير :kind', { kind: identifierKindLabel.toLowerCase() }) }}</h2>
@@ -276,7 +276,7 @@
                 :key="kind"
                 type="button"
                 size="sm"
-                class="rounded-full"
+                class="rounded-xl"
                 :variant="identifierKind === kind ? 'default' : 'outline'"
                 @click="identifierKind = kind"
               >{{ labelFor(kind) }}</Button>
@@ -328,12 +328,12 @@
 
     <!-- Social accounts -->
     <Teleport to="body">
-      <div v-if="socialOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+      <div v-if="socialOpen" class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 py-10" role="dialog" aria-modal="true">
         <div class="absolute inset-0 bg-black/50" @click="socialOpen = false" />
         <div class="relative w-full max-w-md rounded-2xl border bg-background p-6 shadow-lg">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <span class="flex size-9 items-center justify-center rounded-xl bg-brand-mist text-brand-rust">
+              <span class="flex size-9 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust">
                 <LucideLink2 class="size-4" />
               </span>
               <h2 class="font-display text-lg font-semibold text-foreground">{{ t('social_accounts', 'Social accounts', 'الحسابات الاجتماعية') }}</h2>
@@ -345,7 +345,7 @@
           <p class="mt-1 text-sm text-muted-foreground">{{ t('manage_social_providers', 'Connect or disconnect providers linked to your account.', 'اربط أو افصل المزودين المرتبطين بحسابك.') }}</p>
 
           <div class="mt-5 flex flex-col gap-3">
-            <p v-if="!hasPassword" class="rounded-xl bg-brand-mist p-3 text-xs text-brand-rust">
+            <p v-if="!hasPassword" class="rounded-xl bg-brand-rust/10 p-3 text-xs text-brand-rust">
               {{ t('set_password_cta', 'Set a password to enable email/password login and to allow disconnecting your last social provider.', 'عيّن كلمة مرور لتفعيل تسجيل الدخول بالبريد/كلمة المرور وللسماح بفك ربط آخر مزوّد اجتماعي.') }}
             </p>
             <div v-if="socialLoading" class="text-sm text-muted-foreground">{{ t('loading', 'Loading...', 'جارٍ التحميل...') }}</div>
@@ -353,17 +353,17 @@
               <li
                 v-for="p in socialProviders"
                 :key="p"
-                class="flex items-center justify-between rounded-xl border p-3 text-sm"
+                class="flex items-center justify-between gap-3 rounded-xl border p-3 text-sm"
               >
-                <div class="flex flex-col">
+                <div class="flex min-w-0 flex-col">
                   <span class="font-medium text-foreground">{{ providerLabel(p) }}</span>
-                  <span v-if="findLinked(p)" class="text-xs text-muted-foreground">{{ findLinked(p).email ?? findLinked(p).name }}</span>
+                  <span v-if="findLinked(p)" class="truncate text-xs text-muted-foreground">{{ findLinked(p).email ?? findLinked(p).name }}</span>
                 </div>
                 <template v-if="findLinked(p)">
                   <Button
                     variant="outline"
                     size="sm"
-                    class="rounded-full"
+                    class="rounded-xl"
                     :disabled="unlinking === p || (linkedProviders.length === 1 && !hasPassword)"
                     @click="onUnlinkSocial(p)"
                   >{{ unlinking === p ? t('unlinking', 'Unlinking...', 'جارٍ فك الربط...') : t('disconnect', 'Disconnect', 'فك الربط') }}</Button>
@@ -371,7 +371,7 @@
                 <template v-else>
                   <Button
                     size="sm"
-                    class="rounded-full bg-brand-rust hover:bg-brand-rust/90"
+                    class="rounded-xl bg-brand-rust hover:bg-brand-rust/90"
                     :disabled="!canLinkMore || connecting === p"
                     @click="onConnectProvider(p)"
                   >{{ connecting === p ? t('connecting', 'Connecting...', 'جارٍ الربط...') : t('connect', 'Connect', 'ربط') }}</Button>
@@ -405,7 +405,7 @@
           <p class="mt-2 text-sm text-muted-foreground">
             {{ t('delete_account_confirm', 'Permanently delete your account? This cannot be undone.', 'حذف الحساب نهائيًا؟ لا يمكن التراجع.') }}
           </p>
-          <div class="mt-6 flex gap-3">
+          <div class="mt-6 flex flex-col gap-3 sm:flex-row">
             <Button variant="outline" class="h-12 flex-1 rounded-xl text-base" :disabled="deleting" @click="deleteDialogOpen = false">
               {{ t('cancel', 'Cancel', 'إلغاء') }}
             </Button>

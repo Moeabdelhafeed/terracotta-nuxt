@@ -60,7 +60,7 @@
 
       <!-- Empty cart: nothing to quote, nothing to place. -->
       <div v-else-if="!lines.length && !cartLoading" class="mt-8 rounded-3xl border bg-card p-8 text-center sm:p-12">
-        <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-mist text-brand-rust">
+        <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-rust/10 text-brand-rust">
           <LucideShoppingBag class="size-6" />
         </span>
         <p class="mt-4 font-display text-xl font-semibold">{{ t('cart_empty_title', 'Your cart is empty', 'عربيتك فارغة', { subGroup: 'shop' }) }}</p>

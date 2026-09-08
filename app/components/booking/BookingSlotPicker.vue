@@ -10,7 +10,7 @@
           <Button
             type="button"
             size="sm"
-            class="rounded-full"
+            class="rounded-xl"
             :variant="people === n ? 'default' : 'outline'"
             :class="people === n ? 'bg-brand-rust hover:bg-brand-rust/90' : ''"
             :data-people="n"
@@ -38,7 +38,7 @@
 
       <div v-else-if="loadError" class="mt-4 flex flex-col items-start gap-3 rounded-2xl border border-destructive/30 p-4">
         <p class="text-sm text-destructive" data-test="availability-error">{{ loadError }}</p>
-        <Button type="button" size="sm" variant="outline" class="rounded-full" @click="reload">
+        <Button type="button" size="sm" variant="outline" class="rounded-xl" @click="reload">
           {{ t('try_again', 'Try again', 'حاول مرة أخرى') }}
         </Button>
       </div>
@@ -80,7 +80,7 @@
         <li v-for="slot in slots" :key="slot.workshop_slot_id">
           <button
             type="button"
-            class="flex w-full items-center justify-between gap-4 rounded-2xl border bg-card p-4 text-start transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+            class="flex w-full flex-col items-start gap-1 rounded-2xl border bg-card p-4 text-start transition-colors disabled:cursor-not-allowed disabled:opacity-40 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
             :class="slotId === slot.workshop_slot_id ? 'border-brand-rust ring-1 ring-brand-rust' : 'hover:border-brand-rust'"
             :disabled="slot.is_full || slot.has_conflict"
             :data-slot="slot.workshop_slot_id"

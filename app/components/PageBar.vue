@@ -10,7 +10,7 @@
       </NuxtLink>
 
       <nav class="min-w-0 flex-1">
-        <ol class="flex items-center text-sm">
+        <ol class="flex flex-wrap items-center gap-y-1 text-sm">
           <li v-for="(crumb, index) in crumbs" :key="index" class="flex min-w-0 items-center">
             <NuxtLink
               v-if="crumb.to"

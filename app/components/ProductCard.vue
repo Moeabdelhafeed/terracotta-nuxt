@@ -1,6 +1,6 @@
 <template>
-  <NuxtLink :to="`/shop/${product.id}`" class="group block">
-    <div class="relative aspect-square overflow-hidden rounded-2xl border bg-card" :class="{ 'opacity-60': soldOut }">
+  <NuxtLink :to="`/shop/${product.id}`" class="group block overflow-hidden rounded-2xl border bg-card">
+    <div class="relative aspect-square overflow-hidden" :class="{ 'opacity-60': soldOut }">
       <AppImage
         v-if="product.image?.image_api"
         :src="product.image"
@@ -10,34 +10,35 @@
       />
       <span
         v-if="discount"
-        class="absolute top-3 rounded-full bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground ltr:left-3 rtl:right-3"
+        class="absolute top-3 rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground ltr:left-3 rtl:right-3"
       >{{ t('discount_percent', '-:n%', '-:n٪', { n: discount }) }}</span>
+
+      <ShopFavoriteButton class="absolute top-3 ltr:right-3 rtl:left-3" :product="product" />
 
       <span
         v-if="product.is_featured"
-        class="absolute top-3 rounded-full bg-brand-forest/90 px-2.5 py-1 text-xs font-medium text-white ltr:right-3 rtl:left-3"
+        class="absolute bottom-3 rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground ltr:left-3 rtl:right-3"
       >{{ t('featured', 'Featured', 'مميز') }}</span>
 
       <span
         v-if="soldOut"
-        class="absolute inset-x-3 bottom-3 rounded-full bg-brand-ink/85 py-1 text-center text-xs font-medium text-white"
+        class="absolute inset-x-3 bottom-3 rounded-md bg-brand-ink/85 py-1 text-center text-xs font-medium text-white"
       >{{ t('sold_out', 'Sold out', 'نفدت الكمية', { subGroup: 'shop' }) }}</span>
     </div>
 
-    <div class="mt-3 flex items-start justify-between gap-2">
-      <p class="min-w-0 flex-1 truncate text-sm font-medium">{{ product.title }}</p>
-      <ShopFavoriteButton class="-mt-1 shrink-0" :product="product" />
-    </div>
+    <div class="p-3">
+      <p class="truncate text-sm font-medium">{{ product.title }}</p>
 
-    <p class="mt-1 flex items-baseline gap-2">
-      <span class="font-display text-lg font-black text-primary">
-        {{ format(product.sale_price ?? product.price) }}
-      </span>
-      <span
-        v-if="product.sale_price"
-        class="text-sm text-muted-foreground line-through"
-      >{{ format(product.price) }}</span>
-    </p>
+      <p class="mt-1 flex flex-wrap items-baseline gap-x-2">
+        <span
+          v-if="product.sale_price"
+          class="text-sm text-muted-foreground line-through"
+        >{{ format(product.price) }}</span>
+        <span class="font-display text-lg font-black text-primary">
+          {{ format(product.sale_price ?? product.price) }}
+        </span>
+      </p>
+    </div>
   </NuxtLink>
 </template>
 

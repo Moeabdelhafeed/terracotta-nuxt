@@ -41,7 +41,7 @@
       <AppMedia v-if="logo" :src="logo" alt="" class="mx-auto h-12 w-auto object-contain" />
 
       <h1 class="mt-6 text-center font-display text-2xl font-semibold text-foreground">{{ title }}</h1>
-      <p v-if="subtitle" class="mt-2 text-center text-sm leading-relaxed text-muted-foreground">{{ subtitle }}</p>
+      <p v-if="subtitle" class="mt-2 text-center text-sm leading-relaxed break-words text-muted-foreground">{{ subtitle }}</p>
 
       <div class="mt-8">
         <slot />

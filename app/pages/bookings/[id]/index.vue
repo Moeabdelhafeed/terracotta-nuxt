@@ -194,8 +194,8 @@
         <h2 class="font-display text-xl font-semibold">{{ t('pieces_title_detail', 'Your pieces', 'قطعك') }}</h2>
         <ul class="mt-4 flex flex-col gap-3">
           <li v-for="piece in booking.pieces" :key="piece.id" class="flex items-center justify-between gap-4 rounded-2xl border bg-card p-4">
-            <div>
-              <p class="font-medium">{{ piece.label }}</p>
+            <div class="min-w-0">
+              <p class="truncate font-medium">{{ piece.label }}</p>
               <p class="text-xs text-muted-foreground">{{ t('n_photos', ':n photos', ':n صور', { n: piece.images?.length ?? 0 }) }}</p>
             </div>
             <Button
@@ -218,7 +218,7 @@
     <BookingSheet :open="qrOpen" :title="t('tile_code', 'Check-in code', 'رمز المسح')" @close="qrOpen = false">
       <template #icon><LucideQrCode class="size-5" /></template>
       <div class="flex flex-col items-center gap-4 text-center">
-        <p class="font-display text-5xl font-black tracking-[0.2em] tabular-nums" dir="ltr">{{ booking.checkin_code }}</p>
+        <p class="font-display text-4xl font-black tracking-[0.2em] tabular-nums sm:text-5xl" dir="ltr">{{ booking.checkin_code }}</p>
         <p class="text-sm text-muted-foreground">
           {{ t('qr_note', 'Show this code at the desk when you arrive to check in.', 'يرجى مسح رمز الاستجابة السريعة عند الوصول لتسجيل حضورك في الورشة.') }}
         </p>
@@ -363,7 +363,7 @@ const panel = computed(() => {
     },
     preparing: {
       icon: resolveComponent('LucideFlame'),
-      tone: 'bg-brand-mist text-brand-rust',
+      tone: 'bg-brand-rust/10 text-brand-rust',
       title: t('panel_preparing_title', 'Being prepared', 'قيد التحضير'),
       body: t('panel_preparing_body', 'Your piece is being finished with care and will be ready in five to seven days.', 'جارٍ تجهيز قطعتك بعناية، وستكون جاهزة خلال 5 إلى 7 أيام.'),
     },
@@ -381,13 +381,13 @@ const panel = computed(() => {
     },
     getting_ready: {
       icon: resolveComponent('LucidePackage'),
-      tone: 'bg-brand-mist text-brand-rust',
+      tone: 'bg-brand-rust/10 text-brand-rust',
       title: t('panel_getting_ready_title', 'Being packed', 'قيد التغليف'),
       body: t('panel_getting_ready_body', 'We are packing your piece carefully, ready for delivery.', 'جارٍ تغليف قطعتك وتجهيزها بعناية استعدادًا للتوصيل.'),
     },
     on_the_way: {
       icon: resolveComponent('LucideTruck'),
-      tone: 'bg-brand-mist text-brand-rust',
+      tone: 'bg-brand-rust/10 text-brand-rust',
       title: t('panel_on_the_way_title', 'Out for delivery', 'خرجت للتوصيل'),
       body: t('panel_on_the_way_body', 'Your piece is on its way to you and will arrive soon.', 'قطعتك الآن في طريقها إليك وسيتم تسليمها قريبًا.'),
     },

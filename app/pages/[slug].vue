@@ -5,12 +5,12 @@
         <div class="flex items-center justify-between">
           <NuxtLink
             to="/"
-            class="flex size-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground ltr:-ms-2 rtl:-me-2 rtl:-scale-x-100"
+            class="flex size-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground -ms-2 rtl:-scale-x-100"
             :aria-label="t('back', 'Back', 'رجوع')"
           >
             <LucideArrowLeft class="size-5" />
           </NuxtLink>
-          <h1 class="font-display text-lg font-semibold text-foreground">{{ page?.name ?? '' }}</h1>
+          <h1 class="min-w-0 text-center font-display text-lg font-semibold text-foreground">{{ page?.name ?? '' }}</h1>
           <span class="size-10" />
         </div>
 
@@ -34,7 +34,7 @@
             class="mb-6 aspect-video w-full rounded-xl object-cover"
           />
           <div
-            class="prose prose-sm max-w-none dark:prose-invert [&_a]:text-brand-rust [&_a]:underline [&_h2]:mt-6 [&_h2]:mb-2 [&_h2]:text-xl [&_h2]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2 [&_h3]:font-semibold [&_li]:my-1 [&_p]:my-3 [&_ul]:list-disc [&_ul]:ps-6"
+            class="prose prose-sm max-w-none break-words dark:prose-invert [&_a]:text-brand-rust [&_a]:underline [&_h2]:mt-6 [&_h2]:mb-2 [&_h2]:text-xl [&_h2]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2 [&_h3]:font-semibold [&_li]:my-1 [&_p]:my-3 [&_ul]:list-disc [&_ul]:ps-6 [&_img]:h-auto [&_img]:max-w-full [&_pre]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto"
             v-html="page.content"
           />
         </div>

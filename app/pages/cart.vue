@@ -2,7 +2,7 @@
   <main class="min-h-svh bg-background pb-28">
     <PageBar :crumbs="crumbs" />
 
-    <div class="mx-auto max-w-3xl px-6 py-16">
+    <div class="mx-auto max-w-6xl px-6 py-16">
       <h1 class="font-display text-3xl font-semibold sm:text-4xl">{{ t('cart_title', 'My cart', 'عربيتي') }}</h1>
 
       <div v-if="(pending || !mounted) && !items.length" class="mt-8 flex flex-col gap-4" aria-busy="true">
@@ -10,7 +10,7 @@
       </div>
 
       <div v-else-if="!items.length" class="mt-8 rounded-3xl border bg-card p-8 text-center sm:p-12">
-        <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-mist text-brand-rust">
+        <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-rust/10 text-brand-rust">
           <LucideShoppingBag class="size-6" />
         </span>
         <p class="mt-4 font-display text-xl font-semibold">{{ t('cart_empty_title', 'Your cart is empty', 'عربيتك فارغة') }}</p>
@@ -26,7 +26,7 @@
         <div class="mt-8 rounded-3xl border bg-card p-6 sm:p-8">
           <div class="flex items-center justify-between gap-4">
             <span class="text-sm text-muted-foreground">{{ t('summary_total', 'Total', 'الإجمالي', { subGroup: 'checkout' }) }}</span>
-            <span class="font-display text-2xl font-black text-primary">{{ format(total) }}</span>
+            <span class="font-display text-xl font-black text-primary sm:text-2xl">{{ format(total) }}</span>
           </div>
           <p class="mt-1 text-xs text-muted-foreground">
             {{ t('cart_total_note', 'Delivery, discounts and your wallet are applied at checkout.', 'يُحتسب التوصيل والخصومات والمحفظة عند الدفع.') }}

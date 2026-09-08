@@ -78,7 +78,7 @@
              response, deliberately. -->
         <p
           v-else-if="!gift.is_claimable"
-          class="rounded-2xl bg-brand-mist px-4 py-4 text-sm font-medium text-brand-rust"
+          class="rounded-2xl bg-brand-rust/10 px-4 py-4 text-sm font-medium text-brand-rust"
         >
           {{ t('gift_claimed', 'This gift has already been claimed.', 'تم استلام هذه الهدية بالفعل.') }}
         </p>

@@ -5,14 +5,14 @@
     <div class="mx-auto max-w-3xl px-6 py-16">
       <h1 class="font-display text-3xl font-semibold sm:text-4xl">{{ t('bookings_title', 'My bookings', 'ورشاتي') }}</h1>
 
-      <ul class="mt-6 flex gap-2">
+      <ul class="mt-6 flex flex-wrap gap-2">
         <li>
-          <Button as-child size="sm" variant="outline" class="rounded-full">
+          <Button as-child size="sm" variant="outline" class="rounded-xl">
             <NuxtLink to="/workshops">{{ t('tab_book', 'Book a workshop', 'حجز ورشة') }}</NuxtLink>
           </Button>
         </li>
         <li>
-          <Button size="sm" class="rounded-full bg-brand-rust hover:bg-brand-rust/90">{{ t('tab_mine', 'My workshops', 'ورشاتي') }}</Button>
+          <Button size="sm" class="rounded-xl bg-brand-rust hover:bg-brand-rust/90">{{ t('tab_mine', 'My workshops', 'ورشاتي') }}</Button>
         </li>
       </ul>
 
@@ -36,7 +36,7 @@
           :key="n"
           as-child
           size="sm"
-          class="rounded-full"
+          class="rounded-xl"
           :variant="n === page ? 'default' : 'outline'"
         >
           <NuxtLink :to="{ query: { page: n > 1 ? n : undefined } }">{{ n }}</NuxtLink>

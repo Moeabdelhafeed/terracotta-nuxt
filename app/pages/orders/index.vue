@@ -5,7 +5,7 @@
         <div class="flex items-center justify-between">
           <NuxtLink
             to="/shop"
-            class="flex size-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground ltr:-ms-2 rtl:-me-2 rtl:-scale-x-100"
+            class="flex size-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground -ms-2 rtl:-scale-x-100"
             :aria-label="t('back_to_shop', 'Back to the shop', 'عودة للمتجر')"
           >
             <LucideArrowLeft class="size-5" />
@@ -19,7 +19,7 @@
         </ul>
 
         <div v-else-if="!items.length" class="rounded-2xl border bg-card p-8 text-center">
-          <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-mist text-brand-rust">
+          <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-rust/10 text-brand-rust">
             <LucidePackage class="size-6" />
           </span>
           <p class="mt-4 font-display text-lg font-semibold">{{ t('orders_empty_title', 'No orders yet', 'لا توجد طلبات بعد') }}</p>
@@ -57,7 +57,7 @@
 
         <!-- Real links, so a page is shareable and the back button walks it. -->
         <nav v-if="lastPage > 1" class="mt-2 flex flex-wrap items-center justify-center gap-2">
-          <Button v-if="currentPage > 1" as-child size="sm" variant="outline" class="rounded-full">
+          <Button v-if="currentPage > 1" as-child size="sm" variant="outline" class="rounded-xl">
             <NuxtLink :to="linkTo(currentPage - 1)" rel="prev">{{ t('previous', 'Previous', 'السابق', { subGroup: 'general' }) }}</NuxtLink>
           </Button>
           <Button
@@ -66,11 +66,11 @@
             as-child
             size="sm"
             :variant="number === currentPage ? 'default' : 'outline'"
-            class="min-w-10 rounded-full"
+            class="min-w-10 rounded-xl"
           >
             <NuxtLink :to="linkTo(number)" :aria-current="number === currentPage ? 'page' : undefined">{{ number }}</NuxtLink>
           </Button>
-          <Button v-if="currentPage < lastPage" as-child size="sm" variant="outline" class="rounded-full">
+          <Button v-if="currentPage < lastPage" as-child size="sm" variant="outline" class="rounded-xl">
             <NuxtLink :to="linkTo(currentPage + 1)" rel="next">{{ t('next', 'Next', 'التالي', { subGroup: 'general' }) }}</NuxtLink>
           </Button>
         </nav>

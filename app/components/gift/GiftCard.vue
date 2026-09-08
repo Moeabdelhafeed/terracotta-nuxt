@@ -17,16 +17,16 @@
     <p v-if="gift.message" class="line-clamp-2 text-sm text-muted-foreground">“{{ gift.message }}”</p>
 
     <div class="flex flex-wrap items-center gap-2">
-      <span class="rounded-full px-3 py-1 text-xs font-medium" :class="statusClass">{{ statusLabel }}</span>
+      <span class="rounded-md px-3 py-1 text-xs font-medium" :class="statusClass">{{ statusLabel }}</span>
 
       <span
         v-if="gift.payment_status === 'refunded'"
-        class="rounded-full bg-brand-mist px-3 py-1 text-xs font-medium text-muted-foreground"
+        class="rounded-md bg-brand-mist px-3 py-1 text-xs font-medium text-muted-foreground"
       >{{ t('gift_refunded', 'Refunded', 'مسترد') }}</span>
 
       <span
         v-if="gift.is_redeemed"
-        class="rounded-full bg-brand-green/10 px-3 py-1 text-xs font-medium text-brand-green"
+        class="rounded-md bg-brand-green/10 px-3 py-1 text-xs font-medium text-brand-green"
       >{{ t('gift_redeemed', 'Redeemed', 'تم الاستخدام') }}</span>
 
       <span class="ms-auto text-xs text-muted-foreground">{{ formatDateOnly(gift.created_at) }}</span>

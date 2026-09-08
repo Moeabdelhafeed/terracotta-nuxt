@@ -20,7 +20,7 @@
       </Button>
       <button
         type="button"
-        class="mx-auto rounded-full bg-brand-mist px-4 py-2 text-sm font-medium text-brand-rust transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+        class="mx-auto rounded-xl bg-brand-rust/10 px-4 py-2 text-sm font-medium text-brand-rust transition-colors disabled:cursor-not-allowed disabled:opacity-50"
         :disabled="cooldown > 0 || resending || loading"
         @click="resend"
       >

@@ -1,5 +1,5 @@
 <template>
-  <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium" :class="tone">{{ label }}</span>
+  <span class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium" :class="tone">{{ label }}</span>
 </template>
 
 <script setup>

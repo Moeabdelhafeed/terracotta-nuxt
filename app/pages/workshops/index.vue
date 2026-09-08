@@ -13,12 +13,12 @@
 
     <div class="mx-auto max-w-6xl px-6 py-16">
       <!-- Hub tabs (woLWX): browse the workshops, or jump to the bookings you already have. -->
-      <ul class="mb-8 flex gap-2">
+      <ul class="mb-8 flex flex-wrap gap-2">
         <li>
-          <Button size="sm" class="rounded-full bg-brand-rust hover:bg-brand-rust/90">{{ t('tab_book', 'Book a workshop', 'حجز ورشة') }}</Button>
+          <Button size="sm" class="rounded-xl bg-brand-rust hover:bg-brand-rust/90">{{ t('tab_book', 'Book a workshop', 'حجز ورشة') }}</Button>
         </li>
         <li>
-          <Button as-child size="sm" variant="outline" class="rounded-full">
+          <Button as-child size="sm" variant="outline" class="rounded-xl">
             <NuxtLink to="/bookings">
               {{ t('tab_mine', 'My workshops', 'ورشاتي') }}
               <span v-if="activeCount" class="ms-2 rounded-full bg-brand-rust px-2 text-xs text-white">{{ activeCount }}</span>
@@ -52,7 +52,7 @@
             class="size-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
           <span
-            class="absolute top-4 rounded-full px-3 py-1 text-xs font-medium text-white ltr:left-4 rtl:right-4"
+            class="absolute top-4 rounded-md px-3 py-1 text-xs font-medium text-white ltr:left-4 rtl:right-4"
             :style="{ backgroundColor: workshop.color || 'var(--brand-terracotta)' }"
           >{{ typeLabel(workshop.type) }}</span>
         </NuxtLink>
@@ -62,7 +62,7 @@
           <p class="line-clamp-2 text-sm text-muted-foreground">{{ workshop.short_description }}</p>
 
           <!-- The three info tiles from the hub frames: price, seats per session, length. -->
-          <dl class="mt-auto grid grid-cols-3 gap-2 pt-4 text-center text-xs">
+          <dl class="mt-auto grid gap-2 pt-4 text-center text-xs sm:grid-cols-3">
             <div class="rounded-2xl bg-brand-mist/60 p-3">
               <dd class="font-display text-sm font-semibold">
                 {{ isZeroMoney(workshop.price)

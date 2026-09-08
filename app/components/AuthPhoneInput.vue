@@ -23,7 +23,7 @@
 
     <div
       v-if="open"
-      class="absolute start-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-xl border bg-popover text-popover-foreground shadow-lg"
+      class="absolute start-0 top-full z-50 mt-2 w-full min-w-0 overflow-hidden rounded-xl border bg-popover text-popover-foreground shadow-lg sm:w-72"
     >
       <input
         v-model="search"

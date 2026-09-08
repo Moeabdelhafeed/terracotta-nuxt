@@ -16,7 +16,7 @@
       />
     </svg>
 
-    <div class="mx-auto max-w-6xl px-6 py-20">
+    <div class="mx-auto max-w-6xl px-6 pb-28 pt-20">
       <div class="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between">
         <div class="max-w-sm">
           <!-- AppMedia, not AppImage: `mediaAsset` hands back the `{ type, image }`

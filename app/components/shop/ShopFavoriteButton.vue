@@ -1,14 +1,14 @@
 <template>
   <button
     type="button"
-    class="flex items-center justify-center rounded-full border bg-background/90 text-brand-rust shadow-sm backdrop-blur transition-transform hover:scale-110 active:scale-95"
-    :class="[sizeClass, active ? 'border-brand-rust/40' : 'border-border']"
+    class="flex items-center justify-center rounded-xl border shadow-sm backdrop-blur transition-transform hover:scale-110 active:scale-95"
+    :class="[sizeClass, active ? 'border-brand-blush bg-brand-blush text-white' : 'border-border bg-background/90 text-brand-blush']"
     :aria-pressed="active"
     :aria-label="active ? t('unfavorite', 'Remove from favorites', 'إزالة من المفضلة') : t('favorite', 'Add to favorites', 'إضافة إلى المفضلة')"
     :disabled="busy"
     @click.prevent.stop="onToggle"
   >
-    <LucideHeart class="size-[55%]" :class="active ? 'fill-brand-rust' : ''" />
+    <LucideHeart class="size-[55%]" :class="active ? 'fill-current' : ''" />
   </button>
 </template>
 
@@ -24,7 +24,7 @@ const { t } = useLang('web', 'shop')
 const { isFavorited, toggle } = useFavorites()
 
 const active = computed(() => isFavorited(props.product))
-const sizeClass = computed(() => (props.size === 'lg' ? 'size-12' : 'size-9'))
+const sizeClass = computed(() => (props.size === 'lg' ? 'size-12' : 'size-10'))
 const busy = ref(false)
 
 const onToggle = async () => {

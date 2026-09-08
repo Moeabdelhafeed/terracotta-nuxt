@@ -30,7 +30,7 @@
         <ol class="mt-6 flex flex-wrap gap-2 text-sm">
           <li v-for="(name, index) in stepNames" :key="name.key">
             <span
-              class="rounded-full px-3 py-1"
+              class="rounded-xl px-3 py-1"
               :class="index === stepIndex ? 'bg-brand-rust text-white' : 'bg-brand-mist text-muted-foreground'"
             >{{ index + 1 }}. {{ name.label }}</span>
           </li>
@@ -99,7 +99,7 @@
               <button
                 v-if="withCelebration"
                 type="button"
-                class="mt-4 inline-flex items-center gap-2 rounded-full bg-brand-blush/40 px-3 py-1 text-xs font-medium text-brand-rust"
+                class="mt-4 inline-flex items-center gap-2 rounded-md bg-brand-blush/40 px-3 py-1 text-xs font-medium text-brand-rust"
                 @click="withCelebration = false"
               >
                 <LucideX class="size-3.5" />{{ t('remove_celebration', 'Remove the celebration', 'ازالة الاحتفال') }}

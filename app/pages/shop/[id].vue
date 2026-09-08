@@ -4,13 +4,13 @@
   <main v-if="status !== 'success' && !product" class="mx-auto max-w-6xl px-6 py-16" aria-busy="true">
     <div class="grid gap-10 lg:grid-cols-2 lg:items-start">
       <div>
-        <AppSkeleton class="aspect-square w-full !rounded-3xl" />
+        <AppSkeleton class="aspect-square w-full !rounded-2xl" />
         <div class="mt-3 flex gap-3">
           <AppSkeleton v-for="n in 4" :key="n" class="size-20 !rounded-xl" />
         </div>
       </div>
 
-      <div class="rounded-3xl border bg-card p-6 sm:p-8">
+      <div class="rounded-2xl border bg-card p-6 sm:p-8">
         <AppSkeleton class="h-4 w-32" />
         <AppSkeleton class="mt-3 h-9 w-3/4" />
         <AppSkeleton class="mt-5 h-8 w-32" />
@@ -30,7 +30,7 @@
     <div class="mx-auto max-w-6xl px-6 py-16">
       <div class="grid gap-10 lg:grid-cols-2 lg:items-start">
         <div ref="content">
-          <div class="overflow-hidden rounded-3xl border bg-card">
+          <div class="overflow-hidden rounded-2xl border bg-card">
             <AppImage v-if="active" :src="active" :alt="product.title" class="aspect-square w-full object-cover" />
           </div>
 
@@ -51,7 +51,7 @@
         <!-- Pinned rather than `position: sticky`: ScrollSmoother transforms
              #smooth-content, and a transformed ancestor makes sticky behave like static. -->
         <aside ref="aside">
-          <div class="rounded-3xl border bg-card p-6 sm:p-8">
+          <div class="rounded-2xl border bg-card p-6 sm:p-8">
             <!-- The API sends these as plain localized strings, not objects. -->
             <p v-if="product.category" class="text-sm uppercase tracking-[0.18em] text-muted-foreground">
               {{ product.category }}<template v-if="product.sub_category"> · {{ product.sub_category }}</template>
@@ -63,20 +63,20 @@
             </div>
 
             <p class="mt-4 flex items-baseline gap-3">
-              <span class="font-display text-3xl font-black text-primary">{{ format(product.sale_price ?? product.price) }}</span>
               <span v-if="product.sale_price" class="text-lg text-muted-foreground line-through">{{ format(product.price) }}</span>
+              <span class="font-display text-3xl font-black text-primary">{{ format(product.sale_price ?? product.price) }}</span>
             </p>
 
             <div
               v-if="product.description"
-              class="prose prose-sm mt-6 max-w-none dark:prose-invert [&_li]:my-1 [&_p]:my-3 [&_ul]:list-disc [&_ul]:ps-6"
+              class="prose prose-sm mt-6 max-w-none break-words dark:prose-invert [&_li]:my-1 [&_p]:my-3 [&_ul]:list-disc [&_ul]:ps-6"
               v-html="product.description"
             />
 
-            <ul v-if="colours.length" class="mt-6 flex items-center gap-2">
+            <ul v-if="colours.length" class="mt-6 flex flex-wrap items-center gap-2">
               <li v-for="colour in colours" :key="colour.hex" class="group/colour relative">
                 <span
-                  class="block size-7 rounded-full border transition-transform group-hover/colour:scale-110"
+                  class="block size-7 rounded-md border transition-transform group-hover/colour:scale-110"
                   :style="{ backgroundColor: colour.hex }"
                   :aria-label="colour.name"
                 />

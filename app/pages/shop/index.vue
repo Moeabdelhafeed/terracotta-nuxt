@@ -26,7 +26,7 @@
         <li>
           <button type="button" class="group w-16 sm:w-20" @click="pick(null)">
             <span
-              class="flex aspect-square items-center justify-center rounded-full bg-brand-mist ring-2 ring-offset-2 ring-offset-background transition group-hover:brightness-95"
+              class="flex aspect-square items-center justify-center rounded-2xl bg-brand-rust/10 ring-2 ring-offset-2 ring-offset-background transition group-hover:brightness-95"
               :class="categoryId ? 'ring-transparent' : 'ring-primary'"
             >
               <LucideShapes class="size-6 text-brand-rust" />
@@ -41,7 +41,7 @@
         <li v-for="category in categories" :key="category.id">
           <button type="button" class="group w-16 sm:w-20" @click="pick(category.id)">
             <span
-              class="flex aspect-square items-center justify-center overflow-hidden rounded-full bg-brand-mist ring-2 ring-offset-2 ring-offset-background transition"
+              class="flex aspect-square items-center justify-center overflow-hidden rounded-2xl bg-brand-mist ring-2 ring-offset-2 ring-offset-background transition"
               :class="categoryId === category.id ? 'ring-primary' : 'ring-transparent opacity-80 group-hover:opacity-100'"
             >
               <AppImage
@@ -63,7 +63,7 @@
 
     <!-- Sub-categories, once a category narrows things down. -->
     <div v-if="subCategories.length" class="mb-10 flex flex-wrap gap-2">
-      <Button size="sm" :variant="!subCategoryId ? 'secondary' : 'ghost'" class="rounded-full" @click="pickSub(null)">
+      <Button size="sm" :variant="!subCategoryId ? 'secondary' : 'ghost'" class="rounded-xl" @click="pickSub(null)">
         {{ t('all_in_category', 'All of these', 'كل هذه') }}
       </Button>
 
@@ -72,7 +72,7 @@
         :key="sub.id"
         size="sm"
         :variant="subCategoryId === sub.id ? 'secondary' : 'ghost'"
-        class="rounded-full"
+        class="rounded-xl"
         @click="pickSub(sub.id)"
       >{{ sub.title }}</Button>
     </div>
@@ -86,27 +86,27 @@
         <Input
           v-model="term"
           type="search"
-          class="h-12 rounded-full text-base ltr:pl-10 rtl:pr-10"
+          class="h-12 rounded-xl text-base ltr:pl-10 rtl:pr-10"
           :placeholder="t('search_pieces', 'Search pieces…', 'ابحث عن قطعة…')"
         />
       </div>
 
       <Button
         :variant="featured ? 'default' : 'outline'"
-        class="h-12 rounded-full px-6"
+        class="h-12 rounded-xl px-6"
         @click="apply({ featured: featured ? null : 1 })"
       >{{ t('featured', 'Featured', 'مميز') }}</Button>
 
       <Button
         :variant="onSale ? 'default' : 'outline'"
-        class="h-12 rounded-full px-6"
+        class="h-12 rounded-xl px-6"
         @click="apply({ sale: onSale ? null : 1 })"
       >{{ t('on_sale', 'On sale', 'خصم') }}</Button>
 
       <Button
         v-if="hasFilters"
         variant="ghost"
-        class="h-12 rounded-full px-5 text-muted-foreground"
+        class="h-12 rounded-xl px-5 text-muted-foreground"
         @click="clearAll"
       >{{ t('clear_filters', 'Clear', 'مسح') }}</Button>
     </div>
@@ -134,7 +134,7 @@
         as-child
         size="sm"
         variant="outline"
-        class="rounded-full"
+        class="rounded-xl"
       >
         <NuxtLink :to="linkTo(currentPage - 1)" rel="prev">{{ t('previous', 'Previous', 'السابق') }}</NuxtLink>
       </Button>
@@ -145,7 +145,7 @@
         as-child
         size="sm"
         :variant="number === currentPage ? 'default' : 'outline'"
-        class="min-w-10 rounded-full"
+        class="min-w-10 rounded-xl"
       >
         <NuxtLink :to="linkTo(number)" :aria-current="number === currentPage ? 'page' : undefined">
           {{ number }}
@@ -157,7 +157,7 @@
         as-child
         size="sm"
         variant="outline"
-        class="rounded-full"
+        class="rounded-xl"
       >
         <NuxtLink :to="linkTo(currentPage + 1)" rel="next">{{ t('next', 'Next', 'التالي') }}</NuxtLink>
       </Button>

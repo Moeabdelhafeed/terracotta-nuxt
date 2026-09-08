@@ -41,7 +41,7 @@
       <span v-if="err('delivery_zone_id')" class="text-xs text-destructive">{{ err('delivery_zone_id') }}</span>
     </div>
 
-    <div class="grid grid-cols-2 gap-3">
+    <div class="grid gap-3 sm:grid-cols-2">
       <div class="grid gap-2">
         <Label for="building_number">{{ t('address_building', 'Building no.', 'رقم المبنى') }}</Label>
         <Input id="building_number" v-model="form.building_number" type="text" inputmode="numeric" maxlength="4" class="h-12 rounded-xl text-base" placeholder="1234" dir="ltr" />
@@ -60,7 +60,7 @@
       <span v-if="err('street')" class="text-xs text-destructive">{{ err('street') }}</span>
     </div>
 
-    <div class="grid grid-cols-2 gap-3">
+    <div class="grid gap-3 sm:grid-cols-2">
       <div class="grid gap-2">
         <Label for="district">{{ t('address_district', 'District', 'الحي') }}</Label>
         <Input id="district" v-model="form.district" type="text" maxlength="160" class="h-12 rounded-xl text-base" />
@@ -73,7 +73,7 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-2 gap-3">
+    <div class="grid gap-3 sm:grid-cols-2">
       <div class="grid gap-2">
         <Label for="unit_number">{{ t('address_unit', 'Unit', 'الوحدة') }} <span class="text-xs text-muted-foreground">{{ t('optional', '(optional)', '(اختياري)') }}</span></Label>
         <Input id="unit_number" v-model="form.unit_number" type="text" maxlength="16" class="h-12 rounded-xl text-base" dir="ltr" />

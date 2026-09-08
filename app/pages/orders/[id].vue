@@ -5,7 +5,7 @@
         <div class="flex items-center justify-between">
           <NuxtLink
             to="/orders"
-            class="flex size-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground ltr:-ms-2 rtl:-me-2 rtl:-scale-x-100"
+            class="flex size-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground -ms-2 rtl:-scale-x-100"
             :aria-label="t('back_to_orders', 'Back to my orders', 'عودة للطلبات')"
           >
             <LucideArrowLeft class="size-5" />
@@ -26,7 +26,7 @@
               <ShopOrderStatusBadge :status="order.status" />
               <span class="text-xs text-muted-foreground">{{ formatDate(order.created_at) }}</span>
             </div>
-            <span class="font-display text-xl font-black text-primary">{{ format(order.total_price) }}</span>
+            <span class="font-display text-lg font-black text-primary sm:text-xl">{{ format(order.total_price) }}</span>
           </div>
 
           <!-- The pay step is a pre-step of the timeline, so it sits right above it. -->
@@ -56,7 +56,7 @@
 
           <section v-if="hasDelivery" class="rounded-2xl border bg-card p-5">
             <h2 class="font-display text-base font-semibold text-foreground">{{ t('delivery_details', 'Delivery', 'التوصيل') }}</h2>
-            <dl class="mt-4 flex flex-col gap-3 text-sm">
+            <dl class="mt-4 flex flex-col gap-3 break-words text-sm">
               <div v-if="order.delivery_address">
                 <dt class="text-xs text-muted-foreground">{{ t('delivery_address', 'Address', 'العنوان') }}</dt>
                 <dd class="mt-0.5 text-foreground">{{ order.delivery_address }}</dd>

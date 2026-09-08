@@ -20,7 +20,7 @@
           <NuxtLink :to="`/shop?category=${category.id}`" class="group block text-center">
             <!-- A real photo per category, uploaded whole — it fills the circle rather
                  than sitting on a colour disc. -->
-            <div class="aspect-square overflow-hidden rounded-full bg-brand-mist">
+            <div class="aspect-square overflow-hidden rounded-2xl bg-brand-mist">
               <AppImage
                 v-if="category.image?.image_api"
                 :src="category.image"

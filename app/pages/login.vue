@@ -8,13 +8,13 @@
     >
       <template v-if="appUsers">
         <form class="flex flex-col gap-5" @submit.prevent="onSubmit">
-          <div v-if="identifierTypes.length > 1" class="flex gap-2">
+          <div v-if="identifierTypes.length > 1" class="flex flex-wrap gap-2">
             <Button
               v-for="kind in identifierTypes"
               :key="kind"
               type="button"
               size="sm"
-              class="rounded-full"
+              class="rounded-xl"
               :variant="identifierType === kind ? 'default' : 'outline'"
               @click="identifierType = kind"
             >{{ labelFor(kind) }}</Button>
@@ -152,7 +152,7 @@
           <p class="mt-2 text-sm text-muted-foreground">
             {{ t('account_pending_deletion_body', 'This account is scheduled for deletion. Logging in will restore it.', 'هذا الحساب مجدول للحذف. تسجيل الدخول سيستعيده.') }}
           </p>
-          <div class="mt-6 flex justify-end gap-2">
+          <div class="mt-6 flex flex-wrap justify-end gap-2">
             <Button variant="outline" :disabled="loading" @click="restoreDialogOpen = false">
               {{ t('cancel', 'Cancel', 'إلغاء') }}
             </Button>

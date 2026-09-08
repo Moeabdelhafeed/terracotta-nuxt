@@ -52,7 +52,7 @@
                 ? t('resend_code_in', 'Resend the code :timer', 'اعادة ارسال الرمز :timer', { timer: countdown })
                 : t('resend_code', 'Resend the code', 'اعادة ارسال الرمز') }}
           </button>
-          <Button variant="outline" size="sm" class="rounded-full" :disabled="loggingOut || loading || resending" @click="handleLogout">
+          <Button variant="outline" size="sm" class="rounded-xl" :disabled="loggingOut || loading || resending" @click="handleLogout">
             {{ loggingOut ? t('logging_out', 'Logging out...', 'جارٍ تسجيل الخروج...') : t('logout', 'Sign out', 'تسجيل الخروج') }}
           </Button>
         </div>

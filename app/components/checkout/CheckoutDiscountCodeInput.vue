@@ -37,7 +37,7 @@
       <li v-for="offer in offers" :key="offer.code">
         <button
           type="button"
-          class="flex items-center gap-2 rounded-full border border-dashed border-brand-rust/40 px-3 py-1.5 text-xs transition-colors hover:bg-brand-mist/60 disabled:opacity-50"
+          class="flex items-center gap-2 rounded-md border border-dashed border-brand-rust/40 px-3 py-1.5 text-xs transition-colors hover:bg-brand-mist/60 disabled:opacity-50"
           :disabled="disabled"
           @click="use(offer.code)"
         >

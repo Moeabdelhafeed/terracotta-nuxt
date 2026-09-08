@@ -59,7 +59,7 @@
               class="w-full rounded-xl border border-input bg-transparent p-4 text-base outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
               :placeholder="t('complaint_message_placeholder', 'Describe the problem in a few lines…', 'اشرح المشكلة في بضعة أسطر…')"
             />
-            <div class="flex items-center justify-between">
+            <div class="flex flex-wrap items-center justify-between gap-x-3">
               <span v-if="err('message')" data-test="message-error" class="text-xs text-destructive">{{ err('message') }}</span>
               <span v-else class="text-xs text-muted-foreground">{{ t('complaint_message_hint', 'At least 5 characters, no HTML.', '5 أحرف على الأقل، بدون وسوم HTML.') }}</span>
               <span class="text-xs text-muted-foreground" dir="ltr">{{ form.message.length }}/2000</span>
@@ -94,12 +94,12 @@
             <li v-for="complaint in complaints" :key="complaint.id" class="rounded-2xl border p-4">
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <span class="text-sm font-medium text-foreground">{{ complaintTypeLabel(complaint.type, t) }}</span>
-                <span class="rounded-full px-2.5 py-0.5 text-xs font-medium" :class="statusClass(complaint.status)">
+                <span class="rounded-md px-2.5 py-0.5 text-xs font-medium" :class="statusClass(complaint.status)">
                   {{ complaintStatusLabel(complaint.status, t) }}
                 </span>
               </div>
-              <p class="mt-2 whitespace-pre-line text-sm text-muted-foreground">{{ complaint.message }}</p>
-              <p v-if="complaint.reference" class="mt-1 text-xs text-muted-foreground" dir="ltr">{{ complaint.reference }}</p>
+              <p class="mt-2 break-words whitespace-pre-line text-sm text-muted-foreground">{{ complaint.message }}</p>
+              <p v-if="complaint.reference" class="mt-1 text-xs break-words text-muted-foreground" dir="ltr">{{ complaint.reference }}</p>
               <p class="mt-2 text-xs text-muted-foreground">
                 {{ formatDate(complaint.created_at) }}
                 <template v-if="complaint.resolved_at">

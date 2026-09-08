@@ -1,20 +1,21 @@
 <template>
-  <section v-if="items.length" id="banners" class="mx-auto max-w-6xl px-6 py-16">
+  <section v-if="items.length" id="banners" class="relative py-16">
     <ul
+      ref="track"
       v-gsap.whenVisible.once.from.stagger="{ opacity: 0, y: 32, duration: 0.6 }"
-      class="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      class="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-ps-6 px-6 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
       <li
         v-for="banner in items"
         :key="banner.id"
-        class="w-[85%] shrink-0 snap-start sm:w-[55%] lg:w-[40%]"
+        class="w-[85%] shrink-0 snap-start sm:w-[48%] lg:w-[32%]"
       >
         <!-- Three shapes, one card: an in-app link, an external anchor that opens in a new
              tab, and a plain box for a `none` banner, which is decoration and takes no tap. -->
         <component
           :is="banner.tag"
           v-bind="banner.attrs"
-          class="group relative block aspect-[16/9] overflow-hidden rounded-3xl bg-brand-mist"
+          class="group relative block aspect-[3/2] overflow-hidden rounded-2xl bg-brand-mist lg:aspect-[16/9]"
         >
           <AppImage
             v-if="banner.image?.image_api"
@@ -23,7 +24,7 @@
             class="size-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
 
-          <div class="absolute inset-0 flex flex-col justify-end gap-1 bg-gradient-to-t from-brand-ink/70 via-brand-ink/20 to-transparent p-5 text-white">
+          <div class="absolute inset-0 flex flex-col justify-end gap-1 bg-gradient-to-t from-brand-ink/85 via-brand-ink/35 to-transparent p-5 text-white">
             <p v-if="banner.label" class="text-xs font-medium uppercase tracking-wide text-white/80">{{ banner.label }}</p>
             <h3 class="font-display text-xl font-semibold drop-shadow-sm sm:text-2xl">{{ banner.title }}</h3>
             <span
@@ -43,6 +44,28 @@
         </component>
       </li>
     </ul>
+
+    <!-- Paging by card, not by pixel. The track is a plain scroller, so RTL flips the
+         sign of `scrollBy` — read the resolved direction rather than assuming LTR. -->
+    <template v-if="items.length > 1">
+      <button
+        type="button"
+        class="absolute top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-xl border bg-background/90 text-brand-rust shadow-sm backdrop-blur transition-colors hover:bg-background ltr:left-3 rtl:right-3"
+        :aria-label="t('previous', 'Previous', 'السابق', { subGroup: 'general' })"
+        @click="scrollByCard(-1)"
+      >
+        <LucideChevronLeft class="size-5 rtl:rotate-180" />
+      </button>
+
+      <button
+        type="button"
+        class="absolute top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-xl border bg-background/90 text-brand-rust shadow-sm backdrop-blur transition-colors hover:bg-background ltr:right-3 rtl:left-3"
+        :aria-label="t('next', 'Next', 'التالي', { subGroup: 'general' })"
+        @click="scrollByCard(1)"
+      >
+        <LucideChevronRight class="size-5 rtl:rotate-180" />
+      </button>
+    </template>
   </section>
 </template>
 
@@ -57,8 +80,23 @@
  */
 import { NuxtLink } from '#components'
 
+/** `gap-4` in the track, needed in JS to page by a whole card. */
+const GAP = 16
+
 const { banners } = useHome()
 const { pages } = usePages()
+const { t } = useLang('web', 'home')
+
+const track = ref()
+
+const scrollByCard = (direction) => {
+  const el = track.value
+  if (!el) return
+  const card = el.firstElementChild
+  const step = card ? card.offsetWidth + GAP : el.clientWidth
+  const sign = getComputedStyle(el).direction === 'rtl' ? -1 : 1
+  el.scrollBy({ left: step * direction * sign, behavior: 'smooth' })
+}
 
 const items = computed(() => banners.value
   .slice(1)

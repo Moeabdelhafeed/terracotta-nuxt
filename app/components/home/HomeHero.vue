@@ -19,7 +19,7 @@
             vector-effect="non-scaling-stroke"
           />
         </svg>
-        <div class="mx-auto flex h-full max-w-6xl items-center px-6 py-12 sm:py-16">
+        <div class="mx-auto flex h-full max-w-6xl items-center-safe overflow-y-auto px-6 py-12 sm:py-16">
           <div class="grid w-full items-center gap-6 sm:gap-10 lg:grid-cols-2 lg:gap-16">
             <!-- What the material actually is: the panel earns its full screen by
                  explaining the name rather than repeating the pitch. -->
@@ -156,14 +156,14 @@
             :href="heroRoute"
             target="_blank"
             rel="noopener noreferrer"
-            class="pointer-events-auto rounded-full bg-white/95 px-6 py-2.5 text-sm font-semibold text-brand-ink transition-colors hover:bg-white"
+            class="pointer-events-auto rounded-xl bg-white/95 px-6 py-2.5 text-sm font-semibold text-brand-ink transition-colors hover:bg-white"
           >
             {{ hero.cta_text || t('discover', 'Discover', 'اكتشف') }}
           </a>
           <NuxtLink
             v-else-if="heroRoute"
             :to="heroRoute"
-            class="pointer-events-auto rounded-full bg-white/95 px-6 py-2.5 text-sm font-semibold text-brand-ink transition-colors hover:bg-white"
+            class="pointer-events-auto rounded-xl bg-white/95 px-6 py-2.5 text-sm font-semibold text-brand-ink transition-colors hover:bg-white"
           >
             {{ hero.cta_text || t('discover', 'Discover', 'اكتشف') }}
           </NuxtLink>

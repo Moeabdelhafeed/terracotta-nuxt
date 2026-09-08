@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-center gap-2" dir="ltr">
+  <div class="flex w-full justify-center gap-1.5 sm:gap-2" dir="ltr">
     <input
       v-for="(digit, index) in digits"
       :key="index"
@@ -9,7 +9,7 @@
       inputmode="numeric"
       autocomplete="one-time-code"
       maxlength="1"
-      class="h-12 w-11 rounded-xl border border-input bg-transparent text-center text-lg font-semibold text-foreground shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+      class="h-12 w-full min-w-0 max-w-11 rounded-xl border border-input bg-transparent text-center text-lg font-semibold text-foreground shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
       @input="onInput(index, $event)"
       @keydown="onKeydown(index, $event)"
       @paste="onPaste($event)"

@@ -4,7 +4,7 @@
     :class="{ 'border-brand-rust/50 bg-brand-mist/40': enabled, 'cursor-not-allowed opacity-60': disabled || !hasBalance }"
   >
     <span class="flex items-center gap-3">
-      <span class="flex size-9 items-center justify-center rounded-xl bg-brand-mist text-brand-rust">
+      <span class="flex size-9 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust">
         <LucideWallet class="size-4" />
       </span>
       <span class="flex flex-col">

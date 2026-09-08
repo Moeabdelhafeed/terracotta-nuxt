@@ -3,7 +3,7 @@
     <div class="relative rounded-3xl border border-brand-mist bg-brand-mist/30 p-6 sm:p-8">
       <button
         type="button"
-        class="absolute top-4 flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-brand-mist hover:text-foreground ltr:right-4 rtl:left-4"
+        class="absolute top-3 flex size-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-brand-mist hover:text-foreground ltr:right-3 rtl:left-3"
         :aria-label="t('dismiss', 'Dismiss', 'إغلاق')"
         @click="dismiss"
       >

@@ -5,7 +5,7 @@
         <div class="flex items-center justify-between">
           <NuxtLink
             to="/profile"
-            class="flex size-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground ltr:-ms-2 rtl:-me-2 rtl:-scale-x-100"
+            class="flex size-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground -ms-2 rtl:-scale-x-100"
             :aria-label="t('back_to_profile', 'Back to profile', 'عودة للملف')"
           >
             <LucideArrowLeft class="size-5" />
@@ -15,11 +15,11 @@
         </div>
 
         <div class="flex flex-wrap items-center justify-between gap-3">
-          <div class="flex gap-2">
-            <Button as-child size="sm" class="rounded-full" :variant="unreadOnly ? 'outline' : 'default'">
+          <div class="flex flex-wrap gap-2">
+            <Button as-child size="sm" class="rounded-xl" :variant="unreadOnly ? 'outline' : 'default'">
               <NuxtLink :to="linkTo(1, false)">{{ t('notifications_all', 'All', 'الكل') }}</NuxtLink>
             </Button>
-            <Button as-child size="sm" class="rounded-full" :variant="unreadOnly ? 'default' : 'outline'">
+            <Button as-child size="sm" class="rounded-xl" :variant="unreadOnly ? 'default' : 'outline'">
               <NuxtLink :to="linkTo(1, true)">
                 {{ t('notifications_unread_only', 'Unread only', 'غير المقروءة فقط') }}
                 <span v-if="unreadCount > 0" class="ms-1 rounded-full bg-brand-blush px-1.5 text-[10px] font-semibold text-brand-ink" dir="ltr">{{ unreadCount }}</span>
@@ -42,7 +42,7 @@
         </div>
 
         <div v-else-if="!notifications.length" class="flex flex-col items-center gap-3 rounded-2xl border bg-card p-10 text-center">
-          <span class="flex size-12 items-center justify-center rounded-full bg-brand-mist text-brand-rust">
+          <span class="flex size-12 items-center justify-center rounded-full bg-brand-rust/10 text-brand-rust">
             <LucideBellOff class="size-5" />
           </span>
           <h2 class="font-display text-lg font-semibold text-foreground">
@@ -73,7 +73,7 @@
                   <span class="truncate text-sm text-foreground" :class="n.is_read ? 'font-medium' : 'font-semibold'">{{ notificationTitle(n, t) }}</span>
                   <span v-if="!n.is_read" class="size-2 shrink-0 rounded-full bg-brand-rust" aria-hidden="true" />
                 </span>
-                <span class="mt-0.5 block text-sm text-muted-foreground">{{ n.body }}</span>
+                <span class="mt-0.5 block text-sm break-words text-muted-foreground">{{ n.body }}</span>
                 <time class="mt-1 block text-xs text-muted-foreground" :datetime="n.created_at" :title="formatDate(n.created_at)">{{ relative(n.created_at) }}</time>
               </span>
               <LucideChevronRight v-if="notificationRoute(n)" class="mt-1 size-4 shrink-0 text-muted-foreground rtl:-scale-x-100 group-hover:text-foreground" />
@@ -82,7 +82,7 @@
         </ul>
 
         <nav v-if="lastPage > 1" class="flex flex-wrap items-center justify-center gap-2">
-          <Button v-if="currentPage > 1" as-child size="sm" variant="outline" class="rounded-full">
+          <Button v-if="currentPage > 1" as-child size="sm" variant="outline" class="rounded-xl">
             <NuxtLink :to="linkTo(currentPage - 1)" rel="prev">{{ t('previous', 'Previous', 'السابق') }}</NuxtLink>
           </Button>
           <Button
@@ -91,11 +91,11 @@
             as-child
             size="sm"
             :variant="number === currentPage ? 'default' : 'outline'"
-            class="min-w-10 rounded-full"
+            class="min-w-10 rounded-xl"
           >
             <NuxtLink :to="linkTo(number)" :aria-current="number === currentPage ? 'page' : undefined">{{ number }}</NuxtLink>
           </Button>
-          <Button v-if="currentPage < lastPage" as-child size="sm" variant="outline" class="rounded-full">
+          <Button v-if="currentPage < lastPage" as-child size="sm" variant="outline" class="rounded-xl">
             <NuxtLink :to="linkTo(currentPage + 1)" rel="next">{{ t('next', 'Next', 'التالي') }}</NuxtLink>
           </Button>
         </nav>

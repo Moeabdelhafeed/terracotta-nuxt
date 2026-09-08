@@ -5,13 +5,13 @@
     :subtitle="t('forgot_password_description', 'We will send a code to it to reset your password.', 'سنرسل لك رمزًا عليه لإعادة تعيين كلمة المرور.')"
   >
     <form class="flex flex-col gap-5" @submit.prevent="onSubmit">
-      <div v-if="identifierTypes.length > 1" class="flex gap-2">
+      <div v-if="identifierTypes.length > 1" class="flex flex-wrap gap-2">
         <Button
           v-for="kind in identifierTypes"
           :key="kind"
           type="button"
           size="sm"
-          class="rounded-full"
+          class="rounded-xl"
           :variant="form.type === kind ? 'default' : 'outline'"
           @click="form.type = kind"
         >{{ labelFor(kind) }}</Button>
@@ -42,13 +42,13 @@
 
       <div v-if="exists && availableChannels.length > 1" class="grid gap-2">
         <Label>{{ t('send_otp_via', 'Send OTP via', 'إرسال الرمز عبر') }}</Label>
-        <div class="flex gap-2">
+        <div class="flex flex-wrap gap-2">
           <Button
             v-for="ch in availableChannels"
             :key="ch"
             type="button"
             size="sm"
-            class="rounded-full"
+            class="rounded-xl"
             :variant="form.channel === ch ? 'default' : 'outline'"
             @click="form.channel = ch"
           >

@@ -5,7 +5,7 @@
         <div class="flex items-center justify-between">
           <NuxtLink
             to="/profile"
-            class="flex size-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground ltr:-ms-2 rtl:-me-2 rtl:-scale-x-100"
+            class="flex size-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground -ms-2 rtl:-scale-x-100"
             :aria-label="t('back_to_profile', 'Back to profile', 'عودة للملف')"
           >
             <LucideArrowLeft class="size-5" />
@@ -19,7 +19,7 @@
         </div>
 
         <div v-else-if="!addresses.length" class="flex flex-col items-center gap-3 rounded-2xl border bg-card p-10 text-center">
-          <span class="flex size-12 items-center justify-center rounded-full bg-brand-mist text-brand-rust">
+          <span class="flex size-12 items-center justify-center rounded-full bg-brand-rust/10 text-brand-rust">
             <LucideMapPin class="size-5" />
           </span>
           <h2 class="font-display text-lg font-semibold text-foreground">{{ t('no_addresses', 'No addresses yet', 'لا توجد عناوين بعد') }}</h2>
@@ -34,11 +34,11 @@
               <div class="min-w-0 flex-1">
                 <div class="flex flex-wrap items-center gap-2">
                   <span class="font-display text-base font-semibold text-foreground">{{ address.label || t('address_untitled', 'Address', 'عنوان') }}</span>
-                  <span v-if="address.is_default" data-test="default-badge" class="rounded-full bg-brand-green/15 px-2.5 py-0.5 text-xs font-medium text-brand-green">
+                  <span v-if="address.is_default" data-test="default-badge" class="rounded-md bg-brand-green/15 px-2.5 py-0.5 text-xs font-medium text-brand-green">
                     {{ t('address_default', 'Default', 'الافتراضي') }}
                   </span>
                 </div>
-                <p class="mt-1 text-sm text-muted-foreground">{{ address.address_line }}</p>
+                <p class="mt-1 text-sm break-words text-muted-foreground">{{ address.address_line }}</p>
                 <p class="mt-1 text-sm text-muted-foreground" dir="ltr">{{ address.phone }}</p>
                 <p v-if="address.notes" class="mt-1 text-xs text-muted-foreground">{{ address.notes }}</p>
                 <p v-if="address.delivery_zone" class="mt-2 text-xs text-muted-foreground">
@@ -92,7 +92,7 @@
         <div class="relative w-full max-w-md rounded-2xl border bg-background p-6 shadow-lg">
           <div class="mb-5 flex items-center justify-between">
             <span class="flex items-center gap-3">
-              <span class="flex size-9 items-center justify-center rounded-xl bg-brand-mist text-brand-rust"><LucideMapPin class="size-4" /></span>
+              <span class="flex size-9 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust"><LucideMapPin class="size-4" /></span>
               <span class="font-display text-base font-semibold">
                 {{ editing ? t('edit_address', 'Edit address', 'تعديل العنوان') : t('add_address', 'Add an address', 'إضافة عنوان') }}
               </span>

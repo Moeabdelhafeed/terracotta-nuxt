@@ -10,7 +10,7 @@
           <Button
             type="button"
             size="sm"
-            class="rounded-full"
+            class="rounded-xl"
             :variant="categoryId === category.id ? 'default' : 'outline'"
             :class="categoryId === category.id ? 'bg-brand-rust hover:bg-brand-rust/90' : ''"
             @click="categoryId = category.id"
@@ -28,7 +28,7 @@
             <Button
               type="button"
               size="sm"
-              class="rounded-full"
+              class="rounded-xl"
               :variant="subId === sub.id ? 'default' : 'outline'"
               :class="subId === sub.id ? 'bg-brand-rust hover:bg-brand-rust/90' : ''"
               @click="subId = sub.id"
@@ -114,17 +114,17 @@
               <p v-if="line.subtitle" class="truncate text-xs text-muted-foreground">{{ line.subtitle }}</p>
               <p class="mt-1 text-sm font-medium text-primary">{{ format(line.price) }}</p>
             </div>
-            <Button type="button" size="icon" variant="ghost" class="size-8 rounded-lg text-destructive" :aria-label="t('remove', 'Remove', 'حذف')" @click="removeLine(line)">
+            <Button type="button" size="icon" variant="ghost" class="size-10 rounded-lg text-destructive sm:size-8" :aria-label="t('remove', 'Remove', 'حذف')" @click="removeLine(line)">
               <LucideX class="size-4" />
             </Button>
           </div>
 
           <div v-if="line.workshop_product_id" class="mt-3 flex items-center gap-3">
-            <Button type="button" size="icon" variant="outline" class="size-8 rounded-lg" :data-dec="line.workshop_product_id" @click="step(line, -1)">
+            <Button type="button" size="icon" variant="outline" class="size-10 rounded-lg sm:size-8" :data-dec="line.workshop_product_id" @click="step(line, -1)">
               <LucideMinus class="size-4" />
             </Button>
             <span class="text-sm tabular-nums">{{ t('qty_n', 'Qty :n', 'عدد :n', { n: line.quantity }) }}</span>
-            <Button type="button" size="icon" variant="outline" class="size-8 rounded-lg" :data-inc="line.workshop_product_id" :disabled="totalQuantity >= bounds.max" @click="step(line, 1)">
+            <Button type="button" size="icon" variant="outline" class="size-10 rounded-lg sm:size-8" :data-inc="line.workshop_product_id" :disabled="totalQuantity >= bounds.max" @click="step(line, 1)">
               <LucidePlus class="size-4" />
             </Button>
           </div>

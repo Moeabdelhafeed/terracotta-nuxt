@@ -11,7 +11,7 @@
       <div v-if="hasDiscount" class="flex items-center justify-between gap-4 text-brand-green">
         <dt>
           {{ t('summary_discount', 'Discount', 'الخصم') }}
-          <span v-if="quote.discount_code" class="ms-1 rounded-full bg-brand-green/10 px-2 py-0.5 text-xs font-medium uppercase">{{ quote.discount_code }}</span>
+          <span v-if="quote.discount_code" class="ms-1 rounded-md bg-brand-green/10 px-2 py-0.5 text-xs font-medium uppercase">{{ quote.discount_code }}</span>
         </dt>
         <dd class="font-medium">−{{ format(quote.discount_amount) }}</dd>
       </div>
@@ -43,7 +43,7 @@
 
       <div class="flex items-center justify-between gap-4 border-t pt-2">
         <dt class="font-semibold text-foreground">{{ t('summary_amount_due', 'Amount due', 'المبلغ المستحق') }}</dt>
-        <dd class="font-display text-2xl font-black text-primary">{{ format(quote.amount_due) }}</dd>
+        <dd class="font-display text-xl font-black text-primary sm:text-2xl">{{ format(quote.amount_due) }}</dd>
       </div>
 
       <p v-if="settled" class="rounded-xl bg-brand-green/10 px-3 py-2 text-xs font-medium text-brand-green">

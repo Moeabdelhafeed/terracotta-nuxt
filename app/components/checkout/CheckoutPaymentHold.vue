@@ -31,7 +31,7 @@
     <div v-else class="flex flex-col gap-4">
       <div class="flex items-center justify-between gap-4">
         <div class="flex items-center gap-3">
-          <span class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-mist text-brand-rust">
+          <span class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust">
             <LucideTimer class="size-5" />
           </span>
           <div>
@@ -42,9 +42,9 @@
         <span class="font-display text-2xl font-semibold tabular-nums" :class="remaining <= 60 ? 'text-destructive' : 'text-foreground'" dir="ltr">{{ clock }}</span>
       </div>
 
-      <div class="flex items-center justify-between rounded-xl bg-brand-mist/40 px-4 py-3">
+      <div class="flex items-center justify-between gap-3 rounded-xl bg-brand-mist/40 px-4 py-3">
         <span class="text-sm text-muted-foreground">{{ t('summary_amount_due', 'Amount due', 'المبلغ المستحق') }}</span>
-        <span class="font-display text-xl font-black text-primary">{{ format(amountDue) }}</span>
+        <span class="font-display text-lg font-black text-primary sm:text-xl">{{ format(amountDue) }}</span>
       </div>
 
       <span v-if="errorText" class="text-xs text-destructive">{{ errorText }}</span>

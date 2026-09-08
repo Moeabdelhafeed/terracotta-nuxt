@@ -3,7 +3,7 @@
     <Card class="w-full max-w-sm">
       <CardHeader>
         <CardTitle class="text-2xl">{{ t('verify_login_title', 'Enter code', 'أدخل الرمز') }}</CardTitle>
-        <CardDescription>
+        <CardDescription class="break-words">
           {{ t('enter_otp_sent_to', 'Enter the OTP sent to :target.', 'أدخل الرمز المرسل إلى :target.', { target: identifier }) }}
         </CardDescription>
       </CardHeader>

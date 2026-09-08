@@ -2,7 +2,7 @@
   <button
     v-if="other"
     type="button"
-    class="flex items-center gap-2 whitespace-nowrap rounded-full bg-white/10 px-4 py-2 text-white/85 transition-colors hover:bg-white/20 hover:text-white"
+    class="flex items-center gap-2 whitespace-nowrap rounded-xl bg-white/10 px-4 py-2.5 text-white/85 transition-colors hover:bg-white/20 hover:text-white"
     :aria-label="t('language', 'Language', 'اللغة')"
     @click="setLanguage(other.code)"
   >

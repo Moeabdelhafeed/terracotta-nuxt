@@ -3,9 +3,9 @@
     <li v-for="tile in tiles" :key="tile.key">
       <NuxtLink
         :to="tile.to"
-        class="flex h-full flex-col items-center justify-center gap-2 rounded-2xl border bg-card p-4 text-center transition-colors hover:bg-brand-mist/40"
+        class="flex h-full flex-col items-center justify-center gap-2 rounded-2xl border bg-card p-3 text-center sm:p-4 transition-colors hover:bg-brand-mist/40"
       >
-        <span class="relative flex size-11 items-center justify-center rounded-xl bg-brand-mist text-brand-rust">
+        <span class="relative flex size-11 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust">
           <LucideShoppingBag v-if="tile.key === 'cart'" class="size-5" />
           <LucideHeart v-else-if="tile.key === 'favorites'" class="size-5" />
           <LucidePackage v-else class="size-5" />

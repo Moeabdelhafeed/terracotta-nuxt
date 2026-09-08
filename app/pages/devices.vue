@@ -5,7 +5,7 @@
         <div class="flex items-center justify-between">
           <NuxtLink
             to="/profile"
-            class="flex size-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground ltr:-ms-2 rtl:-me-2 rtl:-scale-x-100"
+            class="flex size-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground -ms-2 rtl:-scale-x-100"
             :aria-label="t('back_to_profile', 'Back to profile', 'عودة للملف')"
           >
             <LucideArrowLeft class="size-5" />
@@ -22,17 +22,17 @@
             <li
               v-for="d in devices"
               :key="d.id"
-              class="flex items-center justify-between gap-4 rounded-xl border p-4 text-sm"
+              class="flex flex-wrap items-center justify-between gap-4 rounded-xl border p-4 text-sm"
             >
-              <div class="flex flex-col gap-0.5">
-                <span class="font-medium text-foreground">
+              <div class="flex min-w-0 flex-col gap-0.5">
+                <span class="font-medium break-words text-foreground">
                   {{ d.device_name || t('unknown_device', 'Unknown device', 'جهاز غير معروف') }}
                   <span
                     v-if="d.is_current"
-                    class="ms-2 rounded-full bg-brand-mist px-2 py-0.5 text-xs font-medium text-brand-rust"
+                    class="ms-2 rounded-md bg-brand-rust/10 px-2 py-0.5 text-xs font-medium text-brand-rust"
                   >{{ t('this_device', 'This device', 'هذا الجهاز') }}</span>
                 </span>
-                <span class="text-xs text-muted-foreground">
+                <span class="text-xs break-words text-muted-foreground">
                   {{ [d.platform, d.ip].filter(Boolean).join(' • ') }}
                 </span>
                 <span v-if="d.last_seen_at" class="text-xs text-muted-foreground">
@@ -43,7 +43,7 @@
                 v-if="!d.is_current"
                 size="sm"
                 variant="outline"
-                class="shrink-0 rounded-full"
+                class="shrink-0 rounded-xl"
                 :disabled="revoking === d.id"
                 @click="onRevoke(d.id)"
               >{{ revoking === d.id ? t('revoking', 'Revoking...', 'جارٍ الإلغاء...') : t('revoke', 'Revoke', 'إلغاء') }}</Button>

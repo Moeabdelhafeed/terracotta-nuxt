@@ -2,7 +2,7 @@
   <section id="gallery" v-if="pool.length" ref="root" class="bg-brand-mist/40">
     <!-- Exactly one viewport tall: header at the top, the wall taking whatever is left.
          Any spare height here pools above the heading as a gap. -->
-    <div ref="panel" class="flex h-svh w-full flex-col gap-5 px-4 py-24 sm:px-6">
+    <div ref="panel" class="flex h-svh w-full flex-col gap-5 px-4 py-12 sm:px-6 sm:py-24">
       <header class="mx-auto w-full max-w-[1600px]">
         <h2 class="font-display text-3xl font-semibold sm:text-4xl">
           {{ t('gallery_title', 'From the studio', 'من الاستوديو') }}
@@ -25,14 +25,25 @@
                offset, so the pictures slide through the window rather than playing a
                transition of their own. -->
           <div ref="strips" class="absolute inset-0 will-change-transform">
-            <div
+            <NuxtLink
               v-for="(slide, position) in slidesFor(index)"
               :key="slide.id"
-              class="absolute inset-x-0 h-full"
+              :to="`/gallery/${slide.category.id}`"
+              class="group absolute inset-x-0 block h-full"
               :style="{ top: `${position * 100}%` }"
             >
-              <AppImage :src="slide.image" alt="" class="size-full object-cover" />
-            </div>
+              <AppImage :src="slide.image" :alt="slide.category.title" class="size-full object-cover" />
+
+              <!-- The gallery page's tile scrim, held back until the picture is hovered:
+                   the wall reads as photographs, and naming the category is what the
+                   pointer asks for. -->
+              <div
+                class="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-brand-ink/30 px-4 text-center text-white opacity-0 backdrop-blur-[3px] transition-opacity duration-300 group-hover:opacity-100"
+              >
+                <h3 class="font-display text-xl font-semibold drop-shadow-sm sm:text-2xl">{{ slide.category.title }}</h3>
+                <p class="text-sm text-white/90 drop-shadow-sm">{{ galleryCounts(slide.category, t) }}</p>
+              </div>
+            </NuxtLink>
           </div>
         </li>
       </ul>
@@ -74,9 +85,16 @@ const { data: pool } = await useAsyncData(
       list.map((category) => api(`/api/gallery/${category.id}`).catch(() => null)),
     )
 
-    return details
-      .flatMap((detail) => detail?.data?.items ?? [])
-      .filter((item) => item.type === 'image' && item.image?.image_api)
+    // The category rides along on every picture: a tile links to the wall the photograph
+    // came from, and names it on hover. Only the fields the overlay needs, not the whole
+    // record with its cover — the payload carries one copy per image.
+    return details.flatMap((detail, index) => {
+      const { id, title, images_count, videos_count } = list[index]
+
+      return (detail?.data?.items ?? [])
+        .filter((item) => item.type === 'image' && item.image?.image_api)
+        .map((item) => ({ ...item, category: { id, title, images_count, videos_count } }))
+    })
   },
   { default: () => [], watch: [lang, i18nLocale] },
 )

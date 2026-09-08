@@ -2,7 +2,7 @@
   <NuxtLink
     v-if="isRegistered"
     to="/notifications"
-    class="relative flex size-9 items-center justify-center rounded-full transition-colors"
+    class="relative flex size-10 items-center justify-center rounded-xl transition-colors"
     :class="active ? 'bg-white text-brand-ink' : 'text-white/75 hover:text-white'"
     :aria-label="t('nav_notifications', 'Notifications', 'الإشعارات')"
   >

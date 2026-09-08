@@ -2,7 +2,7 @@
   <div class="inline-flex items-center gap-1 rounded-xl border bg-card p-1" :class="{ 'opacity-50': disabled }">
     <button
       type="button"
-      class="flex size-9 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-brand-mist disabled:cursor-not-allowed disabled:opacity-40"
+      class="flex size-10 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-brand-mist disabled:cursor-not-allowed disabled:opacity-40"
       :aria-label="t('decrease', 'Decrease quantity', 'تقليل الكمية')"
       :disabled="disabled || quantity <= min"
       @click="set(quantity - 1)"
@@ -16,7 +16,7 @@
 
     <button
       type="button"
-      class="flex size-9 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-brand-mist disabled:cursor-not-allowed disabled:opacity-40"
+      class="flex size-10 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-brand-mist disabled:cursor-not-allowed disabled:opacity-40"
       :aria-label="t('increase', 'Increase quantity', 'زيادة الكمية')"
       :disabled="disabled || quantity >= max"
       @click="set(quantity + 1)"

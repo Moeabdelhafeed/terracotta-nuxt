@@ -7,13 +7,13 @@
       :class="{ 'border-destructive/40': line.in_stock === false }"
       :data-line="line.id"
     >
-      <div class="flex gap-4" :class="{ 'opacity-60': line.in_stock === false }">
+      <div class="flex gap-3 sm:gap-4" :class="{ 'opacity-60': line.in_stock === false }">
         <!-- An order line outlives its product: the row stays, but it must not become a
              link to `/shop/undefined`. -->
         <component
           :is="line.product ? NuxtLink : 'span'"
           :to="line.product ? `/shop/${line.product.id}` : undefined"
-          class="block size-24 shrink-0 overflow-hidden rounded-xl border bg-brand-mist sm:size-28"
+          class="block size-20 shrink-0 overflow-hidden rounded-xl border bg-brand-mist sm:size-24 md:size-28"
         >
           <AppImage
             v-if="line.product?.image?.image_api"
@@ -44,7 +44,7 @@
 
             <button
               type="button"
-              class="flex size-9 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+              class="flex size-10 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
               :aria-label="t('remove_line', 'Remove from cart', 'إزالة من العربة')"
               :disabled="busy === line.id"
               @click="onRemove(line)"

@@ -9,7 +9,7 @@
   <section id="workshops" v-if="workshops.length" class="mx-auto max-w-6xl px-6 py-24">
     <header class="mb-12 flex flex-wrap items-end justify-between gap-4">
       <div class="max-w-xl">
-        <h2 class="font-display text-4xl font-semibold sm:text-5xl">
+        <h2 class="font-display text-3xl font-semibold sm:text-4xl lg:text-5xl">
           {{ t('workshops_title', 'The workshop experience', 'تجربة الورشة') }}
         </h2>
         <p class="mt-3 text-muted-foreground">
@@ -51,7 +51,7 @@
               />
             </div>
             <span
-              class="absolute top-4 rounded-full px-3 py-1 text-xs font-medium text-white ltr:left-4 rtl:right-4"
+              class="absolute top-4 rounded-md px-3 py-1 text-xs font-medium text-white ltr:left-4 rtl:right-4"
               :style="{ backgroundColor: workshop.color || 'var(--brand-terracotta)' }"
             >{{ typeLabel(workshop.type) }}</span>
           </div>
@@ -60,7 +60,7 @@
             <h3 class="font-display text-xl font-semibold">{{ workshop.title }}</h3>
             <p class="line-clamp-2 text-sm text-muted-foreground">{{ workshop.short_description }}</p>
 
-            <dl class="mt-auto flex items-center gap-4 pt-4 text-sm text-muted-foreground">
+            <dl class="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-4 text-sm text-muted-foreground">
               <div class="flex items-center gap-1.5">
                 <LucideClock class="size-4" />
                 <dd>{{ t('minutes', ':n min', ':n دقيقة', { n: workshop.duration_minutes }) }}</dd>

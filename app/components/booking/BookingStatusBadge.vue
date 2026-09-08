@@ -1,5 +1,5 @@
 <template>
-  <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium" :class="tone" :data-state="state">
+  <span class="inline-flex items-center rounded-md px-3 py-1 text-xs font-medium" :class="tone" :data-state="state">
     {{ label }}
   </span>
 </template>
@@ -33,11 +33,11 @@ const tones = {
   confirmed: 'bg-brand-green/15 text-brand-green',
   attending: 'bg-brand-green/15 text-brand-green',
   absent: 'bg-muted text-muted-foreground',
-  preparing: 'bg-brand-mist text-brand-rust',
+  preparing: 'bg-brand-rust/10 text-brand-rust',
   ready: 'bg-brand-blush/40 text-brand-rust',
   awaiting_pickup: 'bg-brand-blush/40 text-brand-rust',
-  getting_ready: 'bg-brand-mist text-brand-rust',
-  on_the_way: 'bg-brand-mist text-brand-rust',
+  getting_ready: 'bg-brand-rust/10 text-brand-rust',
+  on_the_way: 'bg-brand-rust/10 text-brand-rust',
   delivered: 'bg-brand-green/15 text-brand-green',
   cancelled: 'bg-destructive/10 text-destructive',
 }

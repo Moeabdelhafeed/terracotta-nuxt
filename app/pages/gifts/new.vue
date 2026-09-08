@@ -7,7 +7,7 @@
            refuse with `gift_unavailable`. Say so once, at the top, instead of letting the
            buyer fill a form that cannot be submitted. -->
       <section v-if="unavailable" class="mx-auto max-w-xl rounded-3xl border bg-card p-6 text-center sm:p-8">
-        <span class="mx-auto flex size-12 items-center justify-center rounded-2xl bg-brand-mist text-brand-rust">
+        <span class="mx-auto flex size-12 items-center justify-center rounded-2xl bg-brand-rust/10 text-brand-rust">
           <LucideGift class="size-5" />
         </span>
         <h1 class="mt-5 font-display text-2xl font-semibold">
