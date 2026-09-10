@@ -1,9 +1,10 @@
 <template>
   <!--
-    The link always lands here, never in the app: no Universal/App Link association is
-    served for this path on purpose, so the OS hands the URL to the browser and the
-    recipient sees the gift — often their first sight of Terracotta at all. Opening the
-    app is a button they press, not something that happens to them.
+    The link lands here first: the recipient sees the gift — often their first sight of
+    Terracotta at all — and opening the app is a button they press. With the association
+    files in public/.well-known filled in, a phone that has the app installed skips this
+    page and opens the app directly; the button stays for in-app browsers, which defeat
+    that verification.
   -->
   <div>
     <!-- Opened by hand: the gift is behind it, and tapping the mark is the opening of it. -->
@@ -109,6 +110,17 @@
                already spent, unpaid, or the buyer's own. -->
           <p v-if="redeemError" class="mt-4 text-sm text-destructive">{{ redeemError }}</p>
 
+          <!-- A phone only: the scheme means nothing on a desktop. -->
+          <Button
+            v-if="appLink"
+            variant="outline"
+            size="lg"
+            class="mt-3 h-12 w-full rounded-2xl text-base"
+            @click="openInApp"
+          >
+            {{ t('gift_open_in_app', 'Open in the app', 'افتح في التطبيق') }}
+          </Button>
+
           <div v-if="gift.store_links?.length" class="mt-6">
             <p class="text-xs text-muted-foreground">
               {{ t('gift_get_app', 'Do not have the app yet?', 'ليس لديك التطبيق بعد؟') }}
@@ -192,11 +204,32 @@ const notFound = computed(() => error.value?.statusCode === 404)
  * Claiming. The face amount lands in the redeemer's wallet — not what the buyer paid,
  * which this page never sees — and it happens exactly once, so the button is disabled for
  * the duration of the call and the server is the authority on every refusal.
- *
- * `deep_link` stays unused: the app does not register the scheme yet, so tapping it would
- * raise "cannot open page". The store links below are the way to the app.
  */
 const { redeem } = useGifts()
+
+/**
+ * "Open in the app". `deep_link` is the custom scheme (`terracotta://gift/{token}`) the
+ * app registers; the OS switches to the app if it is installed and does nothing at all if
+ * it is not — no error, no event. So the page waits a moment and, if it is still the one
+ * in front, sends the visitor to the store for their platform instead.
+ */
+const { platform } = useDevice()
+
+const appLink = computed(() => (
+  ['ios', 'android'].includes(platform.value) ? gift.value?.deep_link ?? null : null
+))
+
+const storeFor = (device) => gift.value?.store_links
+  ?.find((link) => link.type === (device === 'ios' ? 'app_store' : 'google_play'))?.url
+
+const openInApp = () => {
+  const store = storeFor(platform.value)
+  window.location.href = appLink.value
+  if (!store) return
+  setTimeout(() => {
+    if (document.visibilityState === 'visible') window.location.href = store
+  }, 1500)
+}
 
 // A guest session is an anonymous device, not an account with a ledger — it cannot hold
 // wallet credit, so it is sent through sign-in like a visitor with no session at all.

@@ -130,6 +130,12 @@ export default defineNuxtConfig({
         'Referrer-Policy': 'strict-origin-when-cross-origin',
       },
     },
+    // Universal Links (iOS) / App Links (Android) for the gift share link. Apple's file
+    // has no extension, so it would otherwise go out as octet-stream, which iOS ignores;
+    // both verifiers also refuse a redirect, so nothing may rewrite this path.
+    '/.well-known/**': {
+      headers: { 'Content-Type': 'application/json' },
+    },
   },
 
   robots: {
