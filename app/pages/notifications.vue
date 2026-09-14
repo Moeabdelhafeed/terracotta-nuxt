@@ -1,7 +1,7 @@
 <template>
   <main class="min-h-svh bg-background pb-28">
     <div class="mx-auto max-w-6xl px-6 py-16">
-      <div class="mx-auto flex max-w-lg flex-col gap-5">
+      <div class="flex flex-col gap-5">
         <div class="flex items-center justify-between">
           <NuxtLink
             to="/profile"
@@ -37,11 +37,11 @@
           </button>
         </div>
 
-        <div v-if="pending && !notifications.length" class="flex flex-col gap-3" aria-busy="true">
+        <div v-if="pending && !notifications.length" class="grid gap-3 lg:grid-cols-2" aria-busy="true">
           <AppSkeleton v-for="n in 4" :key="n" class="h-20 w-full !rounded-2xl" />
         </div>
 
-        <div v-else-if="!notifications.length" class="flex flex-col items-center gap-3 rounded-2xl border bg-card p-10 text-center">
+        <div v-else-if="!notifications.length" class="mx-auto flex w-full max-w-xl flex-col items-center gap-3 rounded-2xl border bg-card p-10 text-center">
           <span class="flex size-12 items-center justify-center rounded-full bg-brand-rust/10 text-brand-rust">
             <LucideBellOff class="size-5" />
           </span>
@@ -53,11 +53,11 @@
           </p>
         </div>
 
-        <ul v-else class="flex flex-col gap-3">
+        <ul v-else class="grid gap-3 lg:grid-cols-2">
           <li v-for="n in notifications" :key="n.id">
             <button
               type="button"
-              class="group flex w-full items-start gap-3 rounded-2xl border bg-card p-4 text-start transition-colors hover:bg-brand-mist/40"
+              class="group flex h-full w-full items-start gap-3 rounded-2xl border bg-card p-4 text-start transition-colors hover:bg-brand-mist/40"
               :class="n.is_read ? '' : 'border-brand-rust/30 bg-brand-mist/30'"
               :aria-label="notificationTitle(n, t)"
               @click="open(n)"

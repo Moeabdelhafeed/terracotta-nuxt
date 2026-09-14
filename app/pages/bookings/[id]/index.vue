@@ -1,14 +1,16 @@
 <template>
-  <main v-if="status !== 'success' && !booking" class="mx-auto max-w-3xl px-6 py-16" aria-busy="true">
+  <main v-if="status !== 'success' && !booking" class="mx-auto max-w-6xl px-6 py-16" aria-busy="true">
     <AppSkeleton class="h-9 w-2/3" />
-    <AppSkeleton class="mt-6 h-28 w-full !rounded-3xl" />
-    <AppSkeleton class="mt-4 h-48 w-full !rounded-3xl" />
+    <div class="mt-8 grid gap-8 lg:grid-cols-[1.5fr_1fr]">
+      <AppSkeleton class="h-48 w-full !rounded-3xl" />
+      <AppSkeleton class="h-28 w-full !rounded-3xl" />
+    </div>
   </main>
 
   <main v-else-if="booking" class="min-h-svh bg-background pb-28">
     <PageBar :crumbs="crumbs" />
 
-    <div class="mx-auto max-w-3xl px-6 py-16">
+    <div class="mx-auto max-w-6xl px-6 py-16">
       <div class="flex items-start justify-between gap-4">
         <h1 class="font-display text-3xl font-semibold sm:text-4xl">
           {{ booking.workshop_title }}<span v-if="booking.has_celebration"> {{ t('with_celebration', 'with a celebration', 'مع احتفال') }}</span>
@@ -16,202 +18,163 @@
         <BookingStatusBadge :booking="booking" />
       </div>
 
-      <!-- Status panel: illustration, title and the copy for this exact state. -->
-      <section class="mt-6 flex items-start gap-4 rounded-3xl border bg-card p-6">
-        <span class="flex size-12 shrink-0 items-center justify-center rounded-2xl" :class="panel.tone">
-          <component :is="panel.icon" class="size-6" />
-        </span>
-        <div class="flex-1">
-          <h2 class="font-display text-xl font-semibold">{{ panel.title }}</h2>
-          <p class="mt-1 text-sm text-muted-foreground">{{ panel.body }}</p>
+      <div class="mt-8 grid gap-8 lg:grid-cols-[1.5fr_1fr] lg:items-start">
+        <div class="flex flex-col gap-6">
+          <!-- Six tiles (gE058): date · people · price · code · time · celebration -->
+          <dl class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div class="rounded-2xl border bg-card p-4">
+              <dt class="text-xs uppercase tracking-[0.2em] text-muted-foreground">{{ t('tile_date', 'Date', 'التاريخ') }}</dt>
+              <dd class="mt-1 font-display text-lg font-semibold">{{ formatBookingDate(booking.booking_date, code) }}</dd>
+            </div>
+            <div class="rounded-2xl border bg-card p-4">
+              <dt class="text-xs uppercase tracking-[0.2em] text-muted-foreground">{{ t('tile_people', 'People', 'الأشخاص') }}</dt>
+              <dd class="mt-1 font-display text-lg font-semibold">{{ t('n_people', ':n people', ':n اشخاص', { n: booking.people_count }) }}</dd>
+            </div>
+            <div class="rounded-2xl border bg-card p-4">
+              <dt class="text-xs uppercase tracking-[0.2em] text-muted-foreground">{{ t('tile_price', 'Price', 'السعر') }}</dt>
+              <dd class="mt-1 font-display text-lg font-semibold text-primary">{{ format(booking.total_price) }}</dd>
+            </div>
+            <button type="button" class="rounded-2xl border bg-card p-4 text-start transition-colors hover:border-brand-rust" @click="qrOpen = true">
+              <dt class="text-xs uppercase tracking-[0.2em] text-muted-foreground">{{ t('tile_code', 'Check-in code', 'رمز المسح') }}</dt>
+              <dd class="mt-1 font-display text-lg font-semibold tabular-nums" dir="ltr">{{ booking.checkin_code }}</dd>
+            </button>
+            <div class="rounded-2xl border bg-card p-4">
+              <dt class="text-xs uppercase tracking-[0.2em] text-muted-foreground">{{ t('tile_time', 'Time', 'الوقت') }}</dt>
+              <dd class="mt-1 font-display text-lg font-semibold" dir="ltr">{{ formatSlotTime(booking.start_time, booking.end_time) }}</dd>
+            </div>
+            <div class="rounded-2xl border bg-card p-4">
+              <dt class="text-xs uppercase tracking-[0.2em] text-muted-foreground">{{ t('tile_celebration', 'Celebration', 'الاحتفال') }}</dt>
+              <dd class="mt-1 font-display text-lg font-semibold">
+                {{ booking.has_celebration ? t('with_celebration_short', 'With a celebration', 'مع احتفال') : t('no_celebration', 'None', 'بدون') }}
+              </dd>
+            </div>
+          </dl>
+
+          <!-- Photos: only while the session is running (qQmRc / QCR16). -->
+          <BookingPieceUploader
+            v-if="booking.status === 'attending'"
+            :booking="booking"
+            @uploaded="onUploaded"
+            @remove-piece="askRemovePiece"
+          />
+
+          <section v-if="booking.images?.length">
+            <h2 class="font-display text-xl font-semibold">{{ t('photos_title', 'Your photos', 'صور قطعك') }}</h2>
+            <ul class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <li v-for="image in booking.images" :key="image.id" class="relative overflow-hidden rounded-2xl border">
+                <AppImage :src="image" :alt="booking.workshop_title" class="aspect-square w-full object-cover" />
+                <Button
+                  v-if="booking.status === 'attending'"
+                  type="button"
+                  size="icon"
+                  variant="secondary"
+                  class="absolute top-2 size-8 rounded-lg ltr:right-2 rtl:left-2"
+                  :aria-label="t('remove', 'Remove', 'حذف')"
+                  @click="removeImage(image.id)"
+                >
+                  <LucideX class="size-4" />
+                </Button>
+              </li>
+            </ul>
+          </section>
+
+          <section v-if="booking.pieces?.length && booking.status !== 'attending'">
+            <h2 class="font-display text-xl font-semibold">{{ t('pieces_title_detail', 'Your pieces', 'قطعك') }}</h2>
+            <p class="mt-1 text-sm text-muted-foreground">
+              {{ t('pieces_closed', 'The session is over, so no more photos can be added to this booking.', 'انتهت الورشة، لذا لا يمكن إضافة مزيد من الصور إلى هذا الحجز.') }}
+            </p>
+            <ul class="mt-4 flex flex-col gap-3">
+              <li v-for="piece in booking.pieces" :key="piece.id" class="flex items-center justify-between gap-4 rounded-2xl border bg-card p-4">
+                <div class="min-w-0">
+                  <p class="truncate font-medium">{{ piece.label }}</p>
+                  <p class="text-xs text-muted-foreground">{{ t('n_photos', ':n photos', ':n صور', { n: piece.images?.length ?? 0 }) }}</p>
+                </div>
+              </li>
+            </ul>
+          </section>
         </div>
-        <Button
-          v-if="state === 'ready'"
-          type="button"
-          size="icon"
-          variant="ghost"
-          class="size-9 shrink-0 rounded-xl text-destructive"
-          :aria-label="t('pickup_warning_title', 'Notice', 'تحذير')"
-          @click="warningOpen = true"
-        >
-          <LucideTriangleAlert class="size-5" />
-        </Button>
-      </section>
 
-      <!-- Six tiles (gE058): date · people · price · code · time · celebration -->
-      <dl class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <div class="rounded-2xl border bg-card p-4">
-          <dt class="text-xs uppercase tracking-[0.2em] text-muted-foreground">{{ t('tile_date', 'Date', 'التاريخ') }}</dt>
-          <dd class="mt-1 font-display text-lg font-semibold">{{ formatBookingDate(booking.booking_date, code) }}</dd>
-        </div>
-        <div class="rounded-2xl border bg-card p-4">
-          <dt class="text-xs uppercase tracking-[0.2em] text-muted-foreground">{{ t('tile_people', 'People', 'الأشخاص') }}</dt>
-          <dd class="mt-1 font-display text-lg font-semibold">{{ t('n_people', ':n people', ':n اشخاص', { n: booking.people_count }) }}</dd>
-        </div>
-        <div class="rounded-2xl border bg-card p-4">
-          <dt class="text-xs uppercase tracking-[0.2em] text-muted-foreground">{{ t('tile_price', 'Price', 'السعر') }}</dt>
-          <dd class="mt-1 font-display text-lg font-semibold text-primary">{{ format(booking.total_price) }}</dd>
-        </div>
-        <button type="button" class="rounded-2xl border bg-card p-4 text-start transition-colors hover:border-brand-rust" @click="qrOpen = true">
-          <dt class="text-xs uppercase tracking-[0.2em] text-muted-foreground">{{ t('tile_code', 'Check-in code', 'رمز المسح') }}</dt>
-          <dd class="mt-1 font-display text-lg font-semibold tabular-nums" dir="ltr">{{ booking.checkin_code }}</dd>
-        </button>
-        <div class="rounded-2xl border bg-card p-4">
-          <dt class="text-xs uppercase tracking-[0.2em] text-muted-foreground">{{ t('tile_time', 'Time', 'الوقت') }}</dt>
-          <dd class="mt-1 font-display text-lg font-semibold" dir="ltr">{{ formatSlotTime(booking.start_time, booking.end_time) }}</dd>
-        </div>
-        <div class="rounded-2xl border bg-card p-4">
-          <dt class="text-xs uppercase tracking-[0.2em] text-muted-foreground">{{ t('tile_celebration', 'Celebration', 'الاحتفال') }}</dt>
-          <dd class="mt-1 font-display text-lg font-semibold">
-            {{ booking.has_celebration ? t('with_celebration_short', 'With a celebration', 'مع احتفال') : t('no_celebration', 'None', 'بدون') }}
-          </dd>
-        </div>
-      </dl>
-
-      <!-- A held booking still needs paying; the countdown is the server's, not ours. -->
-      <CheckoutPaymentHold
-        v-if="booking.status === 'pending_payment'"
-        class="mt-6"
-        :amount-due="booking.amount_due"
-        :payment-status="booking.payment_status"
-        :expires-at="booking.payment_expires_at"
-        :pay="actions.pay"
-        :restart-to="`/workshops/${booking.workshop_id}/book`"
-        @paid="apply"
-        @expired="refresh"
-      />
-
-      <p v-if="booking.editable_until" class="mt-4 text-xs text-muted-foreground">
-        {{ t('editable_until', 'You can change or cancel this booking until :at.', 'يمكنك تعديل الحجز أو إلغاؤه حتى :at.', { at: formatDate(booking.editable_until) }) }}
-      </p>
-
-      <!-- Actions -->
-      <div class="mt-6 flex flex-wrap gap-3">
-        <Button
-          v-if="booking.can_cancel"
-          type="button"
-          variant="outline"
-          class="h-12 rounded-xl border-destructive/40 text-destructive hover:bg-destructive/10"
-          @click="cancelOpen = true"
-        >{{ t('cancel_booking', 'Cancel the booking', 'الغاء موعد') }}</Button>
-
-        <Button
-          v-if="booking.can_edit"
-          type="button"
-          variant="outline"
-          class="h-12 rounded-xl border-amber-400 text-amber-700 hover:bg-amber-50"
-          @click="openReschedule"
-        >{{ t('reschedule', 'Change the time', 'تغير موعد') }}</Button>
-
-        <Button v-if="booking.location_url" as-child variant="outline" class="h-12 rounded-xl">
-          <a :href="booking.location_url" target="_blank" rel="noopener noreferrer">{{ t('the_location', 'The location', 'الموقع') }}</a>
-        </Button>
-      </div>
-
-      <!-- Piece ready (rourY / vONkg): pickup or delivery, and the paint-it-again upsell. -->
-      <div v-if="state === 'ready' && !booking.delivery_method" class="mt-6 flex flex-wrap gap-3">
-        <Button as-child class="h-12 rounded-xl bg-brand-green px-8 text-base hover:bg-brand-green/90">
-          <NuxtLink :to="`/bookings/${booking.id}/delivery?method=pickup`">{{ t('choose_pickup', 'Pick it up', 'استلام') }}</NuxtLink>
-        </Button>
-        <Button as-child class="h-12 rounded-xl bg-brand-rust px-8 text-base hover:bg-brand-rust/90">
-          <NuxtLink :to="`/bookings/${booking.id}/delivery?method=delivery`">{{ t('choose_delivery', 'Have it delivered', 'توصيل') }}</NuxtLink>
-        </Button>
-      </div>
-
-      <Button v-if="paintable" as-child class="mt-3 h-12 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90">
-        <NuxtLink :to="`/workshops/${paintable.id}/book`">{{ t('paint_this_piece', 'Paint my piece', 'لوني الكوب') }}</NuxtLink>
-      </Button>
-
-      <p v-if="booking.delivery_fee_amount_due && !isZeroMoney(booking.delivery_fee_amount_due)" class="mt-4 rounded-2xl bg-brand-mist/60 p-4 text-sm">
-        {{ t('delivery_fee_owed', 'Delivery fee still owed: :amount — settle it at the studio.', 'رسوم توصيل مستحقة: :amount — تُدفع في الاستوديو.', { amount: format(booking.delivery_fee_amount_due) }) }}
-      </p>
-
-      <!-- Photos: only while the session is running (qQmRc / QCR16). -->
-      <section v-if="booking.status === 'attending'" class="mt-10 rounded-3xl border bg-card p-6" data-test="upload">
-        <h2 class="font-display text-xl font-semibold">{{ t('upload_title', 'Upload a photo of your piece', 'ارفعي صورة قطعتك') }}</h2>
-        <p class="mt-1 text-sm text-muted-foreground">
-          {{ t('upload_note', 'Give each photo the name of the piece it belongs to — photos sharing a name become one piece. :n left.', 'أعطِ كل صورة اسم القطعة التي تخصها — الصور التي تحمل الاسم نفسه تُجمع في قطعة واحدة. متبقٍ :n.', { n: remainingUploads }) }}
-        </p>
-
-        <input
-          ref="fileInput"
-          type="file"
-          accept="image/*"
-          multiple
-          class="mt-4 block w-full text-sm"
-          @change="onFiles"
-        >
-
-        <ul v-if="files.length" class="mt-4 flex flex-col gap-3">
-          <li v-for="(file, index) in files" :key="index" class="flex items-center gap-3">
-            <span class="min-w-0 flex-1 truncate text-sm text-muted-foreground">{{ file.name }}</span>
-            <Input
-              v-model="labels[index]"
-              list="piece-labels"
-              class="h-12 max-w-48 rounded-xl"
-              :placeholder="t('piece_label', 'Piece name', 'اسم القطعة')"
-              maxlength="60"
-            />
-          </li>
-        </ul>
-        <datalist id="piece-labels">
-          <option v-for="piece in booking.pieces" :key="piece.id" :value="piece.label" />
-        </datalist>
-
-        <span v-if="uploadError" class="mt-3 block text-xs text-destructive">{{ uploadError }}</span>
-        <span v-if="fieldError(uploadErrors, 'piece_labels')" class="mt-1 block text-xs text-destructive">{{ fieldError(uploadErrors, 'piece_labels') }}</span>
-        <span v-if="fieldError(uploadErrors, 'images')" class="mt-1 block text-xs text-destructive">{{ fieldError(uploadErrors, 'images') }}</span>
-
-        <Button
-          type="button"
-          class="mt-4 h-12 rounded-xl bg-brand-rust px-8 text-base hover:bg-brand-rust/90"
-          :disabled="!files.length || uploading || labels.some((label) => !label?.trim())"
-          @click="upload"
-        >{{ uploading ? t('uploading', 'Uploading…', 'جارٍ الرفع...') : t('upload_action', 'Upload', 'رفع') }}</Button>
-      </section>
-
-      <section v-if="booking.images?.length" class="mt-10">
-        <h2 class="font-display text-xl font-semibold">{{ t('photos_title', 'Your photos', 'صور قطعك') }}</h2>
-        <ul class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <li v-for="image in booking.images" :key="image.id" class="relative overflow-hidden rounded-2xl border">
-            <AppImage :src="image" :alt="booking.workshop_title" class="aspect-square w-full object-cover" />
-            <Button
-              v-if="booking.status === 'attending'"
-              type="button"
-              size="icon"
-              variant="secondary"
-              class="absolute top-2 size-8 rounded-lg ltr:right-2 rtl:left-2"
-              :aria-label="t('remove', 'Remove', 'حذف')"
-              @click="removeImage(image.id)"
-            >
-              <LucideX class="size-4" />
-            </Button>
-          </li>
-        </ul>
-      </section>
-
-      <section v-if="booking.pieces?.length" class="mt-10">
-        <h2 class="font-display text-xl font-semibold">{{ t('pieces_title_detail', 'Your pieces', 'قطعك') }}</h2>
-        <ul class="mt-4 flex flex-col gap-3">
-          <li v-for="piece in booking.pieces" :key="piece.id" class="flex items-center justify-between gap-4 rounded-2xl border bg-card p-4">
-            <div class="min-w-0">
-              <p class="truncate font-medium">{{ piece.label }}</p>
-              <p class="text-xs text-muted-foreground">{{ t('n_photos', ':n photos', ':n صور', { n: piece.images?.length ?? 0 }) }}</p>
+        <aside class="flex flex-col gap-4">
+          <!-- Status panel: illustration, title and the copy for this exact state. -->
+          <section class="flex items-start gap-4 rounded-3xl border bg-card p-6">
+            <span class="flex size-12 shrink-0 items-center justify-center rounded-2xl" :class="panel.tone">
+              <component :is="panel.icon" class="size-6" />
+            </span>
+            <div class="flex-1">
+              <h2 class="font-display text-xl font-semibold">{{ panel.title }}</h2>
+              <p class="mt-1 text-sm text-muted-foreground">{{ panel.body }}</p>
             </div>
             <Button
-              v-if="booking.status === 'attending'"
+              v-if="state === 'ready'"
               type="button"
               size="icon"
               variant="ghost"
-              class="size-9 rounded-xl text-destructive"
-              :aria-label="t('remove', 'Remove', 'حذف')"
-              @click="askRemovePiece(piece)"
+              class="size-9 shrink-0 rounded-xl text-destructive"
+              :aria-label="t('pickup_warning_title', 'Notice', 'تحذير')"
+              @click="warningOpen = true"
             >
-              <LucideTrash2 class="size-4" />
+              <LucideTriangleAlert class="size-5" />
             </Button>
-          </li>
-        </ul>
-      </section>
+          </section>
+
+          <!-- A held booking still needs paying; the countdown is the server's, not ours. -->
+          <CheckoutPaymentHold
+            v-if="booking.status === 'pending_payment'"
+            :amount-due="booking.amount_due"
+            :payment-status="booking.payment_status"
+            :expires-at="booking.payment_expires_at"
+            :pay="actions.pay"
+            :restart-to="`/workshops/${booking.workshop_id}/book`"
+            @paid="apply"
+            @expired="refresh"
+          />
+
+          <!-- Piece ready (rourY / vONkg): pickup or delivery, and the paint-it-again upsell. -->
+          <div v-if="state === 'ready' && !booking.delivery_method" class="flex flex-col gap-3 sm:flex-row lg:flex-col">
+            <Button as-child class="h-12 flex-1 rounded-xl bg-brand-green px-8 text-base hover:bg-brand-green/90">
+              <NuxtLink :to="`/bookings/${booking.id}/delivery?method=pickup`">{{ t('choose_pickup', 'Pick it up', 'استلام') }}</NuxtLink>
+            </Button>
+            <Button as-child class="h-12 flex-1 rounded-xl bg-brand-rust px-8 text-base hover:bg-brand-rust/90">
+              <NuxtLink :to="`/bookings/${booking.id}/delivery?method=delivery`">{{ t('choose_delivery', 'Have it delivered', 'توصيل') }}</NuxtLink>
+            </Button>
+          </div>
+
+          <Button v-if="paintable" as-child class="h-12 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90">
+            <NuxtLink :to="`/workshops/${paintable.id}/book`">{{ t('paint_this_piece', 'Paint my piece', 'لوني الكوب') }}</NuxtLink>
+          </Button>
+
+          <!-- Actions -->
+          <div class="flex flex-wrap gap-3">
+            <Button
+              v-if="booking.can_cancel"
+              type="button"
+              variant="outline"
+              class="h-12 flex-1 rounded-xl border-destructive/40 text-destructive hover:bg-destructive/10"
+              @click="cancelOpen = true"
+            >{{ t('cancel_booking', 'Cancel the booking', 'الغاء موعد') }}</Button>
+
+            <Button
+              v-if="booking.can_edit"
+              type="button"
+              variant="outline"
+              class="h-12 flex-1 rounded-xl border-amber-400 text-amber-700 hover:bg-amber-50"
+              @click="openReschedule"
+            >{{ t('reschedule', 'Change the time', 'تغير موعد') }}</Button>
+
+            <Button v-if="booking.location_url" as-child variant="outline" class="h-12 flex-1 rounded-xl">
+              <a :href="booking.location_url" target="_blank" rel="noopener noreferrer">{{ t('the_location', 'The location', 'الموقع') }}</a>
+            </Button>
+          </div>
+
+          <p v-if="booking.editable_until" class="text-xs text-muted-foreground">
+            {{ t('editable_until', 'You can change or cancel this booking until :at.', 'يمكنك تعديل الحجز أو إلغاؤه حتى :at.', { at: formatDate(booking.editable_until) }) }}
+          </p>
+
+          <p v-if="booking.delivery_fee_amount_due && !isZeroMoney(booking.delivery_fee_amount_due)" class="rounded-2xl bg-brand-mist/60 p-4 text-sm">
+            {{ t('delivery_fee_owed', 'Delivery fee still owed: :amount — settle it at the studio.', 'رسوم توصيل مستحقة: :amount — تُدفع في الاستوديو.', { amount: format(booking.delivery_fee_amount_due) }) }}
+          </p>
+        </aside>
+      </div>
     </div>
 
     <!-- QR / check-in code (rO1Zg) -->
@@ -407,40 +370,9 @@ const panel = computed(() => {
 })
 
 /* ---- photos ---- */
-const fileInput = ref(null)
-const files = ref([])
-const labels = ref([])
-const uploading = ref(false)
-const uploadError = ref('')
-const uploadErrors = ref({})
-
-const remainingUploads = computed(() => Math.max(0, 4 * (booking.value?.people_count ?? 1) - (booking.value?.images?.length ?? 0)))
-
-const onFiles = (event) => {
-  const picked = Array.from(event.target.files ?? []).slice(0, remainingUploads.value)
-  files.value = picked
-  labels.value = picked.map(() => booking.value?.pieces?.[0]?.label ?? '')
-}
-
-const upload = async () => {
-  uploading.value = true
-  uploadError.value = ''
-  uploadErrors.value = {}
-  try {
-    const res = await actions.uploadImages(files.value, labels.value.map((label) => label.trim()))
-    apply(res)
-    files.value = []
-    labels.value = []
-    if (fileInput.value) fileInput.value.value = ''
-    toast.success(res?.message ?? '')
-  } catch (err) {
-    const normalized = normalizeApiError(err)
-    uploadErrors.value = normalized.errors
-    // "Not attending" comes back with `errors: null` — the message is all there is.
-    if (!Object.keys(normalized.errors).length) uploadError.value = normalized.message
-  } finally {
-    uploading.value = false
-  }
+const onUploaded = (res) => {
+  apply(res)
+  toast.success(res?.message ?? '')
 }
 
 const removeImage = async (imageId) => {

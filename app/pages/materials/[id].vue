@@ -2,14 +2,18 @@
   <ProductDetailView
     :product="product"
     :status="status"
-    section-to="/shop"
-    :section-label="t('nav_shop', 'Shop', 'المتجر', { subGroup: 'general' })"
+    section-to="/materials"
+    :section-label="
+      t('nav_materials', 'Raw materials & tools', 'المواد الخام والأدوات', {
+        subGroup: 'general',
+      })
+    "
   />
 </template>
 
 <script setup>
 const route = useRoute();
-const { product, error, status } = useProduct(() => route.params.id);
+const { product, error, status } = useMaterial(() => route.params.id);
 
 // A record that does not exist, or a lookup that failed, hands over to the site's error
 // page — the markup's `v-if` would otherwise match nothing and leave a blank screen.
@@ -46,9 +50,9 @@ useSeoMeta({
   description: () =>
     stripTags(product.value?.description) ||
     t(
-      "shop_subtitle",
-      "Every piece is thrown, glazed and fired in our studio.",
-      "كل قطعة تُصنع وتُطلى وتُحرق في الاستوديو.",
+      "materials_subtitle",
+      "Clay, glazes and tools from the studio’s own shelves.",
+      "طين وطلاءات وأدوات من رفوف الاستوديو نفسه.",
     ),
   ogImage: () => product.value?.image?.image_api ?? fallbackCard,
   ogType: "product",

@@ -1,27 +1,37 @@
 <template>
   <main>
     <PageHero
-      media-key="hero_shop"
-      fallback="/seed/hero-shop.webp"
+      media-key="hero_materials"
+      fallback="/seed/hero-materials.webp"
       :crumbs="[
         {
           to: '/',
           label: t('nav_home', 'Home', 'الرئيسية', { subGroup: 'general' }),
         },
-        { label: t('nav_shop', 'Shop', 'المتجر', { subGroup: 'general' }) },
+        {
+          label: t(
+            'nav_materials',
+            'Raw materials & tools',
+            'المواد الخام والأدوات',
+            { subGroup: 'general' },
+          ),
+        },
       ]"
-      :title="t('shop_title', 'The shop', 'المتجر')"
+      :title="
+        t('materials_title', 'Raw materials & tools', 'المواد الخام والأدوات')
+      "
       :subtitle="
         t(
-          'shop_subtitle',
-          'Every piece is thrown, glazed and fired in our studio.',
-          'كل قطعة تُصنع وتُطلى وتُحرق في الاستوديو.',
+          'materials_subtitle',
+          'Clay, glazes and tools from the studio’s own shelves.',
+          'طين وطلاءات وأدوات من رفوف الاستوديو نفسه.',
         )
       "
     />
 
     <div class="mx-auto max-w-6xl px-6 py-16">
-      <!-- Cart / favourites / orders, the three shortcuts the store home carries. -->
+      <!-- Cart / favourites / orders: one basket serves both shelves, so the same three
+         shortcuts belong here. -->
       <ShopQuickTiles class="mb-10 sm:max-w-md" />
 
       <!--
@@ -132,7 +142,7 @@
         class="grid grid-cols-2 gap-5 lg:grid-cols-4"
       >
         <li v-for="product in products" :key="product.id">
-          <ProductCard :product="product" />
+          <ProductCard :product="product" base="/materials" />
         </li>
       </ul>
 
@@ -202,7 +212,7 @@ import {
 const route = useRoute();
 const router = useRouter();
 const { t } = useLang("web", "home");
-const { categories } = useShopCategories();
+const { categories } = useMaterialCategories();
 
 // The URL is the source of truth: filters and page are shareable, and the back button
 // walks through them like any other navigation.
@@ -214,7 +224,7 @@ const subCategoryId = computed(() =>
 );
 const currentPage = computed(() => Math.max(1, Number(route.query.page ?? 1)));
 
-const { products, lastPage, total, pending } = useProducts(
+const { products, lastPage, total, pending } = useMaterials(
   computed(() => productApiQuery(route.query)),
 );
 
@@ -266,14 +276,15 @@ const { media: heroMedia } = useMedia("web", "heroes");
 const fallbackCard = `${useSiteConfig().url}/og-default.png`;
 
 useSeoMeta({
-  title: () => t("shop_title", "The shop", "المتجر"),
+  title: () =>
+    t("materials_title", "Raw materials & tools", "المواد الخام والأدوات"),
   description: () =>
     t(
-      "shop_subtitle",
-      "Every piece is thrown, glazed and fired in our studio.",
-      "كل قطعة تُصنع وتُطلى وتُحرق في الاستوديو.",
+      "materials_subtitle",
+      "Clay, glazes and tools from the studio’s own shelves.",
+      "طين وطلاءات وأدوات من رفوف الاستوديو نفسه.",
     ),
-  ogImage: () => heroMedia("hero_shop") ?? fallbackCard,
+  ogImage: () => heroMedia("hero_materials") ?? fallbackCard,
 });
 
 useSchemaOrg([
@@ -284,8 +295,13 @@ useSchemaOrg([
         item: "/",
       },
       {
-        name: t("nav_shop", "Shop", "المتجر", { subGroup: "general" }),
-        item: "/shop",
+        name: t(
+          "nav_materials",
+          "Raw materials & tools",
+          "المواد الخام والأدوات",
+          { subGroup: "general" },
+        ),
+        item: "/materials",
       },
     ],
   }),

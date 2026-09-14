@@ -43,7 +43,7 @@ const ShopOrderCancelButton = (await import('~/components/shop/ShopOrderCancelBu
 beforeEach(() => {
   globalThis.__order = order()
   globalThis.__orders = [order()]
-  globalThis.__cancel = () => ({ success: true, message: 'Order cancelled.', errors: null, data: order({ status: 'cancelled', can_cancel: false, payment_status: 'refunded', refunded_amount: '50.00', amount_due: '0.00' }) })
+  globalThis.__cancel = () => ({ success: true, message: 'Order cancelled.', errors: null, data: order({ status: 'cancelled', can_cancel: false, payment_status: 'refunded', refunded_amount: '195.00', amount_due: '0.00' }) })
   api.$fetch.mockClear()
 })
 
@@ -65,7 +65,7 @@ describe('useOrder', () => {
     await one.cancel()
     expect(api.calls.at(-1)).toMatchObject({ method: 'DELETE', url: '/api/shop/orders/9' })
     expect(one.order.value.status).toBe('cancelled')
-    expect(one.order.value.refunded_amount).toBe('50.00')
+    expect(one.order.value.refunded_amount).toBe('195.00')
   })
 
   it('pay is a bare POST — the endpoint takes no body', async () => {
@@ -113,13 +113,20 @@ describe('ShopOrderTimeline', () => {
     expect(items[0].text()).toContain('Payment')
   })
 
+  it('a cancelled hold names the wallet slice that was released, not a refund', async () => {
+    const wrapper = await mountSuspended(ShopOrderTimeline, {
+      props: { order: order({ status: 'cancelled', payment_status: 'unpaid', refunded_amount: null, wallet_applied: '50.00', cancelled_at: '2026-07-05T09:00:00+00:00' }) },
+    })
+    expect(wrapper.findAll('li').at(-1).text()).toContain('released back to your wallet')
+  })
+
   it('a cancelled order stops the timeline and names the refund', async () => {
     const wrapper = await mountSuspended(ShopOrderTimeline, {
-      props: { order: order({ status: 'cancelled', payment_status: 'refunded', refunded_amount: '50.00', cancelled_at: '2026-07-05T09:00:00+00:00' }) },
+      props: { order: order({ status: 'cancelled', payment_status: 'refunded', refunded_amount: '195.00', cancelled_at: '2026-07-05T09:00:00+00:00' }) },
     })
     const items = wrapper.findAll('li')
     expect(items.at(-1).text()).toContain('Cancelled')
-    expect(items.at(-1).text()).toContain('50.00 SAR')
+    expect(items.at(-1).text()).toContain('195.00 SAR')
     expect(wrapper.text()).not.toContain('Out for delivery')
   })
 })
@@ -132,7 +139,45 @@ describe('ShopOrderCancelButton', () => {
     expect(wrapper.find('button').exists()).toBe(false)
   })
 
-  it('confirms first, warns that only the wallet part comes back, and cancels once', async () => {
+  it('tells a paid order the whole charge comes back to the wallet', async () => {
+    const wrapper = await mountSuspended(ShopOrderCancelButton, {
+      props: { order: order({ status: 'preparing', payment_status: 'paid', amount_due: '0.00' }), cancel: vi.fn() },
+    })
+    await wrapper.find('button').trigger('click')
+    await flushPromises()
+
+    const copy = [...document.querySelectorAll('[data-test="cancel-refund-copy"]')].at(-1).textContent
+    expect(copy).toContain('195.00 SAR')
+    expect(copy).toContain('back to your wallet')
+    expect(copy).not.toContain('Nothing has been charged')
+  })
+
+  it('tells an unpaid hold nothing was charged and only the held slice returns', async () => {
+    const wrapper = await mountSuspended(ShopOrderCancelButton, {
+      props: { order: order({ status: 'awaiting_payment', payment_status: 'unpaid' }), cancel: vi.fn() },
+    })
+    await wrapper.find('button').trigger('click')
+    await flushPromises()
+
+    const copy = [...document.querySelectorAll('[data-test="cancel-refund-copy"]')].at(-1).textContent
+    expect(copy).toContain('Nothing has been charged')
+    expect(copy).toContain('50.00 SAR')
+    expect(copy).not.toContain('195.00 SAR')
+  })
+
+  it('tells a hold that never touched the wallet there is nothing to refund', async () => {
+    const wrapper = await mountSuspended(ShopOrderCancelButton, {
+      props: { order: order({ status: 'awaiting_payment', payment_status: 'unpaid', wallet_applied: '0.00' }), cancel: vi.fn() },
+    })
+    await wrapper.find('button').trigger('click')
+    await flushPromises()
+
+    const copy = [...document.querySelectorAll('[data-test="cancel-refund-copy"]')].at(-1).textContent
+    expect(copy).toContain('nothing to refund')
+    expect(copy).not.toContain('SAR')
+  })
+
+  it('confirms first and cancels once', async () => {
     let resolveCancel
     const cancel = vi.fn(() => new Promise((resolve) => { resolveCancel = resolve }))
     const wrapper = await mountSuspended(ShopOrderCancelButton, { props: { order: order(), cancel } })
@@ -140,8 +185,7 @@ describe('ShopOrderCancelButton', () => {
     await wrapper.find('button').trigger('click')
     await flushPromises()
 
-    const dialog = document.querySelector('[role="dialog"]')
-    expect(dialog.textContent).toContain('50.00 SAR')
+    const dialog = [...document.querySelectorAll('[role="dialog"]')].at(-1)
 
     const confirm = [...dialog.querySelectorAll('button')].at(-1)
     confirm.click()

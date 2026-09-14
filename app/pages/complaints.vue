@@ -2,7 +2,7 @@
   <main class="min-h-svh bg-background pb-28">
     <PageBar :crumbs="crumbs" />
     <div class="mx-auto max-w-6xl px-6 py-16">
-      <div class="mx-auto flex max-w-lg flex-col gap-5">
+      <div class="flex flex-col gap-5">
         <div>
           <h1 class="font-display text-3xl font-semibold sm:text-4xl">{{ t('complaints_title', 'Complaints', 'الشكاوى') }}</h1>
           <p class="mt-3 text-muted-foreground">
@@ -10,7 +10,7 @@
           </p>
         </div>
 
-        <form class="flex flex-col gap-4 rounded-3xl border bg-card p-6 sm:p-8" @submit.prevent="onSubmit">
+        <form class="grid gap-4 rounded-3xl border bg-card p-6 sm:grid-cols-2 sm:p-8" @submit.prevent="onSubmit">
           <div class="grid gap-2">
             <Label for="complaint_type">{{ t('complaint_type', 'What is this about?', 'موضوع الشكوى') }}</Label>
             <select
@@ -46,7 +46,7 @@
             <span v-if="err('reference')" class="text-xs text-destructive">{{ err('reference') }}</span>
           </div>
 
-          <div class="grid gap-2">
+          <div class="grid gap-2 sm:col-span-2">
             <Label for="complaint_message">{{ t('complaint_message', 'What happened?', 'ماذا حدث؟') }}</Label>
             <textarea
               id="complaint_message"
@@ -66,13 +66,13 @@
             </div>
           </div>
 
-          <span v-if="submitError" data-test="complaint-error" class="text-xs text-destructive">{{ submitError }}</span>
-          <p v-if="sentMessage" data-test="complaint-success" class="rounded-2xl bg-brand-mist/60 p-4 text-sm text-foreground">{{ sentMessage }}</p>
+          <span v-if="submitError" data-test="complaint-error" class="text-xs text-destructive sm:col-span-2">{{ submitError }}</span>
+          <p v-if="sentMessage" data-test="complaint-success" class="rounded-2xl bg-brand-mist/60 p-4 text-sm text-foreground sm:col-span-2">{{ sentMessage }}</p>
 
           <Button
             type="submit"
             data-test="complaint-submit"
-            class="h-12 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+            class="h-12 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90 sm:col-span-2 sm:justify-self-start sm:px-10"
             :disabled="submitting"
           >
             {{ submitting ? t('sending', 'Sending...', 'جارٍ الإرسال...') : t('complaint_send', 'Send complaint', 'إرسال الشكوى') }}
@@ -82,7 +82,7 @@
         <section v-if="isRegistered" class="rounded-3xl border bg-card p-6 sm:p-8">
           <h2 class="font-display text-lg font-semibold text-foreground">{{ t('my_complaints', 'My complaints', 'شكاواي') }}</h2>
 
-          <div v-if="pending && !complaints.length" class="mt-4 flex flex-col gap-3" aria-busy="true">
+          <div v-if="pending && !complaints.length" class="mt-4 grid gap-3 lg:grid-cols-2" aria-busy="true">
             <AppSkeleton v-for="n in 2" :key="n" class="h-24 w-full" />
           </div>
 
@@ -90,7 +90,7 @@
             {{ t('no_complaints', 'You have not filed a complaint yet.', 'لم تقدّم أي شكوى بعد.') }}
           </p>
 
-          <ul v-else class="mt-4 flex flex-col gap-3">
+          <ul v-else class="mt-4 grid gap-3 lg:grid-cols-2">
             <li v-for="complaint in complaints" :key="complaint.id" class="rounded-2xl border p-4">
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <span class="text-sm font-medium text-foreground">{{ complaintTypeLabel(complaint.type, t) }}</span>

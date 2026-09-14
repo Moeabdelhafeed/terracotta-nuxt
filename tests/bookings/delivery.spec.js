@@ -4,7 +4,7 @@ import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import { h, ref } from 'vue'
 
-const { api, lang, sanctum, toast, navigate, addressId } = await vi.hoisted(async () => {
+const { api, lang, sanctum, toast, navigate, addressId, walletRefresh } = await vi.hoisted(async () => {
   const { ref: r } = await import('vue')
   const { vi: v } = await import('vitest')
   const { createApiMock, envelope, createLang, createSanctumState } = await import('../helpers/mockApi')
@@ -13,12 +13,14 @@ const { api, lang, sanctum, toast, navigate, addressId } = await vi.hoisted(asyn
       'GET /api/workshops/bookings/{id}': () => envelope(globalThis.__booking),
       'GET /api/workshops/bookings/{id}/delivery/quote': () => globalThis.__quote(),
       'POST /api/workshops/bookings/{id}/delivery': () => envelope(globalThis.__booking, 'Saved.'),
+      'GET /api/wallet/transactions': () => envelope({ balance: '125.00', transactions: [] }),
     }),
     lang: createLang('en'),
     sanctum: createSanctumState({ id: 1, name: 'Sara', is_guest: false, wallet_balance: '100.00' }),
     toast: { success: v.fn(), error: v.fn(), info: v.fn() },
     navigate: v.fn(),
     addressId: r(null),
+    walletRefresh: v.fn(),
   }
 })
 
@@ -30,6 +32,7 @@ mockNuxtImport('useSanctumAuth', () => () => sanctum)
 mockNuxtImport('useToast', () => () => toast)
 mockNuxtImport('navigateTo', () => navigate)
 mockNuxtImport('showError', () => vi.fn())
+mockNuxtImport('useWallet', () => () => ({ balance: ref('125.00'), transactions: ref([]), refresh: walletRefresh }))
 mockNuxtImport('useRoute', () => () => ({ params: { id: '55' }, query: { method: 'delivery' } }))
 
 const DeliveryPage = (await import('~/pages/bookings/[id]/delivery.vue')).default
@@ -46,6 +49,7 @@ const AddressPickerStub = {
 const booking = (over = {}) => ({
   id: 55, workshop_id: 1, workshop_title: 'Wheel throwing',
   status: 'completed', delivery_status: null, delivery_method: null,
+  delivery_fee: null, delivery_fee_wallet_applied: null,
   pickup_deadline: '2026-10-08', ...over,
 })
 
@@ -63,6 +67,8 @@ const quoteCalls = () => api.calls.filter((call) => call.url.endsWith('/delivery
 
 beforeEach(() => {
   api.calls.length = 0
+  walletRefresh.mockClear()
+  sanctum.refreshIdentity.mockClear()
   globalThis.__booking = booking()
   globalThis.__quote = () => ({ success: true, message: 'ok', errors: null, data: quote() })
 })
@@ -131,5 +137,44 @@ describe('piece delivery — what is still owed', () => {
 
     expect(wrapper.text()).toContain('The delivery fee was already charged')
     expect(wrapper.text()).not.toContain('stays owing')
+  })
+})
+
+describe('piece delivery — switching to pickup hands the fee back', () => {
+  const pickUp = async (wrapper) => {
+    await wrapper.findAll('button').find((b) => b.text() === 'Pick it up').trigger('click')
+    await flushPromises()
+  }
+
+  it('says the fee goes back to the wallet before the customer switches', async () => {
+    globalThis.__booking = booking({ delivery_method: 'delivery', delivery_fee: '25.00', delivery_fee_wallet_applied: '25.00' })
+    const wrapper = await mount()
+    await flushPromises()
+    await pickUp(wrapper)
+
+    expect(wrapper.find('[data-test="pickup-refund"]').text()).toContain('The 25.00 SAR delivery fee goes back to your Terracotta balance')
+    expect(wrapper.text()).toContain('charged at the rate on the day')
+  })
+
+  it('says nothing about a refund when no fee was ever charged', async () => {
+    const wrapper = await mount()
+    await flushPromises()
+    await pickUp(wrapper)
+
+    expect(wrapper.find('[data-test="pickup-refund"]').exists()).toBe(false)
+  })
+
+  it('refreshes the balance after the choice, rather than leaving a stale number', async () => {
+    globalThis.__booking = booking({ delivery_method: 'delivery', delivery_fee: '25.00' })
+    const wrapper = await mount()
+    await flushPromises()
+    await pickUp(wrapper)
+
+    await wrapper.findAll('button').find((b) => b.text() === 'Confirm pickup').trigger('click')
+    await flushPromises()
+
+    expect(walletRefresh).toHaveBeenCalled()
+    expect(sanctum.refreshIdentity).toHaveBeenCalled()
+    expect(navigate).toHaveBeenCalledWith('/bookings/55')
   })
 })

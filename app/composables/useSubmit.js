@@ -89,8 +89,8 @@ export const useApiList = (url, { key, query = {}, watch: extraWatch = [], ...re
   const { data, pending, error, refresh, status } = useApiFetch(url, {
     key,
     query,
-    transform: (res) => unwrapList(res?.data),
-    default: () => ({ items: [], page: 1, lastPage: 1, total: 0 }),
+    transform: (res) => ({ ...unwrapList(res?.data), meta: res?.meta ?? null }),
+    default: () => ({ items: [], page: 1, lastPage: 1, total: 0, meta: null }),
     watch: [lang, i18nLocale, ...extraWatch],
     ...rest,
   })
@@ -100,6 +100,9 @@ export const useApiList = (url, { key, query = {}, watch: extraWatch = [], ...re
     page: computed(() => data.value?.page ?? 1),
     lastPage: computed(() => data.value?.lastPage ?? 1),
     total: computed(() => data.value?.total ?? 0),
+    // Facts about the whole result set that belong to no single row — the bookings list
+    // puts its per-status counts here so tabs can be labelled before one is opened.
+    meta: computed(() => data.value?.meta ?? null),
     pending,
     error,
     status,

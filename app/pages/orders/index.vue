@@ -1,7 +1,7 @@
 <template>
   <main class="min-h-svh bg-background pb-28">
     <div class="mx-auto max-w-6xl px-6 py-16">
-      <div class="mx-auto flex max-w-lg flex-col gap-5">
+      <div class="flex flex-col gap-5">
         <div class="flex items-center justify-between">
           <NuxtLink
             to="/shop"
@@ -14,11 +14,11 @@
           <span class="size-10" />
         </div>
 
-        <ul v-if="pending && !items.length" class="flex flex-col gap-3" aria-busy="true">
+        <ul v-if="pending && !items.length" class="grid gap-3 lg:grid-cols-2" aria-busy="true">
           <AppSkeleton v-for="n in 3" :key="n" class="h-28 w-full rounded-2xl!" />
         </ul>
 
-        <div v-else-if="!items.length" class="rounded-2xl border bg-card p-8 text-center">
+        <div v-else-if="!items.length" class="mx-auto w-full max-w-xl rounded-2xl border bg-card p-8 text-center">
           <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-rust/10 text-brand-rust">
             <LucidePackage class="size-6" />
           </span>
@@ -29,9 +29,9 @@
           </Button>
         </div>
 
-        <ul v-else class="flex flex-col gap-3">
+        <ul v-else class="grid gap-3 lg:grid-cols-2">
           <li v-for="order in items" :key="order.id">
-            <NuxtLink :to="`/orders/${order.id}`" class="block rounded-2xl border bg-card p-5 transition-colors hover:bg-brand-mist/40">
+            <NuxtLink :to="`/orders/${order.id}`" class="block h-full rounded-2xl border bg-card p-5 transition-colors hover:bg-brand-mist/40">
               <div class="flex items-center justify-between gap-3">
                 <span class="font-display text-base font-semibold text-foreground">
                   {{ t('order_number', 'Order #:id', 'الطلب رقم :id', { id: order.id }) }}

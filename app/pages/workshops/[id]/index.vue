@@ -30,6 +30,7 @@
           </div>
 
           <h1 class="mt-8 font-display text-3xl font-semibold sm:text-4xl">{{ workshop.title }}</h1>
+          <WorkshopAudienceBadge :audience="workshop.audience" class="mt-3" />
           <p class="mt-3 text-lg text-muted-foreground">{{ workshop.short_description }}</p>
 
           <div

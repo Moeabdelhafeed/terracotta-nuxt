@@ -21,12 +21,15 @@
           </div>
 
           <p class="mt-4 text-sm text-muted-foreground">{{ t('cancel_order_confirm', 'Are you sure you want to cancel this order?', 'هل أنت متأكد من رغبتك في إلغاء هذا الطلب؟') }}</p>
-          <p class="mt-2 text-sm text-muted-foreground">
-            <template v-if="!isZeroMoney(order.wallet_applied)">
-              {{ t('cancel_order_refund', 'Only the :amount paid from your wallet is refunded to it; any card payment is not returned here.', 'يُعاد فقط المبلغ المدفوع من محفظتك (:amount) إليها؛ ولا يُعاد هنا أي مبلغ مدفوع بالبطاقة.', { amount: format(order.wallet_applied) }) }}
+          <p class="mt-2 text-sm text-muted-foreground" data-test="cancel-refund-copy">
+            <template v-if="isPaid">
+              {{ t('cancel_order_refund_full', 'The whole :amount you paid — pieces, delivery and VAT — goes back to your wallet as credit you can spend again.', 'يُعاد كامل ما دفعته (:amount) — القطع والتوصيل والضريبة — إلى محفظتك كرصيد يمكنك استخدامه مجددًا.', { amount: format(order.total_price) }) }}
+            </template>
+            <template v-else-if="!isZeroMoney(order.wallet_applied)">
+              {{ t('cancel_order_release_hold', 'Nothing has been charged yet. The :amount held from your wallet goes straight back to it.', 'لم يُخصم أي مبلغ بعد، ويعود المبلغ المحجوز من محفظتك (:amount) إليها مباشرة.', { amount: format(order.wallet_applied) }) }}
             </template>
             <template v-else>
-              {{ t('cancel_order_no_refund', 'Nothing was paid from your wallet, so there is nothing to refund to it.', 'لم يُدفع شيء من محفظتك، فلا يوجد ما يُعاد إليها.') }}
+              {{ t('cancel_order_no_refund', 'Nothing has been charged yet, so there is nothing to refund.', 'لم يُخصم أي مبلغ بعد، فلا يوجد ما يُعاد.') }}
             </template>
           </p>
 
@@ -50,6 +53,9 @@
 /**
  * Renders nothing unless `can_cancel` — the server decides, not the status. The confirm
  * button locks on the first tap: a second `DELETE` would only earn a 422.
+ *
+ * A paid order is refunded in full to the wallet; an unpaid hold was never charged, so
+ * only the wallet slice it was holding comes back. The copy has to say which.
  */
 const props = defineProps({
   order: { type: Object, required: true },
@@ -63,6 +69,8 @@ const { format } = usePrice()
 const { submit, pending, error } = useSubmit()
 
 const open = ref(false)
+
+const isPaid = computed(() => props.order.payment_status === 'paid')
 
 const onConfirm = async () => {
   if (pending.value) return

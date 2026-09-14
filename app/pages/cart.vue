@@ -5,11 +5,14 @@
     <div class="mx-auto max-w-6xl px-6 py-16">
       <h1 class="font-display text-3xl font-semibold sm:text-4xl">{{ t('cart_title', 'My cart', 'عربيتي') }}</h1>
 
-      <div v-if="(pending || !mounted) && !items.length" class="mt-8 flex flex-col gap-4" aria-busy="true">
-        <AppSkeleton v-for="n in 3" :key="n" class="h-32 w-full rounded-2xl!" />
+      <div v-if="(pending || !mounted) && !items.length" class="mt-8 grid gap-6 lg:grid-cols-[1fr_20rem] lg:items-start" aria-busy="true">
+        <div class="flex flex-col gap-4">
+          <AppSkeleton v-for="n in 3" :key="n" class="h-32 w-full rounded-2xl!" />
+        </div>
+        <AppSkeleton class="h-48 w-full rounded-2xl!" />
       </div>
 
-      <div v-else-if="!items.length" class="mt-8 rounded-3xl border bg-card p-8 text-center sm:p-12">
+      <div v-else-if="!items.length" class="mx-auto mt-8 max-w-xl rounded-3xl border bg-card p-8 text-center sm:p-12">
         <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-rust/10 text-brand-rust">
           <LucideShoppingBag class="size-6" />
         </span>
@@ -20,10 +23,10 @@
         </Button>
       </div>
 
-      <template v-else>
-        <ShopCartLines class="mt-8" />
+      <div v-else class="mt-8 grid gap-6 lg:grid-cols-[1fr_20rem] lg:items-start">
+        <ShopCartLines />
 
-        <div class="mt-8 rounded-3xl border bg-card p-6 sm:p-8">
+        <aside class="rounded-3xl border bg-card p-6 sm:p-8 lg:sticky lg:top-6">
           <div class="flex items-center justify-between gap-4">
             <span class="text-sm text-muted-foreground">{{ t('summary_total', 'Total', 'الإجمالي', { subGroup: 'checkout' }) }}</span>
             <span class="font-display text-xl font-black text-primary sm:text-2xl">{{ format(total) }}</span>
@@ -47,8 +50,8 @@
               ? t('pay_with_total', 'Pay :amount', 'الدفع :amount', { amount: format(total) })
               : t('sign_in_to_check_out', 'Sign in to check out', 'سجّل الدخول لإتمام الشراء') }}
           </Button>
-        </div>
-      </template>
+        </aside>
+      </div>
     </div>
   </main>
 </template>

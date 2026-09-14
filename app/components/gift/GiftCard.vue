@@ -1,7 +1,7 @@
 <template>
   <NuxtLink
     :to="`/gifts/${gift.id}`"
-    class="flex flex-col gap-4 rounded-3xl border bg-card p-6 transition-colors hover:border-brand-rust/40 sm:p-8"
+    class="flex h-full flex-col gap-4 rounded-3xl border bg-card p-6 transition-colors hover:border-brand-rust/40"
   >
     <div class="flex items-start justify-between gap-4">
       <div class="min-w-0">
@@ -16,7 +16,7 @@
 
     <p v-if="gift.message" class="line-clamp-2 text-sm text-muted-foreground">“{{ gift.message }}”</p>
 
-    <div class="flex flex-wrap items-center gap-2">
+    <div class="mt-auto flex flex-wrap items-center gap-2">
       <span class="rounded-md px-3 py-1 text-xs font-medium" :class="statusClass">{{ statusLabel }}</span>
 
       <span

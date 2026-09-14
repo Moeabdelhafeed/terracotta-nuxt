@@ -2,7 +2,7 @@
   <main class="min-h-svh bg-background pb-28">
     <PageBar :crumbs="crumbs" />
 
-    <div class="mx-auto max-w-4xl px-6 py-16">
+    <div class="mx-auto max-w-6xl px-6 py-16">
       <header class="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 class="font-display text-3xl font-semibold sm:text-4xl">{{ t('gifts_title', 'My gifts', 'هداياي') }}</h1>
@@ -19,11 +19,11 @@
         </Button>
       </header>
 
-      <div v-if="pending && !items.length" class="mt-10 flex flex-col gap-4" aria-busy="true">
+      <div v-if="pending && !items.length" class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-busy="true">
         <AppSkeleton v-for="n in 3" :key="n" class="h-40 w-full !rounded-3xl" />
       </div>
 
-      <section v-else-if="!items.length" class="mt-10 rounded-3xl border bg-card p-10 text-center">
+      <section v-else-if="!items.length" class="mx-auto mt-10 max-w-xl rounded-3xl border bg-card p-10 text-center">
         <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-rust/10 text-brand-rust">
           <LucideGift class="size-6" />
         </span>
@@ -38,7 +38,7 @@
         </Button>
       </section>
 
-      <ul v-else class="mt-10 flex flex-col gap-4">
+      <ul v-else class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <li v-for="gift in items" :key="gift.id">
           <GiftCard :gift="gift" />
         </li>

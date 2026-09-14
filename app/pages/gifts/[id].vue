@@ -4,14 +4,19 @@
 
     <AppConfetti v-if="celebrate" @done="celebrate = false" />
 
-    <div class="mx-auto max-w-2xl px-6 py-16">
-      <div v-if="pending && !gift" class="flex flex-col gap-4" aria-busy="true">
-        <AppSkeleton class="h-16 w-16 !rounded-2xl" />
-        <AppSkeleton class="h-9 w-2/3" />
-        <AppSkeleton class="h-40 w-full !rounded-3xl" />
+    <div class="mx-auto max-w-6xl px-6 py-16">
+      <div v-if="pending && !gift" aria-busy="true">
+        <div class="mx-auto flex max-w-xl flex-col items-center gap-4">
+          <AppSkeleton class="size-16 !rounded-full" />
+          <AppSkeleton class="h-9 w-2/3" />
+        </div>
+        <div class="mt-8 grid gap-6 lg:grid-cols-[1fr_22rem] lg:items-start">
+          <AppSkeleton class="h-40 w-full !rounded-3xl" />
+          <AppSkeleton class="h-40 w-full !rounded-3xl" />
+        </div>
       </div>
 
-      <section v-else-if="!gift" class="rounded-3xl border bg-card p-6 text-center sm:p-8">
+      <section v-else-if="!gift" class="mx-auto max-w-xl rounded-3xl border bg-card p-6 text-center sm:p-8">
         <h1 class="font-display text-2xl font-semibold">
           {{ t('gift_missing_title', 'Gift not found', 'الهدية غير موجودة') }}
         </h1>
@@ -24,7 +29,7 @@
       </section>
 
       <template v-else>
-        <header class="text-center">
+        <header class="mx-auto max-w-xl text-center">
           <span
             class="mx-auto flex size-16 items-center justify-center rounded-full"
             :class="cancelled ? 'bg-brand-mist text-muted-foreground' : 'bg-brand-green/10 text-brand-green'"
@@ -47,57 +52,61 @@
           </p>
         </header>
 
-        <div class="mt-8 flex flex-col gap-6">
-          <!-- The hold is still running: same pay step as the purchase page, so a buyer
-               who navigated away can finish here. -->
-          <CheckoutPaymentHold
-            v-if="held"
-            :amount-due="gift.amount_due"
-            :payment-status="gift.payment_status"
-            :expires-at="gift.payment_expires_at"
-            :pay="payGift"
-            restart-to="/gifts/new"
-            @paid="onPaid"
-            @expired="refresh()"
-          />
-
-          <!-- Paid and unclaimed: the link is the product. -->
-          <section v-else-if="!cancelled" class="rounded-3xl border bg-card p-6 sm:p-8">
-            <GiftShare
-              v-if="!gift.is_redeemed"
-              :share-url="gift.share_url"
-              :recipient-phone="gift.recipient_phone"
-              :recipient-name="gift.recipient_name"
+        <div class="mt-8 grid gap-6 lg:grid-cols-[1fr_22rem] lg:items-start">
+          <div class="flex min-w-0 flex-col gap-6">
+            <!-- The hold is still running: same pay step as the purchase page, so a buyer
+                 who navigated away can finish here. -->
+            <CheckoutPaymentHold
+              v-if="held"
+              :amount-due="gift.amount_due"
+              :payment-status="gift.payment_status"
+              :expires-at="gift.payment_expires_at"
+              :pay="payGift"
+              restart-to="/gifts/new"
+              @paid="onPaid"
+              @expired="refresh()"
             />
-            <p v-else class="rounded-2xl bg-brand-green/10 px-4 py-4 text-center text-sm font-medium text-brand-green">
-              {{ t('gift_used_note', 'The credit is already in their wallet — the link is spent.', 'تم إضافة الرصيد إلى محفظتهم — الرابط مستخدم.') }}
-            </p>
-          </section>
 
-          <dl class="flex flex-col gap-2 rounded-3xl border bg-card p-6 text-sm sm:p-8">
-            <div class="flex items-center justify-between gap-4">
-              <dt class="text-muted-foreground">{{ t('gift_recipient', 'For', 'المهدى له') }}</dt>
-              <dd class="font-medium">{{ gift.recipient_name }}</dd>
-            </div>
-            <div v-if="gift.recipient_phone" class="flex items-center justify-between gap-4">
-              <dt class="text-muted-foreground">{{ t('gift_recipient_phone', 'Phone', 'رقم الجوال') }}</dt>
-              <dd class="font-medium" dir="ltr">{{ gift.recipient_phone }}</dd>
-            </div>
-            <div v-if="gift.message" class="flex flex-col gap-1 border-t pt-2">
-              <dt class="text-muted-foreground">{{ t('gift_message', 'Message to them', 'رسالة اليها') }}</dt>
-              <dd class="whitespace-pre-line">{{ gift.message }}</dd>
-            </div>
-            <div class="flex items-center justify-between gap-4 border-t pt-2">
-              <dt class="text-muted-foreground">{{ t('gift_credit', 'Credit', 'الرصيد') }}</dt>
-              <dd class="font-display text-lg font-semibold text-primary">{{ format(gift.amount) }}</dd>
-            </div>
-          </dl>
+            <!-- Paid and unclaimed: the link is the product. -->
+            <section v-else-if="!cancelled" class="rounded-3xl border bg-card p-6 sm:p-8">
+              <GiftShare
+                v-if="!gift.is_redeemed"
+                :share-url="gift.share_url"
+                :recipient-phone="gift.recipient_phone"
+                :recipient-name="gift.recipient_name"
+              />
+              <p v-else class="rounded-2xl bg-brand-green/10 px-4 py-4 text-center text-sm font-medium text-brand-green">
+                {{ t('gift_used_note', 'The credit is already in their wallet — the link is spent.', 'تم إضافة الرصيد إلى محفظتهم — الرابط مستخدم.') }}
+              </p>
+            </section>
 
-          <CheckoutSummary :quote="summaryQuote" :title="t('gift_summary', 'Gift summary', 'ملخص الهدية')" />
+            <dl class="flex flex-col gap-2 rounded-3xl border bg-card p-6 text-sm sm:p-8">
+              <div class="flex items-center justify-between gap-4">
+                <dt class="text-muted-foreground">{{ t('gift_recipient', 'For', 'المهدى له') }}</dt>
+                <dd class="font-medium">{{ gift.recipient_name }}</dd>
+              </div>
+              <div v-if="gift.recipient_phone" class="flex items-center justify-between gap-4">
+                <dt class="text-muted-foreground">{{ t('gift_recipient_phone', 'Phone', 'رقم الجوال') }}</dt>
+                <dd class="font-medium" dir="ltr">{{ gift.recipient_phone }}</dd>
+              </div>
+              <div v-if="gift.message" class="flex flex-col gap-1 border-t pt-2">
+                <dt class="text-muted-foreground">{{ t('gift_message', 'Message to them', 'رسالة اليها') }}</dt>
+                <dd class="whitespace-pre-line break-words">{{ gift.message }}</dd>
+              </div>
+              <div class="flex items-center justify-between gap-4 border-t pt-2">
+                <dt class="text-muted-foreground">{{ t('gift_credit', 'Credit', 'الرصيد') }}</dt>
+                <dd class="font-display text-lg font-semibold text-primary">{{ format(gift.amount) }}</dd>
+              </div>
+            </dl>
+          </div>
 
-          <Button as-child variant="outline" class="h-12 rounded-xl">
-            <NuxtLink to="/gifts">{{ t('close', 'Close', 'اغلاق') }}</NuxtLink>
-          </Button>
+          <aside class="flex flex-col gap-4">
+            <CheckoutSummary :quote="summaryQuote" :title="t('gift_summary', 'Gift summary', 'ملخص الهدية')" />
+
+            <Button as-child variant="outline" class="h-12 rounded-xl">
+              <NuxtLink to="/gifts">{{ t('close', 'Close', 'اغلاق') }}</NuxtLink>
+            </Button>
+          </aside>
         </div>
       </template>
     </div>

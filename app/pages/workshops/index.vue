@@ -59,6 +59,7 @@
 
         <div class="flex flex-1 flex-col gap-2 p-6">
           <NuxtLink :to="`/workshops/${workshop.id}`" class="font-display text-xl font-semibold">{{ workshop.title }}</NuxtLink>
+          <WorkshopAudienceBadge :audience="workshop.audience" />
           <p class="line-clamp-2 text-sm text-muted-foreground">{{ workshop.short_description }}</p>
 
           <!-- The three info tiles from the hub frames: price, seats per session, length. -->

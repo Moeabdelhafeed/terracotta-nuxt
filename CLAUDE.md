@@ -97,6 +97,64 @@ On `POST /api/forgot-password` the two questions are separate fields:
 
 `useAuthConfig()` exposes `identifierTypes` (the kinds this project accepts) and `defaultIdentifierType`. Pages keep the selected kind in state — a picker when there is more than one, otherwise the single configured identifier — and send it with every request. Carry it through multi-step flows in the query string (`/verify-login?identifier=…&type=phone`) so each step declares the same thing.
 
+## Workshop & shop contract details the site must honour
+
+The backend changed on 2026-09-13; the full note for client teams is
+`../terracotta/API-CHANGES-2026-09-13.md`. The parts that bind this site:
+
+### A piece is an object, and a piece key is what says so
+
+`POST /api/workshops/bookings/{id}/images` takes three arrays parallel to `images[]`:
+`piece_labels[]` (the name the customer reads), `piece_keys[]` (what actually groups photos
+— same key, same object) and `piece_ids[]` (a piece from an earlier upload, to add another
+angle to it). The label decides nothing: two friends can both call their cup "mug", and
+matching on label text merged them into one piece, leaving the second cup with no record to
+bring back and paint. `useBookingActions(id).uploadImages(pieces)` takes one
+`{ file, label, key, id }` per file and sends all three.
+
+`expected_piece_count` is a **guide** for `make_your_piece` — one per person who actually
+checked in, and going over it is normal — but a **hard ceiling** for
+`paint_your_piece`/`make_your_candle`, where it is the number of objects bought and the
+server answers 422 past it. Stop the customer before the request in that case.
+
+**Uploads are only accepted while the booking is `attending`** — after check-in, before the
+studio finishes the session. Once it is finished no piece can ever be added to that booking,
+so the window has to be obvious on screen.
+
+### Money comes back to the wallet
+
+- Switching a finished piece to pickup (`POST .../delivery` with `method: "pickup"`) credits
+  the delivery fee back and clears `delivery_fee`/`delivery_fee_wallet_applied`. Choosing
+  delivery again charges the current rate afresh. Refresh the wallet after the call.
+- Cancelling a **paid** shop order credits the full `total_price` — goods, delivery and VAT —
+  and reports it in `refunded_amount`. Cancelling an **unpaid hold** returns only the wallet
+  slice that was actually taken and leaves `refunded_amount` null. The confirmation copy has
+  to distinguish the two.
+
+### Workshops carry an audience and a collection window
+
+`audience` is one of `mixed`, `women_only`, `men_only`, `couples`, `kids`, `families`, shown
+so nobody books a seat in a session they cannot attend — the API never checks it against the
+customer, because it never asks anyone's gender. `piece_warning_days` is how long the studio
+holds a finished piece; each booking's `pickup_deadline` is computed from it, and
+`make_your_candle` has no pickup step at all.
+
+### List parameters
+
+- `GET /api/workshops/bookings` — `sort` (`newest`, the default and newest *booked*;
+  `oldest`; `session_soonest`; `session_latest`), `status` (one or comma-separated), and
+  `meta.status_counts`, which always counts the customer's whole history so tabs can be
+  labelled before one is opened. `useBookings()` takes `{ page, perPage, status, sort }` and
+  returns `statusCounts`; `useApiList` exposes the envelope's `meta` for this.
+- `GET /api/shop/products` — `min_price`, `max_price` and `sort`
+  (`newest`/`price_asc`/`price_desc`), all measured on the price the customer would pay (the
+  sale price when a product is on offer). **Omitting `sort` keeps the studio's catalogue
+  order**, which is deliberate and is the right default for the listing.
+
+Each availability slot also carries `is_non_cancellable` and `cancel_until`: booking that
+slot now means the customer is already inside the cancellation window and will not be able
+to cancel. Warn before they pick it, not after.
+
 ## Translations system (`useLang`)
 
 Single source of truth for locale + dir + translation lookup, in [app/composables/useLang.js](app/composables/useLang.js).
@@ -231,13 +289,21 @@ upload — `mediaAsset(key, defaultPath)`. Every call site does; the seeds live 
 | Key | Seed file |
 |---|---|
 | `web/branding/logo`, `logo_light`, `logo_mark` | `/logo.png`, `/logo-light.png`, `/logo-mark.png` |
-| `web/heroes/hero_shop`, `hero_gallery`, `hero_workshops` | `/seed/hero-*.webp`, passed as `PageHero`'s `fallback` |
+| `web/heroes/hero_shop`, `hero_gallery`, `hero_workshops`, `hero_materials` | `/seed/hero-*.webp`, passed as `PageHero`'s `fallback` |
 | `web/studio/studio_1…4` | `/seed/studio-N.webp` |
 | `web/home/hero_video` | `/seed/hero-video.mp4` |
 | `web/app/app_screen_1`, `app_screen_2` | `/app-screen-N.png` |
 
 Adding a key means adding its seed file, or it can never provision itself — a
 `mediaAsset(key)` with no default renders nothing on a backend that has never seen it.
+
+**A key keeps the first file it ever saw.** Seeding only fires when the backend has no such
+key, so changing a `fallback` after a page has been visited once changes nothing: the CMS
+still serves the original upload, and the new file is only what a *fresh* backend would get.
+To correct one, delete the key in the Media CMS (or `MediaItem` row) and reload the page —
+it re-seeds from the current default. This is how `hero_materials` ended up holding the
+shop's photograph: the page was opened once while its fallback still pointed at
+`/seed/hero-shop.webp`.
 
 **Both seeders are client-side and write-gated.** They fire from the browser, so a page
 has to actually be visited, and they post to endpoints the backend only exposes when

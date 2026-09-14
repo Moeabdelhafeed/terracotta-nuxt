@@ -1,5 +1,5 @@
 <template>
-  <NuxtLink :to="`/bookings/${booking.id}`" class="flex gap-4 rounded-3xl border bg-card p-4 transition-shadow hover:shadow-lg sm:p-6">
+  <NuxtLink :to="`/bookings/${booking.id}`" class="flex h-full gap-4 rounded-3xl border bg-card p-4 transition-shadow hover:shadow-lg sm:p-6">
     <div class="size-20 shrink-0 overflow-hidden rounded-2xl bg-brand-mist sm:size-24">
       <AppImage v-if="booking.workshop_image" :src="booking.workshop_image" :alt="booking.workshop_title" class="size-full object-cover" />
     </div>

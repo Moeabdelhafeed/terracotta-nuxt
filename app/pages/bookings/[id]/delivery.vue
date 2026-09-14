@@ -1,5 +1,5 @@
 <template>
-  <main v-if="status !== 'success' && !booking" class="mx-auto max-w-3xl px-6 py-16" aria-busy="true">
+  <main v-if="status !== 'success' && !booking" class="mx-auto max-w-6xl px-6 py-16" aria-busy="true">
     <AppSkeleton class="h-9 w-2/3" />
     <AppSkeleton class="mt-6 h-64 w-full !rounded-3xl" />
   </main>
@@ -7,12 +7,12 @@
   <main v-else-if="booking" class="min-h-svh bg-background pb-28">
     <PageBar :crumbs="crumbs" />
 
-    <div class="mx-auto max-w-3xl px-6 py-16">
+    <div class="mx-auto max-w-6xl px-6 py-16">
       <h1 class="font-display text-3xl font-semibold sm:text-4xl">{{ t('delivery_title', 'Your finished piece', 'استلام قطعتك') }}</h1>
 
       <!-- The step exists only after the piece is finished, and never for a workshop that
            has no delivery at all (the candle goes home the same day). -->
-      <p v-if="!available" class="mt-8 rounded-3xl border border-dashed p-10 text-center text-muted-foreground">
+      <p v-if="!available" class="mx-auto mt-8 max-w-xl rounded-3xl border border-dashed p-10 text-center text-muted-foreground">
         {{ t('delivery_unavailable', 'This piece has no pickup or delivery step — you take it home the same day.', 'هذه القطعة ليس لها خطوة استلام أو توصيل — تأخذها معك في اليوم نفسه.') }}
       </p>
 
@@ -43,6 +43,10 @@
               {{ t('pickup_note', 'Come by the studio with your booking code and we will hand your piece over.', 'مر على الاستوديو ومعك رمز الحجز وسنسلمك قطعتك.') }}
             </p>
 
+            <p v-if="method === 'pickup' && refundable" class="mt-3 rounded-2xl bg-brand-green/10 p-4 text-sm text-brand-green" data-test="pickup-refund">
+              {{ t('pickup_refunds_fee', 'The :amount delivery fee goes back to your Terracotta balance. Asking for delivery again later is charged at the rate on the day.', 'ستعاد رسوم التوصيل :amount إلى رصيدك في تيراكوتا. وإذا طلبت التوصيل لاحقًا فستُحتسب الرسوم من جديد بسعر اليوم.', { amount: format(booking.delivery_fee) }) }}
+            </p>
+
             <div v-else class="mt-6">
               <AddressPicker v-model="addressId" />
               <span v-if="fieldError(errors, 'address_id')" class="mt-2 block text-xs text-destructive">{{ fieldError(errors, 'address_id') }}</span>
@@ -51,7 +55,7 @@
           </div>
 
           <aside class="flex flex-col gap-4">
-            <CheckoutWalletToggle v-if="method === 'delivery'" v-model="useWallet" :disabled="saving" />
+            <CheckoutWalletToggle v-if="method === 'delivery'" v-model="payWithWallet" :disabled="saving" />
 
             <CheckoutSummary v-if="method === 'delivery'" :quote="quote" :title="t('delivery_summary', 'Delivery', 'التوصيل')" />
 
@@ -106,11 +110,19 @@ const toast = useToast()
 const { booking, status } = useBooking(() => route.params.id)
 const actions = useBookingActions(() => route.params.id)
 
+// Both surfaces of the balance go stale on every choice: pickup credits the fee back, and
+// delivery spends whatever the wallet covers.
+const { refreshIdentity } = useSanctumAuth()
+const { refresh: refreshWallet } = useWallet()
+
 const available = computed(() => hasDeliveryStep(booking.value))
+
+/** A fee is only given back if one was actually charged — see `chooseDelivery(…, pickup)`. */
+const refundable = computed(() => !!booking.value?.delivery_fee && !isZeroMoney(booking.value.delivery_fee))
 
 const method = ref(route.query.method === 'delivery' ? 'delivery' : 'pickup')
 const addressId = ref(null)
-const useWallet = ref(false)
+const payWithWallet = ref(false)
 const quote = ref(null)
 const saving = ref(false)
 const errors = ref({})
@@ -119,7 +131,7 @@ const submitError = ref('')
 const loadQuote = async () => {
   if (!available.value || method.value !== 'delivery') { quote.value = null; return }
   try {
-    const res = await actions.deliveryQuote({ use_wallet: useWallet.value ? 1 : 0, address_id: addressId.value ?? undefined })
+    const res = await actions.deliveryQuote({ use_wallet: payWithWallet.value ? 1 : 0, address_id: addressId.value ?? undefined })
     quote.value = res?.data ?? null
   } catch (err) {
     const normalized = normalizeApiError(err)
@@ -128,7 +140,7 @@ const loadQuote = async () => {
   }
 }
 
-watch([method, addressId, useWallet, available], loadQuote, { immediate: true })
+watch([method, addressId, payWithWallet, available], loadQuote, { immediate: true })
 
 const choose = async () => {
   saving.value = true
@@ -137,9 +149,10 @@ const choose = async () => {
   try {
     const res = await actions.chooseDelivery({
       method: method.value,
-      ...(method.value === 'delivery' ? { address_id: addressId.value, use_wallet: useWallet.value } : {}),
+      ...(method.value === 'delivery' ? { address_id: addressId.value, use_wallet: payWithWallet.value } : {}),
     })
     toast.success(res?.message ?? '')
+    await Promise.all([refreshIdentity(), refreshWallet()])
     await navigateTo(`/bookings/${route.params.id}`)
   } catch (err) {
     const normalized = normalizeApiError(err)

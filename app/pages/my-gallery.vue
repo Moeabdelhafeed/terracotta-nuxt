@@ -1,7 +1,7 @@
 <template>
   <main class="min-h-svh bg-background pb-28">
     <div class="mx-auto max-w-6xl px-6 py-16">
-      <div class="mx-auto flex max-w-lg flex-col gap-5">
+      <div class="flex flex-col gap-5">
         <div class="flex items-center justify-between">
           <NuxtLink
             to="/profile"
@@ -17,15 +17,15 @@
           {{ t('my_gallery_description', 'Photos of the pieces you made in workshops.', 'صور القطع التي صنعتها في الورشات.') }}
         </p>
 
-        <div v-if="pending" class="grid grid-cols-2 gap-3" aria-busy="true">
-          <AppSkeleton v-for="n in 6" :key="n" class="aspect-square w-full rounded-xl" />
+        <div v-if="pending" class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6" aria-busy="true">
+          <AppSkeleton v-for="n in 12" :key="n" class="aspect-square w-full rounded-xl" />
         </div>
 
-        <div v-else-if="!photos.length" class="flex flex-col items-center gap-2 rounded-2xl border bg-card p-10 text-center">
+        <div v-else-if="!photos.length" class="mx-auto flex w-full max-w-xl flex-col items-center gap-2 rounded-2xl border bg-card p-10 text-center">
           <p class="text-sm text-muted-foreground">{{ t('no_photos_yet', 'No photos yet.', 'لا توجد صور بعد.') }}</p>
         </div>
 
-        <div v-else class="grid grid-cols-2 gap-3">
+        <div v-else class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
           <a
             v-for="photo in photos"
             :key="photo.id"

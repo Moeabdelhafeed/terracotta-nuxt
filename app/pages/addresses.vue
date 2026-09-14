@@ -1,7 +1,7 @@
 <template>
   <main class="min-h-svh bg-background pb-28">
     <div class="mx-auto max-w-6xl px-6 py-16">
-      <div class="mx-auto flex max-w-lg flex-col gap-5">
+      <div class="flex flex-col gap-5">
         <div class="flex items-center justify-between">
           <NuxtLink
             to="/profile"
@@ -14,11 +14,11 @@
           <span class="size-10" />
         </div>
 
-        <div v-if="pending && !addresses.length" class="flex flex-col gap-3" aria-busy="true">
+        <div v-if="pending && !addresses.length" class="grid gap-3 lg:grid-cols-2" aria-busy="true">
           <AppSkeleton v-for="n in 2" :key="n" class="h-32 w-full" />
         </div>
 
-        <div v-else-if="!addresses.length" class="flex flex-col items-center gap-3 rounded-2xl border bg-card p-10 text-center">
+        <div v-else-if="!addresses.length" class="mx-auto flex w-full max-w-xl flex-col items-center gap-3 rounded-2xl border bg-card p-10 text-center">
           <span class="flex size-12 items-center justify-center rounded-full bg-brand-rust/10 text-brand-rust">
             <LucideMapPin class="size-5" />
           </span>
@@ -28,7 +28,7 @@
           </p>
         </div>
 
-        <ul v-else class="flex flex-col gap-3" data-test="address-list">
+        <ul v-else class="grid gap-3 lg:grid-cols-2" data-test="address-list">
           <li v-for="address in addresses" :key="address.id" class="rounded-2xl border bg-card p-5" data-test="address-card">
             <div class="flex items-start justify-between gap-3">
               <div class="min-w-0 flex-1">
@@ -79,7 +79,7 @@
           </li>
         </ul>
 
-        <Button data-test="add-address" class="h-12 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90" @click="openAdd">
+        <Button data-test="add-address" class="h-12 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90 sm:self-start sm:px-8" @click="openAdd">
           <LucidePlus class="size-4" />
           {{ t('add_address', 'Add an address', 'إضافة عنوان') }}
         </Button>

@@ -1,8 +1,10 @@
 /**
  * Shop orders: the paginated history, one order, and the two things a customer can do
  * to it — pay the hold (`POST …/pay`, idempotent) and cancel (`DELETE`, only while
- * `can_cancel`). Cancelling refunds `wallet_applied` alone; the response carries
- * `refunded_amount`.
+ * `can_cancel`). Cancelling a **paid** order credits the whole `total_price` back to the
+ * wallet — goods, delivery and VAT — and reports it in `refunded_amount`. Cancelling an
+ * unpaid hold returns only the `wallet_applied` slice that was actually taken and leaves
+ * `refunded_amount` null, because nothing was ever charged.
  */
 export const ORDER_STEPS = ['pending', 'preparing', 'out_for_delivery', 'completed']
 

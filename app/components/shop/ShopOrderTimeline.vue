@@ -53,6 +53,21 @@ const TONES = {
   stopped: 'border-destructive bg-destructive text-white',
 }
 
+/**
+ * `refunded_amount` is the whole charge on a paid order and null on a hold that was never
+ * paid — null means nothing was refunded, not that nothing came back: the wallet slice the
+ * hold was sitting on is still released, and saying so is the only way the line is true.
+ */
+const refundNote = () => {
+  if (!isZeroMoney(props.order.refunded_amount)) {
+    return t('refunded_to_wallet', ':amount refunded to your wallet', 'تمت إعادة :amount إلى محفظتك', { amount: format(props.order.refunded_amount) })
+  }
+  if (!isZeroMoney(props.order.wallet_applied)) {
+    return t('hold_released_to_wallet', ':amount released back to your wallet', 'أُعيد :amount المحجوز إلى محفظتك', { amount: format(props.order.wallet_applied) })
+  }
+  return ''
+}
+
 const steps = computed(() => {
   const labels = LABELS()
   const status = props.order.status
@@ -83,7 +98,7 @@ const steps = computed(() => {
       tone: TONES.stopped,
       note: [
         props.order.cancelled_at ? formatDate(props.order.cancelled_at) : '',
-        !isZeroMoney(props.order.refunded_amount) ? t('refunded_to_wallet', ':amount refunded to your wallet', 'تمت إعادة :amount إلى محفظتك', { amount: format(props.order.refunded_amount) }) : '',
+        refundNote(),
       ].filter(Boolean).join(' · '),
     })
     return cut

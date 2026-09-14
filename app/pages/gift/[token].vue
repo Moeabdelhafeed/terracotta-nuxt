@@ -53,7 +53,7 @@
         </p>
 
         <!-- The buyer's own words, rendered as written — never translated. -->
-        <p v-if="gift.message" class="mt-6 text-lg leading-relaxed">“{{ gift.message }}”</p>
+        <p v-if="gift.message" class="mt-6 text-lg leading-relaxed break-words">“{{ gift.message }}”</p>
 
         <p v-if="gift.recipient_name" class="mt-4 text-sm text-muted-foreground">
           {{ t('gift_to', 'For :name', 'إلى :name', { name: gift.recipient_name }) }}

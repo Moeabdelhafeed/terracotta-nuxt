@@ -80,19 +80,28 @@
         <li v-for="slot in slots" :key="slot.workshop_slot_id">
           <button
             type="button"
-            class="flex w-full flex-col items-start gap-1 rounded-2xl border bg-card p-4 text-start transition-colors disabled:cursor-not-allowed disabled:opacity-40 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+            class="flex w-full flex-col items-start gap-2 rounded-2xl border bg-card p-4 text-start transition-colors disabled:cursor-not-allowed disabled:opacity-40"
             :class="slotId === slot.workshop_slot_id ? 'border-brand-rust ring-1 ring-brand-rust' : 'hover:border-brand-rust'"
             :disabled="slot.is_full || slot.has_conflict"
             :data-slot="slot.workshop_slot_id"
             @click="slotId = slot.workshop_slot_id"
           >
-            <span class="font-medium">
-              {{ t('slot_from_to', 'Session :from to :to', 'ورشة من :from الى :to', { from: slot.start_time, to: slot.end_time }) }}
+            <span class="flex w-full flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+              <span class="font-medium">
+                {{ t('slot_from_to', 'Session :from to :to', 'ورشة من :from الى :to', { from: slot.start_time, to: slot.end_time }) }}
+              </span>
+              <span class="text-sm text-muted-foreground" dir="ltr">
+                {{ slot.has_conflict
+                  ? t('slot_conflict', 'You are already booked then', 'لديك حجز في هذا الوقت')
+                  : t('seats_of', ':left / :capacity people', ':left \\ :capacity اشخاص', { left: slot.remaining, capacity: slot.capacity }) }}
+              </span>
             </span>
-            <span class="text-sm text-muted-foreground" dir="ltr">
-              {{ slot.has_conflict
-                ? t('slot_conflict', 'You are already booked then', 'لديك حجز في هذا الوقت')
-                : t('seats_of', ':left / :capacity people', ':left \\ :capacity اشخاص', { left: slot.remaining, capacity: slot.capacity }) }}
+
+            <!-- Booking this session now lands inside its own cancellation window, so the
+                 booking would arrive already uncancellable — said before it is picked. -->
+            <span v-if="slot.is_non_cancellable" class="flex items-start gap-1.5 text-xs text-amber-700" data-test="slot-no-cancel">
+              <LucideAlertCircle class="mt-px size-3.5 shrink-0" />
+              {{ t('slot_no_cancel', "This session is too close to book and still cancel — you won't be able to cancel or move it.", 'هذه الجلسة قريبة جدًا: لن تتمكن من إلغاء الحجز أو تغيير موعده.') }}
             </span>
           </button>
         </li>

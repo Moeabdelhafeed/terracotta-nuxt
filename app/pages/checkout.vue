@@ -2,11 +2,11 @@
   <main class="min-h-svh bg-background pb-28">
     <PageBar :crumbs="crumbs" />
 
-    <div class="mx-auto max-w-3xl px-6 py-16">
+    <div class="mx-auto max-w-6xl px-6 py-16">
       <h1 class="font-display text-3xl font-semibold sm:text-4xl">{{ t('checkout_title', 'Checkout', 'الدفع') }}</h1>
 
       <!-- The open hold the server refused a second checkout for: pay it or cancel it. -->
-      <section v-if="resumed && order" class="mt-8 rounded-3xl border border-brand-rust/40 bg-brand-mist/40 p-6 sm:p-8">
+      <section v-if="resumed && order" class="mx-auto mt-8 max-w-xl rounded-3xl border border-brand-rust/40 bg-brand-mist/40 p-6 sm:p-8">
         <h2 class="font-display text-xl font-semibold">{{ t('open_hold_title', 'An order is already waiting for payment', 'لديك طلب بانتظار الدفع') }}</h2>
         <p class="mt-2 text-sm text-muted-foreground">{{ error || t('open_hold_body', 'Pay or cancel it before placing a new one.', 'ادفعه أو ألغِه قبل إنشاء طلب جديد.') }}</p>
 
@@ -32,7 +32,7 @@
       </section>
 
       <!-- The order this session created, held and waiting for the pay call. -->
-      <section v-else-if="order" class="mt-8 flex flex-col gap-6">
+      <section v-else-if="order" class="mx-auto mt-8 flex max-w-xl flex-col gap-6">
         <div v-if="settled" class="rounded-3xl border bg-card p-8 text-center">
           <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-green/10 text-brand-green">
             <LucideCheckCircle2 class="size-6" />
@@ -59,7 +59,7 @@
       </section>
 
       <!-- Empty cart: nothing to quote, nothing to place. -->
-      <div v-else-if="!lines.length && !cartLoading" class="mt-8 rounded-3xl border bg-card p-8 text-center sm:p-12">
+      <div v-else-if="!lines.length && !cartLoading" class="mx-auto mt-8 max-w-xl rounded-3xl border bg-card p-8 text-center sm:p-12">
         <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-rust/10 text-brand-rust">
           <LucideShoppingBag class="size-6" />
         </span>
@@ -93,7 +93,7 @@
           </section>
         </div>
 
-        <aside class="flex flex-col gap-4">
+        <aside class="flex flex-col gap-4 lg:sticky lg:top-6">
           <CheckoutSummary :quote="quote" :title="t('summary_title', 'Your order', 'طلبك', { subGroup: 'checkout' })" />
 
           <p v-if="cartError" class="flex items-start gap-2 rounded-2xl bg-destructive/10 px-4 py-3 text-sm text-destructive">

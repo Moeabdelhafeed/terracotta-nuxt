@@ -67,8 +67,9 @@ export const bookingState = (booking) => {
 }
 
 /**
- * The booking carries no `has_delivery`; the contract pins `pickup_deadline` to
- * `completed_at + 7d` for deliverable types and `null` forever for candles.
+ * The booking carries no `has_delivery`; the contract pins `pickup_deadline` to the
+ * workshop's own collection window (`piece_warning_days`, 7 by default) counted from
+ * completion, and `null` forever for candles.
  */
 export const hasDeliveryStep = (booking) =>
   !!booking && booking.status === 'completed' && (booking.pickup_deadline !== null || booking.delivery_method !== null)
@@ -113,11 +114,19 @@ export const useBookingActions = (bookingId) => {
     pay: () => api(`${base()}/pay`, { method: 'POST' }),
     reschedule: (body) => api(base(), { method: 'PUT', body }),
     cancel: () => api(base(), { method: 'DELETE' }),
-    uploadImages: (files, labels) => {
+    /**
+     * `pieces` is one entry per file: `{ file, label, key, id }`. The **key** is what says
+     * which photos show the same object — two friends can both call their cup "mug" and
+     * still end up with two pieces, which matching on the label text could never express.
+     * `id` names a piece from an earlier upload, to add another angle to it.
+     */
+    uploadImages: (pieces) => {
       const form = new FormData()
-      files.forEach((file, i) => {
+      pieces.forEach(({ file, label, key, id }) => {
         form.append('images[]', file)
-        form.append('piece_labels[]', labels[i])
+        form.append('piece_labels[]', label)
+        form.append('piece_keys[]', key ?? '')
+        form.append('piece_ids[]', id ?? '')
       })
       return api(`${base()}/images`, { method: 'POST', body: form })
     },
@@ -149,9 +158,27 @@ export const useBooking = (id) => {
   }
 }
 
-/** `GET /api/workshops/bookings`, paginated. `page` may be a ref. */
-export const useBookings = ({ page = 1, perPage = 10, key = 'bookings' } = {}) =>
-  useApiList('/api/workshops/bookings', { key, query: { page, per_page: perPage } })
+/**
+ * `GET /api/workshops/bookings`, paginated. `page`, `status` and `sort` may be refs.
+ *
+ * The API orders newest-booked first, so the booking just paid for is at the top; `sort`
+ * takes `newest`, `oldest`, `session_soonest` or `session_latest`. `status` is one status
+ * or several comma-separated. `statusCounts` covers the customer's whole history whatever
+ * the filter says — the numbers exist to label the tabs before one is opened.
+ */
+export const useBookings = ({ page = 1, perPage = 10, status, sort, key = 'bookings' } = {}) => {
+  const list = useApiList('/api/workshops/bookings', {
+    key,
+    query: { page, per_page: perPage, status, sort },
+  })
+
+  return { ...list, statusCounts: computed(() => list.meta.value?.status_counts ?? null) }
+}
+
+/** Statuses a customer's own tabs are built from, in the order they happen. */
+export const BOOKING_TABS = ['all', 'pending_payment', 'confirmed', 'attending', 'preparing', 'completed', 'absent', 'cancelled']
+
+export const BOOKING_SORTS = ['newest', 'oldest', 'session_soonest', 'session_latest']
 
 /** How many bookings still need the user's attention — the hub tab badge. */
 export const useActiveBookingsCount = () => {

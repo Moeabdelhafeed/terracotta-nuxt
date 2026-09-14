@@ -1,7 +1,7 @@
 <template>
   <main class="min-h-svh bg-background pb-28">
     <div class="mx-auto max-w-6xl px-6 py-16">
-      <div class="mx-auto flex max-w-lg flex-col gap-5">
+      <div class="flex flex-col gap-5">
         <div class="flex items-center justify-between">
           <NuxtLink
             to="/profile"
@@ -18,7 +18,7 @@
         <section class="rounded-2xl border bg-card p-5">
           <p v-if="pending" class="text-sm text-muted-foreground">{{ t('loading', 'Loading...', 'جارٍ التحميل...') }}</p>
           <p v-else-if="!devices.length" class="text-sm text-muted-foreground">{{ t('no_devices', 'No devices found.', 'لا توجد أجهزة.') }}</p>
-          <ul v-else class="flex flex-col gap-3">
+          <ul v-else class="grid gap-3 lg:grid-cols-2">
             <li
               v-for="d in devices"
               :key="d.id"

@@ -1,5 +1,5 @@
 <template>
-  <main v-if="status !== 'success' && !workshop" class="mx-auto max-w-4xl px-6 py-16" aria-busy="true">
+  <main v-if="status !== 'success' && !workshop" class="mx-auto max-w-6xl px-6 py-16" aria-busy="true">
     <AppSkeleton class="h-9 w-2/3" />
     <AppSkeleton class="mt-6 h-24 w-full !rounded-2xl" />
     <AppSkeleton class="mt-4 h-64 w-full !rounded-3xl" />
@@ -8,9 +8,9 @@
   <main v-else-if="workshop">
     <PageBar :crumbs="crumbs" />
 
-    <div class="mx-auto max-w-4xl px-6 py-16">
+    <div class="mx-auto max-w-6xl px-6 py-16">
       <!-- Success (rDHVc / BhI1o / C75dHn) -->
-      <section v-if="step === 'done'" class="relative overflow-hidden rounded-3xl border bg-card p-8 text-center sm:p-12">
+      <section v-if="step === 'done'" class="relative mx-auto max-w-xl overflow-hidden rounded-3xl border bg-card p-8 text-center sm:p-12">
         <AppConfetti />
         <span class="mx-auto flex size-16 items-center justify-center rounded-full bg-brand-green/15 text-brand-green">
           <LucideCheck class="size-8" />
@@ -37,25 +37,34 @@
         </ol>
 
         <!-- Step 1 — people, date, slot (oDD24 / uA4fJ / Kzosl) -->
-        <section v-show="step === 'when'" class="mt-10">
-          <BookingSlotPicker
-            ref="picker"
-            :workshop="workshop"
-            v-model:people="people"
-            v-model:date="date"
-            v-model:slot-id="slotId"
-            v-model:slot="slot"
-            :errors="allErrors"
-          />
+        <section v-show="step === 'when'" class="mt-10 grid gap-8 lg:grid-cols-[1.5fr_1fr] lg:items-start">
+          <div>
+            <BookingSlotPicker
+              ref="picker"
+              :workshop="workshop"
+              v-model:people="people"
+              v-model:date="date"
+              v-model:slot-id="slotId"
+              v-model:slot="slot"
+              :errors="allErrors"
+            />
 
-          <Button
-            type="button"
-            class="mt-10 h-12 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90 sm:w-auto sm:px-10"
-            :disabled="!slotId"
-            @click="goNext"
-          >
-            {{ catalogue ? t('next', 'Next', 'التالي') : t('to_payment', 'Payment', 'الدفع') }}
-          </Button>
+            <Button
+              type="button"
+              class="mt-10 h-12 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90 sm:w-auto sm:px-10"
+              :disabled="!slotId"
+              @click="goNext"
+            >
+              {{ catalogue ? t('next', 'Next', 'التالي') : t('to_payment', 'Payment', 'الدفع') }}
+            </Button>
+          </div>
+
+          <aside class="flex flex-col gap-3">
+            <CheckoutSummary :quote="quote" :title="t('summary_title', 'Summary', 'الملخص')" />
+            <p v-if="!quote" class="text-sm text-muted-foreground">
+              {{ t('summary_awaiting_slot', 'Pick a date and a session to see the price.', 'اختر التاريخ والجلسة لعرض السعر.') }}
+            </p>
+          </aside>
         </section>
 
         <!-- Step 2 — catalogue pieces (hDFHD / R2fBVR) -->
@@ -130,6 +139,10 @@
             >
               <LucideCake class="me-2 size-5" />{{ t('add_celebration', 'Add a celebration', 'اضافة احتفال') }}
             </Button>
+
+            <p v-if="collectionNote" class="mt-4 flex items-start gap-2 rounded-2xl bg-brand-mist/60 p-4 text-sm text-muted-foreground">
+              <LucidePackage class="mt-0.5 size-4 shrink-0" />{{ collectionNote }}
+            </p>
 
             <p v-if="workshop.location_url" class="mt-6 text-sm text-muted-foreground">
               <a :href="workshop.location_url" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-primary underline">
@@ -243,6 +256,12 @@ const createErrors = ref({})
 const createError = ref('')
 
 const catalogue = computed(() => isCatalogueType(workshop.value?.type))
+
+// `has_delivery` is the API's "this workshop leaves a piece behind" flag — false only for
+// make_your_candle, which the customer carries home the same evening and never collects.
+const collectionNote = computed(() => (workshop.value?.has_delivery
+  ? t('pickup_window_note', "You'll have :n days to collect your piece once it's ready.", 'أمامك :n يوم لاستلام قطعتك بعد أن تصبح جاهزة.', { n: workshop.value.piece_warning_days ?? 7 })
+  : ''))
 const hasCelebration = computed(() => !!workshop.value && !isZeroMoney(workshop.value.celebration_price))
 const allErrors = computed(() => ({ ...quoteErrors.value, ...createErrors.value }))
 
