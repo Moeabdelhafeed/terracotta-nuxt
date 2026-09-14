@@ -1,9 +1,5 @@
 <template>
-  <AppImage
-    v-if="type === 'image'"
-    :src="asset"
-    :alt="alt"
-  />
+  <AppImage v-if="type === 'image'" :src="asset" :alt="alt" />
 
   <video
     v-else-if="type === 'video'"
@@ -17,12 +13,9 @@
     @playing="started = true"
   />
 
-  <a
-    v-else-if="url"
-    :href="url"
-    target="_blank"
-    rel="noopener noreferrer"
-  >{{ asset?.name || alt || url.split('/').pop() }}</a>
+  <a v-else-if="url" :href="url" target="_blank" rel="noopener noreferrer">{{
+    asset?.name || alt || url.split("/").pop()
+  }}</a>
 </template>
 
 <script setup>
@@ -41,27 +34,39 @@
  */
 const props = defineProps({
   src: { type: [Object, String], default: null },
-  alt: { type: String, default: '' },
+  alt: { type: String, default: "" },
   /** Off for decorative/background video, where a control bar would be noise. */
   controls: { type: Boolean, default: true },
-})
+});
 
-const type = computed(() => (typeof props.src === 'string' ? 'image' : props.src?.type ?? 'image'))
+const type = computed(() =>
+  typeof props.src === "string" ? "image" : (props.src?.type ?? "image"),
+);
 
 // `{ type, image|video|file }` wrappers carry the asset under their type key; a bare
 // Image object (app-settings, pages, languages) is already the asset.
 const asset = computed(() => {
-  if (typeof props.src === 'string') return { image_api: props.src }
-  return props.src?.[type.value] ?? props.src
-})
+  if (typeof props.src === "string") return { image_api: props.src };
+  return props.src?.[type.value] ?? props.src;
+});
 
-const url = computed(() => asset.value?.image_api ?? asset.value?.video_api ?? asset.value?.file_api ?? null)
-const poster = computed(() => asset.value?.thumbnail?.image_api ?? null)
+const url = computed(
+  () =>
+    asset.value?.image_api ??
+    asset.value?.video_api ??
+    asset.value?.file_api ??
+    null,
+);
+const poster = computed(() => asset.value?.thumbnail?.image_api ?? null);
 
 // The thumbnail's own hash when there is one, else the asset's.
-const hash = computed(() => asset.value?.thumbnail?.blurhash ?? asset.value?.blurhash ?? null)
-const { placeholderStyle } = useBlurhash(hash)
+const hash = computed(
+  () => asset.value?.thumbnail?.blurhash ?? asset.value?.blurhash ?? null,
+);
+const { placeholderStyle } = useBlurhash(hash);
 
-const started = ref(false)
-watch(url, () => { started.value = false })
+const started = ref(false);
+watch(url, () => {
+  started.value = false;
+});
 </script>

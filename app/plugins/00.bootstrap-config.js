@@ -32,7 +32,12 @@ export default defineNuxtPlugin(async (nuxtApp) => {
         baseURL: baseUrl,
         headers: buildHeaders(deviceId.value, platform.value, fcmToken.value, 'en', null),
       })
-      const languages = res?.data ?? res ?? []
+      // Narrowed to an array rather than trusted: a fronted or failing API answers this
+      // with an envelope whose `data` is an object, and `.find` on that throws inside a
+      // plugin that runs before every first render — a 500 on the cold visit, and nothing
+      // wrong afterwards, because a client-side navigation never re-runs this.
+      const list = res?.data ?? res
+      const languages = Array.isArray(list) ? list : []
 
       // The backend's default language wins a first visit, and the browser's
       // `Accept-Language` is deliberately not consulted: phones here are routinely set to

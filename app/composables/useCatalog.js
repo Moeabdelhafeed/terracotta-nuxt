@@ -27,12 +27,12 @@ export const useWorkshop = (id) => {
 const catalogCategories = (path, key) => {
   const { data, pending } = useApiFetch(path, {
     key,
-    transform: (res) => res?.data ?? [],
+    transform: (res) => asList(res?.data),
     default: () => [],
     watch: localeKeys(),
   });
 
-  return { categories: computed(() => data.value ?? []), pending };
+  return { categories: computed(() => asList(data.value)), pending };
 };
 
 export const useShopCategories = () =>
@@ -82,7 +82,7 @@ export const useProducts = (
   });
 
   return {
-    products: computed(() => data.value?.items ?? []),
+    products: computed(() => asList(data.value?.items)),
     page: computed(() => data.value?.page ?? 1),
     lastPage: computed(() => data.value?.lastPage ?? 1),
     total: computed(() => data.value?.total ?? 0),

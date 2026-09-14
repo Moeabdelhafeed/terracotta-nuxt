@@ -15,16 +15,19 @@
  * actually rule a customer out.
  */
 const props = defineProps({
-  audience: { type: String, default: 'mixed' },
-})
+  audience: { type: String, default: "mixed" },
+});
 
-const { t } = useLang('web', 'home')
+const { t } = useLang("web", "home");
 
-const label = computed(() => ({
-  women_only: t('audience_women_only', 'Women only', 'للنساء فقط'),
-  men_only: t('audience_men_only', 'Men only', 'للرجال فقط'),
-  couples: t('audience_couples', 'Couples', 'للأزواج'),
-  kids: t('audience_kids', 'Kids', 'للأطفال'),
-  families: t('audience_families', 'Families', 'للعائلات'),
-}[props.audience] ?? ''))
+const label = computed(
+  () =>
+    ({
+      women_only: t("audience_women_only", "Women only", "للنساء فقط"),
+      men_only: t("audience_men_only", "Men only", "للرجال فقط"),
+      couples: t("audience_couples", "Couples", "للأزواج"),
+      kids: t("audience_kids", "Kids", "للأطفال"),
+      families: t("audience_families", "Families", "للعائلات"),
+    })[props.audience] ?? "",
+);
 </script>

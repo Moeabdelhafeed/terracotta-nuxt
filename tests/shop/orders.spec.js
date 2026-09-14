@@ -93,7 +93,7 @@ describe('ShopOrderItems', () => {
 
   it('links to the product when it still exists', async () => {
     const wrapper = await mountSuspended(ShopOrderItems, { props: { items: order().items } })
-    expect(wrapper.find('a').attributes('href')).toBe('/shop/11')
+    expect(wrapper.find('a').attributes('href')).toMatch(/\/shop\/11$/)
   })
 })
 

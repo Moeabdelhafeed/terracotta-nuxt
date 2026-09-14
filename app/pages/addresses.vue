@@ -35,7 +35,7 @@
                 <div class="flex flex-wrap items-center gap-2">
                   <span class="font-display text-base font-semibold text-foreground">{{ address.label || t('address_untitled', 'Address', 'عنوان') }}</span>
                   <span v-if="address.is_default" data-test="default-badge" class="rounded-md bg-brand-green/15 px-2.5 py-0.5 text-xs font-medium text-brand-green">
-                    {{ t('address_default', 'Default', 'الافتراضي') }}
+                    {{ t('address_default', 'Default', 'افتراضي') }}
                   </span>
                 </div>
                 <p class="mt-1 text-sm break-words text-muted-foreground">{{ address.address_line }}</p>

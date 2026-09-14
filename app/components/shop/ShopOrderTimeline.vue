@@ -42,7 +42,7 @@ const LABELS = () => ({
   awaiting_payment: t('step_awaiting_payment', 'Payment', 'الدفع'),
   pending: t('step_pending', 'Order confirmed', 'تم تأكيد الطلب'),
   preparing: t('step_preparing', 'Being prepared', 'قيد التحضير'),
-  out_for_delivery: t('step_out_for_delivery', 'Out for delivery', 'خرج للتوصيل'),
+  out_for_delivery: t('step_out_for_delivery', 'Out for delivery', 'خرجت للتوصيل'),
   completed: t('step_completed', 'Delivered', 'تم التسليم'),
 })
 

@@ -38,7 +38,7 @@
 
         <div class="mt-10 flex flex-wrap items-center gap-3">
           <Button size="lg" class="h-13 rounded-xl px-8 text-base" @click="scrollToWorkshops">
-            {{ t('book_workshop', 'Book a workshop', 'احجز ورشة') }}
+            {{ t('book_workshop', 'Book a workshop', 'حجز ورشة') }}
           </Button>
 
           <Button

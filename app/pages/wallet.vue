@@ -61,7 +61,7 @@
           </div>
 
           <p v-else-if="!transactions.length" class="mt-4 text-sm text-muted-foreground">
-            {{ t('no_transactions', 'No transactions yet.', 'لا توجد عمليات بعد.') }}
+            {{ t('no_transactions', 'No transactions yet.', 'لا توجد معاملات بعد') }}
           </p>
 
           <ul v-else class="mt-4 grid gap-3 lg:grid-cols-2" data-test="wallet-ledger">

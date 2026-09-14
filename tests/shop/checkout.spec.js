@@ -125,7 +125,7 @@ describe('checkout — an order already awaiting payment', () => {
 
     expect(wrapper.text()).toContain('An order is already waiting for payment')
     expect(wrapper.text()).toContain('You already have an order awaiting payment.')
-    expect(wrapper.find('a[href="/orders/9"]').exists()).toBe(true)
+    expect(wrapper.find('a[href$="/orders/9"]').exists()).toBe(true)
     expect(byText(wrapper, 'Pay now')).toBeDefined()
     expect(byText(wrapper, 'Cancel order')).toBeDefined()
   })

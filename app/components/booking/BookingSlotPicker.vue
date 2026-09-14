@@ -30,7 +30,7 @@
     <!-- Date strip. `blocked_dates` is relative to the party size, so it is refetched
          whenever `people` changes. -->
     <section>
-      <h2 class="font-display text-xl font-semibold">{{ t('booking_pick_date', 'Pick a date', 'اختر موعد') }}</h2>
+      <h2 class="font-display text-xl font-semibold">{{ t('booking_pick_date', 'Pick a date', 'اختر تاريخًا') }}</h2>
 
       <div v-if="loadingCalendar" class="mt-4 flex gap-3 overflow-hidden" aria-busy="true">
         <AppSkeleton v-for="n in 6" :key="n" class="h-24 w-24 shrink-0 !rounded-2xl" />

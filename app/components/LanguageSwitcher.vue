@@ -25,7 +25,7 @@
 const { lang, languages, setLanguage, t } = useLang()
 
 const other = computed(() => {
-  const list = languages.value ?? []
+  const list = asList(languages.value)
   const index = list.findIndex((l) => l.code === lang.value?.code)
   return list[(index + 1) % list.length] ?? null
 })

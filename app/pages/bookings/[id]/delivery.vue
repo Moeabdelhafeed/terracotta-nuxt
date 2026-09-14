@@ -44,7 +44,7 @@
             </p>
 
             <p v-if="method === 'pickup' && refundable" class="mt-3 rounded-2xl bg-brand-green/10 p-4 text-sm text-brand-green" data-test="pickup-refund">
-              {{ t('pickup_refunds_fee', 'The :amount delivery fee goes back to your Terracotta balance. Asking for delivery again later is charged at the rate on the day.', 'ستعاد رسوم التوصيل :amount إلى رصيدك في تيراكوتا. وإذا طلبت التوصيل لاحقًا فستُحتسب الرسوم من جديد بسعر اليوم.', { amount: format(booking.delivery_fee) }) }}
+              {{ t('pickup_refunds_fee', 'The :amount delivery fee goes back to your Terracotta balance. Asking for delivery again later is charged at the rate on the day.', 'ستعاد رسوم التوصيل :amount إلى رصيدك في تيراكوتا. وإذا طلبت التوصيل لاحقًا فستُحتسب الرسوم من جديد بسعر اليوم.', { amount: format(booking.delivery_fee_wallet_applied) }) }}
             </p>
 
             <div v-else class="mt-6">
@@ -118,7 +118,12 @@ const { refresh: refreshWallet } = useWallet()
 const available = computed(() => hasDeliveryStep(booking.value))
 
 /** A fee is only given back if one was actually charged — see `chooseDelivery(…, pickup)`. */
-const refundable = computed(() => !!booking.value?.delivery_fee && !isZeroMoney(booking.value.delivery_fee))
+// Only the wallet slice is ever taken when delivery is chosen — the rest stays owed, with
+// nothing collecting it — so that slice is the whole of what comes back. Promising the
+// full fee would be promising money the customer never paid.
+const refundable = computed(
+  () => !!booking.value?.delivery_fee_wallet_applied && !isZeroMoney(booking.value.delivery_fee_wallet_applied),
+)
 
 const method = ref(route.query.method === 'delivery' ? 'delivery' : 'pickup')
 const addressId = ref(null)

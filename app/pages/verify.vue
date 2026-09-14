@@ -1,6 +1,6 @@
 <template>
   <AuthScreen
-    :title="t('create_account', 'Create account', 'انشاء حساب')"
+    :title="t('create_account', 'Create account', 'إنشاء حساب')"
     :subtitle="verified ? '' : t('verify_otp_sent_note', 'We sent a :count-digit code to your :field.', 'لقد أرسلنا رمز تحقق مكوّنًا من :count أرقام إلى :field.', { count: OTP_LENGTH, field: targetLabel })"
   >
     <template v-if="verified">

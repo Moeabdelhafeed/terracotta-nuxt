@@ -96,7 +96,7 @@ export const useApiList = (url, { key, query = {}, watch: extraWatch = [], ...re
   })
 
   return {
-    items: computed(() => data.value?.items ?? []),
+    items: computed(() => asList(data.value?.items)),
     page: computed(() => data.value?.page ?? 1),
     lastPage: computed(() => data.value?.lastPage ?? 1),
     total: computed(() => data.value?.total ?? 0),

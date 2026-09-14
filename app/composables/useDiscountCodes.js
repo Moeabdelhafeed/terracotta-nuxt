@@ -21,8 +21,8 @@ export const useDiscountCodes = () => {
   })
 
   return {
-    codes: computed(() => data.value ?? []),
-    hasCodes: computed(() => (data.value ?? []).length > 0),
+    codes: computed(() => asList(data.value)),
+    hasCodes: computed(() => asList(data.value).length > 0),
     pending,
     error,
     refresh,

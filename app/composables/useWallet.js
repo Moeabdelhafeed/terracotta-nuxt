@@ -50,7 +50,7 @@ export const useWallet = ({ page = ref(1), perPage = 10 } = {}) => {
 
   return {
     balance: computed(() => data.value?.balance ?? '0.00'),
-    transactions: computed(() => data.value?.items ?? []),
+    transactions: computed(() => asList(data.value?.items)),
     lastPage: computed(() => data.value?.lastPage ?? 1),
     total: computed(() => data.value?.total ?? 0),
     pending,

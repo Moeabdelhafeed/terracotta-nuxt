@@ -101,7 +101,7 @@
           class="h-48 w-full"
           loading="lazy"
           referrerpolicy="no-referrer"
-          :title="t('address_map', 'Map', 'الخريطة')"
+          :title="t('address_map', 'Map', 'خريطة')"
         />
         <div v-else class="flex h-48 items-center justify-center text-sm text-muted-foreground">
           {{ t('address_pin_empty', 'No location yet', 'لم يتم تحديد الموقع بعد') }}

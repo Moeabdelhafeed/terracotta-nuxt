@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-2">
-    <Label :for="id">{{ t('discount_code', 'Discount code', 'كود الخصم') }}</Label>
+    <Label :for="id">{{ t('discount_code', 'Discount code', 'رمز الخصم') }}</Label>
 
     <div v-if="applied" class="flex h-12 items-center justify-between rounded-xl border border-brand-green/40 bg-brand-green/10 px-4 text-sm">
       <span class="flex items-center gap-2 font-medium text-brand-green">

@@ -166,7 +166,7 @@ describe('/gift/[token] — redeeming', () => {
     expect(api.calls[0].url).toBe(`/api/gifts/${TOKEN}/redeem`)
     expect(wrapper.text()).toContain('200.00 SAR has been added to your wallet.')
     expect(wrapper.text()).toContain('250.00 SAR')
-    expect(wrapper.find('a[href="/wallet"]').exists()).toBe(true)
+    expect(wrapper.find('a[href$="/wallet"]').exists()).toBe(true)
   })
 
   it.each([

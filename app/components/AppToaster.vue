@@ -20,7 +20,7 @@
         <LucideAlertCircle v-else-if="toast.kind === 'error'" class="mt-0.5 size-4 shrink-0" />
         <LucideInfo v-else class="mt-0.5 size-4 shrink-0" />
         <span class="min-w-0 flex-1">{{ toast.message }}</span>
-        <button type="button" class="opacity-70 transition-opacity hover:opacity-100" :aria-label="t('dismiss', 'Dismiss', 'إغلاق')" @click="dismiss(toast.id)">
+        <button type="button" class="opacity-70 transition-opacity hover:opacity-100" :aria-label="t('dismiss', 'Dismiss', 'تجاهل')" @click="dismiss(toast.id)">
           <LucideX class="size-4" />
         </button>
       </div>

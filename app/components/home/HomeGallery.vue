@@ -79,7 +79,7 @@ const CELLS = [
 const { data: pool } = await useAsyncData(
   'gallery-pool',
   async () => {
-    const list = (await api('/api/gallery'))?.data ?? []
+    const list = asList((await api('/api/gallery'))?.data)
 
     const details = await Promise.all(
       list.map((category) => api(`/api/gallery/${category.id}`).catch(() => null)),
@@ -91,7 +91,7 @@ const { data: pool } = await useAsyncData(
     return details.flatMap((detail, index) => {
       const { id, title, images_count, videos_count } = list[index]
 
-      return (detail?.data?.items ?? [])
+      return asList(detail?.data?.items)
         .filter((item) => item.type === 'image' && item.image?.image_api)
         .map((item) => ({ ...item, category: { id, title, images_count, videos_count } }))
     })

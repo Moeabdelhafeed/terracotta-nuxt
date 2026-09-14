@@ -14,7 +14,10 @@ export const useLang = (group = 'web', subGroup = 'general') => {
   const { data: langsData, refresh: refreshLanguages } = useApiFetch('/api/languages', {
     key: 'languages'
   })
-  const languages = computed(() => langsData.value?.data ?? [])
+  // `?? []` is not enough: a failed or fronted `/api/languages` answers with an envelope
+  // whose `data` is an object, and `.find` on it takes the whole server render down with a
+  // 500 — recoverable only by a client-side navigation, which is why it looked intermittent.
+  const languages = computed(() => (Array.isArray(langsData.value?.data) ? langsData.value.data : []))
   const defaultLanguage = computed(
     () => languages.value.find((l) => l.is_default) ?? languages.value[0] ?? null
   )

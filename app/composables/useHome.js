@@ -18,10 +18,10 @@ export const useHome = () => {
 
   return {
     home,
-    banners: computed(() => home.value.banners ?? []),
-    categories: computed(() => home.value.categories ?? []),
-    featuredProducts: computed(() => home.value.featured_products ?? []),
-    offers: computed(() => home.value.offers ?? []),
+    banners: computed(() => asList(home.value.banners)),
+    categories: computed(() => asList(home.value.categories)),
+    featuredProducts: computed(() => asList(home.value.featured_products)),
+    offers: computed(() => asList(home.value.offers)),
     currentBooking: computed(() => home.value.current_booking ?? null),
     pending,
     error,
@@ -37,12 +37,12 @@ export const useWorkshops = () => {
   const { data, pending, error, refresh } = useApiFetch('/api/workshops', {
     key: 'workshops',
     // The endpoint paginates, so the list may arrive wrapped in a paginator.
-    transform: (res) => res?.data?.data ?? res?.data ?? [],
+    transform: (res) => asList(res?.data?.data ?? res?.data),
     default: () => [],
     watch: [lang, i18nLocale],
   })
 
-  return { workshops: computed(() => data.value ?? []), pending, error, refresh }
+  return { workshops: computed(() => asList(data.value)), pending, error, refresh }
 }
 
 /** Gallery categories with their cover image and item counts. */
@@ -52,12 +52,12 @@ export const useGallery = () => {
 
   const { data, pending, error, refresh } = useApiFetch('/api/gallery', {
     key: 'gallery',
-    transform: (res) => res?.data ?? [],
+    transform: (res) => asList(res?.data),
     default: () => [],
     watch: [lang, i18nLocale],
   })
 
-  return { categories: computed(() => data.value ?? []), pending, error, refresh }
+  return { categories: computed(() => asList(data.value)), pending, error, refresh }
 }
 
 /** Prices arrive as decimal strings ("45.00"); show them the way the app does. */

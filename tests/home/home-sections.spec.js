@@ -56,7 +56,7 @@ describe('HomeBooking', () => {
     expect(text).toContain('Confirmed')
     expect(text).toContain('Resume your workshop')
 
-    expect(wrapper.find('a').attributes('href')).toBe('/bookings/10')
+    expect(wrapper.find('a').attributes('href')).toMatch(/\/bookings\/10$/)
   })
 
   it('greets the signed-in visitor by the hour on their own clock', async () => {

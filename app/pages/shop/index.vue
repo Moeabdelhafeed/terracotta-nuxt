@@ -137,7 +137,7 @@
       </ul>
 
       <p v-else class="text-muted-foreground">
-        {{ t("nothing_here", "Nothing here yet.", "لا يوجد شيء بعد.") }}
+        {{ t("nothing_here", "Nothing here yet.", "لا يوجد شيء هنا بعد") }}
       </p>
 
       <!-- Real links, so a page is shareable and crawlable rather than a click handler. -->

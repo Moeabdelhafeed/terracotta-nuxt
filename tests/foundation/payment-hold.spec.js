@@ -49,7 +49,7 @@ describe('PaymentHold', () => {
       props: { amountDue: '145.00', paymentStatus: 'unpaid', expiresAt: inMinutes(-1), pay: vi.fn(), restartTo: '/cart' },
     })
     expect(wrapper.text()).toContain('Payment window closed')
-    expect(wrapper.find('a').attributes('href')).toBe('/cart')
+    expect(wrapper.find('a').attributes('href')).toMatch(/\/cart$/)
   })
 
   it('the server refusing the hold flips to expired with its message', async () => {

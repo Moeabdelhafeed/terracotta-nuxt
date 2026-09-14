@@ -17,195 +17,318 @@
     <!-- Only once the wrapper is off, and only for a gift there is still something to
          celebrate about — paper over "already claimed" would be a joke at the reader's
          expense. -->
-    <AppConfetti v-if="celebrate && gift?.is_claimable" @done="celebrate = false" />
+    <AppConfetti
+      v-if="celebrate && gift?.is_claimable"
+      @done="celebrate = false"
+    />
 
-  <main ref="root" class="relative isolate flex min-h-svh flex-col items-center justify-center overflow-hidden bg-[#FC8B8B] px-6 py-16 text-white">
-    <!-- The line the rest of the site is drawn with. Decorative only. -->
-    <svg
-      class="pointer-events-none absolute inset-0 -z-10 h-full w-full text-white/40"
-      viewBox="0 0 1601 922"
-      fill="none"
-      preserveAspectRatio="xMidYMid slice"
-      aria-hidden="true"
+    <main
+      ref="root"
+      class="relative isolate flex min-h-svh flex-col items-center justify-center overflow-hidden bg-[#FC8B8B] px-6 py-16 text-white"
     >
-      <path
-        d="M533.499 -308.5C561.499 -140.5 487.899 246.8 -30.5009 452C-678.501 708.5 240.999 -304.5 884.499 -146.5C1528 11.5 1738 466.5 1512 1153.5C1286 1840.5 349.5 489.5 -89.5 497.5"
-        stroke="currentColor"
-        stroke-width="2"
-        vector-effect="non-scaling-stroke"
+      <!-- The line the rest of the site is drawn with. Decorative only. -->
+      <svg
+        class="pointer-events-none absolute inset-0 -z-10 h-full w-full text-white/40"
+        viewBox="0 0 1601 922"
+        fill="none"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        <path
+          d="M533.499 -308.5C561.499 -140.5 487.899 246.8 -30.5009 452C-678.501 708.5 240.999 -304.5 884.499 -146.5C1528 11.5 1738 466.5 1512 1153.5C1286 1840.5 349.5 489.5 -89.5 497.5"
+          stroke="currentColor"
+          stroke-width="2"
+          vector-effect="non-scaling-stroke"
+        />
+      </svg>
+
+      <AppMedia
+        v-if="logo"
+        ref="mark"
+        :src="logo"
+        alt=""
+        class="h-14 w-auto object-contain sm:h-16"
       />
-    </svg>
 
-    <AppMedia v-if="logo" ref="mark" :src="logo" alt="" class="h-14 w-auto object-contain sm:h-16" />
-
-    <div ref="card" class="mt-8 w-full max-w-md rounded-[2rem] bg-background p-8 text-center text-foreground shadow-2xl sm:p-10">
-      <!-- The gift itself. Shown whether or not it can still be claimed: the buyer may be
+      <div
+        ref="card"
+        class="mt-8 w-full max-w-md rounded-[2rem] bg-background p-8 text-center text-foreground shadow-2xl sm:p-10"
+      >
+        <!-- The gift itself. Shown whether or not it can still be claimed: the buyer may be
            checking it landed, or the recipient re-opening their own link. -->
-      <template v-if="gift">
-        <p class="text-sm text-muted-foreground">
-          {{ gift.from
-            ? t('gift_from', ':name sent you a gift', ':name أرسل لك هدية', { name: gift.from })
-            : t('gift_from_someone', 'You have been sent a gift', 'وصلتك هدية') }}
-        </p>
+        <template v-if="gift">
+          <p class="text-sm text-muted-foreground">
+            {{
+              gift.from
+                ? t(
+                    "gift_from",
+                    ":name sent you a gift",
+                    ":name أرسل لك هدية",
+                    { name: gift.from },
+                  )
+                : t(
+                    "gift_from_someone",
+                    "You have been sent a gift",
+                    "وصلتك هدية",
+                  )
+            }}
+          </p>
 
-        <p class="mt-4 font-display text-5xl font-black leading-none text-[#FC8B8B]">
-          {{ format(gift.amount) }}
-        </p>
+          <p
+            class="mt-4 font-display text-5xl font-black leading-none text-[#FC8B8B]"
+          >
+            {{ format(gift.amount) }}
+          </p>
 
-        <!-- The buyer's own words, rendered as written — never translated. -->
-        <p v-if="gift.message" class="mt-6 text-lg leading-relaxed break-words">“{{ gift.message }}”</p>
+          <!-- The buyer's own words, rendered as written — never translated. -->
+          <p
+            v-if="gift.message"
+            class="mt-6 text-lg leading-relaxed break-words"
+          >
+            “{{ gift.message }}”
+          </p>
 
-        <p v-if="gift.recipient_name" class="mt-4 text-sm text-muted-foreground">
-          {{ t('gift_to', 'For :name', 'إلى :name', { name: gift.recipient_name }) }}
-        </p>
+          <p
+            v-if="gift.recipient_name"
+            class="mt-4 text-sm text-muted-foreground"
+          >
+            {{
+              t("gift_to", "For :name", "إلى :name", {
+                name: gift.recipient_name,
+              })
+            }}
+          </p>
 
-        <div class="my-8 h-px bg-border" />
+          <div class="my-8 h-px bg-border" />
 
-        <!-- Just claimed, by this visitor. Shown before the "already claimed" branch on
+          <!-- Just claimed, by this visitor. Shown before the "already claimed" branch on
              purpose: the API now says the gift is spent, and telling the person who spent
              it that somebody else got there first would be a lie. -->
-        <div v-if="credited" class="flex flex-col gap-4">
-          <p class="rounded-2xl bg-brand-green/10 px-4 py-4 text-sm font-medium text-brand-green">
-            {{ t('gift_redeem_done', ':amount has been added to your wallet.', 'تمت إضافة :amount إلى محفظتك.', { amount: format(credited.amount) }) }}
-          </p>
-          <p class="font-display text-3xl font-black text-foreground">{{ format(credited.wallet_balance) }}</p>
-          <p class="text-xs text-muted-foreground">{{ t('gift_wallet_balance', 'Your wallet balance', 'رصيد محفظتك') }}</p>
-          <Button as-child size="lg" class="h-14 w-full rounded-2xl bg-[#FC8B8B] text-base text-white hover:bg-[#fb7a7a]">
-            <NuxtLink to="/wallet">{{ t('gift_go_wallet', 'Go to my wallet', 'الذهاب إلى محفظتي') }}</NuxtLink>
-          </Button>
-        </div>
-
-        <!-- Claimed: say so plainly and drop the buttons. Who claimed it is not in the
-             response, deliberately. -->
-        <p
-          v-else-if="!gift.is_claimable"
-          class="rounded-2xl bg-brand-rust/10 px-4 py-4 text-sm font-medium text-brand-rust"
-        >
-          {{ t('gift_claimed', 'This gift has already been claimed.', 'تم استلام هذه الهدية بالفعل.') }}
-        </p>
-
-        <template v-else>
-          <!-- The credit lands in a wallet, so there has to be a wallet: a signed-in
-               registered account. A guest session has no ledger of its own. -->
-          <Button
-            v-if="canRedeem"
-            size="lg"
-            class="h-14 w-full rounded-2xl bg-[#FC8B8B] text-base text-white hover:bg-[#fb7a7a]"
-            :disabled="redeeming"
-            @click="claim"
-          >
-            {{ redeeming ? t('please_wait', 'Please wait...', 'يرجى الانتظار...') : t('gift_redeem', 'Claim your gift', 'استلام الهدية') }}
-          </Button>
-
-          <Button
-            v-else
-            size="lg"
-            class="h-14 w-full rounded-2xl bg-[#FC8B8B] text-base text-white hover:bg-[#fb7a7a]"
-            @click="goSignIn"
-          >
-            {{ t('gift_redeem_sign_in', 'Sign in to claim your gift', 'سجّل الدخول لاستلام الهدية') }}
-          </Button>
-
-          <!-- The server's own words: it is the only thing that knows whether this gift is
-               already spent, unpaid, or the buyer's own. -->
-          <p v-if="redeemError" class="mt-4 text-sm text-destructive">{{ redeemError }}</p>
-
-          <!-- A phone only: the scheme means nothing on a desktop. -->
-          <Button
-            v-if="appLink"
-            variant="outline"
-            size="lg"
-            class="mt-3 h-12 w-full rounded-2xl text-base"
-            @click="openInApp"
-          >
-            {{ t('gift_open_in_app', 'Open in the app', 'افتح في التطبيق') }}
-          </Button>
-
-          <div v-if="gift.store_links?.length" class="mt-6">
-            <p class="text-xs text-muted-foreground">
-              {{ t('gift_get_app', 'Do not have the app yet?', 'ليس لديك التطبيق بعد؟') }}
+          <div v-if="credited" class="flex flex-col gap-4">
+            <p
+              class="rounded-2xl bg-brand-green/10 px-4 py-4 text-sm font-medium text-brand-green"
+            >
+              {{
+                t(
+                  "gift_redeem_done",
+                  ":amount has been added to your wallet.",
+                  "تمت إضافة :amount إلى محفظتك.",
+                  { amount: format(credited.amount) },
+                )
+              }}
             </p>
-            <ul class="mt-3 flex flex-wrap items-center justify-center gap-3">
-              <li v-for="link in gift.store_links" :key="link.type">
-                <a
-                  :href="link.url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex h-11 items-center rounded-xl border px-4 text-sm font-medium transition-colors hover:bg-brand-mist"
-                >{{ storeLabel(link.type) }}</a>
-              </li>
-            </ul>
+            <p class="font-display text-3xl font-black text-foreground">
+              {{ format(credited.wallet_balance) }}
+            </p>
+            <p class="text-xs text-muted-foreground">
+              {{
+                t("gift_wallet_balance", "Your wallet balance", "رصيد محفظتك")
+              }}
+            </p>
+            <Button
+              as-child
+              size="lg"
+              class="h-14 w-full rounded-2xl bg-[#FC8B8B] text-base text-white hover:bg-[#fb7a7a]"
+            >
+              <NuxtLink to="/wallet">{{
+                t("gift_go_wallet", "Go to my wallet", "الذهاب إلى محفظتي")
+              }}</NuxtLink>
+            </Button>
           </div>
+
+          <!-- Claimed: say so plainly and drop the buttons. Who claimed it is not in the
+             response, deliberately. -->
+          <p
+            v-else-if="!gift.is_claimable"
+            class="rounded-2xl bg-brand-rust/10 px-4 py-4 text-sm font-medium text-brand-rust"
+          >
+            {{
+              t(
+                "gift_claimed",
+                "This gift has already been claimed.",
+                "تم استلام هذه الهدية من قبل.",
+              )
+            }}
+          </p>
+
+          <template v-else>
+            <!-- The credit lands in a wallet, so there has to be a wallet: a signed-in
+               registered account. A guest session has no ledger of its own. -->
+            <Button
+              v-if="canRedeem"
+              size="lg"
+              class="h-14 w-full rounded-2xl bg-[#FC8B8B] text-base text-white hover:bg-[#fb7a7a]"
+              :disabled="redeeming"
+              @click="claim"
+            >
+              {{
+                redeeming
+                  ? t("please_wait", "Please wait...", "يرجى الانتظار...")
+                  : t("gift_redeem", "Claim your gift", "استلام الهدية")
+              }}
+            </Button>
+
+            <Button
+              v-else
+              size="lg"
+              class="h-14 w-full rounded-2xl bg-[#FC8B8B] text-base text-white hover:bg-[#fb7a7a]"
+              @click="goSignIn"
+            >
+              {{
+                t(
+                  "gift_redeem_sign_in",
+                  "Sign in to claim your gift",
+                  "سجّل الدخول لاستلام الهدية",
+                )
+              }}
+            </Button>
+
+            <!-- The server's own words: it is the only thing that knows whether this gift is
+               already spent, unpaid, or the buyer's own. -->
+            <p v-if="redeemError" class="mt-4 text-sm text-destructive">
+              {{ redeemError }}
+            </p>
+
+            <!-- A phone only: the scheme means nothing on a desktop. -->
+            <Button
+              v-if="appLink"
+              variant="outline"
+              size="lg"
+              class="mt-3 h-12 w-full rounded-2xl text-base"
+              @click="openInApp"
+            >
+              {{ t("gift_open_in_app", "Open in the app", "افتح في التطبيق") }}
+            </Button>
+
+            <div v-if="gift.store_links?.length" class="mt-6">
+              <p class="text-xs text-muted-foreground">
+                {{
+                  t(
+                    "gift_get_app",
+                    "Do not have the app yet?",
+                    "ليس لديك التطبيق بعد؟",
+                  )
+                }}
+              </p>
+              <ul class="mt-3 flex flex-wrap items-center justify-center gap-3">
+                <li v-for="link in gift.store_links" :key="link.type">
+                  <a
+                    :href="link.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex h-11 items-center rounded-xl border px-4 text-sm font-medium transition-colors hover:bg-brand-mist"
+                    >{{ storeLabel(link.type) }}</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </template>
         </template>
-      </template>
 
-      <!-- An unknown token, or a gift the buyer never paid for. The API does not tell the
+        <!-- An unknown token, or a gift the buyer never paid for. The API does not tell the
            two apart, and neither does this. -->
-      <template v-else-if="notFound">
-        <h1 class="font-display text-2xl font-semibold">
-          {{ t('gift_invalid_title', "This gift link isn't valid", 'رابط الهدية غير صالح') }}
-        </h1>
-        <p class="mt-3 text-sm text-muted-foreground">
-          {{ t('gift_invalid_body', 'Check the link you were sent, or ask whoever sent it.', 'تأكد من الرابط الذي وصلك، أو اسأل من أرسله.') }}
-        </p>
-      </template>
+        <template v-else-if="notFound">
+          <h1 class="font-display text-2xl font-semibold">
+            {{
+              t(
+                "gift_invalid_title",
+                "This gift link isn't valid",
+                "رابط الهدية غير صالح",
+              )
+            }}
+          </h1>
+          <p class="mt-3 text-sm text-muted-foreground">
+            {{
+              t(
+                "gift_invalid_body",
+                "Check the link you were sent, or ask whoever sent it.",
+                "تأكد من الرابط الذي وصلك، أو اسأل من أرسله.",
+              )
+            }}
+          </p>
+        </template>
 
-      <!-- Never an empty gift shell: "you have been sent 0.00" reads worse than an error. -->
-      <template v-else>
-        <h1 class="font-display text-2xl font-semibold">
-          {{ t('gift_error_title', 'We could not open this gift', 'تعذّر فتح الهدية') }}
-        </h1>
-        <p class="mt-3 text-sm text-muted-foreground">
-          {{ t('gift_error_body', 'Something went wrong on our side. Try again in a moment.', 'حدث خطأ لدينا. حاول مرة أخرى بعد قليل.') }}
-        </p>
-        <Button variant="outline" class="mt-6 h-12 rounded-xl px-8" @click="refresh()">
-          {{ t('try_again', 'Try again', 'حاول مرة أخرى') }}
-        </Button>
-      </template>
-    </div>
+        <!-- Never an empty gift shell: "you have been sent 0.00" reads worse than an error. -->
+        <template v-else>
+          <h1 class="font-display text-2xl font-semibold">
+            {{
+              t(
+                "gift_error_title",
+                "We could not open this gift",
+                "تعذّر فتح الهدية",
+              )
+            }}
+          </h1>
+          <p class="mt-3 text-sm text-muted-foreground">
+            {{
+              t(
+                "gift_error_body",
+                "Something went wrong on our side. Try again in a moment.",
+                "حدث خطأ لدينا. حاول مرة أخرى بعد قليل.",
+              )
+            }}
+          </p>
+          <Button
+            variant="outline"
+            class="mt-6 h-12 rounded-xl px-8"
+            @click="refresh()"
+          >
+            {{ t("try_again", "Try again", "حاول مرة أخرى") }}
+          </Button>
+        </template>
+      </div>
 
-    <NuxtLink to="/" class="mt-8 text-sm text-white/80 underline-offset-4 transition-colors hover:text-white hover:underline">
-      {{ t('gift_explore', 'See what Terracotta makes', 'تعرّف على تيراكوتا') }}
-    </NuxtLink>
-  </main>
+      <NuxtLink
+        to="/"
+        class="mt-8 text-sm text-white/80 underline-offset-4 transition-colors hover:text-white hover:underline"
+      >
+        {{
+          t("gift_explore", "See what Terracotta makes", "تعرّف على تيراكوتا")
+        }}
+      </NuxtLink>
+    </main>
   </div>
 </template>
 
 <script setup>
 definePageMeta({
   // No site chrome: the recipient followed a link to one thing.
-  layout: 'bare',
-})
+  layout: "bare",
+});
 
 // The gift page has a ground of its own, unlike the rest of the site. Set on the body too
 // so an overscroll bounce does not flash white behind it.
-useHead({ bodyAttrs: { class: 'bg-[#FC8B8B]' } })
+useHead({ bodyAttrs: { class: "bg-[#FC8B8B]" } });
 
-const route = useRoute()
-const { t } = useLang('web', 'home')
-const { format } = usePrice()
-const { mediaAsset } = useMedia('web', 'branding')
+const route = useRoute();
+const { t } = useLang("web", "home");
+const { format } = usePrice();
+const { mediaAsset } = useMedia("web", "branding");
 
 // Everything sitting directly on the pink is white, the mark included.
-const logo = computed(() => mediaAsset('logo_light', '/logo-light.png'))
+const logo = computed(() => mediaAsset("logo_light", "/logo-light.png"));
 
 /**
  * Server-rendered on purpose: WhatsApp and iMessage fetch the link to build a preview
  * card and run no JavaScript. The call goes to our own server route, which holds the API
  * token — see server/api/gift/[token].get.js.
  */
-const { data: gift, error, refresh } = await useFetch(() => `/api/gift/${route.params.token}`, {
+const {
+  data: gift,
+  error,
+  refresh,
+} = await useFetch(() => `/api/gift/${route.params.token}`, {
   key: () => `gift-${route.params.token}`,
-})
+});
 
-const notFound = computed(() => error.value?.statusCode === 404)
+const notFound = computed(() => error.value?.statusCode === 404);
 
 /**
  * Claiming. The face amount lands in the redeemer's wallet — not what the buyer paid,
  * which this page never sees — and it happens exactly once, so the button is disabled for
  * the duration of the call and the server is the authority on every refusal.
  */
-const { redeem } = useGifts()
+const { redeem } = useGifts();
 
 /**
  * "Open in the app". `deep_link` is the custom scheme (`terracotta://gift/{token}`) the
@@ -213,52 +336,56 @@ const { redeem } = useGifts()
  * it is not — no error, no event. So the page waits a moment and, if it is still the one
  * in front, sends the visitor to the store for their platform instead.
  */
-const { platform } = useDevice()
+const { platform } = useDevice();
 
-const appLink = computed(() => (
-  ['ios', 'android'].includes(platform.value) ? gift.value?.deep_link ?? null : null
-))
+const appLink = computed(() =>
+  ["ios", "android"].includes(platform.value)
+    ? (gift.value?.deep_link ?? null)
+    : null,
+);
 
-const storeFor = (device) => gift.value?.store_links
-  ?.find((link) => link.type === (device === 'ios' ? 'app_store' : 'google_play'))?.url
+const storeFor = (device) =>
+  gift.value?.store_links?.find(
+    (link) => link.type === (device === "ios" ? "app_store" : "google_play"),
+  )?.url;
 
 const openInApp = () => {
-  const store = storeFor(platform.value)
-  window.location.href = appLink.value
-  if (!store) return
+  const store = storeFor(platform.value);
+  window.location.href = appLink.value;
+  if (!store) return;
   setTimeout(() => {
-    if (document.visibilityState === 'visible') window.location.href = store
-  }, 1500)
-}
+    if (document.visibilityState === "visible") window.location.href = store;
+  }, 1500);
+};
 
 // A guest session is an anonymous device, not an account with a ledger — it cannot hold
 // wallet credit, so it is sent through sign-in like a visitor with no session at all.
-const { isRegistered: canRedeem } = useIsRegistered()
+const { isRegistered: canRedeem } = useIsRegistered();
 
-const redeeming = ref(false)
-const redeemError = ref('')
-const credited = ref(null)
+const redeeming = ref(false);
+const redeemError = ref("");
+const credited = ref(null);
 
 const claim = async () => {
-  if (redeeming.value) return
-  redeeming.value = true
-  redeemError.value = ''
+  if (redeeming.value) return;
+  redeeming.value = true;
+  redeemError.value = "";
   try {
-    const res = await redeem(route.params.token)
-    credited.value = res?.data ?? null
-    celebrate.value = true
+    const res = await redeem(route.params.token);
+    credited.value = res?.data ?? null;
+    celebrate.value = true;
   } catch (err) {
-    const normalized = normalizeApiError(err)
+    const normalized = normalizeApiError(err);
     // `errors.gift` carries all four refusals — already redeemed, not paid, your own
     // gift, gifting switched off — already localized.
-    redeemError.value = fieldError(normalized, 'gift') || normalized.message
+    redeemError.value = fieldError(normalized, "gift") || normalized.message;
     // Someone else may have claimed it in the meantime; let the server's fresh answer
     // redraw the page rather than leaving a live-looking button under the error.
-    await refresh()
+    await refresh();
   } finally {
-    redeeming.value = false
+    redeeming.value = false;
   }
-}
+};
 
 /**
  * Login has no `redirect` of its own — it lands on the home page — so the intent is
@@ -267,45 +394,54 @@ const claim = async () => {
  * working the day login honours it.
  */
 const goSignIn = () => {
-  rememberPendingGift(route.params.token)
-  return navigateTo({ path: '/login', query: { redirect: `/gift/${route.params.token}` } })
-}
+  rememberPendingGift(route.params.token);
+  return navigateTo({
+    path: "/login",
+    query: { redirect: `/gift/${route.params.token}` },
+  });
+};
 
 onMounted(() => {
-  if (canRedeem.value && gift.value?.is_claimable && takePendingGift(route.params.token)) claim()
-})
+  if (
+    canRedeem.value &&
+    gift.value?.is_claimable &&
+    takePendingGift(route.params.token)
+  )
+    claim();
+});
 
-const storeLabel = (type) => ({
-  app_store: t('app_store', 'App Store', 'آب ستور'),
-  google_play: t('google_play', 'Google Play', 'جوجل بلاي'),
-  app_gallery: t('app_gallery', 'AppGallery', 'آب جاليري'),
-}[type] ?? type)
+const storeLabel = (type) =>
+  ({
+    app_store: t("app_store", "App Store", "آب ستور"),
+    google_play: t("google_play", "Google Play", "جوجل بلاي"),
+    app_gallery: t("app_gallery", "AppGallery", "آب جاليري"),
+  })[type] ?? type;
 
-const celebrate = ref(false)
+const celebrate = ref(false);
 
-const root = ref(null)
-const mark = ref(null)
-const card = ref(null)
+const root = ref(null);
+const mark = ref(null);
+const card = ref(null);
 
 onMounted(() => {
-  const gsap = useGSAP()
-  const mm = gsap.matchMedia()
+  const gsap = useGSAP();
+  const mm = gsap.matchMedia();
 
   // The card arrives rather than appearing — the one flourish the page gets, and only for
   // visitors who have not asked for less motion.
-  mm.add('(prefers-reduced-motion: no-preference)', () => {
+  mm.add("(prefers-reduced-motion: no-preference)", () => {
     gsap.from([mark.value?.$el ?? mark.value, card.value], {
       opacity: 0,
       y: 28,
       scale: 0.97,
       duration: 0.7,
       stagger: 0.12,
-      ease: 'power2.out',
-    })
-  })
+      ease: "power2.out",
+    });
+  });
 
-  onBeforeUnmount(() => mm.revert())
-})
+  onBeforeUnmount(() => mm.revert());
+});
 
 /**
  * The token is the entitlement — whoever holds it can claim the gift — and previews get
@@ -313,16 +449,34 @@ onMounted(() => {
  * generically rather than as a live offer, and the page is never indexed.
  */
 const previewTitle = computed(() => {
-  if (!gift.value?.is_claimable) return t('gift_generic_title', 'A gift from Terracotta', 'هدية من تيراكوتا')
+  if (!gift.value?.is_claimable)
+    return t(
+      "gift_generic_title",
+      "A gift from Terracotta",
+      "هدية من تيراكوتا",
+    );
 
   return gift.value.from
-    ? t('gift_from', ':name sent you a gift', ':name أرسل لك هدية', { name: gift.value.from })
-    : t('gift_from_someone', 'You have been sent a gift', 'وصلتك هدية')
-})
+    ? t("gift_from", ":name sent you a gift", ":name أرسل لك هدية", {
+        name: gift.value.from,
+      })
+    : t("gift_from_someone", "You have been sent a gift", "وصلتك هدية");
+});
 
-const previewDescription = computed(() => (gift.value?.is_claimable
-  ? t('gift_og_description', 'A :amount gift from Terracotta', 'هدية بقيمة :amount من تيراكوتا', { amount: format(gift.value.amount) })
-  : t('gift_og_generic', 'Handmade pottery, workshops and pieces from our studio.', 'فخار مصنوع يدويًا، ورشات وقطع من الاستوديو.')))
+const previewDescription = computed(() =>
+  gift.value?.is_claimable
+    ? t(
+        "gift_og_description",
+        "A :amount gift from Terracotta",
+        "هدية بقيمة :amount من تيراكوتا",
+        { amount: format(gift.value.amount) },
+      )
+    : t(
+        "gift_og_generic",
+        "Handmade pottery, workshops and pieces from our studio.",
+        "فخار مصنوع يدويًا، ورشات وقطع من الاستوديو.",
+      ),
+);
 
 /**
  * The card WhatsApp and iMessage draw when the link is pasted. They fetch the page with no
@@ -332,24 +486,24 @@ const previewDescription = computed(() => (gift.value?.is_claimable
  * The card itself is generic: previews get screenshotted and forwarded, and possession of
  * the token is the entitlement, so it never appears in a tag.
  */
-const previewCard = `${useSiteConfig().url}/og-gift.png`
+const previewCard = `${useSiteConfig().url}/og-gift.png`;
 
 useSeoMeta({
-  robots: 'noindex, nofollow',
+  robots: "noindex, nofollow",
   title: () => previewTitle.value,
   ogTitle: () => previewTitle.value,
   description: () => previewDescription.value,
   ogDescription: () => previewDescription.value,
-  ogType: 'website',
+  ogType: "website",
   ogImage: previewCard,
   ogImageSecureUrl: previewCard,
-  ogImageType: 'image/png',
+  ogImageType: "image/png",
   ogImageWidth: 1200,
   ogImageHeight: 630,
   ogImageAlt: () => previewTitle.value,
-  twitterCard: 'summary_large_image',
+  twitterCard: "summary_large_image",
   twitterImage: previewCard,
   twitterTitle: () => previewTitle.value,
   twitterDescription: () => previewDescription.value,
-})
+});
 </script>

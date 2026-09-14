@@ -17,11 +17,11 @@ export const useAppSettings = () => {
   })
 
   const blocks = computed(() => data.value ?? {})
-  const social = computed(() => blocks.value.social ?? [])
-  const contact = computed(() => blocks.value.contact ?? [])
-  const appStore = computed(() => blocks.value.app_store ?? [])
-  const googlePlay = computed(() => blocks.value.google_play ?? [])
-  const appGallery = computed(() => blocks.value.app_gallery ?? [])
+  const social = computed(() => asList(blocks.value.social))
+  const contact = computed(() => asList(blocks.value.contact))
+  const appStore = computed(() => asList(blocks.value.app_store))
+  const googlePlay = computed(() => asList(blocks.value.google_play))
+  const appGallery = computed(() => asList(blocks.value.app_gallery))
 
   /**
    * The legal identifiers a Saudi storefront has to display: `{ cr_number, vat_number,

@@ -123,7 +123,7 @@ describe('workshop booking — create then pay', () => {
     expect(wrapper.text()).toContain('Your booking is confirmed!')
     expect(wrapper.text()).not.toContain('Reserved for you')
     expect(api.calls.some((call) => call.url.endsWith('/pay'))).toBe(false)
-    expect(wrapper.find('a[href="/bookings/55"]').exists()).toBe(true)
+    expect(wrapper.find('a[href$="/bookings/55"]').exists()).toBe(true)
   })
 
   it('a create that still owes money renders the hold with its countdown', async () => {

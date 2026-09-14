@@ -9,14 +9,16 @@
  * silently promotes a guest to registered when it is not; check both shapes.
  */
 export const useIsRegistered = () => {
-  const { user, isAuthenticated } = useSanctumAuth()
+  const { user, isAuthenticated } = useSanctumAuth();
 
-  const account = computed(() => user.value?.data ?? user.value ?? null)
-  const isGuest = computed(() => !!(account.value?.is_guest))
+  const account = computed(() => user.value?.data ?? user.value ?? null);
+  const isGuest = computed(() => !!account.value?.is_guest);
 
   return {
     account,
     isGuest,
-    isRegistered: computed(() => !!user.value && isAuthenticated.value !== false && !isGuest.value),
-  }
-}
+    isRegistered: computed(
+      () => !!user.value && isAuthenticated.value !== false && !isGuest.value,
+    ),
+  };
+};

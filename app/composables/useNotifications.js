@@ -62,7 +62,7 @@ export const useNotifications = ({ page = ref(1), perPage = 20, unreadOnly = ref
   }
 
   return {
-    notifications: computed(() => data.value?.items ?? []),
+    notifications: computed(() => asList(data.value?.items)),
     unreadCount,
     lastPage: computed(() => data.value?.lastPage ?? 1),
     total: computed(() => data.value?.total ?? 0),

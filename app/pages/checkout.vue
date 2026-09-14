@@ -63,7 +63,7 @@
         <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-rust/10 text-brand-rust">
           <LucideShoppingBag class="size-6" />
         </span>
-        <p class="mt-4 font-display text-xl font-semibold">{{ t('cart_empty_title', 'Your cart is empty', 'عربيتك فارغة', { subGroup: 'shop' }) }}</p>
+        <p class="mt-4 font-display text-xl font-semibold">{{ t('cart_empty_title', 'Your cart is empty', 'عربيتك فاضية', { subGroup: 'shop' }) }}</p>
         <p class="mt-2 text-sm text-muted-foreground">{{ t('checkout_empty_body', 'There is nothing to pay for yet.', 'لا يوجد ما يُدفع بعد.') }}</p>
         <Button as-child class="mt-6 h-12 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90">
           <NuxtLink to="/shop">{{ t('browse_shop', 'Browse the shop', 'تصفح المتجر', { subGroup: 'shop' }) }}</NuxtLink>

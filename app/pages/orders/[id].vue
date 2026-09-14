@@ -74,7 +74,7 @@
                   class="mt-4 flex items-center gap-2 text-sm font-medium text-brand-rust underline-offset-4 hover:underline"
                 >
                   <LucideMapPin class="size-4" />
-                  {{ t('open_in_maps', 'Open in maps', 'فتح في الخرائط') }}
+                  {{ t('open_in_maps', 'Open in maps', 'افتح في الخرائط') }}
                 </a>
               </section>
             </div>

@@ -20,29 +20,33 @@
  */
 const props = defineProps({
   src: { type: [Object, String], default: null },
-  alt: { type: String, default: '' },
-})
+  alt: { type: String, default: "" },
+});
 
-const url = computed(() => (typeof props.src === 'string' ? props.src : props.src?.image_api ?? null))
-const hash = computed(() => (typeof props.src === 'string' ? null : props.src?.blurhash ?? null))
+const url = computed(() =>
+  typeof props.src === "string" ? props.src : (props.src?.image_api ?? null),
+);
+const hash = computed(() =>
+  typeof props.src === "string" ? null : (props.src?.blurhash ?? null),
+);
 
-const img = ref(null)
-const loaded = ref(false)
-const { placeholderStyle } = useBlurhash(hash)
+const img = ref(null);
+const loaded = ref(false);
+const { placeholderStyle } = useBlurhash(hash);
 
 // The <img> ships in the SSR HTML, so a cached file is usually decoded before Vue
 // hydrates and its `load` event fires with no listener attached. Without this check
 // the placeholder would sit behind the image forever — very visible on a logo with
 // transparency, which is exactly where it showed up.
 const syncLoaded = () => {
-  if (img.value?.complete && img.value.naturalWidth > 0) loaded.value = true
-}
+  if (img.value?.complete && img.value.naturalWidth > 0) loaded.value = true;
+};
 
-onMounted(syncLoaded)
+onMounted(syncLoaded);
 
 watch(url, async () => {
-  loaded.value = false
-  await nextTick()
-  syncLoaded()
-})
+  loaded.value = false;
+  await nextTick();
+  syncLoaded();
+});
 </script>

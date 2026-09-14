@@ -225,12 +225,12 @@
 
                   return [
                     {
-                      label: t("height", "Height", "الارتفاع"),
+                      label: t("height", "Height", "ارتفاع"),
                       value: cm(p.height),
                     },
-                    { label: t("width", "Width", "العرض"), value: cm(p.width) },
+                    { label: t("width", "Width", "عرض"), value: cm(p.width) },
                     {
-                      label: t("length", "Length", "الطول"),
+                      label: t("length", "Length", "طول"),
                       value: cm(p.length),
                     },
                   ].filter((row) => row.value);

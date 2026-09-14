@@ -22,7 +22,7 @@ const labels = computed(() => ({
   preparing: t('status_preparing', 'Being prepared', 'قيد التحضير'),
   ready: t('status_ready', 'Piece ready', 'القطعة جاهزة'),
   awaiting_pickup: t('status_awaiting_pickup', 'Ready for pickup', 'جاهزة للاستلام'),
-  getting_ready: t('status_getting_ready', 'Being packed', 'قيد التغليف'),
+  getting_ready: t('status_getting_ready', 'Being packed', 'قيد التجهيز'),
   on_the_way: t('status_on_the_way', 'Out for delivery', 'خرجت للتوصيل'),
   delivered: t('status_delivered', 'Delivered', 'مسلمة'),
   cancelled: t('status_cancelled', 'Cancelled', 'ملغاة'),

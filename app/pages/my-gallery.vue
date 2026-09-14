@@ -81,7 +81,7 @@ const { data, pending } = useApiFetch('/api/workshops/images', {
 })
 
 const photos = computed(() => {
-  const payload = data.value?.data ?? []
+  const payload = asList(data.value?.data)
   return Array.isArray(payload) ? payload : (payload.data ?? [])
 })
 

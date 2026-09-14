@@ -2,13 +2,24 @@
   <AuthScreen
     back="/forgot-password"
     :title="t('verify_otp', 'Enter the verification code', 'أدخل رمز التحقق')"
-    :subtitle="t('enter_otp_sent_to', 'We sent a code to :target.', 'أرسلنا رمزًا إلى :target.', { target: form.identifier })"
+    :subtitle="
+      t(
+        'enter_otp_sent_to',
+        'We sent a code to :target.',
+        'أرسلنا رمزًا إلى :target.',
+        { target: form.identifier },
+      )
+    "
   >
     <form class="flex flex-col gap-6" @submit.prevent="onSubmit">
       <div class="flex flex-col items-center gap-2">
         <AuthOtpInput v-model="form.otp" />
-        <span v-if="errors.otp" class="text-xs text-destructive">{{ errors.otp[0] }}</span>
-        <span v-if="errors.identifier" class="text-xs text-destructive">{{ errors.identifier[0] }}</span>
+        <span v-if="errors.otp" class="text-xs text-destructive">{{
+          errors.otp[0]
+        }}</span>
+        <span v-if="errors.identifier" class="text-xs text-destructive">{{
+          errors.identifier[0]
+        }}</span>
       </div>
       <Button
         type="submit"
@@ -16,7 +27,11 @@
         class="h-13 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
         :disabled="loading || resending || form.otp.length < 6"
       >
-        {{ loading ? t('verifying', 'Verifying...', 'جارٍ التحقق...') : t('verify', 'Verify', 'تحقق') }}
+        {{
+          loading
+            ? t("verifying", "Verifying...", "جارٍ التحقق...")
+            : t("verify", "Verify", "تحقق")
+        }}
       </Button>
       <button
         type="button"
@@ -24,7 +39,18 @@
         :disabled="cooldown > 0 || resending || loading"
         @click="resend"
       >
-        {{ resending ? t('sending', 'Sending...', 'جارٍ الإرسال...') : (cooldown > 0 ? t('resend_in_seconds', 'Resend in :seconds s', 'إعادة الإرسال خلال :seconds ث', { seconds: cooldown }) : t('resend_otp', 'Resend OTP', 'إعادة إرسال الرمز')) }}
+        {{
+          resending
+            ? t("sending", "Sending...", "جارٍ الإرسال...")
+            : cooldown > 0
+              ? t(
+                  "resend_in_seconds",
+                  "Resend in :seconds s",
+                  "إعادة الإرسال خلال :seconds ث",
+                  { seconds: cooldown },
+                )
+              : t("resend_otp", "Resend OTP", "إعادة إرسال الرمز")
+        }}
       </button>
     </form>
   </AuthScreen>
@@ -32,82 +58,86 @@
 
 <script setup>
 definePageMeta({
-  middleware: ['auth-mode', 'require-pre-auth', 'password-mode-only'],
-  name: 'forgot-password-verify'
-})
+  middleware: ["auth-mode", "require-pre-auth", "password-mode-only"],
+  name: "forgot-password-verify",
+});
 
-const RESEND_COOLDOWN = 120
+const RESEND_COOLDOWN = 120;
 
-const route = useRoute()
-const errors = ref({})
-const loading = ref(false)
-const resending = ref(false)
-const client = useApi()
-const { t } = useLang('web', 'auth')
+const route = useRoute();
+const errors = ref({});
+const loading = ref(false);
+const resending = ref(false);
+const client = useApi();
+const { t } = useLang("web", "auth");
 
 const form = ref({
-  identifier: route.query.identifier?.toString() ?? '',
+  identifier: route.query.identifier?.toString() ?? "",
   // Carried through the flow so every step declares the same identifier kind.
-  type: route.query.type?.toString() ?? '',
-  otp: ''
-})
+  type: route.query.type?.toString() ?? "",
+  otp: "",
+});
 
 if (!form.value.identifier) {
-  navigateTo({ name: 'forgot-password' })
+  navigateTo({ name: "forgot-password" });
 }
 
-const cooldown = ref(0)
-let timer = null
+const cooldown = ref(0);
+let timer = null;
 
 const startCooldown = () => {
-  cooldown.value = RESEND_COOLDOWN
-  if (timer) clearInterval(timer)
+  cooldown.value = RESEND_COOLDOWN;
+  if (timer) clearInterval(timer);
   timer = setInterval(() => {
-    cooldown.value--
+    cooldown.value--;
     if (cooldown.value <= 0) {
-      clearInterval(timer)
-      timer = null
+      clearInterval(timer);
+      timer = null;
     }
-  }, 1000)
-}
+  }, 1000);
+};
 
 onUnmounted(() => {
-  if (timer) clearInterval(timer)
-})
+  if (timer) clearInterval(timer);
+});
 
 const onSubmit = async () => {
-  errors.value = {}
-  loading.value = true
+  errors.value = {};
+  loading.value = true;
   try {
-    await client('/api/verify-forgot-password-otp', {
-      method: 'POST',
-      body: form.value
-    })
+    await client("/api/verify-forgot-password-otp", {
+      method: "POST",
+      body: form.value,
+    });
     navigateTo({
-      name: 'forgot-password-reset',
-      query: { identifier: form.value.identifier, type: form.value.type, otp: form.value.otp }
-    })
+      name: "forgot-password-reset",
+      query: {
+        identifier: form.value.identifier,
+        type: form.value.type,
+        otp: form.value.otp,
+      },
+    });
   } catch (error) {
-    errors.value = error.data?.errors ?? {}
+    errors.value = error.data?.errors ?? {};
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 const resend = async () => {
-  if (cooldown.value > 0 || resending.value) return
-  errors.value = {}
-  resending.value = true
+  if (cooldown.value > 0 || resending.value) return;
+  errors.value = {};
+  resending.value = true;
   try {
-    await client('/api/forgot-password', {
-      method: 'POST',
-      body: { identifier: form.value.identifier, type: form.value.type }
-    })
-    startCooldown()
+    await client("/api/forgot-password", {
+      method: "POST",
+      body: { identifier: form.value.identifier, type: form.value.type },
+    });
+    startCooldown();
   } catch (error) {
-    errors.value = error.data?.errors ?? {}
+    errors.value = error.data?.errors ?? {};
   } finally {
-    resending.value = false
+    resending.value = false;
   }
-}
+};
 </script>

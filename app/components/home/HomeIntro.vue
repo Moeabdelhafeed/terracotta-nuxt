@@ -4,7 +4,7 @@
       <button
         type="button"
         class="absolute top-3 flex size-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-brand-mist hover:text-foreground ltr:right-3 rtl:left-3"
-        :aria-label="t('dismiss', 'Dismiss', 'إغلاق')"
+        :aria-label="t('dismiss', 'Dismiss', 'تجاهل')"
         @click="dismiss"
       >
         <LucideX class="size-4" />

@@ -14,12 +14,12 @@ export const usePages = () => {
 
   const { data, pending, error, refresh } = useApiFetch('/api/pages', {
     key: 'pages',
-    transform: (res) => res?.data ?? [],
+    transform: (res) => asList(res?.data),
     default: () => [],
     watch: [lang, i18nLocale],
   })
 
-  const pages = computed(() => data.value ?? [])
+  const pages = computed(() => asList(data.value))
   const bySlug = (slug) => pages.value.find((p) => p.slug === slug)
 
   return { pages, bySlug, pending, error, refresh }

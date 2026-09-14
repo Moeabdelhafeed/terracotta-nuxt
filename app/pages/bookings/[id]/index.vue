@@ -69,7 +69,7 @@
                   size="icon"
                   variant="secondary"
                   class="absolute top-2 size-8 rounded-lg ltr:right-2 rtl:left-2"
-                  :aria-label="t('remove', 'Remove', 'حذف')"
+                  :aria-label="t('remove', 'Remove', 'إزالة')"
                   @click="removeImage(image.id)"
                 >
                   <LucideX class="size-4" />
@@ -345,7 +345,7 @@ const panel = computed(() => {
     getting_ready: {
       icon: resolveComponent('LucidePackage'),
       tone: 'bg-brand-rust/10 text-brand-rust',
-      title: t('panel_getting_ready_title', 'Being packed', 'قيد التغليف'),
+      title: t('panel_getting_ready_title', 'Being packed', 'قيد التجهيز'),
       body: t('panel_getting_ready_body', 'We are packing your piece carefully, ready for delivery.', 'جارٍ تغليف قطعتك وتجهيزها بعناية استعدادًا للتوصيل.'),
     },
     on_the_way: {

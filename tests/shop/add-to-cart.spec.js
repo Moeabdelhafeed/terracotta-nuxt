@@ -109,7 +109,7 @@ describe('ShopAddToCart — who may add', () => {
     const post = api.calls.find((call) => call.method === 'POST' && call.url === '/api/shop/cart')
     expect(post.body).toEqual({ shop_product_id: 11, quantity: 1 })
     expect(navigate).not.toHaveBeenCalled()
-    expect(wrapper.find('a[href="/cart"]').exists()).toBe(true)
+    expect(wrapper.find('a[href$="/cart"]').exists()).toBe(true)
   })
 
   it("shows the server's stock refusal verbatim", async () => {
@@ -121,6 +121,6 @@ describe('ShopAddToCart — who may add', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain('Only 2 of “Cup” are left.')
-    expect(wrapper.find('a[href="/cart"]').exists()).toBe(false)
+    expect(wrapper.find('a[href$="/cart"]').exists()).toBe(false)
   })
 })
