@@ -227,14 +227,33 @@
               :errors="discountErrors"
               :disabled="busy"
             />
-            <CheckoutWalletToggle v-model="useWallet" :disabled="busy" />
+            <CheckoutWalletToggle v-model="payFromWallet" :disabled="busy" />
           </section>
 
           <aside class="flex flex-col gap-4">
             <CheckoutSummary
+              v-if="!quoteFailed"
               :quote="summaryQuote"
               :title="t('gift_summary', 'Gift summary', 'ملخص الهدية')"
             />
+
+            <!-- Without a quote there is no total, and the summary's grey bars would wait
+                 for ever. -->
+            <div
+              v-else
+              class="rounded-card border bg-brand-mist/40 p-5 text-center"
+              data-test="quote-failed"
+            >
+              <p class="text-sm text-muted-foreground">{{ quoteError }}</p>
+              <Button
+                type="button"
+                variant="outline"
+                class="mt-4 h-11 w-full rounded-control"
+                @click="runQuote"
+              >
+                {{ t("try_again", "Try again", "حاول مرة أخرى") }}
+              </Button>
+            </div>
 
             <p
               v-if="giftValue"
@@ -306,6 +325,11 @@ definePageMeta({
 const { t } = useLang("web", "gifts");
 const { format } = usePrice();
 const { allowedPhoneCountries } = useAuthConfig();
+
+// Buying a gift spends from the wallet, so both surfaces the site reads a balance from —
+// the ledger and the identity every other screen shows the number off — go stale on pay.
+const { refreshIdentity } = useSanctumAuth();
+const { refresh: refreshWallet } = useWallet();
 const {
   packageAmount,
   packageActive,
@@ -322,12 +346,13 @@ const crumbs = computed(() => [
 
 const form = ref({ recipient_name: "", recipient_phone: "", message: "" });
 const discountCode = ref("");
-const useWallet = ref(false);
+const payFromWallet = ref(false);
 
 const quote = ref(null);
 const gift = ref(null);
 const quoting = ref(false);
 const discountErrors = ref({});
+const quoteError = ref("");
 
 const {
   submit: submitCreate,
@@ -337,6 +362,9 @@ const {
 } = useSubmit();
 
 const busy = computed(() => quoting.value || creating.value);
+const quoteFailed = computed(
+  () => !quote.value && !quoting.value && !!quoteError.value,
+);
 
 // The gift is a fixed credit amount — there is nothing to deliver, so the summary's
 // delivery row is meaningless here. `null` is the "this flow has no delivery" signal.
@@ -366,16 +394,20 @@ const runQuote = async () => {
   quoting.value = true;
   try {
     const res = await quoteGift({
-      use_wallet: useWallet.value,
+      use_wallet: payFromWallet.value,
       discount_code: discountCode.value || null,
     });
     quote.value = res?.data ?? null;
     discountErrors.value = {};
+    quoteError.value = "";
   } catch (err) {
     const normalized = normalizeApiError(err);
     if (fieldError(normalized, "gift"))
       unavailableMessage.value = normalized.message;
     discountErrors.value = normalized.errors;
+    quoteError.value = fieldError(normalized, "discount_code")
+      ? ""
+      : normalized.message;
     // A refused code must not leave a stale total on screen; the component drops the code
     // and this watcher fires again without it.
     if (!fieldError(normalized, "discount_code")) quote.value = null;
@@ -384,7 +416,7 @@ const runQuote = async () => {
   }
 };
 
-watch([useWallet, discountCode], runQuote);
+watch([payFromWallet, discountCode], runQuote);
 // A code the buyer is retyping should not keep showing the refusal of the last one.
 watch(discountCode, (code) => {
   if (code) discountErrors.value = {};
@@ -399,7 +431,7 @@ const purchase = async () => {
         recipient_name: form.value.recipient_name,
         message: form.value.message || null,
         recipient_phone: form.value.recipient_phone || null,
-        use_wallet: useWallet.value,
+        use_wallet: payFromWallet.value,
         discount_code: discountCode.value || null,
       }),
     );
@@ -409,6 +441,8 @@ const purchase = async () => {
     // Settled at create — the wallet or a discount covered the whole package. There is
     // no hold and nothing to pay: `/pay` must not be called.
     if (isZeroMoney(data.amount_due)) {
+      // Best-effort: a stale balance must not read as a failed purchase.
+      await Promise.all([refreshIdentity(), refreshWallet()]).catch(() => {});
       await navigateTo({ path: `/gifts/${data.id}`, query: { new: "1" } });
       return;
     }
@@ -424,8 +458,9 @@ const purchase = async () => {
 
 const payGift = () => pay(gift.value.id);
 
-const onPaid = (res) => {
-  navigateTo({ path: `/gifts/${gift.value.id}`, query: { new: "1" } });
+const onPaid = async (res) => {
+  await Promise.all([refreshIdentity(), refreshWallet()]).catch(() => {});
+  await navigateTo({ path: `/gifts/${gift.value.id}`, query: { new: "1" } });
   return res;
 };
 

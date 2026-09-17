@@ -38,6 +38,36 @@ export const useGifts = () => {
     query,
   })
 
+  /**
+   * Both sides of the reader's gifting — `GET /api/gifts/history`. A `sent` row is the
+   * buyer's own receipt, byte for byte what `GET /api/gifts` returns; a `received` row is
+   * narrower (`amount`, `from`, `message`, `redeemed_at`) because the token, the share
+   * link and what was paid belong to whoever bought it.
+   *
+   * `per_page` is left off on purpose: omitted, the server sends the whole list, which is
+   * what lets the direction filter run on the client. `totals` covers the whole history
+   * whatever is filtered, so both sides can be labelled before either is opened.
+   */
+  const history = () => {
+    const { data, pending, error, refresh } = useApiFetch('/api/gifts/history', {
+      key: 'gifts-history',
+      transform: (res) => ({
+        entries: unwrapList(res?.data?.gifts).items,
+        totals: res?.data?.totals ?? null,
+      }),
+      default: () => ({ entries: [], totals: null }),
+    })
+
+    return {
+      entries: computed(() => asList(data.value?.entries)),
+      sentCount: computed(() => data.value?.totals?.sent_count ?? 0),
+      receivedCount: computed(() => data.value?.totals?.received_count ?? 0),
+      pending,
+      error,
+      refresh,
+    }
+  }
+
   const quote = (body) => api('/api/gifts/quote', { method: 'POST', body })
   const create = (body) => api('/api/gifts', { method: 'POST', body })
   const pay = (id) => api(`/api/gifts/${id}/pay`, { method: 'POST' })
@@ -51,6 +81,7 @@ export const useGifts = () => {
     packageStatus,
     refreshPackage,
     list,
+    history,
     quote,
     create,
     pay,

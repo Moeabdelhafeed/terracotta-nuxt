@@ -12,8 +12,21 @@
     "
   >
     <form class="flex flex-col gap-6" @submit.prevent="onSubmit">
+      <p
+        v-if="expired"
+        data-test="reset-code-expired"
+        class="rounded-card bg-warning/15 px-4 py-3 text-center text-sm text-foreground"
+      >
+        {{
+          t(
+            "reset_code_expired",
+            "That code is no longer valid. Ask for a new one and enter it below.",
+            "لم يعد هذا الرمز صالحًا. اطلب رمزًا جديدًا وأدخله أدناه.",
+          )
+        }}
+      </p>
       <div class="flex flex-col items-center gap-2">
-        <AuthOtpInput v-model="form.otp" />
+        <AuthOtpInput v-model="form.otp" @complete="onSubmit" />
         <span v-if="errors.otp" class="text-xs text-destructive">{{
           errors.otp[0]
         }}</span>
@@ -24,7 +37,7 @@
       <Button
         type="submit"
         size="lg"
-        class="h-13 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+        class="h-13 w-full rounded-control bg-brand-rust text-base hover:bg-brand-rust/90"
         :disabled="loading || resending || form.otp.length < 6"
       >
         {{
@@ -35,7 +48,7 @@
       </Button>
       <button
         type="button"
-        class="mx-auto rounded-xl bg-brand-rust/10 px-4 py-2 text-sm font-medium text-brand-rust transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+        class="mx-auto rounded-control bg-brand-rust/10 px-4 py-2 text-sm font-medium text-brand-rust transition-colors disabled:cursor-not-allowed disabled:opacity-50"
         :disabled="cooldown > 0 || resending || loading"
         @click="resend"
       >
@@ -82,6 +95,9 @@ if (!form.value.identifier) {
   navigateTo({ name: "forgot-password" });
 }
 
+const expired = ref(route.query.expired === "1");
+const redirectTarget = computed(() => safeAuthRedirect(route.query.redirect));
+
 const cooldown = ref(0);
 let timer = null;
 
@@ -102,6 +118,7 @@ onUnmounted(() => {
 });
 
 const onSubmit = async () => {
+  if (loading.value) return;
   errors.value = {};
   loading.value = true;
   try {
@@ -115,6 +132,9 @@ const onSubmit = async () => {
         identifier: form.value.identifier,
         type: form.value.type,
         otp: form.value.otp,
+        ...(redirectTarget.value === "/"
+          ? {}
+          : { redirect: redirectTarget.value }),
       },
     });
   } catch (error) {
@@ -128,6 +148,7 @@ const resend = async () => {
   if (cooldown.value > 0 || resending.value) return;
   errors.value = {};
   resending.value = true;
+  expired.value = false;
   try {
     await client("/api/forgot-password", {
       method: "POST",

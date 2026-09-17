@@ -14,7 +14,9 @@
           <span class="size-10" />
         </div>
 
-        <div v-if="pending && !addresses.length" class="grid gap-3 lg:grid-cols-2" aria-busy="true">
+        <AppLoadError v-if="loadError" :error="loadError" :retry="refresh" />
+
+        <div v-else-if="pending && !addresses.length" class="grid gap-3 lg:grid-cols-2" aria-busy="true">
           <AppSkeleton v-for="n in 2" :key="n" class="h-32 w-full" />
         </div>
 
@@ -34,7 +36,7 @@
               <div class="min-w-0 flex-1">
                 <div class="flex flex-wrap items-center gap-2">
                   <span class="font-display text-base font-semibold text-foreground">{{ address.label || t('address_untitled', 'Address', 'عنوان') }}</span>
-                  <span v-if="address.is_default" data-test="default-badge" class="rounded-md bg-brand-green/15 px-2.5 py-0.5 text-xs font-medium text-brand-green">
+                  <span v-if="address.is_default" data-test="default-badge" class="rounded-md bg-success/15 px-2.5 py-0.5 text-xs font-medium text-success">
                     {{ t('address_default', 'Default', 'افتراضي') }}
                   </span>
                 </div>
@@ -46,6 +48,18 @@
                 </p>
               </div>
               <div class="flex shrink-0 gap-1">
+                <button
+                  v-if="!address.is_default"
+                  type="button"
+                  class="flex size-9 items-center justify-center rounded-xl text-foreground/60 transition-colors hover:bg-brand-mist hover:text-foreground disabled:opacity-50"
+                  :aria-label="t('address_make_default', 'Make default', 'اجعله الافتراضي')"
+                  :title="t('address_make_default', 'Make default', 'اجعله الافتراضي')"
+                  :disabled="promoting === address.id"
+                  data-test="make-default"
+                  @click="makeDefault(address)"
+                >
+                  <LucideStar class="size-4" :class="promoting === address.id ? 'animate-pulse' : ''" />
+                </button>
                 <a
                   v-if="address.map_url"
                   :href="address.map_url"
@@ -147,7 +161,7 @@ definePageMeta({
 const { t } = useLang('web', 'addresses')
 const { format } = usePrice()
 const toast = useToast()
-const { addresses, pending, refresh, remove } = useAddresses()
+const { addresses, pending, error: loadError, refresh, remove, save } = useAddresses()
 
 const formOpen = ref(false)
 const editing = ref(null)
@@ -158,6 +172,24 @@ const openEdit = (address) => { editing.value = address; formOpen.value = true }
 const onSaved = () => {
   formOpen.value = false
   toast.success(t('address_saved', 'Address saved.', 'تم حفظ العنوان.'))
+}
+
+/**
+ * One tap, not a round trip through the whole form. The update endpoint takes the record
+ * it was given, which is what Edit already posts — so this is the same call with one
+ * field flipped, and the server's "exactly one default" rule demotes the old one.
+ */
+const promoting = ref(null)
+const makeDefault = async (address) => {
+  promoting.value = address.id
+  try {
+    await save({ ...emptyAddressForm(), ...address, is_default: true }, address.id)
+    toast.success(t('address_default_set', 'Default address updated.', 'تم تحديث العنوان الافتراضي.'))
+  } catch (e) {
+    toast.error(normalizeApiError(e).message)
+  } finally {
+    promoting.value = null
+  }
 }
 
 const confirming = ref(null)

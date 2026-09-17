@@ -142,13 +142,20 @@
               <p v-if="piece.made_on" class="text-xs text-muted-foreground">
                 {{ piece.made_on }}
               </p>
+              <p
+                v-if="unavailableNote(piece)"
+                class="mt-1 text-xs text-muted-foreground"
+                :data-piece-unavailable="piece.id"
+              >
+                {{ unavailableNote(piece) }}
+              </p>
             </div>
             <Button
               type="button"
               size="icon"
               variant="outline"
-              class="size-10 shrink-0 rounded-xl"
-              :disabled="hasPiece(piece.id)"
+              class="size-10 shrink-0 rounded-control"
+              :disabled="hasPiece(piece.id) || !!unavailableNote(piece)"
               :aria-label="t('add_piece', 'Add', 'اضافة')"
               :data-add-piece="piece.id"
               @click="addOwnPiece(piece)"
@@ -363,8 +370,36 @@ const addProduct = (product) => {
   ];
 };
 
+/**
+ * Why this piece is off the table, in the customer's words. The server refuses a claimed
+ * piece with `api.workshop_piece_unavailable`, so offering one is offering a 422 — and a
+ * disabled button that says nothing is the same dead end one step earlier.
+ */
+const unavailableNote = (piece) =>
+  ({
+    booked: t(
+      "piece_already_booked",
+      "Already booked in to be painted at :workshop on :date.",
+      "محجوزة بالفعل للتلوين في :workshop بتاريخ :date.",
+      {
+        workshop: piece.painting_session?.workshop_title ?? "",
+        date: piece.painting_session?.date ?? "",
+      },
+    ),
+    painted: t(
+      "piece_already_painted",
+      "This piece has already been painted.",
+      "تم تلوين هذه القطعة بالفعل.",
+    ),
+  })[pieceUnavailableReason(piece)] ?? "";
+
 const addOwnPiece = (piece) => {
-  if (totalQuantity.value >= bounds.value.max || hasPiece(piece.id)) return;
+  if (
+    totalQuantity.value >= bounds.value.max ||
+    hasPiece(piece.id) ||
+    unavailableNote(piece)
+  )
+    return;
   lines.value = [
     ...lines.value,
     {

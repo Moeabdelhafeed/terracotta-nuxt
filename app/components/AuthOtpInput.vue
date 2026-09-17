@@ -9,7 +9,7 @@
       inputmode="numeric"
       autocomplete="one-time-code"
       maxlength="1"
-      class="h-12 w-full min-w-0 max-w-11 rounded-xl border border-input bg-transparent text-center text-lg font-semibold text-foreground shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+      class="h-12 w-full min-w-0 max-w-11 rounded-field border border-input bg-transparent text-center text-lg font-semibold text-foreground outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
       @input="onInput(index, $event)"
       @keydown="onKeydown(index, $event)"
       @paste="onPaste($event)"
@@ -26,7 +26,14 @@ const props = defineProps({
   length: { type: Number, default: 6 },
 })
 
+const emit = defineEmits(['complete'])
 const modelValue = defineModel({ type: String, default: '' })
+
+// The last digit submits, the way the app's code screens do — nobody types six digits
+// and then goes looking for a button.
+watch(modelValue, (value, previous) => {
+  if (value.length === props.length && previous.length < props.length) emit('complete', value)
+})
 
 const digits = computed(() => {
   const chars = modelValue.value.split('')

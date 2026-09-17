@@ -4,10 +4,28 @@
     :title="t('create_account_title', 'Welcome to Terracotta', 'اهلا بك بتيراكوتا')"
     :subtitle="t('register_description', 'Enter details below to register.', 'أدخل البيانات أدناه للتسجيل.')"
   >
-    <form class="flex flex-col gap-5" @submit.prevent="onSubmit">
+    <template v-if="created">
+      <AppConfetti />
+      <div class="flex flex-col items-center gap-4 text-center">
+        <span class="flex size-16 items-center justify-center rounded-full bg-success/15 text-brand-green">
+          <LucideCheck class="size-8" />
+        </span>
+        <h2 data-test="register-success" class="font-display text-2xl font-semibold text-foreground">
+          {{ t('account_created_success', 'Your account is ready', 'تم انشاء الحساب بنجاح') }}
+        </h2>
+        <p class="text-sm leading-relaxed text-muted-foreground">
+          {{ t('register_success_body', 'Every workshop sets its own deadline for cancelling or rescheduling. You will see yours on the booking itself.', 'لكل ورشة موعد نهائي خاص بها للإلغاء أو تغيير الموعد، وستجده على الحجز نفسه.') }}
+        </p>
+        <Button size="lg" class="h-13 w-full rounded-control bg-brand-rust text-base hover:bg-brand-rust/90" @click="onContinue">
+          {{ t('continue', 'Continue', 'استكمال') }}
+        </Button>
+      </div>
+    </template>
+
+    <form v-else class="flex flex-col gap-5" @submit.prevent="onSubmit">
       <div class="grid gap-2">
         <Label for="name">{{ t('name', 'Name', 'الاسم') }}</Label>
-        <Input id="name" v-model="form.name" type="text" class="h-12 rounded-xl text-base" :placeholder="t('placeholder_name', 'John Doe', 'محمد أحمد')" required />
+        <Input id="name" v-model="form.name" type="text" class="h-12 rounded-field text-base" :placeholder="t('placeholder_name', 'John Doe', 'محمد أحمد')" required />
         <span v-if="errors.name" class="text-xs text-destructive">{{ errors.name[0] }}</span>
       </div>
 
@@ -19,7 +37,7 @@
             :key="kind"
             type="button"
             size="sm"
-            class="rounded-xl"
+            class="rounded-control"
             :variant="identifierKind === kind ? 'default' : 'outline'"
             @click="identifierKind = kind"
           >
@@ -42,7 +60,7 @@
           v-model="form.identifier"
           :type="inputTypeFor(identifierKind)"
           :placeholder="placeholderFor(identifierKind)"
-          class="h-12 rounded-xl text-base"
+          class="h-12 rounded-field text-base"
           required
         />
         <span
@@ -58,6 +76,9 @@
             class="text-xs font-medium text-brand-rust underline-offset-4 hover:underline"
           >{{ t('go_to_login', 'Go to login', 'الذهاب لتسجيل الدخول') }}</NuxtLink>
         </template>
+        <span v-if="emailDomainRejected" class="text-xs text-destructive">
+          {{ t('email_domain_not_allowed', 'Use an address ending in :domains.', 'استخدم بريدًا ينتهي بـ :domains.', { domains: allowedDomainList }) }}
+        </span>
         <span v-if="errors.identifier" class="text-xs text-destructive">{{ errors.identifier[0] }}</span>
       </div>
 
@@ -66,7 +87,7 @@
           {{ labelFor('username') }}
           <span v-if="!isExtraRequired('username')" class="text-xs text-muted-foreground">{{ t('optional', '(optional)', '(اختياري)') }}</span>
         </Label>
-        <Input id="username" v-model="form.username" type="text" class="h-12 rounded-xl text-base" :placeholder="placeholderFor('username')" :required="isExtraRequired('username')" />
+        <Input id="username" v-model="form.username" type="text" class="h-12 rounded-field text-base" :placeholder="placeholderFor('username')" :required="isExtraRequired('username')" />
         <span v-if="errors.username" class="text-xs text-destructive">{{ errors.username[0] }}</span>
       </div>
       <div v-if="showsExtraField('email')" class="grid gap-2">
@@ -74,7 +95,7 @@
           {{ labelFor('email') }}
           <span v-if="!isExtraRequired('email')" class="text-xs text-muted-foreground">{{ t('optional', '(optional)', '(اختياري)') }}</span>
         </Label>
-        <Input id="email_extra" v-model="form.email" type="email" class="h-12 rounded-xl text-base" :placeholder="placeholderFor('email')" :required="isExtraRequired('email')" />
+        <Input id="email_extra" v-model="form.email" type="email" class="h-12 rounded-field text-base" :placeholder="placeholderFor('email')" :required="isExtraRequired('email')" />
         <span v-if="errors.email" class="text-xs text-destructive">{{ errors.email[0] }}</span>
       </div>
       <div v-if="showsExtraField('phone')" class="grid gap-2">
@@ -88,16 +109,17 @@
 
       <div class="grid gap-2">
         <Label for="password">{{ t('password', 'Password', 'كلمة المرور') }}</Label>
-        <AuthPasswordInput id="password" v-model="form.password" required />
+        <AuthPasswordInput id="password" v-model="form.password" required minlength="8" />
         <span v-if="errors.password" class="text-xs text-destructive">{{ errors.password[0] }}</span>
       </div>
       <div class="grid gap-2">
         <Label for="confirm">{{ t('confirm_password', 'Confirm password', 'تأكيد كلمة المرور') }}</Label>
-        <AuthPasswordInput id="confirm" v-model="form.password_confirmation" required />
+        <AuthPasswordInput id="confirm" v-model="form.password_confirmation" required minlength="8" />
         <span v-if="errors.password_confirmation" class="text-xs text-destructive">{{ errors.password_confirmation[0] }}</span>
       </div>
-      <div class="flex items-start gap-2">
-        <Checkbox id="policy" v-model="form.policy_agreed" required class="mt-0.5" />
+      <div class="grid gap-2">
+        <div class="flex items-start gap-2">
+        <Checkbox id="policy" v-model="form.policy_agreed" class="mt-0.5" />
         <Label for="policy" class="text-sm font-normal text-muted-foreground">
           {{ t('policy_agreement_prefix', 'I agree to the', 'أوافق على') }}
           <button
@@ -115,20 +137,24 @@
           >{{ privacyPage.name }}</NuxtLink>
           <span v-else>{{ t('privacy_policy', 'Privacy Policy', 'سياسة الخصوصية') }}</span>
         </Label>
+        </div>
         <span v-if="errors.policy_agreed" class="text-xs text-destructive">{{ errors.policy_agreed[0] }}</span>
       </div>
       <Button
         type="submit"
         size="lg"
-        class="h-13 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+        class="h-13 w-full rounded-control bg-brand-rust text-base hover:bg-brand-rust/90"
         :disabled="loading || identifierTaken || checking"
       >
         {{ loading ? t('creating', 'Creating...', 'جارٍ الإنشاء...') : t('create_account', 'Create account', 'إنشاء حساب') }}
       </Button>
     </form>
-    <p class="mt-6 text-center text-sm">
+    <p v-if="!created" class="mt-6 text-center text-sm">
       <span class="text-muted-foreground">{{ t('have_account', 'Have account?', 'لديك حساب؟') }}&nbsp;</span>
-      <NuxtLink to="/login" class="font-medium text-brand-rust underline-offset-4 hover:underline">
+      <NuxtLink
+        :to="{ path: '/login', query: redirectTarget === '/' ? {} : { redirect: redirectTarget } }"
+        class="font-medium text-brand-rust underline-offset-4 hover:underline"
+      >
         {{ t('sign_in', 'Sign in', 'تسجيل الدخول') }}
       </NuxtLink>
     </p>
@@ -142,7 +168,7 @@ definePageMeta({
   name: 'register'
 })
 
-const { identifiers, isMultiIdentifier, showsExtraField, isExtraRequired, inputTypeFor, placeholderFor, labelFor, allowedPhoneCountries } = useAuthConfig()
+const { identifiers, isMultiIdentifier, showsExtraField, isExtraRequired, inputTypeFor, placeholderFor, labelFor, allowedPhoneCountries, allowedEmailDomains, isEmailDomainAllowed } = useAuthConfig()
 const { t } = useLang('web', 'auth')
 
 const { bySlug } = usePages()
@@ -150,13 +176,17 @@ const termsPage = computed(() => bySlug('terms'))
 const privacyPage = computed(() => bySlug('privacy'))
 const termsOpen = ref(false)
 
+const route = useRoute()
+const redirectTarget = computed(() => safeAuthRedirect(route.query.redirect))
+
 const errors = ref({})
 const loading = ref(false)
+const created = ref(false)
 const checking = ref(false)
 const identifierTaken = ref(false)
 
 const client = useApi()
-const { user, login } = useSanctumAuth()
+const { user, login, refreshIdentity } = useSanctumAuth()
 
 const identifierKind = ref(identifiers.value[0] ?? 'email')
 watch(identifiers, (list) => {
@@ -175,6 +205,14 @@ const form = ref({
   password_confirmation: '',
   policy_agreed: false
 })
+
+const allowedDomainList = computed(() =>
+  Array.isArray(allowedEmailDomains.value) ? allowedEmailDomains.value.join(', ') : ''
+)
+// The backend enforces the same list; this is so the customer is told before the request.
+const emailDomainRejected = computed(() =>
+  identifierKind.value === 'email' && !!form.value.identifier && !isEmailDomainAllowed(form.value.identifier)
+)
 
 let debounce = null
 watch(() => form.value.identifier, (val) => {
@@ -229,20 +267,47 @@ const buildBody = () => {
 
 const onSubmit = async () => {
   errors.value = {}
+  if (!form.value.policy_agreed) {
+    errors.value = { policy_agreed: [t('policy_required', 'Accept the terms to continue.', 'وافق على الشروط للمتابعة.')] }
+    return
+  }
+  if (form.value.password !== form.value.password_confirmation) {
+    errors.value = { password_confirmation: [t('password_mismatch', 'The two passwords do not match.', 'كلمتا المرور غير متطابقتين.')] }
+    return
+  }
+  if (emailDomainRejected.value) return
   loading.value = true
   const body = buildBody()
   try {
-    await client('/api/register', { method: 'POST', body })
+    const res = await client('/api/register', { method: 'POST', body })
     if (user.value?.data?.is_guest) user.value = null
-    await login({ identifier: form.value.identifier, type: identifierKind.value, password: form.value.password })
-    // A verification-required install hands back an unverified session plus an OTP —
-    // the code screen is the next step, not the home page.
+    // Registering already hands back a session. Calling `/api/login` on top of it would
+    // spend one of the five-per-minute auth attempts for nothing. A verification-required
+    // install answers without a token instead — that shape does need the sign-in.
+    const data = res?.data ?? res ?? {}
+    if (data.token) {
+      const sanctum = useSanctumAppConfig()
+      await sanctum?.tokenStorage?.set?.(useNuxtApp(), data.token)
+      await refreshIdentity()
+    } else {
+      await login({
+        identifier: form.value.identifier,
+        type: identifierKind.value,
+        password: form.value.password,
+        ...authDeviceMeta()
+      })
+    }
     const registered = user.value?.data ?? user.value ?? {}
-    navigateTo({ name: registered.verified_at || registered.is_verified ? 'home' : 'verify' })
+    // A verification-required install hands back an unverified session plus an OTP —
+    // the code screen is the next step, not the celebration.
+    if (registered.verified_at || registered.is_verified) created.value = true
+    else navigateTo({ name: 'verify' })
   } catch (error) {
     errors.value = error.data?.errors ?? {}
   } finally {
     loading.value = false
   }
 }
+
+const onContinue = () => navigateTo(redirectTarget.value)
 </script>

@@ -11,13 +11,17 @@ const { api, lang, sanctum, navigate, server } = await vi.hoisted(async () => {
   return {
     server,
     api: createApiMock({
-      'GET /api/notifications': () => envelope({
+      'GET /api/notifications': () => ({
+        ...envelope({
         unread_count: server.unread,
         notifications: [
           { id: 5, type: 'shop_order_out_for_delivery', title: 'Your order is on the way', body: 'Order #12 left the shop.', data: { shop_order_id: 12, type: 'shop_order_out_for_delivery' }, is_read: false, created_at: '2026-08-16T12:00:00+00:00' },
           { id: 4, type: 'workshop_booking_confirmed', title: 'api.notification_booking_confirmed', body: 'Booking confirmed.', data: { workshop_booking_id: 7, type: 'workshop_booking_confirmed' }, is_read: false, created_at: '2026-08-15T12:00:00+00:00' },
           { id: 3, type: 'wallet_credited', title: 'Credit added', body: '50 SAR added.', data: { type: 'wallet_credited' }, is_read: true, created_at: '2026-08-14T12:00:00+00:00' },
         ],
+        }),
+        // A SIBLING of `data`, counting the whole inbox rather than the slice on screen.
+        meta: { filter_counts: { all: 9, unread: 3, bookings: 4, reminders: 0, pieces: 0, orders: 5, gifts: 0, wallet: 1 } },
       }),
       'POST /api/notifications/{id}/read': () => envelope({ unread_count: server.unread }),
       'POST /api/notifications/read-all': () => envelope({ unread_count: (server.unread = 0) }),
@@ -76,6 +80,22 @@ describe('useNotifications', () => {
     expect(unreadCount.value).toBe(0)
   })
 
+  it('sends the category filter, and sends nothing at all for "all"', async () => {
+    const filter = ref('bookings')
+    useNotifications({ filter })
+    await vi.waitFor(() => expect(api.calls.some((c) => c.query?.filter === 'bookings')).toBe(true))
+
+    const everything = ref('all')
+    useNotifications({ filter: everything })
+    await vi.waitFor(() => expect(api.calls.some((c) => c.query && !('filter' in c.query))).toBe(true))
+  })
+
+  it('reads the whole-inbox tallies out of meta rather than counting the loaded page', async () => {
+    const { filterCounts, notifications } = useNotifications()
+    await vi.waitFor(() => expect(notifications.value.length).toBe(3))
+    expect(filterCounts.value.orders).toBe(5)
+  })
+
   it('sends unread_only=1 only when the filter is on', async () => {
     const unreadOnly = ref(true)
     useNotifications({ unreadOnly })
@@ -106,6 +126,19 @@ describe('/notifications page', () => {
     const page = await mount()
     await vi.waitFor(() => expect(page.text()).toContain('Update from Terracotta'))
     expect(page.text()).not.toContain('api.notification_booking_confirmed')
+  })
+
+  it('labels each tab from the whole inbox and leaves out the categories with nothing in them', async () => {
+    const page = await mount()
+    await vi.waitFor(() => expect(page.find('[data-test="filter-bookings"]').exists()).toBe(true))
+
+    expect(page.find('[data-test="filter-bookings"]').text()).toContain('4')
+    expect(page.find('[data-test="filter-orders"]').text()).toContain('5')
+    expect(page.find('[data-test="filter-wallet"]').exists()).toBe(true)
+
+    // Nothing behind them, so a chip for either only asks the reader to work out which apply.
+    expect(page.find('[data-test="filter-reminders"]').exists()).toBe(false)
+    expect(page.find('[data-test="filter-pieces"]').exists()).toBe(false)
   })
 
   it('offers mark-all-read but no delete control — the API has no delete route', async () => {

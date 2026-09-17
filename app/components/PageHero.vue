@@ -49,7 +49,7 @@
       <!-- 90% of the viewport, not of a centred column: the picture is nearly full width,
            with just enough white ground left either side to frame it. The copy sits over
            it, as it does on the home page. -->
-      <div v-if="image" class="relative mt-4 w-[90%] overflow-hidden">
+      <div v-if="image" class="relative mt-4 w-[90%] overflow-hidden rounded-card">
         <!-- Dynamic storage hands back a `{ type, image|video|file }` wrapper, which only
              AppMedia unwraps; a record's own picture is a bare Image object, whose `type`
              is the file extension — AppMedia would read that as a file and render a link. -->
@@ -70,7 +70,7 @@
           class="absolute inset-0 flex flex-col items-center justify-center px-6 text-center text-white"
         >
           <h1
-            class="max-w-2xl font-display text-3xl font-semibold drop-shadow-lg sm:text-5xl"
+            class="max-w-2xl font-display text-3xl font-bold drop-shadow-lg sm:text-5xl"
           >
             {{ title }}
           </h1>
@@ -85,7 +85,7 @@
 
       <!-- Without a picture the copy still needs somewhere to live. -->
       <div v-else class="mt-8 max-w-2xl px-6 text-center">
-        <h1 class="font-display text-3xl font-semibold sm:text-4xl">
+        <h1 class="font-display text-3xl font-bold sm:text-4xl">
           {{ title }}
         </h1>
         <p v-if="subtitle" class="mt-3 text-muted-foreground">{{ subtitle }}</p>

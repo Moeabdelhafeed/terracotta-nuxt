@@ -30,7 +30,7 @@
       </span>
     </div>
 
-    <p class="mt-4 rounded-2xl bg-amber-100/70 p-4 text-sm text-amber-900">
+    <p class="mt-4 rounded-card bg-warning/15 p-4 text-sm text-warning">
       {{
         t(
           "upload_window",
@@ -62,7 +62,7 @@
             type="button"
             size="icon"
             variant="ghost"
-            class="size-9 shrink-0 rounded-xl text-destructive"
+            class="size-9 shrink-0 rounded-control text-destructive"
             :aria-label="t('remove', 'Remove', 'إزالة')"
             :data-remove-piece="piece.id"
             @click="emit('remove-piece', piece)"

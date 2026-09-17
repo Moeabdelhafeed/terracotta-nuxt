@@ -15,14 +15,22 @@
         </div>
 
         <div class="flex flex-wrap items-center justify-between gap-3">
-          <div class="flex flex-wrap gap-2">
-            <Button as-child size="sm" class="rounded-xl" :variant="unreadOnly ? 'outline' : 'default'">
-              <NuxtLink :to="linkTo(1, false)">{{ t('notifications_all', 'All', 'الكل') }}</NuxtLink>
-            </Button>
-            <Button as-child size="sm" class="rounded-xl" :variant="unreadOnly ? 'default' : 'outline'">
-              <NuxtLink :to="linkTo(1, true)">
-                {{ t('notifications_unread_only', 'Unread only', 'غير المقروءة فقط') }}
-                <span v-if="unreadCount > 0" class="ms-1 rounded-full bg-brand-blush px-1.5 text-[10px] font-semibold text-brand-ink" dir="ltr">{{ unreadCount }}</span>
+          <!-- The SERVER filters and the SERVER counts: `meta.filter_counts` is the whole
+               inbox, so a tab carries a number before anyone opens it. A tab with nothing
+               behind it is left off, except the one currently chosen — hiding that would
+               take the way back with it. -->
+          <div class="flex flex-wrap gap-2" data-test="notification-filters">
+            <Button
+              v-for="tab in tabs"
+              :key="tab"
+              as-child
+              size="sm"
+              class="rounded-control"
+              :variant="tab === filter ? 'default' : 'outline'"
+            >
+              <NuxtLink :to="linkTo(1, tab)" :data-test="`filter-${tab}`">
+                {{ filterLabel(tab) }}
+                <span v-if="countFor(tab)" class="ms-1 rounded-full bg-brand-blush px-1.5 text-[10px] font-semibold text-brand-ink" dir="ltr">{{ countFor(tab) }}</span>
               </NuxtLink>
             </Button>
           </div>
@@ -37,7 +45,9 @@
           </button>
         </div>
 
-        <div v-if="pending && !notifications.length" class="grid gap-3 lg:grid-cols-2" aria-busy="true">
+        <AppLoadError v-if="error" :error="error" :retry="refresh" />
+
+        <div v-else-if="pending && !notifications.length" class="grid gap-3 lg:grid-cols-2" aria-busy="true">
           <AppSkeleton v-for="n in 4" :key="n" class="h-20 w-full !rounded-2xl" />
         </div>
 
@@ -46,7 +56,7 @@
             <LucideBellOff class="size-5" />
           </span>
           <h2 class="font-display text-lg font-semibold text-foreground">
-            {{ unreadOnly ? t('notifications_none_unread', 'You are all caught up', 'لا توجد إشعارات غير مقروءة') : t('notifications_none', 'No notifications yet', 'لا توجد إشعارات بعد') }}
+            {{ emptyTitle }}
           </h2>
           <p class="text-sm text-muted-foreground">
             {{ t('notifications_none_note', 'Order and workshop updates will show up here.', 'ستظهر هنا تحديثات طلباتك وورشاتك.') }}
@@ -116,12 +126,52 @@ const { formatDate } = useDateFormat()
 const toast = useToast()
 
 const currentPage = computed(() => Math.max(1, Number(route.query.page ?? 1)))
-const unreadOnly = computed(() => route.query.unread === '1')
 
-const { notifications, unreadCount, lastPage, pending, markRead, markAllRead, refresh } = useNotifications({ page: currentPage, unreadOnly })
+// `?unread=1` was the only slice this page had; it still lands on the unread tab.
+const filter = computed(() => {
+  const asked = String(route.query.filter ?? (route.query.unread === '1' ? 'unread' : 'all'))
+  return NOTIFICATION_FILTERS.includes(asked) ? asked : 'all'
+})
 
-const linkTo = (page, unread = unreadOnly.value) => ({
-  query: { page: page > 1 ? page : undefined, unread: unread ? '1' : undefined },
+const { notifications, unreadCount, filterCounts, lastPage, pending, error, markRead, markAllRead, refresh } = useNotifications({ page: currentPage, filter })
+
+const linkTo = (page, slice = filter.value) => ({
+  query: { page: page > 1 ? page : undefined, filter: slice === 'all' ? undefined : slice },
+})
+
+const FILTER_LABELS = {
+  all: ['All', 'الكل'],
+  unread: ['Unread', 'غير المقروءة'],
+  bookings: ['Bookings', 'الحجوزات'],
+  reminders: ['Reminders', 'التذكيرات'],
+  pieces: ['Pieces', 'القطع'],
+  orders: ['Orders', 'الطلبات'],
+  gifts: ['Gifts', 'الهدايا'],
+  wallet: ['Wallet', 'المحفظة'],
+}
+const filterLabel = (slice) => t(`notifications_filter_${slice}`, ...FILTER_LABELS[slice])
+
+// The unread tally rides on every response, so it is right even on an older server that
+// sends no `filter_counts` at all.
+const countFor = (slice) => {
+  if (slice === 'all') return 0
+  if (slice === 'unread') return unreadCount.value
+  return filterCounts.value?.[slice] ?? 0
+}
+
+/**
+ * With no counts — an older server, or the first load — every tab shows and none carries
+ * a number. Offering a tab that turns out to be empty is better than hiding them all,
+ * because an empty tab says so when it is opened.
+ */
+const tabs = computed(() => NOTIFICATION_FILTERS.filter((slice) => (
+  slice === 'all' || slice === filter.value || !filterCounts.value || countFor(slice) > 0
+)))
+
+const emptyTitle = computed(() => {
+  if (filter.value === 'unread') return t('notifications_none_unread', 'You are all caught up', 'لا توجد إشعارات غير مقروءة')
+  if (filter.value !== 'all') return t('notifications_none_in_filter', 'Nothing in this filter', 'لا يوجد شيء في هذا التصنيف')
+  return t('notifications_none', 'No notifications yet', 'لا توجد إشعارات بعد')
 })
 
 const pageNumbers = computed(() => {

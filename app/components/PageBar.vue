@@ -17,7 +17,7 @@
               :to="crumb.to"
               class="whitespace-nowrap text-white/75 underline-offset-4 transition-colors hover:text-white hover:underline"
             >{{ crumb.label }}</NuxtLink>
-            <span v-else class="truncate font-medium">{{ crumb.label }}</span>
+            <span v-else class="truncate text-base font-bold" aria-current="page">{{ crumb.label }}</span>
 
             <span v-if="index < crumbs.length - 1" class="px-2 text-white/40" aria-hidden="true">/</span>
           </li>

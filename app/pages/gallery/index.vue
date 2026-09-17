@@ -17,11 +17,21 @@
         unevenly, so the wall reads as a pile of photographs rather than a grid. CSS
         columns rather than a grid, since the row heights are meant not to line up.
       -->
-      <ul v-if="pending" class="columns-2 gap-1.5 lg:columns-3 [&>li]:mb-1.5" aria-busy="true">
+      <AppLoadError v-if="error" :error="error" :retry="refresh" />
+
+      <ul v-else-if="pending" class="columns-2 gap-1.5 lg:columns-3 [&>li]:mb-1.5" aria-busy="true">
         <li v-for="n in 6" :key="n" class="break-inside-avoid">
           <AppSkeleton class="w-full !rounded-none" :class="ratio(n - 1)" />
         </li>
       </ul>
+
+      <div v-else-if="!categories.length" class="mx-auto flex w-full max-w-xl flex-col items-center gap-3 rounded-card border bg-card p-10 text-center">
+        <span class="flex size-12 items-center justify-center rounded-control bg-brand-rust/10 text-brand-rust">
+          <LucideImages class="size-5" />
+        </span>
+        <h2 class="font-display text-lg font-semibold text-foreground">{{ t('gallery_empty_title', 'Nothing on the wall yet', 'لا توجد صور بعد') }}</h2>
+        <p class="text-sm text-muted-foreground">{{ t('gallery_empty_body', 'Photographs from the studio will show up here.', 'ستظهر هنا صور من الاستوديو.') }}</p>
+      </div>
 
       <ul v-else class="columns-2 gap-1.5 lg:columns-3 [&>li]:mb-1.5">
         <li v-for="(category, index) in categories" :key="category.id" class="break-inside-avoid">
@@ -51,7 +61,7 @@
 </template>
 
 <script setup>
-const { categories, pending } = useGallery()
+const { categories, pending, error, refresh } = useGallery()
 const { t } = useLang('web', 'home')
 
 // The four tile heights the design cycles through, as ratios of the tile width.

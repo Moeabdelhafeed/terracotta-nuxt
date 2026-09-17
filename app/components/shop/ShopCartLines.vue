@@ -3,7 +3,7 @@
     <li
       v-for="line in items"
       :key="line.id"
-      class="rounded-2xl border bg-card p-4"
+      class="rounded-card border bg-card p-4"
       :class="{ 'border-destructive/40': line.in_stock === false }"
       :data-line="line.id"
     >
@@ -13,7 +13,7 @@
         <component
           :is="line.product ? NuxtLink : 'span'"
           :to="line.product ? `/shop/${line.product.id}` : undefined"
-          class="block size-20 shrink-0 overflow-hidden rounded-xl border bg-brand-mist sm:size-24 md:size-28"
+          class="block size-20 shrink-0 overflow-hidden rounded-field border bg-brand-mist sm:size-24 md:size-28"
         >
           <AppImage
             v-if="line.product?.image?.image_api"
@@ -40,14 +40,20 @@
                 <span class="font-display text-lg font-black text-primary">{{ format(line.unit_price) }}</span>
                 <span v-if="line.product?.sale_price" class="text-sm text-muted-foreground line-through">{{ format(line.product.price) }}</span>
               </p>
+              <!-- The glaze the line was bought in. Two colourways of one piece are two
+                   lines, so without this they are two identical rows. -->
+              <p v-if="line.color" class="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+                <span class="inline-block size-3.5 rounded-[6px] border" :style="{ backgroundColor: line.color }" />
+                {{ t('colour', 'Colour', 'اللون') }}
+              </p>
             </div>
 
             <button
               type="button"
-              class="flex size-10 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+              class="flex size-10 shrink-0 items-center justify-center rounded-control text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
               :aria-label="t('remove_line', 'Remove from cart', 'إزالة من العربة')"
               :disabled="busy === line.id"
-              @click="onRemove(line)"
+              @click="confirming = line.id"
             >
               <LucideTrash2 class="size-4" />
             </button>
@@ -62,6 +68,22 @@
             />
             <span class="font-display text-base font-semibold">{{ format(line.line_total) }}</span>
           </div>
+        </div>
+      </div>
+
+      <!-- Named for what it does rather than asking "are you sure": the row disappears, and
+           a customer who meant to change the quantity deserves to know that first. -->
+      <div v-if="confirming === line.id" class="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-field bg-muted px-4 py-3">
+        <p class="text-xs text-muted-foreground">
+          {{ t('remove_line_message', ':title will be taken out of your cart. You can always add it again.', 'راح ينشال :title من عربيتك. تقدر ترجع تضيفه في أي وقت.', { title: line.product?.title ?? '' }) }}
+        </p>
+        <div class="flex items-center gap-2">
+          <Button type="button" size="sm" variant="ghost" @click="confirming = null">
+            {{ t('keep_line', 'Keep it', 'خلّه') }}
+          </Button>
+          <Button type="button" size="sm" variant="destructive" :disabled="busy === line.id" @click="onRemove(line)">
+            {{ t('remove_line_confirm', 'Take it out', 'شيله') }}
+          </Button>
         </div>
       </div>
 
@@ -90,6 +112,7 @@ const { format } = usePrice()
 const { items, update, remove } = useCart()
 
 const busy = ref(null)
+const confirming = ref(null)
 const lineErrors = ref({})
 
 const run = async (line, call) => {
@@ -111,5 +134,8 @@ const onUpdate = (line, quantity) => {
   run(line, () => update(line.id, quantity))
 }
 
-const onRemove = (line) => run(line, () => remove(line.id))
+const onRemove = async (line) => {
+  await run(line, () => remove(line.id))
+  confirming.value = null
+}
 </script>

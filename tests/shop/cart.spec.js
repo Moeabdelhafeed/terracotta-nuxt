@@ -84,12 +84,16 @@ describe('useCart', () => {
     expect(mutations[1]).toMatchObject({ method: 'PUT', url: '/api/shop/cart/1', body: { quantity: 5 } })
   })
 
-  it('never sends a colour with a line', async () => {
+  it('sends the chosen glaze as the variant id, and nothing when there is none', async () => {
     const cart = useCart()
     await flushPromises()
     await cart.add(11, 1)
-    const post = api.calls.find((c) => c.method === 'POST' && c.url === '/api/shop/cart')
-    expect(Object.keys(post.body)).toEqual(['shop_product_id', 'quantity'])
+    const plain = api.calls.find((c) => c.method === 'POST' && c.url === '/api/shop/cart')
+    expect(Object.keys(plain.body)).toEqual(['shop_product_id', 'quantity'])
+
+    await cart.add(11, 1, '#81341a')
+    const glazed = api.calls.filter((c) => c.method === 'POST' && c.url === '/api/shop/cart').at(-1)
+    expect(glazed.body).toEqual({ shop_product_id: 11, quantity: 1, color: '#81341a' })
   })
 
   it('blocks checkout while any line cannot be fulfilled', async () => {
@@ -160,6 +164,20 @@ describe('ShopCartLines', () => {
     expect(wrapper.text()).toContain('Only 2 left of "Cup".')
 
     api.table['PUT /api/shop/cart/{id}'] = (opts) => ({ success: true, message: 'ok', errors: null, data: { id: 1, quantity: opts.body.quantity } })
+  })
+
+  it('asks before taking a line out, and removes it only once confirmed', async () => {
+    globalThis.__cart = { items: [line()], total_price: '130.00' }
+    const wrapper = await mountSuspended(ShopCartLines)
+    await flushPromises()
+
+    await wrapper.find('button[aria-label="Remove from cart"]').trigger('click')
+    expect(wrapper.text()).toContain('taken out of your cart')
+    expect(api.calls.some((c) => c.method === 'DELETE')).toBe(false)
+
+    await wrapper.findAll('button').find((b) => b.text() === 'Take it out').trigger('click')
+    await flushPromises()
+    expect(api.calls.some((c) => c.method === 'DELETE' && c.url === '/api/shop/cart/1')).toBe(true)
   })
 })
 

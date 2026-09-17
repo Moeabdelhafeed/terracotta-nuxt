@@ -83,7 +83,7 @@
             <h2 class="font-display text-xl font-semibold">{{ t('payment_title', 'Payment', 'الدفع') }}</h2>
             <div class="mt-5 flex flex-col gap-5">
               <CheckoutDiscountCodeInput v-model="discountCode" :errors="errors" :disabled="quoting || placing" />
-              <CheckoutWalletToggle v-model="useWallet" :disabled="quoting || placing" />
+              <CheckoutWalletToggle v-model="payFromWallet" :disabled="quoting || placing" />
             </div>
           </section>
 
@@ -94,13 +94,24 @@
         </div>
 
         <aside class="flex flex-col gap-4 lg:sticky lg:top-6">
-          <CheckoutSummary :quote="quote" :title="t('summary_title', 'Your order', 'طلبك', { subGroup: 'checkout' })" />
+          <CheckoutSummary v-if="!quoteFailed" :quote="quote" :title="t('summary_title', 'Your order', 'طلبك', { subGroup: 'checkout' })" />
+
+          <!-- The quote is the whole of what this page knows about money. With none, and
+               none on the way, the summary's grey bars would wait for ever. -->
+          <div v-else class="rounded-card border bg-brand-mist/40 p-5 text-center" data-test="quote-failed">
+            <p class="text-sm text-muted-foreground">
+              {{ error || t('quote_failed', 'We could not price your order just now.', 'تعذّر تسعير طلبك الآن.') }}
+            </p>
+            <Button type="button" variant="outline" class="mt-4 h-11 w-full rounded-control" @click="requote()">
+              {{ t('try_again', 'Try again', 'حاول مرة أخرى') }}
+            </Button>
+          </div>
 
           <p v-if="cartError" class="flex items-start gap-2 rounded-2xl bg-destructive/10 px-4 py-3 text-sm text-destructive">
             <LucideAlertCircle class="mt-0.5 size-4 shrink-0" />
             <span>{{ cartError }}</span>
           </p>
-          <span v-else-if="error" class="text-xs text-destructive">{{ error }}</span>
+          <span v-else-if="error && !quoteFailed" class="text-xs text-destructive">{{ error }}</span>
 
           <Button
             type="button"
@@ -132,10 +143,26 @@ const { t } = useLang('web', 'checkout')
 const toast = useToast()
 
 const {
-  cart, addressId, discountCode, useWallet,
+  cart, addressId, discountCode, useWallet: payFromWallet,
   quote, quoting, errors, error, order, resumed, settled,
-  checkout, pay, reset,
+  checkout, pay, requote, reset,
 } = useCheckout()
+
+const { refreshIdentity } = useSanctumAuth()
+const { refresh: refreshWallet } = useWallet()
+
+/**
+ * Paying moves the balance, and the site reads one from two places — the ledger and the
+ * identity every other screen shows the number off. Both go stale at that same moment.
+ *
+ * Hung off `settled` rather than off the pay button: an order the wallet covers in full
+ * settles at create with no pay step at all, and on the pay step the hold component is
+ * unmounted by this very flip — taking its `paid` event with it.
+ */
+watch(settled, (is) => {
+  // Best-effort: a stale balance is not worth failing a payment that already landed.
+  if (is) Promise.all([refreshIdentity(), refreshWallet()]).catch(() => {})
+})
 
 const api = useApi()
 const placing = ref(false)
@@ -147,6 +174,7 @@ const cartLoading = cart.pending
 const addressError = computed(() => fieldError(errors.value, 'address_id'))
 const cartError = computed(() => fieldError(errors.value, 'cart'))
 const canPlace = computed(() => !placing.value && !quoting.value && !!quote.value && cart.canCheckout.value)
+const quoteFailed = computed(() => !quote.value && !quoting.value && !!error.value)
 
 const place = async () => {
   if (placing.value) return

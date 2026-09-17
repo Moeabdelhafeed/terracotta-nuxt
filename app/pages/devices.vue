@@ -16,7 +16,9 @@
         <p class="-mt-3 text-center text-sm text-muted-foreground">{{ t('active_devices_description', 'Devices currently signed in to your account.', 'الأجهزة المسجّلة الدخول حاليًا.') }}</p>
 
         <section class="rounded-2xl border bg-card p-5">
-          <p v-if="pending" class="text-sm text-muted-foreground">{{ t('loading', 'Loading...', 'جارٍ التحميل...') }}</p>
+          <AppLoadError v-if="loadError" :error="loadError" :retry="refresh" />
+
+          <p v-else-if="pending" class="text-sm text-muted-foreground">{{ t('loading', 'Loading...', 'جارٍ التحميل...') }}</p>
           <p v-else-if="!devices.length" class="text-sm text-muted-foreground">{{ t('no_devices', 'No devices found.', 'لا توجد أجهزة.') }}</p>
           <ul v-else class="grid gap-3 lg:grid-cols-2">
             <li
@@ -65,7 +67,7 @@ definePageMeta({
 const { t } = useLang('web', 'profile')
 const client = useApi()
 
-const { data, pending, refresh } = useApiFetch('/api/devices', { key: 'devices' })
+const { data, pending, error: loadError, refresh } = useApiFetch('/api/devices', { key: 'devices' })
 
 const devices = computed(() => {
   const d = data.value?.data ?? data.value

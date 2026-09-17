@@ -1,5 +1,5 @@
 <template>
-  <div class="overflow-hidden rounded-2xl border bg-card">
+  <div class="overflow-hidden rounded-card border bg-card">
     <AppSkeleton class="aspect-square w-full !rounded-none" />
     <div class="p-3">
       <AppSkeleton class="h-4 w-3/4" />

@@ -227,6 +227,11 @@ const { format } = usePrice();
 const { formatDate } = useDateFormat();
 const { list, pay } = useGifts();
 
+// Paying here spends from the wallet exactly as the purchase page does, so both surfaces
+// the site reads a balance from go stale at the same moment.
+const { refreshIdentity } = useSanctumAuth();
+const { refresh: refreshWallet } = useWallet();
+
 const { items, pending, refresh } = list();
 
 const gift = computed(
@@ -265,6 +270,7 @@ const payGift = () => pay(gift.value.id);
 const onPaid = async () => {
   await refresh();
   celebrate.value = true;
+  Promise.all([refreshIdentity(), refreshWallet()]).catch(() => {});
 };
 
 useSeoMeta({

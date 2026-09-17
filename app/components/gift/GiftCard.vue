@@ -1,7 +1,7 @@
 <template>
   <NuxtLink
     :to="`/gifts/${gift.id}`"
-    class="flex h-full flex-col gap-4 rounded-3xl border bg-card p-6 transition-colors hover:border-brand-rust/40"
+    class="flex h-full flex-col gap-4 rounded-card border bg-card p-6 transition-colors hover:border-brand-rust/40"
   >
     <div class="flex items-start justify-between gap-4">
       <div class="min-w-0">
@@ -43,7 +43,7 @@
 
       <span
         v-if="gift.is_redeemed"
-        class="rounded-md bg-brand-green/10 px-3 py-1 text-xs font-medium text-brand-green"
+        class="rounded-md bg-success/10 px-3 py-1 text-xs font-medium text-success"
         >{{ t("gift_redeemed", "Redeemed", "تم الاستخدام") }}</span
       >
 
@@ -84,7 +84,7 @@ const statusClass = computed(
   () =>
     ({
       awaiting_payment: "bg-brand-blush/40 text-brand-rust",
-      paid: "bg-brand-green/10 text-brand-green",
+      paid: "bg-success/10 text-success",
       cancelled: "bg-brand-mist text-muted-foreground",
     })[props.gift.status] ?? "bg-brand-mist text-muted-foreground",
 );

@@ -14,7 +14,9 @@
           <span class="size-10" />
         </div>
 
-        <ul v-if="pending && !items.length" class="grid gap-3 lg:grid-cols-2" aria-busy="true">
+        <AppLoadError v-if="error" :error="error" :retry="refresh" />
+
+        <ul v-else-if="pending && !items.length" class="grid gap-3 lg:grid-cols-2" aria-busy="true">
           <AppSkeleton v-for="n in 3" :key="n" class="h-28 w-full rounded-2xl!" />
         </ul>
 
@@ -95,7 +97,7 @@ const { formatDate } = useDateFormat()
 const PER_PAGE = 10
 const currentPage = computed(() => Math.max(1, Number(route.query.page ?? 1)))
 
-const { items, lastPage, pending } = useOrders({ page: currentPage, perPage: PER_PAGE })
+const { items, lastPage, pending, error, refresh } = useOrders({ page: currentPage, perPage: PER_PAGE })
 
 const itemCount = (order) => (order.items ?? []).reduce((sum, item) => sum + (item.quantity ?? 0), 0)
 

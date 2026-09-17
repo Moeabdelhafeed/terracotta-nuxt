@@ -24,23 +24,48 @@
     />
 
     <div class="mx-auto max-w-6xl px-5 py-12">
+      <div
+        v-if="!items.length"
+        class="mx-auto flex w-full max-w-xl flex-col items-center gap-3 rounded-card border bg-card p-10 text-center"
+      >
+        <span class="flex size-12 items-center justify-center rounded-control bg-brand-rust/10 text-brand-rust">
+          <LucideImageOff class="size-5" />
+        </span>
+        <h2 class="font-display text-lg font-semibold text-foreground">
+          {{ t("album_empty_title", "This album is empty", "هذا الألبوم فارغ") }}
+        </h2>
+        <p class="text-sm text-muted-foreground">
+          {{ t("album_empty_body", "Nothing has been added to it yet.", "لم تُضف أي صور إليه بعد.") }}
+        </p>
+      </div>
+
       <!-- Same wall as the album list: staggered heights, hairline gaps, square corners. -->
-      <ul class="columns-2 gap-1.5 lg:columns-3 [&>li]:mb-1.5">
+      <ul v-else class="columns-2 gap-1.5 lg:columns-3 [&>li]:mb-1.5">
         <li
-          v-for="(item, index) in category.items"
+          v-for="(item, index) in items"
           :key="item.id"
           class="break-inside-avoid bg-brand-mist"
         >
           <!-- AppMedia, so a video item plays in place instead of breaking the wall. -->
-          <AppMedia
-            :src="item"
-            :alt="category.title"
-            class="w-full object-cover"
-            :class="ratio(index)"
-          />
+          <button
+            type="button"
+            class="block w-full cursor-zoom-in"
+            :aria-label="t('album_open_photo', 'Open photograph :n', 'افتح الصورة :n', { n: index + 1 })"
+            data-test="album-item"
+            @click="viewing = index"
+          >
+            <AppMedia
+              :src="item"
+              :alt="category.title"
+              class="w-full object-cover"
+              :class="ratio(index)"
+            />
+          </button>
         </li>
       </ul>
     </div>
+
+    <AppLightbox v-model="viewing" :items="items" :alt="category.title" />
   </main>
 </template>
 
@@ -90,6 +115,9 @@ const crumbs = computed(() => [
   },
   { label: category.value?.title ?? "" },
 ]);
+
+const items = computed(() => asList(category.value?.items));
+const viewing = ref(null);
 
 const RATIOS = [
   "aspect-square",

@@ -81,12 +81,19 @@
         class="mt-8 grid gap-4 lg:grid-cols-2"
         aria-busy="true"
       >
-        <AppSkeleton v-for="n in 4" :key="n" class="h-32 w-full !rounded-3xl" />
+        <AppSkeleton v-for="n in 4" :key="n" class="h-32 w-full !rounded-card" />
       </div>
+
+      <AppLoadError
+        v-else-if="error"
+        data-test="bookings-error"
+        :error="error"
+        :retry="refresh"
+      />
 
       <p
         v-else-if="!items.length"
-        class="mx-auto mt-8 max-w-xl rounded-3xl border border-dashed p-10 text-center text-muted-foreground"
+        class="mx-auto mt-8 max-w-xl rounded-card border border-dashed p-10 text-center text-muted-foreground"
       >
         {{
           activeTab === "all"
@@ -145,7 +152,7 @@ const activeSort = computed(() =>
   BOOKING_SORTS.includes(route.query.sort) ? route.query.sort : "newest",
 );
 
-const { items, lastPage, pending, statusCounts } = useBookings({
+const { items, lastPage, pending, error, refresh, statusCounts } = useBookings({
   page,
   perPage: 10,
   status: computed(() =>

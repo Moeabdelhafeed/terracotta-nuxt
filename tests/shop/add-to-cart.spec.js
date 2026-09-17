@@ -8,7 +8,7 @@ const { api, lang, sanctum, toast, navigate } = await vi.hoisted(async () => {
   const { createApiMock, envelope, createLang, createSanctumState } = await import('../helpers/mockApi')
   return {
     api: createApiMock({
-      'GET /api/shop/cart': () => envelope({ items: [], total_price: '0.00' }),
+      'GET /api/shop/cart': () => envelope(globalThis.__cart),
       // The local basket refetches its products from the public catalogue; without this
       // the mock 404s and the guest's line is pruned as "gone" the moment it is added.
       'GET /api/shop/products/{id}': () => envelope({ id: 11, title: 'Cup', price: '45.00', in_stock: true, stock: 40, max_quantity: 40 }),
@@ -37,10 +37,11 @@ const { localCartIds } = await import('~/composables/useLocalShop')
 
 const product = (over = {}) => ({ id: 11, title: 'Cup', in_stock: true, stock: 40, max_quantity: 40, ...over })
 
-const mount = (over) => mountSuspended(ShopAddToCart, { props: { product: product(over) } })
+const mount = (over, props) => mountSuspended(ShopAddToCart, { props: { product: product(over), ...props } })
 const addButton = (wrapper) => wrapper.findAll('button').find((b) => b.text() === 'Add' || b.text() === 'Adding…')
 
 beforeEach(() => {
+  globalThis.__cart = { items: [], total_price: '0.00' }
   api.calls.length = 0
   navigate.mockClear()
   localCartIds.value = []
@@ -122,5 +123,62 @@ describe('ShopAddToCart — who may add', () => {
 
     expect(wrapper.text()).toContain('Only 2 of “Cup” are left.')
     expect(wrapper.find('a[href$="/cart"]').exists()).toBe(false)
+  })
+})
+
+describe('ShopAddToCart — the glaze goes with the line', () => {
+  it('sends the chosen hex as the variant id', async () => {
+    const wrapper = await mount({ colors: ['#81341a', '#345a4a'] }, { colour: '#345a4a' })
+
+    await addButton(wrapper).trigger('click')
+    await flushPromises()
+
+    const post = api.calls.find((call) => call.method === 'POST' && call.url === '/api/shop/cart')
+    expect(post.body).toEqual({ shop_product_id: 11, quantity: 1, color: '#345a4a' })
+  })
+
+  it('keeps two glazes of one piece apart in a guest basket', async () => {
+    sanctum.user.value = null
+
+    const first = await mount({}, { colour: '#81341a' })
+    await addButton(first).trigger('click')
+    await flushPromises()
+
+    const second = await mount({}, { colour: '#345a4a' })
+    await addButton(second).trigger('click')
+    await flushPromises()
+
+    expect(localCartIds.value).toEqual([
+      { id: 11, quantity: 1, color: '#81341a' },
+      { id: 11, quantity: 1, color: '#345a4a' },
+    ])
+  })
+})
+
+describe('ShopAddToCart — what the cart already holds', () => {
+  it('counts it, and takes it off what the stepper may ask for', async () => {
+    globalThis.__cart = {
+      items: [{ id: 1, product: { id: 11, max_quantity: 4 }, quantity: 3, unit_price: '45.00', line_total: '135.00', in_stock: true }],
+      total_price: '135.00',
+    }
+    const wrapper = await mount({ stock: 4, max_quantity: 4 })
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('3 of this already in your cart')
+    // One left of the four the server will take, so the plus is already at its ceiling.
+    expect(wrapper.findAll('button').find((b) => b.attributes('aria-label') === 'Increase quantity').attributes('disabled')).toBeDefined()
+    expect(addButton(wrapper).attributes('disabled')).toBeUndefined()
+  })
+
+  it('goes dead, and says why, once the cart holds the cap', async () => {
+    globalThis.__cart = {
+      items: [{ id: 1, product: { id: 11, max_quantity: 4 }, quantity: 4, unit_price: '45.00', line_total: '180.00', in_stock: true }],
+      total_price: '180.00',
+    }
+    const wrapper = await mount({ stock: 4, max_quantity: 4 })
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('you already have 4 of this in your cart')
+    expect(addButton(wrapper).attributes('disabled')).toBeDefined()
   })
 })

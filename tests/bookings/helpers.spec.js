@@ -4,6 +4,7 @@ import { describe, it, expect } from 'vitest'
 const {
   catalogueBounds, bookingState, hasDeliveryStep, productsQuery, productsBody,
   formatSlotTime, formatBookingDate, dateRange, daysUntil, isCatalogueType,
+  canChooseHandover, hoursUntil, pieceUnavailableReason,
 } = await import('~/composables/useBookings')
 
 describe('booking helpers', () => {
@@ -62,5 +63,32 @@ describe('booking helpers', () => {
     expect(isCatalogueType('paint_your_piece')).toBe(true)
     expect(isCatalogueType('make_your_candle')).toBe(true)
     expect(isCatalogueType('make_your_piece')).toBe(false)
+  })
+
+  it('keeps the handover re-choosable until the piece is handed over', () => {
+    const ready = { status: 'completed', pickup_deadline: '2099-07-11T00:00:00+00:00' }
+    expect(canChooseHandover({ ...ready, delivery_method: null, delivery_status: null })).toBe(true)
+    // Switching back to pickup credits the delivery fee, so it has to stay reachable.
+    expect(canChooseHandover({ ...ready, delivery_method: 'delivery', delivery_status: 'getting_ready' })).toBe(true)
+    expect(canChooseHandover({ ...ready, delivery_method: 'delivery', delivery_status: 'on_the_way' })).toBe(true)
+    expect(canChooseHandover({ ...ready, delivery_method: 'pickup', delivery_status: 'awaiting_pickup' })).toBe(true)
+    expect(canChooseHandover({ ...ready, delivery_method: 'pickup', delivery_status: 'completed' })).toBe(false)
+    // A candle has no handover leg to choose from at all.
+    expect(canChooseHandover({ status: 'completed', pickup_deadline: null, delivery_method: null })).toBe(false)
+    expect(canChooseHandover({ status: 'preparing', pickup_deadline: null })).toBe(false)
+  })
+
+  it('floors the collection countdown at zero, and answers null without a deadline', () => {
+    expect(hoursUntil(null)).toBe(null)
+    expect(hoursUntil('2020-01-01T00:00:00+00:00')).toBe(0)
+    expect(hoursUntil(new Date(Date.now() + 3 * 3600000 + 60000).toISOString())).toBe(3)
+  })
+
+  it('separates a piece booked in to be painted from one already painted', () => {
+    expect(pieceUnavailableReason({ id: 1 })).toBe(null)
+    expect(pieceUnavailableReason({ id: 1, is_available_to_paint: true })).toBe(null)
+    expect(pieceUnavailableReason({ id: 1, is_available_to_paint: false, painting_session: { is_upcoming: true } })).toBe('booked')
+    expect(pieceUnavailableReason({ id: 1, is_available_to_paint: false, painting_session: { is_upcoming: false } })).toBe('painted')
+    expect(pieceUnavailableReason({ id: 1, is_available_to_paint: false, painting_session: null })).toBe('painted')
   })
 })

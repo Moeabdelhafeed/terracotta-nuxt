@@ -12,7 +12,7 @@
         <h2 data-test="verify-success" class="font-display text-2xl font-semibold text-foreground">
           {{ t('account_created_success', 'Your account is ready', 'تم انشاء الحساب بنجاح') }}
         </h2>
-        <Button as-child size="lg" class="h-13 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90">
+        <Button as-child size="lg" class="h-13 w-full rounded-control bg-brand-rust text-base hover:bg-brand-rust/90">
           <NuxtLink to="/">{{ t('continue', 'Continue', 'استكمال') }}</NuxtLink>
         </Button>
       </div>
@@ -22,10 +22,10 @@
       <form class="flex flex-col gap-6" @submit.prevent="onSubmit">
         <div class="grid gap-3">
           <Label class="text-center">{{ t('enter_verification_code', 'Enter the verification code', 'أدخل رمز التحقق') }}</Label>
-          <AuthOtpInput v-model="otp" :length="OTP_LENGTH" />
+          <AuthOtpInput v-model="otp" :length="OTP_LENGTH" @complete="onSubmit" />
           <span v-if="errors.otp" class="text-center text-xs text-destructive">{{ errors.otp[0] }}</span>
           <span v-else-if="error" class="text-center text-xs text-destructive">{{ error }}</span>
-          <span v-if="attempts >= 3" class="text-center text-xs text-amber-600">
+          <span v-if="attempts >= 3" class="text-center text-xs text-warning">
             {{ t('otp_attempts_warning', 'A few more wrong tries and this code stops working — ask for a new one.', 'محاولات خاطئة قليلة أخرى وسيتوقف هذا الرمز — اطلب رمزًا جديدًا.') }}
           </span>
         </div>
@@ -33,7 +33,7 @@
         <Button
           type="submit"
           size="lg"
-          class="h-13 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+          class="h-13 w-full rounded-control bg-brand-rust text-base hover:bg-brand-rust/90"
           :disabled="loading || resending || otp.length < OTP_LENGTH"
         >
           {{ loading ? t('verifying', 'Verifying...', 'جارٍ التحقق...') : t('verify', 'Verify', 'تحقق') }}
@@ -52,7 +52,7 @@
                 ? t('resend_code_in', 'Resend the code :timer', 'اعادة ارسال الرمز :timer', { timer: countdown })
                 : t('resend_code', 'Resend the code', 'اعادة ارسال الرمز') }}
           </button>
-          <Button variant="outline" size="sm" class="rounded-xl" :disabled="loggingOut || loading || resending" @click="handleLogout">
+          <Button variant="outline" size="sm" class="rounded-control" :disabled="loggingOut || loading || resending" @click="handleLogout">
             {{ loggingOut ? t('logging_out', 'Logging out...', 'جارٍ تسجيل الخروج...') : t('logout', 'Sign out', 'تسجيل الخروج') }}
           </Button>
         </div>
@@ -121,6 +121,7 @@ const handleLogout = async () => {
 }
 
 const onSubmit = async () => {
+  if (loading.value) return
   errors.value = {}
   error.value = ''
   loading.value = true

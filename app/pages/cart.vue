@@ -16,18 +16,22 @@
           <AppSkeleton
             v-for="n in 3"
             :key="n"
-            class="h-32 w-full rounded-2xl!"
+            class="h-32 w-full rounded-card!"
           />
         </div>
-        <AppSkeleton class="h-48 w-full rounded-2xl!" />
+        <AppSkeleton class="h-48 w-full rounded-card!" />
       </div>
+
+      <!-- A basket that failed to load is not an empty basket: "your cart is empty"
+           told to someone whose request 500'd hides whatever is actually in it. -->
+      <AppLoadError v-else-if="error" :error="error" :retry="refresh" class="mt-8" />
 
       <div
         v-else-if="!items.length"
-        class="mx-auto mt-8 max-w-xl rounded-3xl border bg-card p-8 text-center sm:p-12"
+        class="mx-auto mt-8 max-w-xl rounded-sheet border bg-card p-8 text-center sm:p-12"
       >
         <span
-          class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-rust/10 text-brand-rust"
+          class="mx-auto flex size-14 items-center justify-center rounded-card bg-brand-rust/10 text-brand-rust"
         >
           <LucideShoppingBag class="size-6" />
         </span>
@@ -45,7 +49,7 @@
         </p>
         <Button
           as-child
-          class="mt-6 h-12 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+          class="mt-6 h-12 bg-brand-rust text-base hover:bg-brand-rust/90"
         >
           <NuxtLink to="/shop">{{
             t("browse_shop", "Browse the shop", "تصفح المتجر")
@@ -59,7 +63,7 @@
       >
         <ShopCartLines />
 
-        <aside class="rounded-3xl border bg-card p-6 sm:p-8 lg:sticky lg:top-6">
+        <aside class="rounded-sheet border bg-card p-6 sm:p-8 lg:sticky lg:top-6">
           <div class="flex items-center justify-between gap-4">
             <span class="text-sm text-muted-foreground">{{
               t("summary_total", "Total", "الإجمالي", { subGroup: "checkout" })
@@ -81,7 +85,7 @@
 
           <p
             v-if="hasOutOfStock"
-            class="mt-4 flex items-start gap-2 rounded-2xl bg-destructive/10 px-4 py-3 text-sm text-destructive"
+            class="mt-4 flex items-start gap-2 rounded-card bg-destructive/10 px-4 py-3 text-sm text-destructive"
           >
             <LucideAlertCircle class="mt-0.5 size-4 shrink-0" />
             <span>{{
@@ -96,7 +100,7 @@
           <Button
             type="button"
             :disabled="!canCheckout"
-            class="mt-6 h-12 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+            class="mt-6 h-12 w-full bg-brand-rust text-base hover:bg-brand-rust/90"
             @click="onPay"
           >
             {{
@@ -133,16 +137,23 @@ definePageMeta({
  */
 const { t } = useLang("web", "shop");
 const { format } = usePrice();
-const { items, total, hasOutOfStock, canCheckout, pending } = useCart();
-const { isRegistered } = useIsRegistered();
+const { items, total, hasOutOfStock, canCheckout, pending, error, refresh } =
+  useCart();
+const { isRegistered, account } = useIsRegistered();
 
 // The local basket only exists after hydration; without this the empty panel flashes.
 const mounted = useMounted();
 
-const onPay = () =>
-  isRegistered.value
-    ? navigateTo("/checkout")
-    : navigateTo({ path: "/login", query: { redirect: "/checkout" } });
+/**
+ * Both gates here rather than at `/checkout`: finding out you need an account, or that
+ * the account needs verifying, at the payment step is worse than being told now.
+ */
+const onPay = () => {
+  if (!isRegistered.value)
+    return navigateTo({ path: "/login", query: { redirect: "/checkout" } });
+  if (!account.value?.verified_at) return navigateTo({ name: "verify" });
+  return navigateTo("/checkout");
+};
 
 const crumbs = computed(() => [
   {

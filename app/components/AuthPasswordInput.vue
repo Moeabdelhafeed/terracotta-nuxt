@@ -4,7 +4,7 @@
       :id="id"
       v-model="modelValue"
       :type="visible ? 'text' : 'password'"
-      class="h-12 rounded-xl pe-11 text-base"
+      class="h-12 rounded-field pe-11 text-base"
       v-bind="$attrs"
     />
     <button
@@ -27,6 +27,10 @@
 defineProps({
   id: { type: String, required: true },
 })
+
+// Everything else (`required`, `minlength`, …) belongs to the field itself, not to the
+// wrapper that holds the eye toggle.
+defineOptions({ inheritAttrs: false })
 
 const modelValue = defineModel({ type: String, default: '' })
 const { t } = useLang('web', 'general')

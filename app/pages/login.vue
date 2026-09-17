@@ -29,7 +29,7 @@
               :key="kind"
               type="button"
               size="sm"
-              class="rounded-xl"
+              class="rounded-control"
               :variant="identifierType === kind ? 'default' : 'outline'"
               @click="identifierType = kind"
               >{{ labelFor(kind) }}</Button
@@ -50,7 +50,7 @@
               v-model="form.identifier"
               :type="identifierInputType"
               :placeholder="identifierPlaceholder"
-              class="h-12 rounded-xl text-base"
+              class="h-12 rounded-field text-base"
               required
             />
             <span v-if="checking" class="text-xs text-muted-foreground">{{
@@ -81,7 +81,7 @@
             >
             <span
               v-else-if="identifierStatus === 'pending_deletion'"
-              class="text-xs text-amber-600"
+              class="text-xs text-warning"
               >{{
                 t(
                   "account_pending_deletion_hint",
@@ -112,7 +112,7 @@
             </span>
             <span
               v-if="identifierStatus === 'active' && !hasPasswordOnAccount"
-              class="text-xs text-amber-600"
+              class="text-xs text-warning"
             >
               {{
                 t(
@@ -135,7 +135,7 @@
               id="name"
               v-model="form.name"
               type="text"
-              class="h-12 rounded-xl text-base"
+              class="h-12 rounded-field text-base"
               :placeholder="t('placeholder_name', 'John Doe', 'محمد أحمد')"
               required
             />
@@ -158,7 +158,17 @@
                 t("password", "Password", "كلمة المرور")
               }}</Label>
               <NuxtLink
-                to="/forgot-password"
+                :to="{
+                  path: '/forgot-password',
+                  query: {
+                    ...(form.identifier
+                      ? { identifier: form.identifier, type: identifierType }
+                      : {}),
+                    ...(redirectTarget === '/'
+                      ? {}
+                      : { redirect: redirectTarget }),
+                  },
+                }"
                 class="text-xs font-medium text-brand-rust underline-offset-4 hover:underline"
                 >{{
                   t("forgot_password", "Forgot password?", "نسيت كلمة السر؟")
@@ -173,7 +183,7 @@
           <Button
             type="submit"
             size="lg"
-            class="h-13 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+            class="h-13 w-full rounded-control bg-brand-rust text-base hover:bg-brand-rust/90"
             :disabled="submitDisabled"
             >{{ submitLabel }}</Button
           >
@@ -205,7 +215,11 @@
           >{{ t("no_account", "No account?", "ليس لديك حساب؟") }}&nbsp;</span
         >
         <NuxtLink
-          to="/register"
+          :to="{
+            path: '/register',
+            query:
+              redirectTarget === '/' ? {} : { redirect: redirectTarget },
+          }"
           class="font-medium text-brand-rust underline-offset-4 hover:underline"
           >{{ t("register", "Register", "إنشاء حساب") }}</NuxtLink
         >
@@ -244,7 +258,7 @@
           @click="loading || (restoreDialogOpen = false)"
         />
         <div
-          class="relative w-full max-w-md rounded-lg border bg-background p-6 shadow-lg"
+          class="relative w-full max-w-md rounded-sheet border bg-background p-6"
         >
           <h2 class="text-lg font-semibold">
             {{
@@ -381,6 +395,11 @@ const submitLabel = computed(() => {
 });
 
 const { user, login, refreshIdentity } = useSanctumAuth();
+const route = useRoute();
+
+// Where the visitor was headed before they were asked to sign in — a gift claim link
+// sends `?redirect=/gift/<token>`. Only ever a path on this site; see `safeAuthRedirect`.
+const redirectTarget = computed(() => safeAuthRedirect(route.query.redirect));
 
 const clearGuestUser = () => {
   if (user.value?.data?.is_guest) user.value = null;
@@ -389,37 +408,6 @@ const clearGuestUser = () => {
 const persistTokenId = (tokenId) => {
   if (tokenId == null || !import.meta.client) return;
   document.cookie = `current_token_id=${tokenId}; path=/; SameSite=Lax; max-age=${60 * 60 * 24 * 365}`;
-};
-
-const detectDeviceMeta = () => {
-  if (!import.meta.client) return { device_name: "Web", platform: "web" };
-  const ua = navigator.userAgent || "";
-  const uaData = navigator.userAgentData;
-  const browser =
-    uaData?.brands?.find((b) => !/Not.?A.?Brand/i.test(b.brand))?.brand ??
-    (/Edg\//.test(ua)
-      ? "Edge"
-      : /Chrome\//.test(ua)
-        ? "Chrome"
-        : /Firefox\//.test(ua)
-          ? "Firefox"
-          : /Safari\//.test(ua)
-            ? "Safari"
-            : "Browser");
-  const os =
-    uaData?.platform ??
-    (/Windows/.test(ua)
-      ? "Windows"
-      : /Mac OS X|Macintosh/.test(ua)
-        ? "Mac"
-        : /Android/.test(ua)
-          ? "Android"
-          : /iPhone|iPad|iOS/.test(ua)
-            ? "iOS"
-            : /Linux/.test(ua)
-              ? "Linux"
-              : "Unknown");
-  return { device_name: `${browser} on ${os}`, platform: "web" };
 };
 
 let debounce = null;
@@ -479,10 +467,14 @@ const performLogin = async () => {
   try {
     clearGuestUser();
     const res = await login(
-      { ...form.value, type: identifierType.value, ...detectDeviceMeta() },
+      { ...form.value, type: identifierType.value, ...authDeviceMeta() },
       true,
     );
     persistTokenId(res?.data?.token_id ?? res?.token_id);
+    // `login` has already sent them to `redirect.onLogin`; this is the second half of
+    // the journey they were on.
+    if (redirectTarget.value !== "/")
+      await navigateTo(redirectTarget.value, { replace: true });
   } catch (error) {
     errors.value = error.data?.errors ?? {};
   } finally {
@@ -503,7 +495,13 @@ const performOtpRequest = async () => {
     await client("/api/login", { method: "POST", body });
     navigateTo({
       path: "/verify-login",
-      query: { identifier: form.value.identifier, type: identifierType.value },
+      query: {
+        identifier: form.value.identifier,
+        type: identifierType.value,
+        ...(redirectTarget.value === "/"
+          ? {}
+          : { redirect: redirectTarget.value }),
+      },
     });
   } catch (error) {
     errors.value = error.data?.errors ?? {};
@@ -540,7 +538,7 @@ const onSocial = async ({ idToken, error }) => {
   try {
     const res = await client("/api/firebase-login", {
       method: "POST",
-      body: { token: idToken, ...detectDeviceMeta() },
+      body: { token: idToken, ...authDeviceMeta() },
     });
     const token = res?.data?.token ?? res?.token;
     if (token) {
@@ -549,7 +547,7 @@ const onSocial = async ({ idToken, error }) => {
     }
     persistTokenId(res?.data?.token_id ?? res?.token_id);
     await refreshIdentity();
-    navigateTo({ name: "home" });
+    navigateTo(redirectTarget.value);
   } catch (err) {
     const tokenErr = err?.data?.errors?.token?.[0];
     const map = {

@@ -362,6 +362,13 @@ const openInApp = () => {
 // wallet credit, so it is sent through sign-in like a visitor with no session at all.
 const { isRegistered: canRedeem } = useIsRegistered();
 
+/**
+ * The claim moves money into the reader's wallet, and every other screen reads that
+ * balance off the identity. The ledger is not touched here: this page is public, and a
+ * visitor with no session would only earn a 401 for it.
+ */
+const { refreshIdentity } = useSanctumAuth();
+
 const redeeming = ref(false);
 const redeemError = ref("");
 const credited = ref(null);
@@ -374,6 +381,7 @@ const claim = async () => {
     const res = await redeem(route.params.token);
     credited.value = res?.data ?? null;
     celebrate.value = true;
+    refreshIdentity().catch(() => {});
   } catch (err) {
     const normalized = normalizeApiError(err);
     // `errors.gift` carries all four refusals — already redeemed, not paid, your own
@@ -388,10 +396,13 @@ const claim = async () => {
 };
 
 /**
- * Login has no `redirect` of its own — it lands on the home page — so the intent is
- * parked in `sessionStorage` against this exact token and picked up the next time this
- * same link is opened with a session. The `redirect` query is sent anyway, so it starts
- * working the day login honours it.
+ * `redirect` is a SAME-ORIGIN RELATIVE PATH, never an absolute URL — sign-in sends the
+ * reader wherever it points, so anything off-site would be an open redirect on a page
+ * strangers are handed by link.
+ *
+ * The same intent is also parked in `sessionStorage` against this exact token: the query
+ * is lost the moment sign-in becomes a cold start (an OTP in another tab, the app taking
+ * over the link), and the parked copy is what survives that.
  */
 const goSignIn = () => {
   rememberPendingGift(route.params.token);

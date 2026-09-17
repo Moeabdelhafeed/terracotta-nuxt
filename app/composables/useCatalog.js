@@ -62,7 +62,7 @@ export const useProducts = (
   query = {},
   { path = "/api/shop/products", key = "shop-products" } = {},
 ) => {
-  const { data, pending } = useApiFetch(path, {
+  const { data, pending, error, refresh } = useApiFetch(path, {
     key,
     query,
     // With a numeric `per_page` the endpoint returns a paginator; with `all` a bare array.
@@ -87,6 +87,10 @@ export const useProducts = (
     lastPage: computed(() => data.value?.lastPage ?? 1),
     total: computed(() => data.value?.total ?? 0),
     pending,
+    // Without these a failed request is indistinguishable from an empty shelf: `default`
+    // hands the page `items: []` and it prints "Nothing here yet."
+    error,
+    refresh,
   };
 };
 

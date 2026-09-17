@@ -1,7 +1,16 @@
 <template>
   <main>
     <HomeSplash />
+
+    <!-- A failed `GET /api/home` used to leave hero, banners, categories and both grids
+         silently absent, which reads as a studio with nothing on. Say so, and offer the
+         one thing that can fix it. -->
+    <div v-if="error" class="mx-auto max-w-6xl px-6 py-16">
+      <AppLoadError :error="error" :retry="refresh" />
+    </div>
+
     <HomeHero />
+    <HomeLiveStrip />
     <HomeIntro />
     <HomeBooking />
     <HomeWorkshops />
@@ -11,11 +20,15 @@
       :products="featuredProducts"
       :title="t('featured_pieces', 'Featured pieces', 'القطع المميزة')"
       anchor="featured"
+      to="/shop?featured=1"
+      :count-query="{ featured: 1 }"
     />
     <HomeProductGrid
       :products="offers"
       :title="t('latest_offers', 'Latest offers', 'اخر العروض')"
       anchor="offers"
+      to="/shop?sale=1"
+      :count-query="{ on_sale: 1 }"
     />
     <HomeGallery />
     <HomeApp />
@@ -30,7 +43,7 @@ definePageMeta({
   name: 'home',
 })
 
-const { featuredProducts, offers } = useHome()
+const { featuredProducts, offers, error, refresh } = useHome()
 const { t } = useLang('web', 'home')
 const { media } = useMedia('web', 'heroes')
 

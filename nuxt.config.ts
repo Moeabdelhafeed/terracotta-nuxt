@@ -1,17 +1,27 @@
 import tailwindcss from "@tailwindcss/vite"
 
+// The site's own identity. Read by @nuxtjs/seo and nuxt-i18n, which resolve at build time
+// rather than through runtimeConfig, so they cannot be overridden by a deploy variable —
+// change them here.
+const SITE_URL = 'https://terracotta-ksa.com'
+const SITE_NAME = 'Terracotta'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
+  // Everything the project needs to boot lives here, not in a `.env` — Nuxt still lets a
+  // deploy override any of it with the matching `NUXT_*` variable, so production points
+  // itself at the real API without the file being edited. The ONE exception is the API
+  // token below: this repository is public, so the secret stays in the environment.
   runtimeConfig: {
-    xApiToken: '',        // NUXT_X_API_TOKEN — private, server-only. Injected by server/api/[...].js proxy.
-    apiBaseUrl: '',       // NUXT_API_BASE_URL — private. Real Laravel URL the proxy forwards to.
+    xApiToken: '',        // NUXT_X_API_TOKEN — secret. Never hardcode it; see .env.example.
+    apiBaseUrl: 'http://localhost:8000', // NUXT_API_BASE_URL overrides this on a deploy.
     public: {
       baseUrl: '',        // own origin (relative). Client fetches hit Nitro proxy, not Laravel directly.
-      translationsMode: process.env.NUXT_PUBLIC_TRANSLATIONS_MODE, // 'remote' | 'local'
+      translationsMode: 'remote', // 'remote' | 'local'
       // Baked in at build time. Passenger (Hostinger's Node host) runs several worker
       // processes and spawns them lazily, so several PIDs is normal — several *builds* is
       // not, and that is what /api/_build compares.
@@ -69,7 +79,7 @@ export default defineNuxtConfig({
   },
 
   i18n: {
-    baseUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    baseUrl: SITE_URL,
     // Arabic is the backend's default language (LanguageSeeder: ar is_default=true,
     // APP_LOCALE=ar) — the storefront is Arabic-first, English stays available.
     defaultLocale: 'ar',
@@ -105,8 +115,8 @@ export default defineNuxtConfig({
   },
 
   site: {
-    name: process.env.NUXT_PUBLIC_SITE_NAME || 'Terracotta',
-    url: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    name: SITE_NAME,
+    url: SITE_URL,
     defaultLocale: 'ar',
   },
 

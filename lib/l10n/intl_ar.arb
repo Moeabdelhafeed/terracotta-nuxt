@@ -1,0 +1,3513 @@
+{
+  "@@locale": "ar",
+  "@@last_modified": "2026-04-20T00:00:00Z",
+  "common_cancel": "إلغاء",
+  "common_done": "تم",
+  "common_ok": "موافق",
+  "common_error": "خطأ",
+  "common_success": "نجاح",
+  "common_retry": "إعادة المحاولة",
+  "common_loading": "جارٍ التحميل...",
+  "common_select_time": "اختر الوقت",
+  "auth_sign_in": "تسجيل الدخول",
+  "auth_remember_me": "أبقني مسجّل الدخول",
+  "auth_sign_out": "تسجيل الخروج",
+  "auth_register": "إنشاء حساب",
+  "auth_forgot_password": "نسيت كلمة السر؟",
+  "auth_enter_otp": "أدخل الرمز المكوّن من {digits} أرقام المرسل إلى هاتفك",
+  "auth_welcome_back": "مرحبًا بعودتك، {name}",
+  "auth_first_name_field_title": "الاسم الأول",
+  "auth_last_name_field_title": "اسم العائلة",
+  "auth_phone_number_field_title": "رقم الهاتف",
+  "auth_password_field_title": "كلمة السر",
+  "auth_confirm_password_field_title": "تأكيد كلمة المرور",
+  "auth_enter_first_name_hint": "أدخل اسمك الأول",
+  "auth_enter_last_name_hint": "أدخل اسم العائلة",
+  "auth_enter_phone_number_hint": "أدخل رقم هاتفك",
+  "auth_enter_middle_name_hint": "أدخل اسمك الأوسط",
+  "auth_enter_father_name_hint": "أدخل اسم الأب",
+  "auth_enter_full_name_hint": "أدخل اسمك الكامل",
+  "auth_enter_password_hint": "أدخل كلمة السر",
+  "auth_enter_confirm_password_hint": "أكّد كلمة المرور",
+  "cart_items": "{count, plural, zero{سلتك فارغة} one{عنصر واحد} two{عنصران} few{{count} عناصر} many{{count} عنصرًا} other{{count} عنصر}}",
+  "notifications_count": "{count, plural, zero{لا توجد إشعارات جديدة} one{إشعار واحد جديد} two{إشعاران جديدان} few{{count} إشعارات جديدة} many{{count} إشعارًا جديدًا} other{{count} إشعار جديد}}",
+  "validator_contains_inappropriate_language": "يحتوي على ألفاظ غير لائقة",
+  "validator_field_is_required": "هذا الحقل مطلوب",
+  "validator_invalid_format": "صيغة غير صالحة",
+  "validator_must_be_at_least_n_characters": "يجب أن يحتوي على {n} أحرف على الأقل",
+  "validator_must_be_at_most_n_characters": "يجب ألّا يتجاوز {n} حرفًا",
+  "validator_must_be_at_least_n": "يجب أن يكون {n} على الأقل",
+  "validator_must_be_at_most_n": "يجب ألّا يتجاوز {n}",
+  "validator_first_name_cannot_be_empty": "الاسم الأول لا يمكن أن يكون فارغًا",
+  "validator_first_name_must_be_at_least_3_characters": "يجب أن يحتوي الاسم الأول على 3 أحرف على الأقل",
+  "validator_first_name_must_be_less_than_50_characters": "يجب ألّا يتجاوز الاسم الأول 50 حرفًا",
+  "validator_first_name_must_contain_only_letters_and_spaces": "يجب أن يحتوي الاسم الأول على حروف ومسافات فقط",
+  "validator_last_name_cannot_be_empty": "اسم العائلة لا يمكن أن يكون فارغًا",
+  "validator_last_name_must_be_at_least_3_characters": "يجب أن يحتوي اسم العائلة على 3 أحرف على الأقل",
+  "validator_last_name_must_be_less_than_50_characters": "يجب ألّا يتجاوز اسم العائلة 50 حرفًا",
+  "validator_last_name_must_contain_only_letters_and_spaces": "يجب أن يحتوي اسم العائلة على حروف ومسافات فقط",
+  "validator_middle_name_cannot_be_empty": "الاسم الأوسط لا يمكن أن يكون فارغًا",
+  "validator_middle_name_must_be_at_least_3_characters": "يجب أن يحتوي الاسم الأوسط على 3 أحرف على الأقل",
+  "validator_middle_name_must_be_less_than_50_characters": "يجب ألّا يتجاوز الاسم الأوسط 50 حرفًا",
+  "validator_middle_name_must_contain_only_letters_and_spaces": "يجب أن يحتوي الاسم الأوسط على حروف ومسافات فقط",
+  "validator_father_name_cannot_be_empty": "اسم الأب لا يمكن أن يكون فارغًا",
+  "validator_father_name_must_be_at_least_3_characters": "يجب أن يحتوي اسم الأب على 3 أحرف على الأقل",
+  "validator_father_name_must_be_less_than_50_characters": "يجب ألّا يتجاوز اسم الأب 50 حرفًا",
+  "validator_father_name_must_contain_only_letters_and_spaces": "يجب أن يحتوي اسم الأب على حروف ومسافات فقط",
+  "validator_full_name_cannot_be_empty": "الاسم الكامل لا يمكن أن يكون فارغًا",
+  "validator_full_name_must_be_less_than_100_characters": "يجب ألّا يتجاوز الاسم الكامل 100 حرف",
+  "validator_full_name_must_contain_only_letters_and_spaces": "يجب أن يحتوي الاسم الكامل على حروف ومسافات فقط",
+  "validator_full_name_must_have_at_least_n_parts": "يجب أن يتكون الاسم الكامل من {count} مقاطع على الأقل",
+  "validator_name_must_use_arabic_letters": "يجب إدخال الاسم بأحرف عربية",
+  "validator_name_must_use_latin_letters": "يجب إدخال الاسم بأحرف إنجليزية",
+  "validator_phone_number_cannot_be_empty": "رقم الهاتف لا يمكن أن يكون فارغًا",
+  "validator_phone_number_must_contain_only_digits": "يجب أن يحتوي رقم الهاتف على أرقام فقط",
+  "validator_phone_number_is_too_short": "رقم الهاتف قصير جدًا",
+  "validator_phone_number_is_too_long": "رقم الهاتف طويل جدًا",
+  "validator_invalid_country_code": "رمز الدولة غير صالح",
+  "validator_password_cannot_be_empty": "كلمة المرور لا يمكن أن تكون فارغة",
+  "validator_password_must_be_at_least_6_characters": "يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل",
+  "validator_password_must_contain_at_least_one_uppercase_letter": "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل",
+  "validator_password_must_contain_at_least_one_lowercase_letter": "يجب أن تحتوي كلمة المرور على حرف صغير واحد على الأقل",
+  "validator_password_must_contain_at_least_one_number": "يجب أن تحتوي كلمة المرور على رقم واحد على الأقل",
+  "validator_password_must_contain_at_least_one_special_character": "يجب أن تحتوي كلمة المرور على رمز خاص واحد على الأقل",
+  "validator_confirm_password_cannot_be_empty": "تأكيد كلمة المرور لا يمكن أن يكون فارغًا",
+  "validator_confirm_password_must_be_the_same_as_password": "يجب أن يطابق تأكيد كلمة المرور كلمة المرور",
+  "validator_gender_cannot_be_empty": "الجنس لا يمكن أن يكون فارغًا",
+  "validator_email_cannot_be_empty": "البريد الإلكتروني لا يمكن أن يكون فارغًا",
+  "validator_email_must_be_valid": "يجب أن يكون البريد الإلكتروني صالحًا",
+  "validator_age_cannot_be_empty": "العمر لا يمكن أن يكون فارغًا",
+  "validator_age_must_be_at_least_12": "يجب أن يكون العمر 12 سنة على الأقل",
+  "validator_age_must_be_less_than_100": "يجب أن يكون العمر أقل من 100 سنة",
+  "validator_username_cannot_be_empty": "اسم المستخدم لا يمكن أن يكون فارغًا",
+  "validator_username_must_be_at_least_3_characters": "يجب أن يحتوي اسم المستخدم على 3 أحرف على الأقل",
+  "validator_username_must_be_less_than_20_characters": "يجب ألّا يتجاوز اسم المستخدم 20 حرفًا",
+  "validator_username_must_be_valid": "يجب أن يكون اسم المستخدم صالحًا",
+  "validator_otp_cannot_be_empty": "رمز التحقق لا يمكن أن يكون فارغًا",
+  "validator_otp_must_be_n_digits": "يجب أن يتكوّن رمز التحقق من {length} أرقام",
+  "validator_date_of_birth_cannot_be_empty": "تاريخ الميلاد لا يمكن أن يكون فارغًا",
+  "validator_date_of_birth_must_be_valid": "يجب أن يقع تاريخ الميلاد بين عام 1900 والتاريخ الحالي",
+  "validator_date_cannot_be_empty": "التاريخ لا يمكن أن يكون فارغًا",
+  "validator_date_must_be_in_the_future": "يجب أن يكون التاريخ في المستقبل",
+  "validator_date_must_be_in_the_past": "يجب أن يكون التاريخ في الماضي",
+  "validator_age_at_least_n_years": "يجب ألّا يقل العمر عن {years} عامًا",
+  "validator_age_under_n_years": "يجب ألّا يزيد العمر عن {years} عامًا",
+  "validator_passport_number_cannot_be_empty": "رقم جواز السفر لا يمكن أن يكون فارغًا",
+  "validator_passport_number_must_be_at_least_3_characters": "يجب أن يحتوي رقم جواز السفر على 3 أحرف على الأقل",
+  "validator_passport_number_must_be_less_than_50_characters": "يجب ألّا يتجاوز رقم جواز السفر 50 حرفًا",
+  "validator_passport_expiry_date_cannot_be_empty": "تاريخ انتهاء جواز السفر لا يمكن أن يكون فارغًا",
+  "validator_passport_expiry_date_must_be_at_least_6_months_from_now": "يجب أن يكون تاريخ انتهاء جواز السفر بعد 6 أشهر على الأقل من الآن",
+  "validator_number_cannot_be_empty": "الرقم لا يمكن أن يكون فارغًا",
+  "validator_must_be_a_valid_number": "يجب أن يكون رقمًا صالحًا",
+  "validator_must_be_a_valid_integer": "يجب أن يكون عددًا صحيحًا صالحًا",
+  "validator_list_cannot_be_empty": "يرجى اختيار عنصر واحد على الأقل",
+  "validator_list_must_have_at_least": "يرجى اختيار {n} عناصر على الأقل",
+  "validator_list_must_have_at_most": "يرجى اختيار {n} عناصر كحد أقصى",
+  "validator_card_number_cannot_be_empty": "رقم البطاقة لا يمكن أن يكون فارغًا",
+  "validator_card_number_must_be_valid": "رقم البطاقة غير صالح",
+  "validator_card_expiry_cannot_be_empty": "تاريخ انتهاء البطاقة لا يمكن أن يكون فارغًا",
+  "validator_card_expiry_must_be_valid": "يجب أن يكون تاريخ الانتهاء بصيغة شهر/سنة (MM/YY أو MM/YYYY)",
+  "validator_card_expiry_must_be_mm_yy": "يجب أن يكون تاريخ الانتهاء بصيغة MM/YY",
+  "validator_card_expiry_month_invalid": "يجب أن يكون الشهر بين 01 و 12",
+  "validator_card_expiry_must_be_in_the_future": "البطاقة منتهية الصلاحية",
+  "validator_card_cvv_cannot_be_empty": "رمز CVV لا يمكن أن يكون فارغًا",
+  "validator_card_cvv_must_be_valid": "يجب أن يتكوّن رمز CVV من 3 أو 4 أرقام",
+  "validator_card_cvv_must_be_n_digits": "يجب أن يتكون رمز CVV من {length} أرقام",
+  "validator_latitude_cannot_be_empty": "خط العرض لا يمكن أن يكون فارغًا",
+  "validator_latitude_must_be_valid": "يجب أن يكون خط العرض بين -90 و 90",
+  "validator_longitude_cannot_be_empty": "خط الطول لا يمكن أن يكون فارغًا",
+  "validator_longitude_must_be_valid": "يجب أن يكون خط الطول بين -180 و 180",
+  "validator_postal_code_cannot_be_empty": "الرمز البريدي لا يمكن أن يكون فارغًا",
+  "validator_postal_code_must_be_valid": "الرمز البريدي غير صالح",
+  "validator_ip_address_cannot_be_empty": "عنوان IP لا يمكن أن يكون فارغًا",
+  "validator_ip_address_must_be_valid": "عنوان IP غير صالح",
+  "validator_port_cannot_be_empty": "المنفذ لا يمكن أن يكون فارغًا",
+  "validator_port_must_be_valid": "يجب أن يكون المنفذ بين 1 و 65535",
+  "validator_mac_address_cannot_be_empty": "عنوان MAC لا يمكن أن يكون فارغًا",
+  "validator_mac_address_must_be_valid": "عنوان MAC غير صالح",
+  "validator_iban_cannot_be_empty": "رقم الآيبان لا يمكن أن يكون فارغًا",
+  "validator_iban_must_be_valid": "رقم الآيبان غير صالح",
+  "validator_iban_length_for_country": "يجب أن يتكون رقم الآيبان لدولة {country} من {length} خانة",
+  "validator_vin_cannot_be_empty": "رقم VIN لا يمكن أن يكون فارغًا",
+  "validator_vin_must_be_valid": "رقم VIN غير صالح",
+  "validator_file_size_cannot_be_empty": "حجم الملف مفقود",
+  "validator_file_size_too_large": "حجم الملف كبير جدًا",
+  "validator_file_name_cannot_be_empty": "اسم الملف لا يمكن أن يكون فارغًا",
+  "validator_file_name_invalid": "اسم الملف يحتوي على أحرف غير صالحة",
+  "validator_file_extension_not_allowed": "امتداد الملف غير مسموح به",
+  "validator_url_cannot_be_empty": "الرابط لا يمكن أن يكون فارغًا",
+  "validator_url_must_be_valid": "يجب أن يكون الرابط صالحًا",
+  "validator_url_must_start_with_http_or_https": "يجب أن يبدأ الرابط بـ http:// أو https://",
+  "validator_image_url_cannot_be_empty": "رابط الصورة لا يمكن أن يكون فارغًا",
+  "validator_image_url_must_be_valid": "يجب أن يكون رابط الصورة صالحًا",
+  "validator_video_url_cannot_be_empty": "رابط الفيديو لا يمكن أن يكون فارغًا",
+  "validator_video_url_must_be_valid": "يجب أن يكون رابط الفيديو صالحًا",
+  "media_failed_to_pick_image": "فشل اختيار الصورة",
+  "media_failed_to_pick_images": "فشل اختيار الصور",
+  "media_failed_to_pick_video": "فشل اختيار الفيديو",
+  "media_failed_to_pick_videos": "فشل اختيار مقاطع الفيديو",
+  "media_failed_to_compress_image": "فشل ضغط الصورة",
+  "media_image_too_large_compression_failed": "الصورة كبيرة جدًا، فشل الضغط",
+  "nav_page_not_found": "الصفحة غير موجودة",
+  "nav_go_home": "العودة إلى الرئيسية",
+  "nav_exit_confirm": "اسحب مرة أخرى للخروج",
+  "api_status_continue": "متابعة",
+  "api_status_switching_protocols": "تبديل البروتوكولات",
+  "api_status_processing": "جارٍ المعالجة",
+  "api_status_early_hints": "تلميحات مبكرة",
+  "api_status_ok": "ناجح",
+  "api_status_created": "تم الإنشاء",
+  "api_status_accepted": "تم القبول",
+  "api_status_non_authoritative_information": "معلومات غير موثّقة",
+  "api_status_no_content": "لا يوجد محتوى",
+  "api_status_reset_content": "إعادة تعيين المحتوى",
+  "api_status_partial_content": "محتوى جزئي",
+  "api_status_multi_status": "حالة متعددة",
+  "api_status_already_reported": "تم الإبلاغ مسبقًا",
+  "api_status_im_used": "IM مستخدم",
+  "api_status_multiple_choices": "خيارات متعددة",
+  "api_status_moved_permanently": "نُقل بشكل دائم",
+  "api_status_found": "تم العثور",
+  "api_status_see_other": "انظر غيره",
+  "api_status_not_modified": "لم يتم التعديل",
+  "api_status_use_proxy": "استخدم وكيلًا",
+  "api_status_temporary_redirect": "إعادة توجيه مؤقتة",
+  "api_status_permanent_redirect": "إعادة توجيه دائمة",
+  "api_status_bad_request": "طلب غير صالح",
+  "api_status_unauthorized": "غير مصرّح",
+  "api_status_payment_required": "الدفع مطلوب",
+  "api_status_forbidden": "محظور",
+  "api_status_not_found": "غير موجود",
+  "api_status_method_not_allowed": "الطريقة غير مسموحة",
+  "api_status_not_acceptable": "غير مقبول",
+  "api_status_proxy_authentication_required": "مصادقة الوكيل مطلوبة",
+  "api_status_request_timeout": "انتهت مهلة الطلب",
+  "api_status_conflict": "تعارض",
+  "api_status_gone": "لم يعد موجودًا",
+  "api_status_length_required": "الطول مطلوب",
+  "api_status_precondition_failed": "فشل الشرط المسبق",
+  "api_status_payload_too_large": "حجم البيانات كبير جدًا",
+  "api_status_uri_too_long": "الرابط طويل جدًا",
+  "api_status_unsupported_media_type": "نوع الوسائط غير مدعوم",
+  "api_status_range_not_satisfiable": "النطاق غير قابل للتحقيق",
+  "api_status_expectation_failed": "فشل التوقّع",
+  "api_status_misdirected_request": "طلب موجّه بشكل خاطئ",
+  "api_status_validation_error": "خطأ في التحقق",
+  "api_status_locked": "مقفل",
+  "api_status_failed_dependency": "فشلت التبعية",
+  "api_status_too_early": "مبكّر جدًا",
+  "api_status_upgrade_required": "الترقية مطلوبة",
+  "api_status_precondition_required": "الشرط المسبق مطلوب",
+  "api_status_too_many_requests": "طلبات كثيرة جدًا",
+  "api_status_request_header_fields_too_large": "حقول رأس الطلب كبيرة جدًا",
+  "api_status_unavailable_for_legal_reasons": "غير متاح لأسباب قانونية",
+  "api_status_internal_server_error": "خطأ داخلي في الخادم",
+  "api_status_not_implemented": "غير مُنفّذ",
+  "api_status_bad_gateway": "بوابة غير صالحة",
+  "api_status_service_unavailable": "الخدمة غير متاحة",
+  "api_status_gateway_timeout": "انتهت مهلة البوابة",
+  "api_status_http_version_not_supported": "إصدار HTTP غير مدعوم",
+  "api_status_variant_also_negotiates": "المتغيّر يتفاوض أيضًا",
+  "api_status_insufficient_storage": "مساحة التخزين غير كافية",
+  "api_status_loop_detected": "تم اكتشاف حلقة",
+  "api_status_not_extended": "غير ممتدّ",
+  "api_status_network_authentication_required": "مصادقة الشبكة مطلوبة",
+  "api_status_network_error": "خطأ في الشبكة",
+  "api_status_timeout": "انتهت المهلة",
+  "api_status_cancelled": "تم الإلغاء",
+  "api_status_unknown_error": "خطأ غير معروف",
+  "country_jordan": "الأردن",
+  "country_united_states": "الولايات المتحدة",
+  "country_united_kingdom": "المملكة المتحدة",
+  "country_saudi_arabia": "المملكة العربية السعودية",
+  "country_united_arab_emirates": "الإمارات العربية المتحدة",
+  "country_kuwait": "الكويت",
+  "country_qatar": "قطر",
+  "country_bahrain": "البحرين",
+  "country_oman": "عُمان",
+  "country_egypt": "مصر",
+  "country_lebanon": "لبنان",
+  "country_syria": "سوريا",
+  "country_iraq": "العراق",
+  "country_palestine": "فلسطين",
+  "country_yemen": "اليمن",
+  "country_libya": "ليبيا",
+  "country_tunisia": "تونس",
+  "country_algeria": "الجزائر",
+  "country_morocco": "المغرب",
+  "country_sudan": "السودان",
+  "country_turkey": "تركيا",
+  "country_iran": "إيران",
+  "country_pakistan": "باكستان",
+  "country_afghanistan": "أفغانستان",
+  "country_india": "الهند",
+  "country_bangladesh": "بنغلاديش",
+  "country_sri_lanka": "سريلانكا",
+  "country_nepal": "نيبال",
+  "country_myanmar": "ميانمار",
+  "country_thailand": "تايلاند",
+  "country_vietnam": "فيتنام",
+  "country_cambodia": "كمبوديا",
+  "country_laos": "لاوس",
+  "country_malaysia": "ماليزيا",
+  "country_singapore": "سنغافورة",
+  "country_indonesia": "إندونيسيا",
+  "country_philippines": "الفلبين",
+  "country_china": "الصين",
+  "country_japan": "اليابان",
+  "country_south_korea": "كوريا الجنوبية",
+  "country_north_korea": "كوريا الشمالية",
+  "country_mongolia": "منغوليا",
+  "country_taiwan": "تايوان",
+  "country_hong_kong": "هونغ كونغ",
+  "country_macau": "ماكاو",
+  "country_canada": "كندا",
+  "country_mexico": "المكسيك",
+  "country_brazil": "البرازيل",
+  "country_argentina": "الأرجنتين",
+  "country_chile": "تشيلي",
+  "country_peru": "بيرو",
+  "country_colombia": "كولومبيا",
+  "country_venezuela": "فنزويلا",
+  "country_ecuador": "الإكوادور",
+  "country_bolivia": "بوليفيا",
+  "country_paraguay": "باراغواي",
+  "country_uruguay": "أوروغواي",
+  "country_guyana": "غيانا",
+  "country_suriname": "سورينام",
+  "country_french_guiana": "غويانا الفرنسية",
+  "country_germany": "ألمانيا",
+  "country_france": "فرنسا",
+  "country_italy": "إيطاليا",
+  "country_spain": "إسبانيا",
+  "country_portugal": "البرتغال",
+  "country_netherlands": "هولندا",
+  "country_belgium": "بلجيكا",
+  "country_switzerland": "سويسرا",
+  "country_austria": "النمسا",
+  "country_sweden": "السويد",
+  "country_norway": "النرويج",
+  "country_denmark": "الدنمارك",
+  "country_finland": "فنلندا",
+  "country_iceland": "آيسلندا",
+  "country_poland": "بولندا",
+  "country_czech_republic": "جمهورية التشيك",
+  "country_slovakia": "سلوفاكيا",
+  "country_hungary": "المجر",
+  "country_romania": "رومانيا",
+  "country_bulgaria": "بلغاريا",
+  "country_croatia": "كرواتيا",
+  "country_slovenia": "سلوفينيا",
+  "country_serbia": "صربيا",
+  "country_montenegro": "الجبل الأسود",
+  "country_bosnia_and_herzegovina": "البوسنة والهرسك",
+  "country_north_macedonia": "مقدونيا الشمالية",
+  "country_albania": "ألبانيا",
+  "country_greece": "اليونان",
+  "country_cyprus": "قبرص",
+  "country_malta": "مالطا",
+  "country_ireland": "أيرلندا",
+  "country_luxembourg": "لوكسمبورغ",
+  "country_monaco": "موناكو",
+  "country_liechtenstein": "ليختنشتاين",
+  "country_san_marino": "سان مارينو",
+  "country_vatican_city": "مدينة الفاتيكان",
+  "country_andorra": "أندورا",
+  "country_russia": "روسيا",
+  "country_ukraine": "أوكرانيا",
+  "country_belarus": "بيلاروسيا",
+  "country_moldova": "مولدوفا",
+  "country_estonia": "إستونيا",
+  "country_latvia": "لاتفيا",
+  "country_lithuania": "ليتوانيا",
+  "country_georgia": "جورجيا",
+  "country_armenia": "أرمينيا",
+  "country_azerbaijan": "أذربيجان",
+  "country_kazakhstan": "كازاخستان",
+  "country_uzbekistan": "أوزبكستان",
+  "country_kyrgyzstan": "قيرغيزستان",
+  "country_tajikistan": "طاجيكستان",
+  "country_turkmenistan": "تركمانستان",
+  "country_australia": "أستراليا",
+  "country_new_zealand": "نيوزيلندا",
+  "country_south_africa": "جنوب أفريقيا",
+  "country_nigeria": "نيجيريا",
+  "country_kenya": "كينيا",
+  "country_ghana": "غانا",
+  "country_ethiopia": "إثيوبيا",
+  "country_unknown": "غير معروف",
+  "country_angola": "أنغولا",
+  "country_burkina_faso": "بوركينا فاسو",
+  "country_benin": "بنين",
+  "country_botswana": "بوتسوانا",
+  "country_democratic_republic_of_the_congo": "جمهورية الكونغو الديمقراطية",
+  "country_central_african_republic": "جمهورية أفريقيا الوسطى",
+  "country_congo": "جمهورية الكونغو",
+  "country_cote_d_ivoire": "ساحل العاج",
+  "country_cameroon": "الكاميرون",
+  "country_cape_verde": "الرأس الأخضر",
+  "country_djibouti": "جيبوتي",
+  "country_western_sahara": "الصحراء الغربية",
+  "country_eritrea": "إريتريا",
+  "country_fiji": "فيجي",
+  "country_micronesia": "ميكرونيزيا",
+  "country_gabon": "الغابون",
+  "country_gambia": "غامبيا",
+  "country_guinea": "غينيا",
+  "country_equatorial_guinea": "غينيا الاستوائية",
+  "country_guinea_bissau": "غينيا بيساو",
+  "country_kiribati": "كيريباتي",
+  "country_comoros": "جزر القمر",
+  "country_liberia": "ليبيريا",
+  "country_lesotho": "ليسوتو",
+  "country_madagascar": "مدغشقر",
+  "country_marshall_islands": "جزر مارشال",
+  "country_mali": "مالي",
+  "country_mauritania": "موريتانيا",
+  "country_mauritius": "موريشيوس",
+  "country_malawi": "ملاوي",
+  "country_mozambique": "موزمبيق",
+  "country_namibia": "ناميبيا",
+  "country_new_caledonia": "كاليدونيا الجديدة",
+  "country_niger": "النيجر",
+  "country_nauru": "ناورو",
+  "country_french_polynesia": "بولينيزيا الفرنسية",
+  "country_papua_new_guinea": "بابوا غينيا الجديدة",
+  "country_palau": "بالاو",
+  "country_solomon_islands": "جزر سليمان",
+  "country_seychelles": "سيشل",
+  "country_sierra_leone": "سيراليون",
+  "country_senegal": "السنغال",
+  "country_somalia": "الصومال",
+  "country_sao_tome_and_principe": "ساو تومي وبرينسيبي",
+  "country_eswatini": "إسواتيني",
+  "country_chad": "تشاد",
+  "country_togo": "توغو",
+  "country_tonga": "تونغا",
+  "country_tuvalu": "توفالو",
+  "country_tanzania": "تنزانيا",
+  "country_uganda": "أوغندا",
+  "country_vanuatu": "فانواتو",
+  "country_samoa": "ساموا",
+  "country_zambia": "زامبيا",
+  "country_zimbabwe": "زيمبابوي",
+  "nationality_jordan": "أردني",
+  "nationality_united_states": "أمريكي",
+  "nationality_united_kingdom": "بريطاني",
+  "nationality_saudi_arabia": "سعودي",
+  "nationality_united_arab_emirates": "إماراتي",
+  "nationality_kuwait": "كويتي",
+  "nationality_qatar": "قطري",
+  "nationality_bahrain": "بحريني",
+  "nationality_oman": "عماني",
+  "nationality_egypt": "مصري",
+  "nationality_lebanon": "لبناني",
+  "nationality_syria": "سوري",
+  "nationality_iraq": "عراقي",
+  "nationality_palestine": "فلسطيني",
+  "nationality_yemen": "يمني",
+  "nationality_libya": "ليبي",
+  "nationality_tunisia": "تونسي",
+  "nationality_algeria": "جزائري",
+  "nationality_morocco": "مغربي",
+  "nationality_sudan": "سوداني",
+  "nationality_turkey": "تركي",
+  "nationality_iran": "إيراني",
+  "nationality_pakistan": "باكستاني",
+  "nationality_afghanistan": "أفغاني",
+  "nationality_india": "هندي",
+  "nationality_bangladesh": "بنغلاديشي",
+  "nationality_sri_lanka": "سريلانكي",
+  "nationality_nepal": "نيبالي",
+  "nationality_myanmar": "ميانماري",
+  "nationality_thailand": "تايلاندي",
+  "nationality_vietnam": "فيتنامي",
+  "nationality_cambodia": "كمبودي",
+  "nationality_laos": "لاوسي",
+  "nationality_malaysia": "ماليزي",
+  "nationality_singapore": "سنغافوري",
+  "nationality_indonesia": "إندونيسي",
+  "nationality_philippines": "فلبيني",
+  "nationality_china": "صيني",
+  "nationality_japan": "ياباني",
+  "nationality_south_korea": "كوري جنوبي",
+  "nationality_north_korea": "كوري شمالي",
+  "nationality_mongolia": "منغولي",
+  "nationality_taiwan": "تايواني",
+  "nationality_hong_kong": "هونغ كونغي",
+  "nationality_macau": "ماكاوي",
+  "nationality_canada": "كندي",
+  "nationality_mexico": "مكسيكي",
+  "nationality_brazil": "برازيلي",
+  "nationality_argentina": "أرجنتيني",
+  "nationality_chile": "تشيلي",
+  "nationality_peru": "بيروفي",
+  "nationality_colombia": "كولومبي",
+  "nationality_venezuela": "فنزويلي",
+  "nationality_ecuador": "إكوادوري",
+  "nationality_bolivia": "بوليفي",
+  "nationality_paraguay": "باراغوياني",
+  "nationality_uruguay": "أوروغوياني",
+  "nationality_guyana": "غياني",
+  "nationality_suriname": "سورينامي",
+  "nationality_french_guiana": "غياني فرنسي",
+  "nationality_germany": "ألماني",
+  "nationality_france": "فرنسي",
+  "nationality_italy": "إيطالي",
+  "nationality_spain": "إسباني",
+  "nationality_portugal": "برتغالي",
+  "nationality_netherlands": "هولندي",
+  "nationality_belgium": "بلجيكي",
+  "nationality_switzerland": "سويسري",
+  "nationality_austria": "نمساوي",
+  "nationality_sweden": "سويدي",
+  "nationality_norway": "نرويجي",
+  "nationality_denmark": "دنماركي",
+  "nationality_finland": "فنلندي",
+  "nationality_iceland": "آيسلندي",
+  "nationality_poland": "بولندي",
+  "nationality_czech_republic": "تشيكي",
+  "nationality_slovakia": "سلوفاكي",
+  "nationality_hungary": "مجري",
+  "nationality_romania": "روماني",
+  "nationality_bulgaria": "بلغاري",
+  "nationality_croatia": "كرواتي",
+  "nationality_slovenia": "سلوفيني",
+  "nationality_serbia": "صربي",
+  "nationality_montenegro": "مونتينيغري",
+  "nationality_bosnia_and_herzegovina": "بوسني",
+  "nationality_north_macedonia": "مقدوني",
+  "nationality_albania": "ألباني",
+  "nationality_greece": "يوناني",
+  "nationality_cyprus": "قبرصي",
+  "nationality_malta": "مالطي",
+  "nationality_ireland": "أيرلندي",
+  "nationality_luxembourg": "لوكسمبورغي",
+  "nationality_monaco": "موناكي",
+  "nationality_liechtenstein": "ليختنشتايني",
+  "nationality_san_marino": "سان ماريني",
+  "nationality_vatican_city": "فاتيكاني",
+  "nationality_andorra": "أندوري",
+  "nationality_russia": "روسي",
+  "nationality_ukraine": "أوكراني",
+  "nationality_belarus": "بيلاروسي",
+  "nationality_moldova": "مولدوفي",
+  "nationality_estonia": "إستوني",
+  "nationality_latvia": "لاتفي",
+  "nationality_lithuania": "ليتواني",
+  "nationality_georgia": "جورجي",
+  "nationality_armenia": "أرميني",
+  "nationality_azerbaijan": "أذربيجاني",
+  "nationality_kazakhstan": "كازاخي",
+  "nationality_uzbekistan": "أوزبكي",
+  "nationality_kyrgyzstan": "قيرغيزي",
+  "nationality_tajikistan": "طاجيكي",
+  "nationality_turkmenistan": "تركماني",
+  "nationality_australia": "أسترالي",
+  "nationality_new_zealand": "نيوزيلندي",
+  "nationality_south_africa": "جنوب أفريقي",
+  "nationality_nigeria": "نيجيري",
+  "nationality_kenya": "كيني",
+  "nationality_ghana": "غاني",
+  "nationality_ethiopia": "إثيوبي",
+  "nationality_unknown": "غير معروف",
+  "nationality_angola": "أنغولي",
+  "nationality_burkina_faso": "بوركينابي",
+  "nationality_benin": "بنيني",
+  "nationality_botswana": "بوتسواني",
+  "nationality_democratic_republic_of_the_congo": "كونغولي",
+  "nationality_central_african_republic": "من أفريقيا الوسطى",
+  "nationality_congo": "كونغولي",
+  "nationality_cote_d_ivoire": "إيفواري",
+  "nationality_cameroon": "كاميروني",
+  "nationality_cape_verde": "من الرأس الأخضر",
+  "nationality_djibouti": "جيبوتي",
+  "nationality_western_sahara": "صحراوي",
+  "nationality_eritrea": "إريتري",
+  "nationality_fiji": "فيجي",
+  "nationality_micronesia": "ميكرونيزي",
+  "nationality_gabon": "غابوني",
+  "nationality_gambia": "غامبي",
+  "nationality_guinea": "غيني",
+  "nationality_equatorial_guinea": "غيني استوائي",
+  "nationality_guinea_bissau": "غيني بيساوي",
+  "nationality_kiribati": "كيريباتي",
+  "nationality_comoros": "قمري",
+  "nationality_liberia": "ليبيري",
+  "nationality_lesotho": "ليسوتي",
+  "nationality_madagascar": "ملغاشي",
+  "nationality_marshall_islands": "مارشالي",
+  "nationality_mali": "مالي",
+  "nationality_mauritania": "موريتاني",
+  "nationality_mauritius": "موريشيوسي",
+  "nationality_malawi": "مالاوي",
+  "nationality_mozambique": "موزمبيقي",
+  "nationality_namibia": "ناميبي",
+  "nationality_new_caledonia": "كاليدوني",
+  "nationality_niger": "نيجري",
+  "nationality_nauru": "ناوروي",
+  "nationality_french_polynesia": "بولينيزي فرنسي",
+  "nationality_papua_new_guinea": "بابواني",
+  "nationality_palau": "بالاوي",
+  "nationality_solomon_islands": "من جزر سليمان",
+  "nationality_seychelles": "سيشيلي",
+  "nationality_sierra_leone": "سيراليوني",
+  "nationality_senegal": "سنغالي",
+  "nationality_somalia": "صومالي",
+  "nationality_sao_tome_and_principe": "ساوتومي",
+  "nationality_eswatini": "سوازي",
+  "nationality_chad": "تشادي",
+  "nationality_togo": "توغولي",
+  "nationality_tonga": "تونغي",
+  "nationality_tuvalu": "توفالوي",
+  "nationality_tanzania": "تنزاني",
+  "nationality_uganda": "أوغندي",
+  "nationality_vanuatu": "فانواتي",
+  "nationality_samoa": "ساموي",
+  "nationality_zambia": "زامبي",
+  "nationality_zimbabwe": "زيمبابوي",
+  "timezone_pacific_pago_pago": "باغو باغو",
+  "timezone_pacific_honolulu": "هونولولو",
+  "timezone_pacific_marquesas": "ماركيساس",
+  "timezone_america_anchorage": "أنكوريج",
+  "timezone_america_los_angeles": "لوس أنجلوس",
+  "timezone_america_denver": "دنفر",
+  "timezone_america_chicago": "شيكاغو",
+  "timezone_america_mexico_city": "مكسيكو سيتي",
+  "timezone_america_bogota": "بوغوتا",
+  "timezone_america_lima": "ليما",
+  "timezone_america_new_york": "نيويورك",
+  "timezone_america_toronto": "تورونتو",
+  "timezone_america_caracas": "كاراكاس",
+  "timezone_america_santiago": "سانتياغو",
+  "timezone_america_st_johns": "سانت جونز",
+  "timezone_america_argentina_buenos_aires": "بوينس آيرس",
+  "timezone_america_sao_paulo": "ساو باولو",
+  "timezone_america_noronha": "فرناندو دي نورونيا",
+  "timezone_atlantic_cape_verde": "برايا",
+  "timezone_africa_accra": "أكرا",
+  "timezone_europe_dublin": "دبلن",
+  "timezone_europe_lisbon": "لشبونة",
+  "timezone_europe_london": "لندن",
+  "timezone_africa_nouakchott": "نواكشوط",
+  "timezone_atlantic_reykjavik": "ريكيافيك",
+  "timezone_africa_algiers": "الجزائر",
+  "timezone_europe_amsterdam": "أمستردام",
+  "timezone_europe_berlin": "برلين",
+  "timezone_africa_casablanca": "الدار البيضاء",
+  "timezone_africa_kinshasa": "كينشاسا",
+  "timezone_africa_lagos": "لاغوس",
+  "timezone_europe_madrid": "مدريد",
+  "timezone_europe_paris": "باريس",
+  "timezone_europe_rome": "روما",
+  "timezone_europe_stockholm": "ستوكهولم",
+  "timezone_africa_tunis": "تونس",
+  "timezone_europe_zurich": "زيورخ",
+  "timezone_europe_athens": "أثينا",
+  "timezone_asia_beirut": "بيروت",
+  "timezone_africa_cairo": "القاهرة",
+  "timezone_asia_jerusalem": "القدس",
+  "timezone_africa_johannesburg": "جوهانسبرغ",
+  "timezone_africa_khartoum": "الخرطوم",
+  "timezone_europe_kyiv": "كييف",
+  "timezone_africa_tripoli": "طرابلس",
+  "timezone_africa_addis_ababa": "أديس أبابا",
+  "timezone_asia_amman": "عمّان",
+  "timezone_asia_baghdad": "بغداد",
+  "timezone_asia_damascus": "دمشق",
+  "timezone_asia_qatar": "الدوحة",
+  "timezone_europe_istanbul": "إسطنبول",
+  "timezone_asia_kuwait": "مدينة الكويت",
+  "timezone_asia_bahrain": "المنامة",
+  "timezone_africa_mogadishu": "مقديشو",
+  "timezone_europe_moscow": "موسكو",
+  "timezone_africa_nairobi": "نيروبي",
+  "timezone_asia_riyadh": "الرياض",
+  "timezone_asia_aden": "صنعاء",
+  "timezone_asia_tehran": "طهران",
+  "timezone_asia_dubai": "دبي",
+  "timezone_asia_muscat": "مسقط",
+  "timezone_asia_kabul": "كابول",
+  "timezone_asia_almaty": "ألماتي",
+  "timezone_asia_karachi": "كراتشي",
+  "timezone_asia_tashkent": "طشقند",
+  "timezone_asia_colombo": "كولومبو",
+  "timezone_asia_kolkata": "دلهي",
+  "timezone_asia_kathmandu": "كاتماندو",
+  "timezone_asia_dhaka": "دكا",
+  "timezone_asia_yangon": "يانغون",
+  "timezone_asia_bangkok": "بانكوك",
+  "timezone_asia_ho_chi_minh": "هو تشي منه",
+  "timezone_asia_jakarta": "جاكرتا",
+  "timezone_asia_hong_kong": "هونغ كونغ",
+  "timezone_asia_kuala_lumpur": "كوالالمبور",
+  "timezone_asia_manila": "مانيلا",
+  "timezone_australia_perth": "بيرث",
+  "timezone_asia_shanghai": "شنغهاي",
+  "timezone_asia_singapore": "سنغافورة",
+  "timezone_asia_taipei": "تايبيه",
+  "timezone_asia_seoul": "سول",
+  "timezone_asia_tokyo": "طوكيو",
+  "timezone_australia_adelaide": "أديلايد",
+  "timezone_australia_darwin": "داروين",
+  "timezone_australia_brisbane": "بريزبن",
+  "timezone_pacific_guam": "غوام",
+  "timezone_australia_melbourne": "ملبورن",
+  "timezone_pacific_port_moresby": "بورت مورسبي",
+  "timezone_australia_sydney": "سيدني",
+  "timezone_australia_lord_howe": "لورد هاو",
+  "timezone_pacific_guadalcanal": "هونيارا",
+  "timezone_pacific_auckland": "أوكلاند",
+  "timezone_pacific_fiji": "سوفا",
+  "timezone_pacific_chatham": "تشاتام",
+  "timezone_pacific_apia": "آبيا",
+  "timezone_pacific_tongatapu": "نوكو ألوفا",
+  "timezone_pacific_kiritimati": "كيريتيماتي",
+  "text_field_req_min_length": "{length} أحرف على الأقل",
+  "text_field_req_uppercase": "يحتوي على حرف كبير",
+  "text_field_req_lowercase": "يحتوي على حرف صغير",
+  "text_field_req_digit": "يحتوي على رقم",
+  "text_field_req_special_char": "يحتوي على رمز خاص",
+  "text_field_req_no_spaces": "بدون مسافات",
+  "text_field_reveal_password_title": "إظهار كلمة المرور؟",
+  "text_field_reveal_password_message": "يتم تسجيل شاشتك أو مشاركتها — أي شخص يشاهد سيرى ما كتبته.",
+  "text_field_reveal": "إظهار",
+  "text_field_cancel": "إلغاء",
+  "text_field_word": "كلمة",
+  "text_field_words": "كلمات",
+  "text_field_chars": "أحرف",
+  "text_field_caps_lock_on": "مفتاح الأحرف الكبيرة (Caps Lock) مفعّل",
+  "text_field_strength_weak": "ضعيفة",
+  "text_field_strength_medium": "متوسطة",
+  "text_field_strength_strong": "قوية",
+  "text_field_clear_all": "مسح الكل",
+  "text_field_generate_password": "إنشاء كلمة مرور",
+  "text_field_undo": "تراجع",
+  "text_field_redo": "إعادة",
+  "text_field_clear": "مسح",
+  "text_field_voice_input": "إدخال صوتي",
+  "text_field_hold_to_reveal": "اضغط مطولًا لإظهار كلمة المرور",
+  "text_field_toggle_visibility": "إظهار أو إخفاء كلمة المرور",
+  "text_field_profanity_warning": "قد يحتوي على ألفاظ غير لائقة",
+  "text_field_name_parts_progress": "{count} من {total} مقاطع الاسم",
+  "text_field_password_hint": "أدخل كلمة المرور",
+  "text_field_password_create_hint": "أنشئ كلمة مرور",
+  "text_field_password_confirm_hint": "أكّد كلمة المرور",
+  "text_field_screen_capture_warning": "يتم تسجيل الشاشة أو مشاركتها — يبقى الإدخال مخفيًا",
+  "text_field_email_domain_not_allowed": "تُقبل فقط عناوين البريد من {domains}",
+  "text_field_email_domain_unreachable": "نطاق البريد الإلكتروني هذا لا يمكنه استقبال الرسائل",
+  "text_field_password_breached": "ظهرت كلمة المرور هذه في {count} من تسريبات البيانات — اختر كلمة أخرى",
+  "phone_field_preferred_countries": "المفضلة",
+  "phone_field_all_countries": "كل الدول",
+  "phone_field_length_exact": "يجب أن يتكون رقم الهاتف من {count} أرقام",
+  "phone_field_length_range": "يجب أن يتكون رقم الهاتف من {min} إلى {max} أرقام",
+  "phone_field_mobile_length_exact": "يجب أن يتكون رقم الجوال من {count} أرقام",
+  "phone_field_mobile_length_range": "يجب أن يتكون رقم الجوال من {min} إلى {max} أرقام",
+  "phone_field_mobile_prefix": "أرقام الجوال تبدأ بـ {prefixes}",
+  "amount_field_preferred_currencies": "المفضلة",
+  "amount_field_all_currencies": "كل العملات",
+  "measurement_field_preferred_units": "شائعة",
+  "measurement_field_all_units": "كل الوحدات",
+  "date_field_incomplete": "تاريخ غير مكتمل — استخدم {format}",
+  "date_field_impossible": "هذا التاريخ غير موجود",
+  "date_field_min_date": "يجب أن يكون التاريخ في {date} أو بعده",
+  "date_field_max_date": "يجب أن يكون التاريخ في {date} أو قبله",
+  "date_field_min_days_ahead": "اختر تاريخًا بعد {days} أيام من الآن على الأقل",
+  "date_field_max_days_ahead": "اختر تاريخًا خلال {days} يومًا القادمة",
+  "date_field_weekday_not_allowed": "هذا اليوم من الأسبوع غير متاح",
+  "date_field_date_unavailable": "هذا التاريخ غير متاح",
+  "date_field_must_be_after": "يجب أن يكون بعد {date}",
+  "date_field_must_be_before": "يجب أن يكون قبل {date}",
+  "date_field_expiry_min_months": "يجب أن يبقى صالحًا لمدة {months} أشهر إضافية على الأقل",
+  "date_field_age_months": "{months, plural, one{العمر شهر واحد} two{العمر شهران} few{العمر {months} أشهر} many{العمر {months} شهرًا} other{العمر {months} شهر}}",
+  "@date_field_age_months": {
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+  "date_field_age_days": "{days, plural, one{العمر يوم واحد} two{العمر يومان} few{العمر {days} أيام} many{العمر {days} يومًا} other{العمر {days} يوم}}",
+  "@date_field_age_days": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "date_field_age_years": "العمر {years} عامًا",
+  "date_field_hijri": "{date} هـ",
+  "date_field_pick_date": "اختر تاريخًا",
+  "date_field_day_word": "يوم",
+  "date_field_month_word": "شهر",
+  "date_field_year_word": "سنة",
+  "date_field_year2_word": "سنة",
+  "date_range_start": "تاريخ البداية",
+  "date_range_end": "تاريخ النهاية",
+  "date_range_nights": "{nights} ليلة",
+  "time_field_hour_word": "ساعة",
+  "time_field_minute_word": "دقيقة",
+  "time_field_required": "الوقت لا يمكن أن يكون فارغًا",
+  "time_field_incomplete": "وقت غير مكتمل — استخدم {format}",
+  "time_field_min_time": "يجب أن يكون الوقت في {time} أو بعده",
+  "time_field_max_time": "يجب أن يكون الوقت في {time} أو قبله",
+  "time_field_outside_window": "يجب أن يكون الوقت بين {start} و{end}",
+  "time_field_interval": "يجب أن يكون الوقت على فواصل {minutes} دقيقة",
+  "time_field_pick_time": "اختر وقتًا",
+  "time_field_format_24": "٢٤ س",
+  "time_field_format_12": "١٢ س",
+  "time_field_second_word": "ثانية",
+  "time_field_now": "الآن",
+  "time_field_must_be_after": "يجب أن يكون بعد {time}",
+  "time_range_start": "وقت البداية",
+  "time_range_end": "وقت النهاية",
+  "time_range_duration": "{hours} س {minutes} د",
+  "datetime_field_date": "التاريخ",
+  "datetime_field_time": "الوقت",
+  "login_field_hint": "البريد الإلكتروني أو رقم الهاتف",
+  "national_id_field_hint": "أدخل الرقم الوطني",
+  "national_id_required": "الرقم الوطني مطلوب",
+  "national_id_length": "يجب أن يتكون من {length} خانة",
+  "@national_id_length": {
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
+  "national_id_generic": "أدخل رقم هوية صحيحًا",
+  "national_id_prefix": "بادئة الرقم غير صحيحة",
+  "national_id_checksum": "رقم الهوية غير صحيح",
+  "national_id_birthdate": "تاريخ الميلاد المضمّن غير صحيح",
+  "national_id_governorate": "رمز المحافظة غير معروف",
+  "national_id_dob_mismatch": "الرقم لا يطابق تاريخ الميلاد",
+  "national_id_citizens_only": "للمواطنين فقط",
+  "national_id_residents_only": "للمقيمين فقط",
+  "national_id_born": "من مواليد {date}",
+  "@national_id_born": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "national_id_male": "ذكر",
+  "national_id_female": "أنثى",
+  "national_id_citizen": "مواطن",
+  "national_id_resident": "مقيم",
+  "address_field_area": "المنطقة / الحي",
+  "address_field_area_hint": "الحي أو المنطقة",
+  "address_field_city_hint": "أدخل المدينة",
+  "address_field_line2_hint": "شقة، طابق، علامة مميزة",
+  "address_field_enter": "أدخل {label}",
+  "@address_field_enter": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "address_field_type_home": "المنزل",
+  "address_field_type_work": "العمل",
+  "address_field_type_other": "أخرى",
+  "address_field_recipient": "اسم المستلم",
+  "address_field_recipient_hint": "من يستلم الطلب",
+  "address_field_phone": "هاتف التواصل",
+  "location_field_label": "الموقع الدقيق",
+  "location_field_latitude": "خط العرض",
+  "location_field_longitude": "خط الطول",
+  "location_field_use_current": "استخدام الموقع الحالي",
+  "location_field_pick_map": "التحديد على الخريطة",
+  "location_field_unavailable": "الموقع غير متاح — تحقق من GPS والأذونات",
+  "location_field_confirm": "تأكيد الموقع",
+  "location_field_lat_range": "خط العرض يجب أن يكون بين -90 و90",
+  "location_field_lng_range": "خط الطول يجب أن يكون بين -180 و180",
+  "address_field_notes": "ملاحظات التوصيل (اختياري)",
+  "address_field_notes_hint": "اتركه عند الباب، اقرع الجرس مرتين…",
+  "address_field_country": "الدولة",
+  "address_field_street": "عنوان الشارع",
+  "address_field_street_hint": "اسم الشارع والرقم",
+  "address_field_line2": "شقة، مكتب، مبنى (اختياري)",
+  "address_field_city": "المدينة",
+  "address_field_state": "الولاية",
+  "address_field_governorate": "المحافظة",
+  "address_field_emirate": "الإمارة",
+  "address_field_region": "المنطقة",
+  "address_field_county": "المقاطعة",
+  "address_field_postal_code": "الرمز البريدي",
+  "address_field_zip_code": "الرمز البريدي",
+  "address_field_postcode": "الرمز البريدي",
+  "address_field_field_required": "{label} مطلوب",
+  "@address_field_field_required": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "address_field_postal_invalid": "أدخل {label} صحيحًا",
+  "@address_field_postal_invalid": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "address_field_select_state": "اختر {label}",
+  "@address_field_select_state": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "duration_field_required": "المدة مطلوبة",
+  "duration_field_incomplete": "أدخل مدة كاملة",
+  "duration_field_min": "يجب ألا تقل عن {duration}",
+  "@duration_field_min": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "duration_field_max": "يجب ألا تتجاوز {duration}",
+  "@duration_field_max": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "duration_field_step": "الدقائق يجب أن تكون بمضاعفات {step}",
+  "@duration_field_step": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "duration_field_minutes": "{minutes} د",
+  "@duration_field_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "duration_field_seconds": "{seconds} ث",
+  "@duration_field_seconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "duration_field_pick": "اختر المدة",
+  "duration_field_hours_word": "ساعات",
+  "duration_field_minutes_word": "دقائق",
+  "duration_field_seconds_word": "ثوانٍ",
+  "percent_field_hint": "أدخل النسبة المئوية",
+  "percent_field_required": "النسبة المئوية مطلوبة",
+  "percent_field_range": "يجب أن تكون بين {min} و{max}",
+  "@percent_field_range": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "percent_field_min": "يجب ألا تقل عن {min}",
+  "@percent_field_min": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "percent_field_max": "يجب ألا تتجاوز {max}",
+  "@percent_field_max": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "plate_field_hint": "أدخل رقم اللوحة",
+  "plate_field_required": "رقم اللوحة مطلوب",
+  "plate_field_invalid": "رقم اللوحة غير صحيح",
+  "crypto_field_hint": "أدخل عنوان المحفظة",
+  "crypto_field_required": "عنوان المحفظة مطلوب",
+  "crypto_field_invalid": "عنوان {network} غير صحيح",
+  "@crypto_field_invalid": {
+    "placeholders": {
+      "network": {
+        "type": "String"
+      }
+    }
+  },
+  "vin_field_hint": "أدخل رقم الهيكل (VIN)",
+  "vin_field_required": "رقم الهيكل مطلوب",
+  "vin_field_length": "يتكون رقم الهيكل من 17 خانة",
+  "vin_field_checksum": "رقم الهيكل غير صحيح (خانة التحقق غير مطابقة)",
+  "vin_field_year": "سنة الصنع {year}",
+  "@vin_field_year": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "ip_field_hint": "أدخل عنوان IP أو اسم المضيف",
+  "ip_field_required": "العنوان مطلوب",
+  "ip_field_invalid_ip": "عنوان IP غير صحيح",
+  "ip_field_invalid_host": "اسم المضيف غير صحيح",
+  "ip_field_invalid_port": "منفذ غير صحيح",
+  "promo_field_hint": "أدخل رمز الخصم",
+  "promo_field_apply": "تطبيق",
+  "promo_field_remove": "إزالة الرمز",
+  "promo_field_empty": "أدخل الرمز أولًا",
+  "swift_field_hint": "أدخل رمز السويفت (BIC)",
+  "swift_field_required": "رمز السويفت مطلوب",
+  "swift_field_length": "يتكون رمز BIC من 8 أو 11 خانة",
+  "swift_field_bank": "رمز البنك 4 أحرف",
+  "swift_field_country": "رمز الدولة غير معروف",
+  "swift_field_country_not_allowed": "الدولة غير مدعومة",
+  "swift_field_location": "رمز الموقع غير صحيح",
+  "swift_field_branch": "رمز الفرع غير صحيح",
+  "swift_field_iban_mismatch": "دولة رمز BIC لا تطابق رقم الآيبان",
+  "swift_field_head_office": "المكتب الرئيسي",
+  "swift_field_test_warning": "رمز تجريبي — غير مخصص للمدفوعات الفعلية",
+  "tags_field_hint": "أضف وسمًا…",
+  "tags_field_min": "أضف {count} وسوم على الأقل",
+  "@tags_field_min": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tags_field_too_long": "الحد الأقصى {max} حرفًا",
+  "@tags_field_too_long": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "tags_field_max_reached": "تم بلوغ الحد الأقصى {max} وسوم",
+  "@tags_field_max_reached": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "tags_field_not_allowed": "اختر من الاقتراحات",
+  "drop_down_select_option": "اختر خيارًا",
+  "drop_down_select_options": "اختر خيارات",
+  "drop_down_search": "بحث",
+  "drop_down_no_results": "لا توجد نتائج",
+  "drop_down_create_new": "إنشاء \"{query}\"",
+  "drop_down_select_all": "تحديد الكل",
+  "drop_down_clear_all": "مسح الكل",
+  "drop_down_selected_count": "تم تحديد {count}",
+  "drop_down_selected_of_max": "{count}/{max} محدد",
+  "drop_down_load_failed": "تعذر تحميل الخيارات",
+  "drop_down_more_items": "{labels} (+{count} أخرى)",
+  "drop_down_tap_to_open": "انقر نقرًا مزدوجًا للفتح",
+  "drop_down_tap_to_close": "انقر نقرًا مزدوجًا للإغلاق",
+  "drop_down_clear_selection": "مسح التحديد",
+  "change_password_current_label": "كلمة المرور الحالية",
+  "change_password_current_hint": "أدخل كلمة المرور الحالية",
+  "change_password_new_label": "كلمة المرور الجديدة",
+  "change_password_confirm_label": "تأكيد كلمة المرور الجديدة",
+  "change_password_same_as_current": "يجب أن تختلف كلمة المرور الجديدة عن كلمة المرور الحالية",
+  "bank_field_holder_label": "صاحب الحساب",
+  "bank_field_holder_hint": "الاسم الكامل كما في الحساب",
+  "otp_form_sent_to": "تم إرسال الرمز إلى {destination}",
+  "@otp_form_sent_to": {
+    "placeholders": {
+      "destination": {
+        "type": "String"
+      }
+    }
+  },
+  "otp_form_no_code": "لم يصلك الرمز؟",
+  "otp_form_resend": "إعادة الإرسال",
+  "otp_form_resend_in": "إعادة الإرسال خلال {seconds} ث",
+  "@otp_form_resend_in": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "contact_form_message_label": "الرسالة",
+  "contact_form_message_hint": "اكتب رسالتك",
+  "contact_form_message_required": "الرسالة مطلوبة",
+  "field_hint_email": "أدخل بريدك الإلكتروني",
+  "field_hint_phone": "أدخل رقم الهاتف",
+  "field_hint_username": "اختر اسم مستخدم",
+  "field_hint_passport": "أدخل رقم جواز السفر",
+  "field_hint_cardholder": "الاسم على البطاقة",
+  "field_hint_search": "بحث",
+  "common_skip": "تخطي",
+  "common_something_went_wrong": "حدث خطأ ما",
+  "common_try_again": "حاول مرة أخرى",
+  "common_contact_support": "التواصل مع الدعم",
+  "common_close": "إغلاق",
+  "common_pause": "إيقاف مؤقت",
+  "common_resume": "استئناف",
+  "common_continue": "متابعة",
+  "common_dismiss": "تجاهل",
+  "banner_update_title": "يتوفر تحديث",
+  "banner_update_message": "إصدار أحدث من التطبيق جاهز للتثبيت.",
+  "banner_update_action": "تحديث",
+  "banner_offline_message": "ستتم مزامنة تغييراتك عند عودة الاتصال.",
+  "common_expand": "توسيع",
+  "common_collapse": "طي",
+  "common_undo": "تراجع",
+  "common_dismissed": "تم التجاهل",
+  "common_clear": "مسح",
+  "common_clear_all": "مسح الكل",
+  "common_remove": "إزالة",
+  "common_save": "حفظ",
+  "common_saving": "جارٍ الحفظ…",
+  "common_edit": "تعديل",
+  "common_add": "إضافة",
+  "common_delete": "حذف",
+  "common_copy": "نسخ",
+  "common_copied_to_clipboard": "تم النسخ إلى الحافظة",
+  "common_no_results": "لا توجد نتائج",
+  "common_refresh": "تحديث",
+  "common_search": "بحث",
+  "common_share": "مشاركة",
+  "common_next": "التالي",
+  "common_count": "عدد {count}",
+  "@common_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "common_back": "رجوع",
+  "error_support_email_unconfigured": "لم يتم إعداد بريد الدعم بعد.",
+  "error_diagnostics": "التشخيص",
+  "error_report_failed": "تعذّر إرسال التقرير. حاول مرة أخرى.",
+  "coming_soon_eta_label": "متوقّع",
+  "coming_soon_body_plain": "نعمل على تطويرها. تابعنا قريبًا.",
+  "coming_soon_change_email": "استخدام بريد آخر",
+  "pdf_bookmark_count": "{count, plural, zero{لا إشارات} one{إشارة مرجعية واحدة} two{إشارتان} few{{count} إشارات} many{{count} إشارة} other{{count} إشارة}}",
+  "@pdf_bookmark_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "common_settings": "الإعدادات",
+  "common_open_settings": "فتح الإعدادات",
+  "common_paste": "لصق",
+  "common_stop": "إيقاف",
+  "common_previous": "السابق",
+  "common_reset": "إعادة تعيين",
+  "common_later": "لاحقًا",
+  "common_update": "تحديث",
+  "common_open": "فتح",
+  "common_submit": "إرسال",
+  "common_help": "مساعدة",
+  "pdf_unlock": "إلغاء القفل",
+  "pdf_previous_page": "الصفحة السابقة",
+  "pdf_next_page": "الصفحة التالية",
+  "pdf_reset_zoom": "إعادة تعيين التكبير",
+  "wizard_clear_draft": "مسح المسودة",
+  "faq_all": "الكل",
+  "faq_recent": "الأخيرة",
+  "faq_still_need_help": "هل ما زلت بحاجة إلى مساعدة؟",
+  "coming_soon_save_failed": "تعذر حفظ بريدك الإلكتروني. حاول مرة أخرى.",
+  "media_rotate": "تدوير",
+  "media_realign": "إعادة محاذاة",
+  "media_selected_count": "تم تحديد {count} من {max}",
+  "@media_selected_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "pdf_go": "انتقال",
+  "pdf_previous_match": "النتيجة السابقة",
+  "pdf_next_match": "النتيجة التالية",
+  "pdf_forget": "نسيان هذا المستند",
+  "pdf_outline": "الفهرس",
+  "pdf_bookmarks": "الإشارات المرجعية",
+  "scanner_title": "مسح الرمز",
+  "drawer_expand": "توسيع",
+  "wizard_submit_failed": "فشل الإرسال",
+  "sheet_confirm_title": "هل أنت متأكد؟",
+  "sheet_confirm": "تأكيد",
+  "sheet_delete_title": "حذف هذا العنصر؟",
+  "sheet_delete_message": "لا يمكن التراجع عن هذا الإجراء.",
+  "sheet_logout_title": "تسجيل الخروج؟",
+  "sheet_logout_message": "يمكنك تسجيل الدخول مرة أخرى في أي وقت.",
+  "sheet_logout_confirm": "تسجيل الخروج",
+  "sheet_discard_title": "تجاهل التغييرات؟",
+  "sheet_discard_message": "ستفقد التغييرات غير المحفوظة.",
+  "sheet_discard_confirm": "تجاهل",
+  "sheet_got_it": "حسنًا",
+  "sheet_filters": "عوامل التصفية",
+  "sheet_apply": "تطبيق",
+  "sheet_reset": "إعادة تعيين",
+  "common_tap_to_retry": "انقر لإعادة المحاولة",
+  "button_tooltip_add": "إضافة",
+  "button_tooltip_copy": "نسخ",
+  "button_tooltip_delete": "حذف",
+  "button_tooltip_edit": "تعديل",
+  "button_tooltip_filter": "تصفية",
+  "button_tooltip_more": "المزيد",
+  "button_tooltip_refresh": "تحديث",
+  "button_tooltip_search": "بحث",
+  "button_tooltip_send": "إرسال",
+  "button_tooltip_add_favorite": "إضافة إلى المفضلة",
+  "button_tooltip_remove_favorite": "إزالة من المفضلة",
+  "button_tooltip_start_voice_input": "بدء الإدخال الصوتي",
+  "button_tooltip_stop_listening": "إيقاف الاستماع",
+  "button_read_more": "قراءة المزيد",
+  "button_show_less": "عرض أقل",
+  "button_icon_semantic_label": "زر أيقونة",
+  "button_result_success": "تم بنجاح",
+  "button_result_failed": "فشل",
+  "social_button_continue_with": "المتابعة باستخدام {provider}",
+  "drop_down_gender_label": "الجنس",
+  "drop_down_gender_hint": "اختر الجنس",
+  "drop_down_hour_label": "الساعة",
+  "drop_down_hour_hint": "اختر الساعة",
+  "drop_down_language_label": "اللغة",
+  "drop_down_language_hint": "اختر اللغة",
+  "drop_down_month_label": "الشهر",
+  "drop_down_month_hint": "اختر الشهر",
+  "drop_down_theme_label": "المظهر",
+  "drop_down_theme_hint": "اختر المظهر",
+  "drop_down_year_label": "السنة",
+  "drop_down_year_hint": "اختر السنة",
+  "drop_down_country_hint": "الدولة",
+  "drop_down_state_hint": "اختر المحافظة / المنطقة",
+  "drop_down_city_hint": "اختر المدينة / الحي",
+  "drop_down_currency_hint": "اختر العملة",
+  "drop_down_unit_hint": "اختر الوحدة",
+  "drop_down_color_format_label": "الصيغة",
+  "drop_down_color_format_hint": "اختر الصيغة",
+  "drop_down_day_label": "اليوم",
+  "drop_down_day_hint": "اختر اليوم",
+  "drop_down_weekday_label": "يوم الأسبوع",
+  "drop_down_weekday_hint": "اختر يوم الأسبوع",
+  "drop_down_nationality_hint": "الجنسية",
+  "drop_down_timezone_hint": "اختر المنطقة الزمنية",
+  "drop_down_blood_type_label": "فصيلة الدم",
+  "drop_down_blood_type_hint": "اختر فصيلة الدم",
+  "drop_down_marital_status_label": "الحالة الاجتماعية",
+  "drop_down_marital_status_hint": "اختر الحالة",
+  "drop_down_education_label": "المستوى التعليمي",
+  "drop_down_education_hint": "اختر المستوى",
+  "drop_down_sort_by_label": "ترتيب حسب",
+  "drop_down_sort_by_hint": "ترتيب حسب",
+  "drop_down_duration_label": "المدة",
+  "drop_down_duration_hint": "اختر المدة",
+  "drop_down_recurrence_label": "التكرار",
+  "drop_down_recurrence_hint": "اختر التكرار",
+  "language_name_en": "الإنجليزية",
+  "language_name_ar": "العربية",
+  "gender_male": "ذكر",
+  "gender_female": "أنثى",
+  "gender_other": "آخر",
+  "gender_prefer_not_to_say": "أفضّل عدم الإفصاح",
+  "marital_single": "أعزب / عزباء",
+  "marital_married": "متزوج / متزوجة",
+  "marital_divorced": "مطلق / مطلقة",
+  "marital_widowed": "أرمل / أرملة",
+  "education_primary": "ابتدائي",
+  "education_middle": "إعدادي",
+  "education_secondary": "ثانوي",
+  "education_diploma": "دبلوم",
+  "education_bachelor": "بكالوريوس",
+  "education_master": "ماجستير",
+  "education_doctorate": "دكتوراه",
+  "sort_newest": "الأحدث",
+  "sort_oldest": "الأقدم",
+  "sort_price_low_high": "السعر: من الأقل إلى الأعلى",
+  "sort_price_high_low": "السعر: من الأعلى إلى الأقل",
+  "sort_name_az": "الاسم: أ–ي",
+  "sort_name_za": "الاسم: ي–أ",
+  "sort_rating": "الأعلى تقييمًا",
+  "sort_relevance": "الأكثر صلة",
+  "recurrence_none": "لا يتكرر",
+  "recurrence_daily": "يوميًا",
+  "recurrence_weekly": "أسبوعيًا",
+  "recurrence_monthly": "شهريًا",
+  "recurrence_yearly": "سنويًا",
+  "duration_minutes": "{n} د",
+  "duration_hours": "{n} س",
+  "duration_days": "{n} ي",
+  "theme_mode_system": "النظام",
+  "theme_mode_light": "فاتح",
+  "theme_mode_dark": "داكن",
+  "bank_field_iban_label": "رقم الآيبان (IBAN)",
+  "bank_field_swift_bic_label": "رمز السويفت (SWIFT / BIC)",
+  "card_field_number_label": "رقم البطاقة",
+  "card_field_expiry_label": "تاريخ الانتهاء",
+  "card_field_cvv_label": "رمز الأمان (CVV)",
+  "color_field_picker_title": "اختر لونًا",
+  "color_field_required": "أدخل لونًا",
+  "color_field_invalid_format": "استخدم {hint}",
+  "url_field_https_required": "استخدم رابطًا آمنًا يبدأ بـ https://",
+  "url_field_scheme_not_allowed": "نوع الرابط \"{scheme}\" غير مسموح",
+  "url_field_domain_not_allowed": "يجب أن يكون الرابط على {domains}",
+  "url_field_domain_blocked": "الروابط إلى {host} غير مسموحة",
+  "url_field_lookalike_host": "يستخدم العنوان أحرفًا متشابهة — تحقق منه بعناية",
+  "url_field_punycode_host": "نطاق دولي مشفّر — تحقق منه بعناية",
+  "url_field_dismiss_paste": "تجاهل",
+  "stepper_increase": "زيادة",
+  "stepper_decrease": "إنقاص",
+  "otp_field_must_be_n_chars": "يجب أن يتكوّن الرمز من {length} خانة",
+  "scroll_to_top": "العودة إلى الأعلى",
+  "scroll_progress": "تقدّم التمرير",
+  "scroll_new_items": "{count} جديد",
+  "@scroll_new_items": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "list_page": "صفحة {page}",
+  "@list_page": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "stack_card_of": "بطاقة {index} من {total}",
+  "@stack_card_of": {
+    "placeholders": {
+      "index": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "stack_layer_of": "عنصر {index} من {total}",
+  "@stack_layer_of": {
+    "placeholders": {
+      "index": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "stack_swipe_left": "اسحب يسارًا",
+  "stack_swipe_right": "اسحب يمينًا",
+  "stack_swipe_up": "اسحب لأعلى",
+  "stack_swipe_down": "اسحب لأسفل",
+  "list_page_of": "صفحة {page} من {total}",
+  "@list_page_of": {
+    "placeholders": {
+      "page": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "list_previous_page": "الصفحة السابقة",
+  "list_next_page": "الصفحة التالية",
+  "list_more_pages": "صفحات أخرى",
+  "list_section_index": "فهرس الأقسام",
+  "list_load_more": "تحميل المزيد",
+  "list_empty_title": "لا يوجد شيء هنا بعد",
+  "list_clear_selection": "مسح التحديد",
+  "list_selected_count": "تم تحديد {count}",
+  "badge_count_notifications": "{count} إشعارات",
+  "badge_new_notification": "إشعار جديد",
+  "text_read_more": "قراءة المزيد",
+  "text_read_less": "قراءة أقل",
+  "checkbox_select_all": "تحديد الكل",
+  "checkbox_semantic_label": "خانة اختيار",
+  "switch_on": "مفعّل",
+  "switch_off": "معطّل",
+  "switch_dark_mode": "الوضع الداكن",
+  "switch_notifications": "الإشعارات",
+  "switch_biometric": "الدخول بالبصمة",
+  "switch_biometric_desc": "بصمة الوجه أو الإصبع عند التشغيل",
+  "switch_analytics": "مشاركة بيانات الاستخدام",
+  "switch_analytics_desc": "تحليلات مجهولة تساعد في تحسين التطبيق",
+  "switch_crash_reports": "إرسال تقارير الأعطال",
+  "switch_haptics": "الاهتزاز اللمسي",
+  "indicator_page_of": "الصفحة {index} من {total}",
+  "indicator_go_to_page": "الانتقال إلى الصفحة {index}",
+  "indicator_story_segment": "القصة {index} من {total}",
+  "indicator_story_playing": "قيد التشغيل",
+  "indicator_story_paused": "متوقفة مؤقتًا",
+  "@indicator_page_of": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "@indicator_go_to_page": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "@indicator_story_segment": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "stepper_step_of": "الخطوة {index} من {total}",
+  "stepper_current": "الخطوة الحالية",
+  "stepper_completed": "مكتملة",
+  "stepper_upcoming": "لم تبدأ",
+  "stepper_error": "تحتاج إلى مراجعة",
+  "stepper_disabled": "غير متاحة",
+  "@stepper_step_of": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "slider_volume": "مستوى الصوت",
+  "slider_muted": "صامت",
+  "slider_brightness": "السطوع",
+  "slider_text_size": "حجم النص",
+  "slider_playback_speed": "سرعة التشغيل",
+  "slider_quality": "الجودة",
+  "slider_quality_low": "منخفضة",
+  "slider_quality_medium": "متوسطة",
+  "slider_quality_high": "عالية",
+  "slider_quality_ultra": "فائقة",
+  "slider_price_range": "نطاق السعر",
+  "slider_age_range": "الفئة العمرية",
+  "slider_years": "سنة",
+  "slider_distance": "المسافة",
+  "slider_unit_km": "كم",
+  "slider_unit_mi": "ميل",
+  "slider_min_rating": "أقل تقييم",
+  "slider_any": "الكل",
+  "toggle_group_overflow_tooltip": "خيارات أخرى",
+  "toggle_group_overflow_label": "{count} خيارات أخرى",
+  "empty_no_results_title": "لا نتائج لـ “{query}”",
+  "empty_no_results_subtitle": "جرّب تهجئة مختلفة أو كلمات أقل.",
+  "empty_clear_search": "مسح البحث",
+  "empty_offline_title": "أنت غير متصل",
+  "empty_offline_subtitle": "تحقق من اتصالك وحاول مرة أخرى.",
+  "empty_failed_title": "حدث خطأ ما",
+  "empty_failed_subtitle": "تعذّر تحميل هذا. حاول بعد قليل.",
+  "empty_retry": "إعادة المحاولة",
+  "avatar_more_count": "{count} آخرون",
+  "rating_semantic_label": "التقييم",
+  "rating_value_out_of": "{value} من {count}",
+  "radio_semantic_label": "خيار",
+  "radio_yes": "نعم",
+  "radio_no": "لا",
+  "consent_prefix": "أوافق على ",
+  "consent_terms": "شروط الخدمة",
+  "consent_and": " و",
+  "consent_privacy": "سياسة الخصوصية",
+  "consent_required": "يجب الموافقة على الشروط للمتابعة",
+  "checkbox_age_confirm": "أؤكد أنني بعمر {age} عامًا أو أكثر",
+  "checkbox_age_required": "يجب تأكيد العمر للمتابعة",
+  "checkbox_acknowledge_required": "يجب الإقرار للمتابعة",
+  "checkbox_marketing_opt_in": "أرسلوا لي العروض وتحديثات المنتجات",
+  "checkbox_dont_show_again": "عدم الإظهار مرة أخرى",
+  "checkbox_save_card": "حفظ هذه البطاقة للدفعات القادمة",
+  "checkbox_default_address": "تعيين كعنوان افتراضي",
+  "checkbox_same_as_billing": "عنوان الشحن مطابق لعنوان الفواتير",
+  "toggle_group_semantic_label": "مجموعة تبديل",
+  "toggle_group_sort_asc": "تصاعدي",
+  "toggle_group_sort_desc": "تنازلي",
+  "toggle_group_format_bold": "غامق",
+  "toggle_group_format_italic": "مائل",
+  "toggle_group_format_underline": "تسطير",
+  "toggle_group_format_strikethrough": "يتوسطه خط",
+  "toggle_group_align_start": "محاذاة إلى البداية",
+  "toggle_group_align_center": "توسيط",
+  "toggle_group_align_end": "محاذاة إلى النهاية",
+  "toggle_group_align_justify": "ضبط",
+  "toggle_group_channel_push": "فوري",
+  "toggle_group_channel_email": "بريد إلكتروني",
+  "toggle_group_channel_sms": "رسائل نصية",
+  "toggle_group_daypart_morning": "الصباح",
+  "toggle_group_daypart_afternoon": "بعد الظهر",
+  "toggle_group_daypart_evening": "المساء",
+  "toggle_group_daypart_night": "الليل",
+  "toggle_group_count_any": "الكل",
+  "segmented_control_semantic_label": "عنصر تحكم مقسّم",
+  "segmented_control_view_list": "قائمة",
+  "segmented_control_view_grid": "شبكة",
+  "segmented_control_period_day": "يوم",
+  "segmented_control_period_week": "أسبوع",
+  "segmented_control_period_month": "شهر",
+  "segmented_control_period_year": "سنة",
+  "segmented_control_view_map": "خريطة",
+  "segmented_control_status_all": "الكل",
+  "segmented_control_status_active": "نشط",
+  "segmented_control_status_archived": "مؤرشف",
+  "segmented_control_time_12h": "12 ساعة",
+  "segmented_control_time_24h": "24 ساعة",
+  "dialog_confirm": "تأكيد",
+  "dialog_enter_text_hint": "أدخل نصًا...",
+  "dialog_closing_in": "الإغلاق خلال {seconds} ث",
+  "@dialog_closing_in": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "popup_opened_semantic": "تم فتح النافذة المنبثقة",
+  "popup_closed_semantic": "تم إغلاق النافذة المنبثقة",
+  "drawer_no_results": "لا توجد نتائج",
+  "drawer_no_items_match": "لا توجد عناصر تطابق \"{query}\"",
+  "video_load_failed": "فشل تحميل الفيديو",
+  "video_player": "مشغل الفيديو",
+  "video_play": "تشغيل",
+  "video_pause": "إيقاف مؤقت",
+  "video_replay": "إعادة من البداية",
+  "video_mute": "كتم الصوت",
+  "video_unmute": "إلغاء الكتم",
+  "video_enter_fullscreen": "ملء الشاشة",
+  "video_exit_fullscreen": "إنهاء ملء الشاشة",
+  "video_settings": "إعدادات التشغيل",
+  "video_screenshot": "التقاط صورة",
+  "video_next": "الفيديو التالي",
+  "video_previous": "الفيديو السابق",
+  "video_seek": "موضع التشغيل",
+  "video_playback_speed": "سرعة التشغيل",
+  "video_subtitles": "الترجمة",
+  "video_audio_track": "المسار الصوتي",
+  "video_quality": "الجودة",
+  "video_lock_screen": "قفل الشاشة",
+  "video_unlock_screen": "إلغاء قفل الشاشة",
+  "video_up_next": "التالي",
+  "video_cancel_autoplay": "إلغاء",
+  "video_play_now": "تشغيل الآن",
+  "video_subtitles_on": "تشغيل الترجمة",
+  "video_subtitles_off": "إيقاف الترجمة",
+  "video_chapters": "الفصول",
+  "video_replay_start": "التشغيل من البداية",
+  "video_zoom_fill": "ملء الإطار",
+  "video_zoom_fit": "احتواء الإطار",
+  "video_sleep_timer": "مؤقت النوم",
+  "video_sleep_off": "بدون مؤقت",
+  "video_sleep_minutes": "{count} دقيقة",
+  "@video_sleep_minutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "video_sleep_end": "نهاية هذا المقطع",
+  "video_loop_set_a": "التكرار من هنا",
+  "video_loop_set_b": "التكرار إلى هنا",
+  "video_loop_clear": "إلغاء التكرار",
+  "video_subtitle_delay": "تأخير الترجمة",
+  "video_subtitle_earlier": "أبكر",
+  "video_subtitle_later": "أبطأ",
+  "video_subtitle_reset": "متزامنة",
+  "video_cast": "التشغيل على شاشة أخرى",
+  "video_subtitle_size": "حجم الترجمة",
+  "video_subtitle_smaller": "أصغر",
+  "video_subtitle_larger": "أكبر",
+  "video_subtitle_normal": "عادي",
+  "audio_play": "تشغيل",
+  "audio_pause": "إيقاف مؤقت",
+  "audio_loading": "جارٍ التحميل",
+  "audio_error": "تعذر تشغيل هذا الصوت",
+  "audio_skip_back": "رجوع {count} ثانية",
+  "@audio_skip_back": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "audio_skip_forward": "تقدم {count} ثانية",
+  "@audio_skip_forward": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "audio_speed": "سرعة التشغيل",
+  "audio_loop": "تكرار",
+  "audio_timeline": "الموضع",
+  "audio_waveform": "تمرير الصوت",
+  "audio_retry": "إعادة المحاولة",
+  "audio_next": "المقطع التالي",
+  "audio_previous": "المقطع السابق",
+  "audio_sleep": "مؤقت النوم",
+  "audio_sleep_off": "مؤقت النوم متوقف",
+  "audio_sleep_end": "التوقف عند نهاية المقطع",
+  "audio_sleep_minutes": "التوقف بعد {minutes} دقيقة",
+  "@audio_sleep_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "audio_sleep_short_minutes": "{minutes}د",
+  "audio_sleep_short_end": "النهاية",
+  "@audio_sleep_short_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "video_off": "إيقاف",
+  "video_seek_forward": "تقديم {seconds} ثانية",
+  "@video_seek_forward": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "video_seek_back": "إرجاع {seconds} ثانية",
+  "@video_seek_back": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "video_no_audio_device": "لا يوجد جهاز إخراج صوتي",
+  "animation_load_failed": "فشل تحميل الرسوم المتحركة",
+  "animation_not_found": "الرسوم المتحركة غير موجودة",
+  "animation_access_denied": "تم رفض الوصول",
+  "animation_network_error": "خطأ في الشبكة",
+  "animation_invalid_file": "ملف رسوم متحركة غير صالح",
+  "animation_play": "تشغيل",
+  "animation_pause": "إيقاف مؤقت",
+  "animation_replay": "إعادة التشغيل من البداية",
+  "animation_seek": "موضع التشغيل",
+  "animation_percent_played": "تم تشغيل {percent}%",
+  "animation_playback_speed": "سرعة التشغيل",
+  "animation_speed_multiplier": "{rate}×",
+  "animation_paused_reduced_motion": "متوقف مؤقتًا — تقليل الحركة مفعّل",
+  "scanner_camera_access_blocked": "الوصول إلى الكاميرا محظور",
+  "scanner_camera_permission_required": "إذن الكاميرا مطلوب",
+  "scanner_open_settings_hint": "افتح الإعدادات للسماح لهذا التطبيق بالوصول إلى الكاميرا.",
+  "scanner_allow_camera_hint": "اسمح بالوصول إلى الكاميرا لمسح الرموز.",
+  "scanner_open_settings": "فتح الإعدادات",
+  "scanner_grant_access": "منح الإذن",
+  "scanner_use_this_code": "استخدام هذا الرمز",
+  "scanner_torch_on": "تشغيل الإضاءة",
+  "scanner_torch_off": "إيقاف الإضاءة",
+  "scanner_flip_camera": "تبديل الكاميرا",
+  "scanner_zoom": "تكبير",
+  "scanner_hint": "وجّه الكاميرا نحو الرمز",
+  "scanner_camera_failed": "الكاميرا غير متاحة",
+  "scanner_camera_failed_hint": "تعذّر تشغيل الكاميرا.",
+  "scanner_retry": "إعادة المحاولة",
+  "scanner_pending_code": "الرمز الممسوح",
+  "scanner_empty_value": "(لا توجد بيانات)",
+  "scanner_rejected": "هذا الرمز غير مقبول هنا",
+  "scanner_from_image": "مسح من صورة",
+  "scanner_image_no_code": "لم يتم العثور على رمز في الصورة",
+  "scanner_scan_again": "مسح مرة أخرى",
+  "legal_section_label": "القانونية والمعلومات",
+  "legal_version": "الإصدار {version}",
+  "@legal_version": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "legal_version_build": "الإصدار {version} · البنية {build}",
+  "@legal_version_build": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "build": {
+        "type": "String"
+      }
+    }
+  },
+  "legal_title_about": "حول التطبيق",
+  "legal_title_privacy": "سياسة الخصوصية",
+  "legal_title_tos": "شروط الخدمة",
+  "legal_title_licenses": "تراخيص المصادر المفتوحة",
+  "legal_title_eula": "اتفاقية ترخيص المستخدم النهائي",
+  "legal_title_refund": "الاسترداد والإلغاء",
+  "legal_title_credits": "شكر وتقدير",
+  "legal_title_contact": "التواصل والدعم",
+  "legal_page_unavailable": "{title} غير متاح",
+  "legal_page_load_failed": "تعذر تحميل {title}",
+  "legal_page_disabled_body": "هذه الصفحة معطّلة حاليًا.",
+  "legal_check_connection_body": "تحقق من اتصالك وحاول مرة أخرى.",
+  "maintenance_default_title": "سنعود قريبًا",
+  "maintenance_default_message": "الخدمة غير متاحة مؤقتًا. يرجى المحاولة بعد قليل.",
+  "maintenance_scheduled_message": "نقوم بأعمال صيانة مجدولة. يرجى المحاولة لاحقًا.",
+  "maintenance_eta_any_moment": "في أي لحظة",
+  "maintenance_eta_hours_minutes": "خلال {hours} س {minutes} د تقريبًا",
+  "maintenance_eta_minutes": "خلال {minutes} دقيقة تقريبًا",
+  "maintenance_eta_seconds": "خلال {seconds} ثانية تقريبًا",
+  "maintenance_back_eta": "نعود {eta}",
+  "maintenance_retry_in_seconds": "إعادة المحاولة خلال {seconds} ث",
+  "connectivity_offline": "أنت غير متصل بالإنترنت",
+  "connectivity_offline_queued": "أنت غير متصل — {count} في قائمة الانتظار",
+  "connectivity_back_online": "عاد الاتصال",
+  "connectivity_vpn_warning": "تم اكتشاف VPN — قد يؤثر على بعض الميزات",
+  "connectivity_vpn_blocked": "يجب تعطيل VPN للمتابعة",
+  "connectivity_quality_offline": "غير متصل",
+  "connectivity_quality_poor": "ضعيف",
+  "connectivity_quality_fair": "مقبول",
+  "connectivity_quality_good": "جيد",
+  "connectivity_quality_excellent": "ممتاز",
+  "connectivity_quality_unknown": "غير معروف",
+  "connectivity_type_offline": "غير متصل",
+  "connectivity_type_wifi": "واي فاي",
+  "connectivity_type_ethernet": "إيثرنت",
+  "connectivity_type_mobile": "بيانات الجوال",
+  "connectivity_type_vpn": "شبكة افتراضية خاصة",
+  "connectivity_type_other": "أخرى",
+  "preferences_app_role_title": "سمة الألوان",
+  "preferences_app_role_subtitle": "لوحة الألوان التي يرتديها التطبيق",
+  "preferences_reveal_shape_title": "حركة التبديل",
+  "preferences_reveal_shape_subtitle": "شكل الكشف عند تغيير السمة",
+  "preferences_reveal_direction_title": "اتجاه الحركة",
+  "preferences_reveal_direction_subtitle": "الاتجاه الذي يتحرك فيه هذا الشكل",
+  "preferences_color_saturation_title": "تشبّع الألوان",
+  "preferences_color_saturation_subtitle": "مدى حيوية الألوان المعروضة",
+  "preferences_saturation_muted": "هادئ",
+  "preferences_saturation_normal": "عادي",
+  "preferences_saturation_vibrant": "نابض",
+  "preferences_dynamic_color_title": "الألوان الديناميكية",
+  "preferences_dynamic_color_subtitle": "استخدام لون النظام المميز (أندرويد 12 فأحدث).",
+  "preferences_theme_title": "المظهر",
+  "preferences_theme_subtitle": "فاتح · داكن · حسب النظام",
+  "preferences_theme_light": "فاتح",
+  "preferences_theme_dark": "داكن",
+  "preferences_theme_system": "النظام",
+  "preferences_language_title": "اللغة",
+  "preferences_language_subtitle": "لغة عرض التطبيق",
+  "preferences_font_scale_small": "صغير",
+  "preferences_font_scale_default": "افتراضي",
+  "preferences_font_scale_large": "كبير",
+  "preferences_font_scale_extra_large": "كبير جدًا",
+  "preferences_font_scale_huge": "ضخم",
+  "preferences_font_size_title": "حجم الخط",
+  "preferences_font_size_subtitle": "يتكامل مع تكبير النص في النظام",
+  "preferences_font_preview_sample": "نص حكيم له سر قاطع وذو شأن عظيم مكتوب على ثوب أخضر.",
+  "preferences_reset_to_defaults": "إعادة التعيين إلى الافتراضي",
+  "preferences_reset_confirm_title": "إعادة تعيين تفضيلات العرض؟",
+  "preferences_reset_confirm_body": "سيُعاد المظهر والتشبّع وحجم الخط والألوان الديناميكية وحركة الكشف إلى الإعدادات الافتراضية. لن تتأثر اللغة وحالة التهيئة الأولى.",
+  "preferences_reset_action": "إعادة تعيين",
+  "wizard_back": "رجوع",
+  "wizard_next": "التالي",
+  "wizard_submit": "إرسال",
+  "wizard_discard_draft_title": "تجاهل المسودة؟",
+  "wizard_discard_draft_body": "سيحتفظ الإغلاق بتقدمك محفوظًا لتكمل لاحقًا.",
+  "wizard_keep_draft": "الاحتفاظ بالمسودة",
+  "wizard_discard": "تجاهل",
+  "date_range_preset_today": "اليوم",
+  "date_range_preset_last_7_days": "آخر 7 أيام",
+  "date_range_preset_last_30_days": "آخر 30 يومًا",
+  "date_range_preset_this_month": "هذا الشهر",
+  "date_range_preset_last_month": "الشهر الماضي",
+  "date_range_select_range": "اختر النطاق",
+  "date_range_select_date_range": "اختر نطاق التاريخ",
+  "date_picker_previous_month": "الشهر السابق",
+  "date_picker_next_month": "الشهر التالي",
+  "date_picker_previous_year": "السنة السابقة",
+  "date_picker_next_year": "السنة التالية",
+  "date_picker_previous_years": "سنوات سابقة",
+  "date_picker_next_years": "سنوات لاحقة",
+  "date_picker_choose_month": "اختر الشهر",
+  "date_picker_choose_year": "اختر السنة",
+  "date_picker_today": "اليوم",
+  "date_picker_selected": "محدد",
+  "date_picker_range_start": "بداية النطاق",
+  "date_picker_range_end": "نهاية النطاق",
+  "date_picker_in_range": "ضمن النطاق",
+  "date_picker_unavailable": "غير متاح",
+  "date_picker_min_range_days": "اختر نطاقًا لا يقل عن {days} يوم",
+  "@date_picker_min_range_days": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "date_picker_max_range_days": "اختر نطاقًا لا يزيد عن {days} يوم",
+  "@date_picker_max_range_days": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "date_picker_hour": "الساعة",
+  "date_picker_minute": "الدقيقة",
+  "date_picker_month": "الشهر",
+  "date_picker_day": "اليوم",
+  "date_picker_year": "السنة",
+  "date_picker_second": "الثانية",
+  "date_picker_select_time_range": "اختر نطاقًا زمنيًا",
+  "date_picker_type_a_date": "اكتب التاريخ",
+  "date_picker_pick_from_calendar": "اختر من التقويم",
+  "date_picker_period": "صباحًا أو مساءً",
+  "date_picker_select_time": "اختر الوقت",
+  "date_picker_select_date_time": "اختر التاريخ والوقت",
+  "date_picker_select_month_year": "اختر الشهر والسنة",
+  "date_picker_select_year": "اختر السنة",
+  "date_picker_events": "{count} أحداث",
+  "@date_picker_events": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "date_picker_close": "أغلق المنتقي",
+  "date_field_select_date": "اختر التاريخ",
+  "faq_help_center": "مركز المساعدة",
+  "faq_search_hint": "ابحث في المساعدة…",
+  "faq_no_matching_answers": "لا توجد إجابات مطابقة",
+  "faq_was_this_helpful": "هل كان هذا مفيدًا؟",
+  "faq_marked_helpful": "تم وضع علامة مفيد",
+  "faq_feedback_recorded": "تم تسجيل الملاحظة",
+  "faq_helpful": "مفيد",
+  "faq_not_helpful": "غير مفيد",
+  "faq_load_failed": "فشل تحميل مركز المساعدة",
+  "faq_no_articles_yet": "لا توجد مقالات مساعدة بعد",
+  "faq_thanks_marked_helpful": "شكرًا — لقد وضعت علامة أن هذا مفيد",
+  "faq_thanks_feedback_recorded": "شكرًا — تم تسجيل الملاحظة",
+  "coming_soon_this_feature": "هذه الميزة",
+  "coming_soon_title": "قريبًا",
+  "coming_soon_feature_on_the_way": "{feature} في الطريق",
+  "coming_soon_body": "نعمل عليها حاليًا. هل تريد تنبيهًا فور توفرها؟",
+  "coming_soon_enter_email": "أدخل بريدك الإلكتروني",
+  "coming_soon_email_invalid": "هذا البريد الإلكتروني لا يبدو صحيحًا",
+  "coming_soon_notify_me": "أعلمني",
+  "coming_soon_success_title": "أنت على القائمة",
+  "coming_soon_success_body": "سنراسل {email} عند الإطلاق.",
+  "nav_back_to_home": "العودة إلى الرئيسية",
+  "nav_page_not_found_body": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+  "nav_go_back": "رجوع",
+  "nav_tab_position": "علامة التبويب {index} من {total}",
+  "nav_breadcrumbs": "مسار التنقل",
+  "nav_breadcrumbs_hidden": "{count, plural, zero{لا خطوات} one{خطوة واحدة أخرى} two{خطوتان أخريان} few{{count} خطوات أخرى} many{{count} خطوة أخرى} other{{count} خطوة أخرى}}",
+  "@nav_breadcrumbs_hidden": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "nav_copy_url": "نسخ الرابط",
+  "nav_path_copied": "تم نسخ المسار",
+  "error_diagnostics_copied": "تم نسخ بيانات التشخيص إلى الحافظة",
+  "error_no_email_app": "لا يوجد تطبيق بريد إلكتروني متاح",
+  "error_default_message": "واجهنا خطأ غير متوقع. يمكنك المحاولة مرة أخرى — وإذا استمر الخطأ فأرسل لنا بيانات التشخيص لنصلحه.",
+  "error_report_sent": "تم إرسال البلاغ — شكرًا",
+  "error_report_this": "الإبلاغ عن هذا",
+  "error_copy_diagnostics": "نسخ بيانات التشخيص",
+  "error_email_support": "مراسلة الدعم",
+  "error_offline_hint": "أنت غير متصل بالإنترنت. قد يختفي الخطأ عند إعادة الاتصال.",
+  "error_boundary_release_title": "تعذر تحميل هذا الجزء",
+  "error_boundary_release_body": "حاول مرة أخرى بعد قليل.",
+  "error_boundary_fallback_title": "حدث خطأ ما",
+  "media_file_too_large": "حجم الملف {size} م.ب؛ الحد الأقصى {max} م.ب.",
+  "media_extension_not_allowed": "يُسمح فقط بـ {extensions}.",
+  "media_image_too_small": "يجب ألّا يقل أقصر ضلع في الصورة عن {side} بكسل.",
+  "media_image_too_large": "يجب ألّا يتجاوز أطول ضلع في الصورة {side} بكسل.",
+  "media_wrong_aspect_ratio": "نسبة الأبعاد {ratio} — المتوقع {expected}.",
+  "media_photo": "صورة",
+  "media_video": "فيديو",
+  "media_file": "ملف",
+  "media_gallery": "المعرض",
+  "media_camera": "الكاميرا",
+  "media_clipboard": "الحافظة",
+  "media_browse": "تصفح",
+  "media_record": "تسجيل",
+  "media_image_copied": "تم نسخ الصورة إلى الحافظة",
+  "media_video_copied": "تم نسخ الفيديو إلى الحافظة",
+  "media_file_copied": "تم نسخ الملف إلى الحافظة",
+  "media_copy_failed": "فشل النسخ",
+  "media_copy_image_tooltip": "نسخ الصورة إلى الحافظة",
+  "media_copy_video_tooltip": "نسخ الفيديو إلى الحافظة",
+  "media_copy_file_tooltip": "نسخ الملف إلى الحافظة",
+  "media_trim_video": "قص الفيديو",
+  "media_choose_file": "اختر ملفًا",
+  "media_add_attachment": "إضافة مرفق",
+  "media_crop_review_title": "مراجعة",
+  "media_crop_review_subtitle": "انقر على صورة لقصّها. يجب قص الصور الحمراء للمتابعة.",
+  "media_must_crop": "يجب القص",
+  "media_new_badge": "جديد",
+  "media_existing_badge": "سابقة",
+  "media_crop_title": "قص",
+  "media_clipboard_empty": "الحافظة (فارغة)",
+  "media_add_photo": "إضافة صورة",
+  "media_add_video": "إضافة فيديو",
+  "media_add_file": "إضافة ملف",
+  "media_item_of": "العنصر {index} من {total}",
+  "media_remove_item": "إزالة",
+  "media_download_item": "تنزيل",
+  "media_new_item": "لم يتم الرفع بعد",
+  "media_existing_item": "مرفوعة مسبقاً",
+  "media_uploading": "جارٍ الرفع",
+  "media_reorder_hint": "اسحب لإعادة الترتيب",
+  "@media_item_of": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "media_limit_dropped": "لم تتم إضافة {count} — الحد الأقصى {max}",
+  "media_duplicate_skipped": "مضاف مسبقًا",
+  "media_preparing": "جارٍ التحضير…",
+  "media_upload_cancel": "إيقاف الرفع",
+  "media_upload_cancelled": "تم إيقاف الرفع",
+  "media_upload_retry": "إعادة الرفع",
+  "media_share": "مشاركة",
+  "media_more_actions": "إجراءات أخرى",
+  "media_move_left": "تحريك لليسار",
+  "media_move_right": "تحريك لليمين",
+  "media_moved_to": "تم النقل إلى الموضع {index}",
+  "@media_limit_dropped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "@media_moved_to": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "media_gallery_subtitle": "اختر من صورك",
+  "media_camera_subtitle": "التقاط صورة جديدة",
+  "media_clipboard_subtitle": "لصق ما نسخته",
+  "media_browse_subtitle": "اختر من ملفاتك",
+  "media_cannot_preview_bytes": "لا يمكن المعاينة — لم يتم حفظه بعد",
+  "media_recent": "الأخيرة",
+  "media_limit_reached": "تم بلوغ الحد",
+  "media_open_failed": "فشل الفتح: {message}",
+  "media_url_copied": "تم نسخ الرابط إلى الحافظة",
+  "media_play_pause": "تشغيل / إيقاف",
+  "pdf_resumed_at_page": "استئناف من الصفحة {page}",
+  "pdf_start_over": "البدء من جديد",
+  "pdf_save_dialog_title": "حفظ PDF",
+  "pdf_downloading_percent": "جارٍ التنزيل… {percent}٪",
+  "pdf_load_failed": "فشل تحميل ملف PDF",
+  "pdf_password_required": "كلمة المرور مطلوبة",
+  "pdf_not_found": "ملف PDF غير موجود",
+  "pdf_load_failed_detail": "تحقق من رابط المصدر أو من اتصالك.",
+  "pdf_encrypted_detail": "المستند مشفّر. أدخل كلمة المرور للمتابعة.",
+  "pdf_not_found_detail": "أعاد الملف على هذا الرابط الخطأ 404.",
+  "pdf_rotate_90": "تدوير 90°",
+  "pdf_save_as": "حفظ باسم…",
+  "pdf_print": "طباعة",
+  "pdf_page_count": "{count, plural, zero{لا صفحات} one{صفحة واحدة} two{صفحتان} few{{count} صفحات} many{{count} صفحة} other{{count} صفحة}}",
+  "pdf_zoom_out": "تصغير",
+  "pdf_zoom_in": "تكبير",
+  "pdf_jump_to_page": "الانتقال إلى صفحة",
+  "pdf_page_of": "صفحة {page} من {total}",
+  "pdf_no_bookmarks": "لا توجد إشارات مرجعية لهذا المستند بعد",
+  "pdf_page_number": "صفحة {page}",
+  "pdf_remove_bookmark": "إزالة الإشارة المرجعية",
+  "pdf_bookmark_page": "وضع إشارة مرجعية",
+  "pdf_bookmark_list_hint": "اضغط مطولًا لعرض القائمة",
+  "pdf_page_count_short": "{count} ص",
+  "pdf_match_of": "النتيجة {index} من {total}",
+  "pdf_no_matches": "لا توجد نتائج",
+  "pdf_searching": "جارٍ البحث",
+  "pdf_open_document": "فتح {name}",
+  "pdf_no_outline": "لا يوجد فهرس محتويات في هذا الملف",
+  "pdf_no_recent_documents": "لم تُفتح أي مستندات بعد",
+  "feedback_title": "إرسال ملاحظات",
+  "feedback_subtitle": "نقرأ كل شيء. أخبرنا بما يحدث.",
+  "feedback_type_label": "النوع",
+  "feedback_severity_label": "الخطورة",
+  "feedback_description_label": "الوصف",
+  "feedback_description_hint": "ماذا حدث؟ وماذا كنت تتوقع؟",
+  "feedback_description_required": "الوصف مطلوب",
+  "feedback_repro_label": "خطوات إعادة إنتاج المشكلة",
+  "feedback_repro_hint": "1. افتح …\n2. انقر …\n3. لاحظ …",
+  "feedback_email_label": "البريد الإلكتروني (اختياري)",
+  "feedback_email_invalid": "هذا البريد الإلكتروني لا يبدو صحيحًا",
+  "feedback_attachments_label": "المرفقات",
+  "feedback_diagnostics_label": "بيانات التشخيص",
+  "feedback_diagnostics_hint": "الجهاز وإصدار التطبيق والنشاط الأخير. يساعدنا على إعادة إنتاج المشكلة.",
+  "feedback_pick_gallery": "من المعرض",
+  "feedback_pick_camera": "من الكاميرا",
+  "feedback_submit": "إرسال",
+  "feedback_submitting": "جارٍ الإرسال…",
+  "feedback_success_title": "شكرًا على التنبيه",
+  "feedback_success_body": "وصلتنا ملاحظتك. سنتابع معك عبر بريدك إن تركته.",
+  "feedback_cooldown_title": "على مهل",
+  "feedback_cooldown_hint": "انتظر لحظة قبل إرسال ملاحظة أخرى.",
+  "feedback_offline_queued_title": "أنت غير متصل بالإنترنت",
+  "feedback_offline_queued_body": "حُفظت للإرسال لاحقًا — ستُرسل عند إعادة الاتصال.",
+  "feedback_failure_title": "تعذر الإرسال",
+  "feedback_failure_body": "حال شيء دون الإرسال. هل تحاول مرة أخرى؟",
+  "feedback_disabled": "الملاحظات غير متاحة.",
+  "feedback_send_feedback": "إرسال ملاحظات",
+  "feedback_attachment_too_large": "المرفق كبير جدًا بعد الضغط",
+  "feedback_type_bug": "خلل",
+  "feedback_type_bug_subtitle": "شيء ما معطّل أو خاطئ",
+  "feedback_type_suggestion": "اقتراح",
+  "feedback_type_suggestion_subtitle": "فكرة لتحسين",
+  "feedback_type_question": "سؤال",
+  "feedback_type_question_subtitle": "بحاجة إلى مساعدة لفهم شيء ما",
+  "feedback_type_other": "أخرى",
+  "feedback_type_other_subtitle": "أي شيء آخر",
+  "feedback_severity_low": "منخفضة",
+  "feedback_severity_low_subtitle": "بسيطة — يمكن تجاوزها بسهولة",
+  "feedback_severity_medium": "متوسطة",
+  "feedback_severity_medium_subtitle": "تؤثر على الاستخدام الطبيعي",
+  "feedback_severity_high": "مرتفعة",
+  "feedback_severity_high_subtitle": "يصعب تجاوزها",
+  "feedback_severity_blocking": "معطِّلة",
+  "feedback_severity_blocking_subtitle": "لا يمكن استخدام التطبيق",
+  "feedback_error_no_email_app": "لا يوجد تطبيق بريد إلكتروني متاح",
+  "feedback_error_email_open_failed": "فشل فتح البريد الإلكتروني: {error}",
+  "feedback_error_no_endpoint": "لم يتم تكوين وجهة لإرسال الملاحظات",
+  "update_hard_title": "التحديث مطلوب",
+  "update_hard_message": "أنت تستخدم إصدارًا قديمًا. حدّث التطبيق لمواصلة استخدامه.",
+  "update_hard_button": "التحديث الآن",
+  "update_soft_title": "يتوفر إصدار جديد",
+  "update_soft_message": "إصدار أحدث جاهز. حدّث للحصول على آخر التحسينات.",
+  "update_soft_update_button": "تحديث",
+  "update_soft_later_button": "ربما لاحقًا",
+  "update_soft_skip_button": "تخطي هذا الإصدار",
+  "update_version_label": "الإصدار",
+  "update_unavailable_title": "التحديث غير متاح",
+  "update_unavailable_message": "لا يمكننا فتح المتجر الآن. حاول مرة أخرى من الشاشة الرئيسية.",
+  "onboarding_skip": "تخطي",
+  "onboarding_next": "التالي",
+  "onboarding_back": "رجوع",
+  "onboarding_get_started": "يلا نبلش",
+  "onboarding_allow": "السماح",
+  "onboarding_not_now": "ليس الآن",
+  "onboarding_permission_denied_hint": "يمكنك تغيير هذا لاحقًا من الإعدادات.",
+  "onboarding_make_title": "اصنع قطعتك بيدك",
+  "onboarding_make_body": "اختر ورشة، اجلس مع المدرّب، واصنع أو لوّن قطعة فخارية خاصة فيك.",
+  "onboarding_workshop_title": "تجربة الورشة",
+  "onboarding_workshop_body": "جلسات عملية بإشراف مدرّبين تصنع أو تلوّن قطعتك خطوة بخطوة داخل الاستوديو",
+  "onboarding_track_title": "تتبّع طلبك أول بأول",
+  "onboarding_track_body": "من التحضير، للجهوزية، لباب بيتك بتوصلك إشعار عند كل تغيير.",
+  "notifications_channel_transactional_name": "الطلبات والمعاملات",
+  "notifications_channel_transactional_description": "تحديثات الطلبات والإيصالات وإشعارات التوصيل.",
+  "notifications_channel_messages_name": "الرسائل",
+  "notifications_channel_messages_description": "الرسائل المباشرة والإشارات وإشعارات المحادثات.",
+  "notifications_channel_promo_name": "العروض الترويجية",
+  "notifications_channel_promo_description": "التسويق والعروض الترويجية والعروض الخاصة.",
+  "notifications_channel_system_name": "النظام والأمان",
+  "notifications_channel_system_description": "تحديثات التطبيق وتنبيهات الأمان والرسائل الهامة.",
+  "notifications_channel_general_name": "عام",
+  "notifications_channel_general_description": "إشعارات متنوعة.",
+  "validator_form_invalid": "النموذج غير صالح",
+  "field_hint_name": "اسمك",
+  "field_label_email": "البريد الإلكتروني",
+  "field_label_password": "كلمة المرور",
+  "field_label_confirm_password": "تأكيد كلمة المرور",
+  "field_label_phone": "رقم الهاتف",
+  "field_label_name": "الاسم",
+  "field_label_username": "اسم المستخدم",
+  "field_label_url": "الرابط",
+  "field_label_code": "الرمز",
+  "field_label_number": "الرقم",
+  "auth_login_title": "اهلا بعودتك",
+  "auth_login_subtitle": "شوف كل الورش المتاحة واحجز مكانك اللي يناسب وقتك.",
+  "auth_no_account_prompt": "ليس لديك حساب؟",
+  "auth_create_account": "انشئ حساب",
+  "auth_register_title": "اهلا بك بتيراكوتا",
+  "auth_have_account_prompt": "لديك حساب؟",
+  "auth_otp_title": "أدخل رمز التحقق",
+  "auth_otp_resend": "إعادة إرسال الرمز",
+  "auth_verify": "تحقق",
+  "auth_register_success_title": "تم انشاء الحساب بنجاح",
+  "auth_continue": "استكمال",
+  "auth_forgot_title": "أدخل رقم هاتفك",
+  "auth_forgot_subtitle": "ادخل رقم هاتفك لكي نرسل اليك رمز التحقق لتغيير كلمة السر",
+  "auth_send_code": "إرسال الرمز",
+  "auth_reset_title": "تغيير كلمة السر",
+  "auth_new_password": "كلمة السر الجديدة",
+  "auth_change": "تغيير",
+  "auth_error_generic": "صار خطأ. حاول مرة ثانية.",
+  "auth_otp_subtitle": "لقد أرسلنا رمز تحقق مكوّنًا من {digits} أرقام إلى رقم هاتفك",
+  "auth_dev_otp_title": "رمز التحقق الخاص بك",
+  "auth_verify_card_title": "وثّق رقمك",
+  "auth_verify_card_body": "أدخل الرمز المُرسل إليك لتتمكن من حجز ورشة أو إتمام طلب.",
+  "auth_verify_card_cta": "وثّق الآن",
+  "auth_verify_needed_title": "وثّق رقمك أولاً",
+  "auth_verify_needed_confirm": "وثّق الآن",
+  "auth_verify_sent": "أرسلنا لك رمزاً جديداً",
+  "auth_verify_needed_book": "حجز الورشة يحتاج رقماً موثّقاً. الأمر لا يستغرق وقتاً.",
+  "auth_verify_needed_buy": "إتمام الطلب يحتاج رقماً موثّقاً. الأمر لا يستغرق وقتاً.",
+  "@auth_otp_subtitle": {
+    "placeholders": {
+      "digits": {
+        "type": "int"
+      }
+    }
+  },
+  "auth_otp_resend_timer": "اعادة ارسال الرمز {timer}",
+  "@auth_otp_resend_timer": {
+    "placeholders": {
+      "timer": {
+        "type": "String"
+      }
+    }
+  },
+  "auth_confirm_password": "أكد كلمة السر",
+  "auth_full_name": "الاسم الكامل",
+  "auth_policy_agree": "أوافق على الشروط وسياسة الخصوصية",
+  "auth_policy_required": "يجب الموافقة على الشروط للمتابعة",
+  "auth_register_success_body": "لكل ورشة موعد نهائي خاص بها للإلغاء أو تغيير الموعد، وستجده على الحجز نفسه.",
+  "home_greeting": "مساء الخير, {name}",
+  "@home_greeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "nav_tab_gallery": "المعرض",
+  "nav_tab_workshops": "الورشات",
+  "nav_tab_shop": "المتجر",
+  "nav_tab_profile": "حسابي",
+  "booking_status_pending_payment": "بانتظار الدفع",
+  "booking_no_cancel_title": "لا يمكن إلغاء هذه الجلسة",
+  "booking_no_cancel_body": "موعدها أقرب من مدة الإلغاء المسموحة. يمكنك الحجز، لكن لن تتمكن من الإلغاء أو تغيير الموعد بعدها.",
+  "booking_no_cancel_confirm": "احجز على أي حال",
+  "booking_cancel_policy": "ألغِ قبل {when} ويعود المبلغ كاملاً إلى رصيدك في تيراكوتا.",
+  "@booking_cancel_policy": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_cancel_policy_none": "موعد هذه الجلسة أقرب من أن تُلغى أو يُغيَّر موعدها.",
+  "booking_time_to": "الى",
+  "money_currency": "ريال",
+  "home_title": "الرئيسية",
+  "home_continue_workshop": "استكمل ورشتك",
+  "home_live_order": "طلبك",
+  "home_live_workshop": "يحدث الآن",
+  "home_live_order_eta": "يصل {when}",
+  "@home_live_order_eta": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "home_live_workshop_until": "حتى {time}",
+  "@home_live_workshop_until": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "home_live_show_code": "اعرض رمزي",
+  "home_next_booking": "ورشتك القادمة",
+  "home_next_booking_when": "{date} · {time}",
+  "@home_next_booking_when": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "home_live_items": "{count, plural, =1{قطعة واحدة} =2{قطعتان} few{{count} قطع} many{{count} قطعة} other{{count} قطعة}}",
+  "@home_live_items": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "home_featured": "القطع المميزة",
+  "home_offers": "اخر العروض",
+  "home_browse_categories": "تصفح الفئات",
+  "home_see_all": "عرض الكل",
+  "home_see_all_count": "عرض الكل ({count})",
+  "@home_see_all_count": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "home_badge_featured": "مميز",
+  "page_section_title": "تيراكوتا",
+  "page_terms": "الشروط والأحكام",
+  "page_privacy": "سياسة الخصوصية",
+  "page_returns": "سياسة الاسترجاع والاستبدال",
+  "page_shipping": "سياسة الشحن والتوصيل",
+  "page_about": "عن تيراكوتا",
+  "page_missing": "لا يوجد شيء هنا بعد",
+  "page_missing_body": "لم تكتب الورشة هذه الصفحة.",
+  "shop_discount_badge": "-{percent}%",
+  "@shop_discount_badge": {
+    "description": "How much a sale price takes off, on a product card badge.",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "gallery_title": "لحظات تيراكوتا",
+  "gallery_subtitle": "شوف قطع سوّاها زوّار مثلك, كل صورة قصة طين تحول لشي حقيقي.",
+  "gallery_counts": "{photos} صور . {videos} فيديو",
+  "@gallery_counts": {
+    "placeholders": {
+      "photos": {
+        "type": "int"
+      },
+      "videos": {
+        "type": "int"
+      }
+    }
+  },
+  "gallery_counts_photos": "{photos} صور",
+  "@gallery_counts_photos": {
+    "placeholders": {
+      "photos": {
+        "type": "int"
+      }
+    }
+  },
+  "gallery_counts_videos": "{videos} فيديو",
+  "@gallery_counts_videos": {
+    "placeholders": {
+      "videos": {
+        "type": "int"
+      }
+    }
+  },
+  "gallery_album_empty": "لا توجد صور في هذا الألبوم بعد",
+  "gallery_empty": "لا توجد ألبومات بعد",
+  "workshop_title": "ورشات تيراكوتا",
+  "workshop_studio_location": "موقع الاستوديو",
+  "workshop_open_in_maps": "افتح في الخرائط",
+  "workshop_map_pending": "ستظهر الخريطة هنا بعد ربط مفتاح الاستوديو.",
+  "workshop_no_location": "لم ينشر الاستوديو موقعه بعد.",
+  "workshop_subtitle": "شوف كل الورش المتاحة واحجز مكانك اللي يناسب وقتك.",
+  "workshop_tab_mine": "ورشاتي",
+  "workshop_tab_book": "حجز ورشة",
+  "workshop_book": "احجز",
+  "workshop_location": "الموقع",
+  "workshop_price_per_person": "{price} للشخص",
+  "@workshop_price_per_person": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "workshop_seats_per_session": "{count} بالجلسة",
+  "@workshop_seats_per_session": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workshop_duration_hour": "ساعة",
+  "workshop_duration_minutes": "{minutes} دقيقة",
+  "@workshop_duration_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "workshop_gift": "اهداء",
+  "workshop_wallet_balance": "رصيد تيراكوتا",
+  "workshop_view_transactions": "عرض المعاملات",
+  "workshop_not_specified": "غير محدد",
+  "workshop_empty": "لا توجد ورشات متاحة حالياً",
+  "booking_pick_slot": "اختر موعد",
+  "booking_people_count": "{count} اشخاص",
+  "@booking_people_count": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_session_time": "ورشة من {start} الى {end}",
+  "@booking_session_time": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_seats_left": "{left} \\ {total} اشخاص",
+  "@booking_seats_left": {
+    "placeholders": {
+      "left": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_for_people": "حجز لـ {count}",
+  "@booking_for_people": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_pick_pieces": "اختيار القطع",
+  "booking_selected_pieces": "القطع المختارة {count}",
+  "@booking_selected_pieces": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "booking_pieces_range": "اختر من {min} الى {max} قطعة",
+  "@booking_pieces_range": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "booking_pieces_exact": "اختر {count} قطعة",
+  "@booking_pieces_exact": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "booking_pieces_total": "الاجمالي",
+  "booking_pieces_min_only": "اختر {min} قطعة على الاقل",
+  "@booking_pieces_min_only": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "booking_pieces_empty": "ما فيه قطع في هذه الورشة بعد.",
+  "booking_piece_untitled": "قطعة",
+  "booking_piece_painting_on": "محجوزة للتلوين · {workshop}، {date}",
+  "@booking_piece_painting_on": {
+    "placeholders": {
+      "workshop": {},
+      "date": {}
+    }
+  },
+  "booking_piece_painted_at": "لُوِّنت في {workshop}",
+  "@booking_piece_painted_at": {
+    "placeholders": {
+      "workshop": {}
+    }
+  },
+  "booking_own_pieces": "قطعي",
+  "booking_own_piece_made_on": "صنعتها {date}",
+  "@booking_own_piece_made_on": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_own_pieces_hint": "قطع صنعتها بنفسك وتقدر تلونها الان.",
+  "booking_confirmed_title": "تم تاكيد حجز الورشة !",
+  "booking_confirmed_body": "يمكنك الإلغاء أو تغيير الموعد حتى {when}، ويعود المبلغ كاملاً إلى رصيدك في تيراكوتا.",
+  "booking_track": "تتبع الحجز",
+  "booking_detail_confirmed": "الحجز مؤكد",
+  "booking_scan_on_arrival": "يرجى مسح الرمز عند الوصول إلى موقع الورشة، والمتبقي على موعدها {days}",
+  "@booking_scan_on_arrival": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_scan_code": "رمز المسح",
+  "booking_qr_instructions": "يرجى مسح رمز الاستجابة السريعة عند الوصول لتسجيل حضورك في الورشة.",
+  "booking_reschedule": "تغير موعد",
+  "booking_reschedule_title": "تغيير موعد",
+  "booking_change": "تغيير",
+  "booking_cancel": "الغاء موعد",
+  "booking_cancel_title": "الغاء الحجز",
+  "booking_cancel_confirm": "هل أنت متأكد من رغبتك في إلغاء الحجز؟",
+  "booking_yes": "نعم",
+  "booking_no": "لا",
+  "booking_close": "اغلاق",
+  "booking_with_celebration": "مع احتفال",
+  "booking_add_celebration": "اضافة احتفال",
+  "booking_remove_celebration": "ازالة الاحتفال",
+  "booking_my_bookings": "ورشاتي",
+  "booking_empty": "لا يوجد لديك حجوزات بعد",
+  "booking_slot_full": "مكتمل",
+  "booking_slot_conflict": "لديك حجز في نفس الوقت",
+  "checkout_title": "الدفع",
+  "checkout_confirm_and_pay": "تاكيد الحجز و الدفع",
+  "checkout_subtotal": "المجموع",
+  "checkout_discount": "الخصم",
+  "checkout_delivery_fee": "التوصيل",
+  "checkout_vat": "شامل الضريبة ({rate})",
+  "@checkout_vat": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "checkout_total": "الإجمالي",
+  "checkout_wallet_applied": "رصيد تيراكوتا",
+  "checkout_amount_due": "المبلغ المستحق",
+  "checkout_already_settled": "مغطى بالكامل من رصيدك",
+  "checkout_discount_code": "رمز الخصم",
+  "checkout_discount_code_hint": "SAVE10",
+  "checkout_apply": "تطبيق",
+  "checkout_free": "مجاني",
+  "checkout_code_off_percent": "خصم {value}%",
+  "@checkout_code_off_percent": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "checkout_code_off_fixed": "خصم {amount}",
+  "@checkout_code_off_fixed": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "checkout_code_min_order": "للطلبات فوق {amount}",
+  "@checkout_code_min_order": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "checkout_pay_method": "طريقة الدفع",
+  "checkout_open_order": "لديك طلب بانتظار الدفع. أكمل دفعه أو ألغه أولاً.",
+  "checkout_open_order_action": "عرض طلباتي",
+  "checkout_hold_expired": "انتهت مهلة حجز هذا الطلب. الرجاء البدء من جديد.",
+  "shop_browse_sub_categories": "تصفح فئات {category}",
+  "@shop_browse_sub_categories": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "shop_no_results": "لا توجد نتائج مطابقة",
+  "shop_results_count": "{count, plural, zero{لا توجد نتائج} one{نتيجة واحدة} two{نتيجتان} few{{count} نتائج} many{{count} نتيجة} other{{count} نتيجة}}",
+  "@shop_results_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shop_filters": "عوامل التصفية",
+  "shop_filter_featured": "المميزة فقط",
+  "shop_filter_on_sale": "العروض",
+  "shop_filter_apply": "عرض النتائج",
+  "shop_filter_clear": "مسح",
+  "shop_title": "متجر تيراكوتا",
+  "shop_subtitle": "قطع مصنوعة بإيد، جاهزة تاخذها معك.",
+  "shop_materials": "الخامات والأدوات",
+  "shop_materials_subtitle": "طين وطلاءات وأدوات الأستوديو نفسها",
+  "shop_materials_cta": "تسوّق الخامات",
+  "shop_materials_one_basket": "تُضاف الخامات إلى السلة نفسها مع بقية المنتجات.",
+  "shop_search_hint": "البحث...",
+  "shop_my_cart": "عربيتي",
+  "shop_my_favorites": "منتجاتي المفضلة",
+  "shop_my_orders": "طلباتي",
+  "shop_browse_category": "تصفح فئات {category}",
+  "@shop_browse_category": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "shop_you_may_like": "قد يعجبك ايضا",
+  "shop_category": "الفئة",
+  "shop_colour": "اللون",
+  "shop_size": "المقاس",
+  "shop_add_to_cart": "اضافة",
+  "shop_quantity": "عدد {count}",
+  "@shop_quantity": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "shop_filter": "تصفية",
+  "shop_empty": "لا يوجد شيء هنا بعد",
+  "shop_favorites_empty": "لا توجد مفضلات بعد",
+  "shop_orders_empty": "لا توجد طلبات بعد",
+  "order_number": "طلب رقم {number}",
+  "@order_number": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "order_placed_on": "بتاريخ {date}",
+  "@order_placed_on": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "order_items_count": "{count, plural, =0{لا قطع} =1{قطعة واحدة} =2{قطعتان} few{{count} قطع} many{{count} قطعة} other{{count} قطعة}}",
+  "@order_items_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "order_status_awaiting_payment": "بانتظار الدفع",
+  "order_status_pending": "مؤكد",
+  "order_status_preparing": "قيد التجهيز",
+  "order_status_out_for_delivery": "في الطريق",
+  "order_status_completed": "تم التوصيل",
+  "order_status_cancelled": "ملغي",
+  "order_status_unknown": "قيد المعالجة",
+  "order_items_heading": "ما طلبته",
+  "order_delivery_heading": "التوصيل",
+  "order_delivery_to": "التوصيل إلى",
+  "order_delivery_notes": "ملاحظة لمندوب التوصيل",
+  "order_short_address": "العنوان المختصر",
+  "order_quantity": "{count} × {price}",
+  "@order_quantity": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "order_pay_now": "ادفع الآن",
+  "order_pay_before": "ادفع قبل {time}",
+  "@order_pay_before": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "order_cancel": "إلغاء الطلب",
+  "order_cancel_title": "إلغاء هذا الطلب؟",
+  "order_cancel_body": "يعود كل ما دُفع إلى رصيدك في تيراكوتا، لا إلى بطاقتك. لا يمكن التراجع عن هذا.",
+  "order_cancel_refunded": "عاد {amount} إلى رصيدك في تيراكوتا.",
+  "@order_cancel_refunded": {
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "order_cancel_yes": "نعم، ألغه",
+  "order_cancel_no": "احتفظ به",
+  "order_cancelled_on": "أُلغي في {date}",
+  "@order_cancelled_on": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "order_not_found": "تعذّر فتح هذا الطلب",
+  "order_settled": "مدفوع بالكامل",
+  "order_confirmed_title": "تم تأكيد طلبك !",
+  "order_confirmed_body": "نجهزه الآن. يمكنك متابعته من طلباتك في أي وقت.",
+  "order_track": "تتبع الطلب",
+  "shop_orders_empty_body": "كل ما تطلبه من الاستوديو يظهر هنا.",
+  "pieces_title": "قطعي",
+  "pieces_empty": "لم تصنع شيئاً بعد",
+  "pieces_empty_body": "القطع التي تصنعها في الاستوديو تُحفظ هنا، جاهزة للتلوين.",
+  "pieces_no_source": "غير متاح حالياً",
+  "pieces_no_source_body": "الاستوديو لا يستقبل القطع حالياً. قطعك محفوظة.",
+  "pieces_made_on": "صُنعت في {date}",
+  "@pieces_made_on": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "pieces_untitled": "قطعة بلا اسم",
+  "pieces_painted": "ملوّنة",
+  "pieces_available": "جاهزة للتلوين",
+  "pieces_paint_price": "لوّن واحدة بـ {amount}",
+  "@pieces_paint_price": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "shop_cart_empty": "عربيتك فاضية",
+  "shop_line_item": "{title} × {count}",
+  "@shop_line_item": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "shop_checkout": "تاكيد الدفع",
+  "delivery_piece_ready": "القطعة جاهزة",
+  "delivery_piece_ready_body": "قطعتك جاهزة الآن للاستلام أو التوصيل.",
+  "delivery_deliver": "توصيل",
+  "delivery_pickup": "استلام",
+  "delivery_paint_it": "لوني الكوب",
+  "delivery_paint_pick_title": "أين تودّ تلوينها؟",
+  "delivery_phone": "رقم الهاتف للتوصيل",
+  "delivery_warning_title": "تحذير",
+  "delivery_warning_body": "تبقّى {left} لاستلام قطعتك أو طلب توصيلها، وبعد انتهاء هذه المدة لا يمكن للاستوديو الاحتفاظ بها.",
+  "@delivery_warning_body": {
+    "placeholders": {
+      "left": {
+        "type": "String"
+      }
+    }
+  },
+  "delivery_fee_line": "توصيل قطعة",
+  "delivery_confirm_and_pay": "تاكيد التوصيل و الدفع",
+  "delivery_close": "اغلاق",
+  "gift_title": "اهداء رصيد",
+  "gift_amount": "اهداء رصيد {amount}",
+  "@gift_amount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "gift_recipient_name": "اسم المستلم",
+  "gift_recipient_phone": "رقم المستلم",
+  "gift_recipient_phone_hint": "05XXXXXXXX",
+  "gift_message": "رسالة",
+  "gift_hero_body": "ارسل هدية رصيد لاحبائك للاستمتاع بورشات الفخار والسيراميك",
+  "gift_purchased_body": "الرجاء نسخ الرابط وارساله لمتلقي الهدية للاستمتاع بورشات تيراكوتا",
+  "gift_recipient_hint": "سارة",
+  "gift_message_hint": "اكتب رسالتك هنا...",
+  "gift_confirm_and_pay": "تاكيد الهدية و الدفع",
+  "gift_purchased_title": "تم شراء الهدية!",
+  "gift_share_link": "مشاركة الرابط",
+  "gift_empty": "لم ترسل أي هدايا بعد",
+  "gift_tab_send": "إهداء رصيد",
+  "gift_tab_mine": "هداياي",
+  "gift_state_claimed": "تم الاستلام",
+  "gift_state_unclaimed": "لم تُستلم بعد",
+  "gift_state_unpaid": "غير مدفوعة",
+  "gift_copy_link": "نسخ الرابط",
+  "gift_link_copied": "تم نسخ الرابط",
+  "gift_for": "إلى {name}",
+  "gift_from": "من {name}",
+  "@gift_from": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "gift_from_someone": "هدية استلمتها",
+  "gift_filter_all": "الكل",
+  "gift_filter_sent": "أرسلتها",
+  "gift_filter_received": "استلمتها",
+  "gift_none_sent": "لم ترسل أي هدية بعد",
+  "gift_none_received": "لم تستلم أي هدية بعد",
+  "gift_state_cancelled": "انتهت دون دفع",
+  "@gift_for": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "profile_title": "حسابي",
+  "profile_edit": "تعديل الملف الشخصي",
+  "profile_addresses": "عناويني",
+  "profile_wallet": "محفظتي",
+  "profile_notifications": "الاشعارات",
+  "profile_orders": "طلباتي",
+  "profile_devices": "الأجهزة",
+  "profile_change_password": "تغيير كلمة السر",
+  "profile_logout": "تسجيل الخروج",
+  "profile_delete_account": "حذف الحساب",
+  "profile_delete_warning": "سيتم حذف حسابك نهائياً ولا يمكن التراجع عن ذلك.",
+  "profile_add_address": "اضافة عنوان",
+  "profile_set_default": "تعيين كافتراضي",
+  "profile_default": "افتراضي",
+  "profile_no_addresses": "لا توجد عناوين محفوظة",
+  "profile_no_notifications": "لا توجد اشعارات",
+  "profile_mark_all_read": "تعليم الكل كمقروء",
+  "profile_no_devices": "لا توجد أجهزة أخرى",
+  "profile_revoke": "تسجيل خروج هذا الجهاز",
+  "profile_this_device": "هذا الجهاز",
+  "profile_no_transactions": "لا توجد معاملات بعد",
+  "wallet_empty_body": "كل ما يضاف الى رصيدك وكل ما يخصم منه سيظهر هنا.",
+  "wallet_reason_delivery_fee": "رسوم التوصيل",
+  "wallet_reason_booking_cancelled": "استرجاع حجز ملغي",
+  "wallet_reason_booking_payment": "دفع حجز ورشة",
+  "wallet_reason_order_payment": "دفع طلب",
+  "wallet_reason_gift": "هدية رصيد",
+  "wallet_reason_booking_rescheduled": "تعديل حجز",
+  "wallet_reason_shop_order_cancelled": "الغاء طلب",
+  "wallet_reason_admin_adjustment": "تعديل من الادارة",
+  "wallet_reason_gift_purchase": "شراء هدية",
+  "wallet_reason_booking_absent": "تعويض عدم حضور",
+  "wallet_credit": "اضافة الى الرصيد",
+  "wallet_debit": "خصم من الرصيد",
+  "wallet_balance_after": "الرصيد بعدها {amount}",
+  "@wallet_balance_after": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "profile_order_detail": "تفاصيل الطلب",
+  "profile_cancel_order": "الغاء الطلب",
+  "auth_reset_subtitle": "الان يمكنك كتابة كلمة السر الجديدة للتسجيل بحسابك",
+  "auth_otp_subtitle_phone": "لقد أرسلنا رمز تحقق مكوّنًا من {digits} أرقام إلى {phone}",
+  "@auth_otp_subtitle_phone": {
+    "placeholders": {
+      "digits": {
+        "type": "int"
+      },
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "auth_otp_incomplete": "أدخل رمز التحقق كاملًا",
+  "shop_product_details": "تفاصيل المنتج",
+  "shop_dimension_height": "ارتفاع",
+  "shop_dimension_width": "عرض",
+  "shop_dimension_length": "طول",
+  "shop_dimension_unit": "سم",
+  "color_name_black": "أسود",
+  "color_name_white": "أبيض",
+  "color_name_grey": "رمادي",
+  "color_name_beige": "بيج",
+  "color_name_brown": "بني",
+  "color_name_terracotta": "طيني",
+  "color_name_orange": "برتقالي",
+  "color_name_red": "أحمر",
+  "color_name_pink": "وردي",
+  "color_name_purple": "بنفسجي",
+  "color_name_navy": "كحلي",
+  "color_name_blue": "أزرق",
+  "color_name_teal": "تركوازي",
+  "color_name_green": "أخضر",
+  "color_name_olive": "زيتي",
+  "color_name_yellow": "أصفر",
+  "profile_sign_out_title": "تسجيل الخروج؟",
+  "profile_sign_out_message": "راح تحتاج رقم جوالك وكلمة السر عشان ترجع. ما راح يضيع شي من عربيتك ولا حجوزاتك.",
+  "profile_delete_confirm": "احذف نهائياً",
+  "profile_delete_message": "حجوزاتك وطلباتك ورصيد تيراكوتا راح تنحذف معه. يصير على طول وما فيه رجعة.",
+  "profile_current_password": "كلمة السر الحالية",
+  "profile_current_password_hint": "اكتب كلمة السر الحالية",
+  "profile_password_changed": "تم تغيير كلمة السر.",
+  "profile_change_password_message": "راح تبقى مسجل دخول على هذا الجهاز.",
+  "profile_edit_name": "تعديل الاسم",
+  "profile_name_label": "اسمك",
+  "profile_name_hint": "اكتب اسمك",
+  "profile_name_updated": "تم تحديث اسمك.",
+  "shop_remove_line_title": "نشيله من العربية؟",
+  "shop_remove_line_message": "راح ينشال {title} من عربيتك. تقدر ترجع تضيفه في أي وقت.",
+  "@shop_remove_line_message": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_status_confirmed": "مؤكد",
+  "booking_status_completed": "منتهية",
+  "booking_status_cancelled": "ملغاة",
+  "booking_status_expired": "منتهي وقتها",
+  "booking_mine_empty": "ما حجزت أي ورشة لحد الآن.",
+  "booking_meta": "{people} · {date} · {time}",
+  "@booking_meta": {
+    "placeholders": {
+      "people": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_people_unit": "{count, plural, zero{أشخاص} one{شخص} two{شخصان} few{أشخاص} many{شخصًا} other{شخص}}",
+  "booking_no_slots": "ما فيه جلسات في هذا اليوم.",
+  "booking_pick_people": "كم شخص؟",
+  "booking_slot_seats": "{left} من {total}",
+  "@booking_slot_seats": {
+    "placeholders": {
+      "left": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_slot_label": "ورشة من {start} الى {end}",
+  "@booking_slot_label": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_full_up": "محجوزة بالكامل",
+  "@booking_people_unit": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkout_workshop_line": "{title} من {people}",
+  "@checkout_workshop_line": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "people": {
+        "type": "String"
+      }
+    }
+  },
+  "celebration_title": "احتفل مع تيراكوتا",
+  "celebration_body": "بالونات وكيكة صغيرة والمكان محضّر — نجهز كل شي وانت تسوي قطعتك.",
+  "celebration_add_price": "اضافة {price}",
+  "@celebration_add_price": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_party": "{count, plural, zero{{count} أشخاص} one{شخص واحد} two{شخصان} few{{count} أشخاص} many{{count} شخصًا} other{{count} شخص}}",
+  "@booking_party": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkout_use_wallet": "استخدم رصيد تيراكوتا",
+  "checkout_wallet_covers": "يغطي {amount} منه",
+  "@checkout_wallet_covers": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "checkout_left_to_pay": "الباقي عليك",
+  "auth_session_expired_title": "انتهت جلستك",
+  "auth_session_expired_message": "تم تسجيل خروجك. سجّل الدخول مرة اخرى للوصول الى سلتك وحجوزاتك ورصيدك.",
+  "auth_sign_in_required_title": "سجّل الدخول للمتابعة",
+  "auth_sign_in_required_message": "هذه الخطوة تحتاج الى حساب. سجّل الدخول للوصول الى سلتك وحجوزاتك ورصيدك.",
+  "auth_continue_as_guest": "تصفح كزائر",
+  "auth_or": "أو",
+  "profile_guest": "زائر",
+  "profile_guest_hint": "سجّل الدخول لحفظ سلتك وحجوزاتك ورصيدك.",
+  "shop_out_of_stock": "نفدت الكمية",
+  "shop_stock_left": "{count, plural, zero{لم يتبق شيء} one{بقيت قطعة واحدة} two{بقيت قطعتان} few{بقي {count} قطع} many{بقي {count} قطعة} other{بقي {count} قطعة}}",
+  "@shop_stock_left": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shop_max_reached": "{count, plural, zero{لا يوجد متاح} one{المتاح قطعة واحدة فقط} two{المتاح قطعتان فقط} few{المتاح {count} قطع فقط} many{المتاح {count} قطعة فقط} other{المتاح {count} قطعة فقط}}",
+  "@shop_max_reached": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shop_max_per_order": "الحد الاعلى ١٠٠ قطعة في الطلب",
+  "transfer_title": "ننقل اختياراتك معك؟",
+  "transfer_body": "جمعت هذه قبل تسجيل الدخول، وهي محفوظة على هذا الجهاز فقط. يمكننا نقلها الى حسابك الان.",
+  "transfer_basket": "{count, plural, zero{لا شيء في سلتك} one{قطعة واحدة في سلتك} two{قطعتان في سلتك} few{{count} قطع في سلتك} many{{count} قطعة في سلتك} other{{count} قطعة في سلتك}}",
+  "@transfer_basket": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "auth_needed_title": "خطوة واحدة تبقّت",
+  "auth_needed_booking": "سجّل الدخول لتأكيد الحجز. موعدك ومقاعدك وكل ما اخترته محفوظ كما هو.",
+  "auth_needed_cart": "سجّل الدخول لإتمام الدفع. سلتك وعناوينك وقطعك المحفوظة تنتقل معك.",
+  "auth_needed_confirm": "تسجيل الدخول",
+  "auth_needed_later": "ليس الآن",
+  "transfer_addresses": "{count, plural, zero{لا عناوين} one{عنوان واحد} two{عنوانان} few{{count} عناوين} many{{count} عنوانًا} other{{count} عنوان}}",
+  "@transfer_addresses": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "transfer_saved": "{count, plural, zero{لا شيء محفوظ} one{قطعة واحدة محفوظة} two{قطعتان محفوظتان} few{{count} قطع محفوظة} many{{count} قطعة محفوظة} other{{count} قطعة محفوظة}}",
+  "@transfer_saved": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "transfer_confirm": "انقلها الى حسابي",
+  "transfer_skip": "ليس هذه",
+  "transfer_discard_title": "نتركها؟",
+  "transfer_discard_body": "هي محفوظة على هذا الجهاز فقط، وستختفي عند المتابعة. لن يتم خصم اي مبلغ في الحالتين.",
+  "transfer_discard_confirm": "اتركها",
+  "transfer_done": "{count, plural, zero{لم يتم نقل شيء} one{تم نقل قطعة واحدة} two{تم نقل قطعتين} few{تم نقل {count} قطع} many{تم نقل {count} قطعة} other{تم نقل {count} قطعة}}",
+  "@transfer_done": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "transfer_partial": "{count, plural, zero{لم يتعذر نقل شيء} one{قطعة واحدة لم تنتقل — نفدت من المشغل} two{قطعتان لم تنتقلا — نفدتا من المشغل} few{{count} قطع لم تنتقل — نفدت من المشغل} many{{count} قطعة لم تنتقل — نفدت من المشغل} other{{count} قطعة لم تنتقل — نفدت من المشغل}}",
+  "@transfer_partial": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cart_stock_title": "نفدت بعض القطع",
+  "cart_stock_body": "بيعت بعض هذه القطع اثناء تصفحك. هذا ما تغير:",
+  "cart_stock_line_left": "{title}: طلبت {wanted}، والمتبقي {left} فقط",
+  "@cart_stock_line_left": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "wanted": {
+        "type": "int"
+      },
+      "left": {
+        "type": "int"
+      }
+    }
+  },
+  "cart_stock_line_gone": "{title}: نفدت الكمية",
+  "@cart_stock_line_gone": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "cart_stock_fix": "عدّل سلتي نيابة عني",
+  "cart_stock_fix_note": "سننقص ما يمكن انقاصه ونحذف ما نفد.",
+  "cart_stock_keep": "اتركها كما هي",
+  "cart_stock_keep_note": "يمكنك تعديلها بنفسك. الدفع يبقى مغلقا حتى ذلك.",
+  "cart_stock_fixed": "سلتك جاهزة",
+  "cart_line_over": "المتبقي {left} فقط",
+  "@cart_line_over": {
+    "placeholders": {
+      "left": {
+        "type": "int"
+      }
+    }
+  },
+  "booking_absent_title": "لم تحضر",
+  "booking_absent_body": "لم تحضر للورشة، وسيتم اعادة المبلغ الى رصيدك في التطبيق لاستخدامه لاحقا.",
+  "booking_attending_title": "حاضرة",
+  "booking_attending_body": "تم تسجيل حضورك بنجاح، وأنت الان مشارك في الورشة.",
+  "booking_upload_piece": "ارفع صورة قطعتك",
+  "booking_upload_remaining": "ارفع الصور المتبقية",
+  "booking_status_attending": "حاضرة",
+  "booking_status_absent": "لم تحضر",
+  "booking_status_preparing": "قيد التجهيز",
+  "booking_preparing_title": "قيد التحضير",
+  "booking_preparing_body": "جاري تجهيز قطعتك بعناية.",
+  "booking_preparing_body_in": "جاري تجهيز قطعتك بعناية، وستكون جاهزة خلال {span}.",
+  "@booking_preparing_body_in": {
+    "placeholders": {
+      "span": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_preparing_body_painted": "جاري تجهيز القطعة وسيتم تاكيد التفاصيل قريبا.",
+  "booking_cancelled_title": "ملغاة",
+  "booking_cancelled_body": "تم الغاء الورشة، وسيتم اعلامك باي تحديثات او مواعيد بديلة.",
+  "booking_packing_title": "قيد التغليف",
+  "booking_packing_body": "جاري تغليف قطعتك وتجهيزها بعناية استعدادا للتوصيل.",
+  "booking_on_the_way_title": "خرجت للتوصيل",
+  "booking_on_the_way_body": "قطعتك الان في طريقها اليك، وسيتم تسليمها قريبا.",
+  "booking_handed_over_title": "مسلمة",
+  "booking_handed_over_body": "تم الانتهاء من الورشة، واصبحت القطعة لحوزتك الان.",
+  "delivery_status_awaiting_pickup": "جاهزة للاستلام",
+  "delivery_status_getting_ready": "قيد التغليف",
+  "delivery_status_on_the_way": "خرجت للتوصيل",
+  "delivery_status_completed": "مسلمة",
+  "address_add": "اضف عنوان",
+  "address_edit": "تعديل العنوان",
+  "address_save": "حفظ العنوان",
+  "address_default": "الافتراضي",
+  "address_make_default": "اجعله الافتراضي",
+  "address_delete": "حذف",
+  "address_delete_title": "حذف هذا العنوان؟",
+  "address_delete_body": "يمكنك اضافته مرة اخرى في اي وقت. لن يتغير شيء اخر.",
+  "address_short_label": "العنوان الوطني المختصر",
+  "address_short_hint": "ABCD1234",
+  "address_short_help": "ثمانية رموز — اربعة احرف ثم اربعة ارقام، وسنكمل الباقي عنك.",
+  "address_short_find": "بحث",
+  "address_short_invalid": "اربعة احرف ثم اربعة ارقام، مثل ABCD1234.",
+  "address_short_not_found": "لم نجد هذا الرمز. يمكنك كتابة العنوان بالاسفل.",
+  "address_short_unavailable": "البحث غير متاح حاليا. يمكنك كتابة العنوان بالاسفل.",
+  "address_short_too_fast": "امهلنا لحظة قبل المحاولة مرة اخرى.",
+  "address_short_found": "وجدناه — تحقق من التفاصيل بالاسفل.",
+  "address_or_manual": "او اكتبه بنفسك",
+  "address_label_field": "سم هذا العنوان",
+  "address_label_hint": "المنزل، العمل…",
+  "address_city": "المدينة",
+  "address_street": "الشارع",
+  "address_district": "الحي",
+  "address_building": "رقم المبنى",
+  "address_additional": "الرقم الاضافي",
+  "address_postal": "الرمز البريدي",
+  "address_unit": "رقم الوحدة",
+  "address_notes": "ملاحظات لمندوب التوصيل",
+  "address_phone": "رقم الهاتف للتوصيل",
+  "address_pin": "حدد الموقع على الخريطة",
+  "address_pin_set": "تم تحديد الموقع",
+  "address_pin_missing": "حدد موقعك على الخريطة ليصل اليك المندوب.",
+  "address_saved": "تم حفظ العنوان",
+  "address_deleted": "تم حذف العنوان",
+  "address_required": "{field} مطلوب",
+  "@address_required": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "address_digits_exactly": "{count} ارقام",
+  "@address_digits_exactly": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "address_hint_street": "مثال: شارع ابي الكرم",
+  "address_hint_district": "مثال: الضباط",
+  "address_hint_building": "4359",
+  "address_hint_additional": "2817",
+  "address_hint_postal": "12627",
+  "address_hint_unit": "12",
+  "address_hint_phone": "05XXXXXXXX",
+  "address_hint_notes": "الباب الازرق، الدور الثاني",
+  "address_pin_fallback": "الخريطة غير متاحة — حددنا وسط مدينتك مؤقتا.",
+  "address_unnamed": "عنوان محفوظ",
+  "address_building_short": "مبنى {n}",
+  "@address_building_short": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "address_unit_short": "وحدة {n}",
+  "@address_unit_short": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "address_postal_short": "ر.ب {n}",
+  "@address_postal_short": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "delivery_pickup_confirm_title": "ستستلمها بنفسك؟",
+  "delivery_pickup_confirm_body": "سنحتفظ بقطعتك في الأستوديو، ويمكنك التحويل إلى التوصيل في أي وقت قبل استلامها.",
+  "delivery_pickup_confirm_body_refund": "سنحتفظ بقطعتك في الأستوديو. سيعود {amount} إلى رصيدك في تيراكوتا — لا إلى بطاقتك — ويمكنك التحويل إلى التوصيل في أي وقت قبل استلامها.",
+  "@delivery_pickup_confirm_body_refund": {
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "delivery_pickup_credited": "عاد {amount} إلى رصيدك في تيراكوتا.",
+  "@delivery_pickup_credited": {
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "delivery_pickup_done": "ستستلمها من الأستوديو.",
+  "delivery_pickup_confirm_yes": "نعم، ساستلمها",
+  "delivery_chose_pickup": "ستستلم قطعتك من المشغل",
+  "delivery_chose_delivery": "قطعتك في طريقها اليك",
+  "delivery_switch_to_delivery": "حولها الى التوصيل",
+  "delivery_switch_to_pickup": "بل ساستلمها بنفسي",
+  "delivery_where_title": "الى اين نرسلها؟",
+  "delivery_change_address": "ارسلها الى عنوان اخر",
+  "delivery_add_address": "اضف عنوان جديد",
+  "delivery_no_address": "لا يوجد لديك عنوان محفوظ بعد.",
+  "delivery_continue": "المتابعة للدفع",
+  "complaint_title": "تواصل معنا",
+  "complaint_new": "شكوى جديدة",
+  "complaint_mine": "شكاواي",
+  "complaint_empty": "ما ارسلت اي شكوى بعد.",
+  "complaint_empty_body": "اذا صار شي غير متوقع في طلب او حجز، خبرنا وبنرد عليك.",
+  "complaint_type": "الموضوع",
+  "complaint_reference": "رقم الطلب او الحجز (اختياري)",
+  "complaint_reference_hint": "38079300",
+  "complaint_message": "التفاصيل",
+  "complaint_message_hint": "اكتب ما صار…",
+  "complaint_name": "اسمك",
+  "complaint_contact": "رقم او بريد للتواصل",
+  "complaint_send": "ارسال",
+  "complaint_sent": "وصلتنا شكواك، وبنرجع لك.",
+  "complaint_type_order": "طلب من المتجر",
+  "complaint_type_workshop": "ورشة",
+  "complaint_type_delivery": "توصيل",
+  "complaint_type_payment": "دفع",
+  "complaint_type_other": "شي ثاني",
+  "complaint_status_new": "جديدة",
+  "complaint_status_in_progress": "قيد المعالجة",
+  "complaint_status_resolved": "تم حلها",
+  "complaint_status_closed": "مغلقة",
+  "@booking_confirmed_body": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_confirmed_body_final": "موعد هذه الجلسة أقرب من أن تُلغى أو يُغيَّر موعدها.",
+  "booking_piece_label": "سمِّ هذه القطعة",
+  "booking_piece_label_hint": "كوبي",
+  "booking_piece_label_required": "أدخل اسم كل شخص.",
+  "booking_name_taken": "هذا الاسم مأخوذ لشخص آخر.",
+  "booking_piece_name_taken": "هذا الاسم مأخوذ لقطعة أخرى.",
+  "booking_photos_left": "تبقى {count} صورة",
+  "@booking_photos_left": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_photos_full": "اكتملت صور هذا الحجز.",
+  "booking_piece_number": "القطعة {index}",
+  "@booking_piece_number": {
+    "placeholders": {
+      "index": {}
+    }
+  },
+  "booking_piece_needs_photo": "أضف صورة واحدة على الأقل لهذه القطعة.",
+  "booking_piece_hint": "القطعة {index}",
+  "@booking_piece_hint": {
+    "placeholders": {
+      "index": {}
+    }
+  },
+  "booking_person_name_hint": "اسمه",
+  "booking_all_named": "كل من في هذا الحجز له قطعة بالفعل. أضف صوراً أخرى لإحداها في الأسفل.",
+  "booking_piece_name": "الاسم",
+  "booking_piece_renamed": "تم تغيير الاسم",
+  "booking_add_photos_for": "إضافة صور لـ {name}",
+  "@booking_add_photos_for": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_edit_person_name": "تعديل اسم الشخص",
+  "booking_edit_piece_name": "تعديل اسم القطعة",
+  "booking_photos_old": "سابقة",
+  "booking_save": "حفظ",
+  "booking_done": "تم",
+  "booking_person_hint": "الشخص {index}",
+  "@booking_person_hint": {
+    "placeholders": {
+      "index": {}
+    }
+  },
+  "booking_next": "التالي",
+  "booking_back": "رجوع",
+  "booking_upload_photos": "أضف صوراً",
+  "booking_upload_send": "رفع",
+  "booking_photos_uploaded": "تم رفع الصور.",
+  "booking_scan_on_arrival_soon": "يرجى مسح الرمز عند الوصول، وموعدها بعد قليل.",
+  "booking_filter_all": "الكل",
+  "booking_add_more_photos": "أضف المزيد",
+  "booking_photo_removed": "تم حذف الصورة.",
+  "booking_piece_removed": "تم حذف القطعة.",
+  "booking_remove_photo_title": "حذف هذه الصورة؟",
+  "booking_remove_photo_body": "هذه هي الطريقة الوحيدة لاستبدالها، فلا يوجد تبديل مباشر.",
+  "booking_remove_piece_title": "حذف {label}؟",
+  "@booking_remove_piece_title": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_remove_piece_body": "ستُحذف كل صورها أيضاً.",
+  "booking_piece_photo_count": "{count, plural, one{صورة واحدة} two{صورتان} few{{count} صور} other{{count} صورة}}",
+  "@booking_piece_photo_count": {
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "scan_desk_title": "الاستقبال",
+  "scan_today": "اليوم",
+  "scan_no_sessions": "لا جلسات محجوزة اليوم",
+  "scan_no_sessions_body": "لم يحجز أحد ورشة في هذا اليوم بعد.",
+  "scan_scan_code": "امسح الرمز",
+  "scan_enter_code": "أدخل الرمز",
+  "scan_code_hint": "٨ أرقام",
+  "scan_start_session": "ابدأ الجلسة",
+  "scan_finish_session": "أنهِ الجلسة",
+  "scan_start_warning_title": "بدء الجلسة؟",
+  "scan_start_warning_body": "كل من لم يُمسح رمزه سيُسجَّل كغائب. لا يمكن التراجع، ولا يُسترد مبلغ الغائب.",
+  "scan_finish_warning_title": "إنهاء الجلسة؟",
+  "scan_finish_warning_body": "سينتقل كل الحاضرين إلى المرحلة التالية.",
+  "scan_session_closed": "التسجيل مغلق",
+  "scan_session_closed_at": "انتهت في {time}",
+  "@scan_session_closed_at": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "scan_check_in_closed_body": "انتهت هذه الجلسة، فلا يمكن تسجيل دخول أحد إليها.",
+  "scan_pieces_progress": "{done} من {expected} قطعة",
+  "@scan_pieces_progress": {
+    "placeholders": {
+      "done": {},
+      "expected": {}
+    }
+  },
+  "scan_finish_missing_title": "بعض القطع لم تُصوَّر بعد",
+  "scan_finish_missing_body": "بعد الإنهاء لا يمكن إضافة أي صورة إلى هذه الحجوزات. ابحث عن هؤلاء العملاء أولاً.",
+  "scan_finish_all_done": "صوّر الجميع قطعهم.",
+  "scan_missing_row": "{name} — {done} من {expected}",
+  "@scan_missing_row": {
+    "placeholders": {
+      "name": {},
+      "done": {},
+      "expected": {}
+    }
+  },
+  "scan_finish_anyway": "أنهِ على أي حال",
+  "scan_session_started": "بدأت الجلسة.",
+  "scan_session_finished": "انتهت الجلسة.",
+  "scan_arrived": "حضر {arrived} من {total}",
+  "@scan_arrived": {
+    "placeholders": {
+      "arrived": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "scan_how_many_title": "كم شخصاً حضر؟",
+  "scan_how_many_body": "حجز {name} لـ {count}. لن يُحفظ شيء حتى تختار.",
+  "@scan_how_many_body": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "scan_confirm_count": "تسجيل الحضور",
+  "scan_checked_in": "تم تسجيل حضور {name}",
+  "@scan_checked_in": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "scan_already_in": "{name} مسجَّل حضوره بالفعل",
+  "@scan_already_in": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "scan_point_camera": "وجّه الكاميرا إلى رمز العميل",
+  "scan_camera_denied": "الكاميرا غير متاحة. أدخل الرمز يدوياً.",
+  "scan_sign_out": "تسجيل الخروج",
+  "scan_seats": "{booked} من {capacity}",
+  "@scan_seats": {
+    "placeholders": {
+      "booked": {
+        "type": "String"
+      },
+      "capacity": {
+        "type": "String"
+      }
+    }
+  },
+  "scan_previous_day": "اليوم السابق",
+  "scan_next_day": "اليوم التالي",
+  "scan_back_to_today": "العودة إلى اليوم",
+  "scan_not_today": "لا يمكن بدء الجلسة أو إنهاؤها إلا في يومها.",
+  "booking_unit_days": "{count, plural, one{يوم واحد} two{يومان} few{{count} أيام} other{{count} يوماً}}",
+  "@booking_unit_days": {
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "booking_unit_hours": "{count, plural, one{ساعة واحدة} two{ساعتان} few{{count} ساعات} other{{count} ساعة}}",
+  "@booking_unit_hours": {
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "booking_unit_days_hours": "{days} و{hours}",
+  "@booking_unit_days_hours": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      },
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "profile_notif_filter_all": "الكل",
+  "profile_notif_filter_unread": "غير المقروءة",
+  "profile_notif_filter_bookings": "الحجوزات",
+  "profile_notif_filter_reminders": "التذكيرات",
+  "profile_notif_filter_pieces": "القطع",
+  "profile_notif_filter_orders": "الطلبات",
+  "profile_notif_filter_gifts": "الهدايا",
+  "profile_notif_filter_wallet": "المحفظة",
+  "profile_notif_none_in_filter": "لا يوجد شيء هنا حالياً",
+  "gift_claim_title": "هدية لك",
+  "gift_claim_from": "من {name}",
+  "@gift_claim_from": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "gift_claim_to": "إلى {name}",
+  "@gift_claim_to": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "gift_claim_cta": "أضفها إلى محفظتي",
+  "gift_claim_signed_out": "سجّل الدخول لإضافتها إلى محفظتك.",
+  "gift_claim_already": "تم استلام هذه الهدية من قبل.",
+  "gift_claim_unavailable": "لا يمكن استلام هذه الهدية.",
+  "gift_claim_done_title": "أصبحت في محفظتك",
+  "gift_claim_done_body": "تمت إضافة {amount}، ورصيدك الآن {balance}.",
+  "@gift_claim_done_body": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "balance": {
+        "type": "String"
+      }
+    }
+  },
+  "gift_claim_open_wallet": "افتح محفظتي",
+  "gift_claim_not_found": "لم نتمكن من العثور على هذه الهدية. قد يكون الرابط خاطئًا، أو لم يُكمل مُرسِلها الدفع بعد.",
+  "gift_claim_browse": "تصفح الاستوديو",
+  "booking_reschedule_confirm_title": "نقل الحجز؟",
+  "booking_reschedule_confirm_body": "ستُنقل مقاعدك إلى الموعد الجديد، ويُلغى الموعد السابق.",
+  "booking_reschedule_confirm_yes": "انقله",
+  "workshop_price_per_piece": "حسب القطعة",
+  "workshop_piece_hold": "أمامك {days} لاستلام قطعتك بعد أن تصبح جاهزة.",
+  "@workshop_piece_hold": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "workshop_audience_women": "للنساء فقط",
+  "workshop_audience_men": "للرجال فقط",
+  "workshop_audience_couples": "للأزواج",
+  "workshop_audience_kids": "للأطفال",
+  "workshop_audience_families": "للعائلات",
+  "workshop_audience_mixed": "للجميع",
+  "shop_in_cart_already": "لديك {count} من هذه القطعة في السلة.",
+  "@shop_in_cart_already": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "shop_cart_full_for_item": "هذا كل ما يمكن إضافته، فلديك {count} من هذه القطعة في السلة.",
+  "@shop_cart_full_for_item": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "address_city_required": "اختر المدينة، فهي التي تحدد رسوم التوصيل.",
+  "address_zones_empty": "تعذّر تحميل المدن، اسحب للأسفل للمحاولة مرة أخرى.",
+  "checkout_address_required": "اختر عنوان التوصيل.",
+  "shop_sort_label": "الترتيب",
+  "shop_sort_default": "ترتيب الاستوديو",
+  "shop_sort_newest": "الأحدث أولاً",
+  "shop_sort_price_asc": "السعر: من الأقل",
+  "shop_sort_price_desc": "السعر: من الأعلى",
+  "booking_slot_current": "موعدك الحالي",
+  "shop_price_range": "السعر",
+  "shop_price_min": "من",
+  "shop_price_max": "إلى",
+  "shop_price_range_invalid": "«إلى» لا يمكن أن يكون أقل من «من».",
+  "profile_contact_us": "تواصل معنا",
+  "profile_contact_body": "تواصل مع الاستوديو مباشرة، أو تابعنا.",
+  "profile_contact_social": "تابع الاستوديو",
+  "profile_contact_empty": "لم ينشر الاستوديو وسيلة للتواصل بعد.",
+  "complaint_send_title": "إرسال شكوى",
+  "settings_language": "اللغة",
+  "settings_text_size": "حجم الخط",
+  "settings_notifications": "الإشعارات",
+  "settings_notifications_on": "مفعّلة — ستصلك أخبار حجوزاتك وطلباتك.",
+  "settings_notifications_off": "غير مفعّلة، فعّلها لتصلك أخبار حجوزاتك وطلباتك.",
+  "settings_notifications_open": "افتح إعدادات الإشعارات",
+  "settings_version": "الإصدار {version}",
+  "@settings_version": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "auth_identifier_unsupported": "يسجّل هذا الاستوديو الدخول بوسيلة لا يستطيع التطبيق طلبها بعد، يرجى التواصل معنا.",
+  "settings_theme": "المظهر",
+  "settings_theme_note": "صُمّمت هوية الأستوديو بالوضع الفاتح، والوضع الداكن مبنيّ ليطابقها.",
+  "profile_notif_signed_out": "سجّل الدخول لعرض إشعاراتك",
+  "profile_notif_signed_out_body": "تأكيدات الحجز وتحديثات الطلبات وأخبار الاستوديو تصلك هنا.",
+  "scan_no_sessions_day": "لا توجد جلسات محجوزة في ذلك اليوم",
+  "scan_no_sessions_body_day": "لم يحجز أحد ورشة في ذلك اليوم بعد."
+}

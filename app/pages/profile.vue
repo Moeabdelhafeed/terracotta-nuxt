@@ -72,6 +72,13 @@
           </span>
           <span class="flex items-center gap-2">
             <span
+              v-if="row.count"
+              data-test="hub-count"
+              class="text-xs font-semibold text-muted-foreground tabular-nums"
+              dir="ltr"
+              >{{ row.count }}</span
+            >
+            <span
               v-if="row.badge"
               data-test="unread-badge"
               class="min-w-5 rounded-full bg-brand-rust px-1.5 py-0.5 text-center text-xs font-semibold text-white"
@@ -883,11 +890,29 @@ const identifierKindLabel = computed(() => labelFor(identifierKind.value));
 
 // Every account destination lives on this hub — nothing is reachable only by typing a URL.
 const { unreadCount } = useUnreadCount();
+
+/**
+ * How much is behind each row. One paginator row per list, after hydration only: a number
+ * next to a link is not worth delaying the page for, and it is the count the server keeps
+ * rather than the length of whatever page happens to be loaded.
+ */
+const rowCount = (url, key) => useApiList(url, {
+  key: `hub-count-${key}`,
+  query: { per_page: 1 },
+  server: false,
+  lazy: true,
+}).total;
+
+const ordersCount = rowCount("/api/shop/orders", "orders");
+const favoritesCount = rowCount("/api/shop/favorites", "favorites");
+const addressesCount = rowCount("/api/addresses", "addresses");
+const complaintsCount = rowCount("/api/complaints", "complaints");
 const hubRows = computed(() => [
   {
     to: "/orders",
     icon: "LucideShoppingBag",
     label: t("my_orders", "My orders", "طلباتي"),
+    count: ordersCount.value,
   },
   {
     to: "/bookings",
@@ -903,6 +928,7 @@ const hubRows = computed(() => [
     to: "/favorites",
     icon: "LucideHeart",
     label: t("my_favorites", "My favourites", "منتجاتي المفضلة"),
+    count: favoritesCount.value,
   },
   {
     to: "/gifts",
@@ -913,6 +939,7 @@ const hubRows = computed(() => [
     to: "/addresses",
     icon: "LucideMapPin",
     label: t("my_addresses", "My addresses", "عناويني"),
+    count: addressesCount.value,
   },
   {
     to: "/notifications",
@@ -924,6 +951,7 @@ const hubRows = computed(() => [
     to: "/complaints",
     icon: "LucideMessageSquareWarning",
     label: t("complaints_title", "Complaints", "الشكاوى"),
+    count: complaintsCount.value,
   },
 ]);
 

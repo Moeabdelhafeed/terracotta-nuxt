@@ -102,6 +102,32 @@ export const hasDeliveryStep = (booking) =>
   booking.status === "completed" &&
   (booking.pickup_deadline !== null || booking.delivery_method !== null);
 
+/**
+ * Whether the handover choice is still the customer's to make. The spec keeps it
+ * re-choosable until `delivery_status` reaches `completed` — switching back to pickup
+ * credits the delivery fee to the wallet, so a piece still at the studio or still on its
+ * way has money riding on the button.
+ */
+export const canChooseHandover = (booking) =>
+  hasDeliveryStep(booking) && booking.delivery_status !== "completed";
+
+/** Whole hours from now to an offset-bearing timestamp, floored at zero; null without one. */
+export const hoursUntil = (at) => {
+  if (!at) return null;
+  const ms = new Date(at).getTime() - Date.now();
+  return Number.isNaN(ms) ? null : Math.max(0, Math.floor(ms / 3600000));
+};
+
+/**
+ * Why this piece cannot be booked in to be painted, as a key the caller words:
+ * `booked` while the painting session is still ahead, `painted` once it has run.
+ * Null when the piece is free.
+ */
+export const pieceUnavailableReason = (piece) => {
+  if (piece?.is_available_to_paint !== false) return null;
+  return piece.painting_session?.is_upcoming ? "booked" : "painted";
+};
+
 export const isActiveBooking = (booking) =>
   ACTIVE_STATUSES.includes(booking?.status);
 

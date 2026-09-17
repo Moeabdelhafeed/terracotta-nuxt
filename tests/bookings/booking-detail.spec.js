@@ -77,6 +77,126 @@ describe('booking detail — what the server permits', () => {
   })
 })
 
+describe('booking detail — the handover choice stays the customer\'s', () => {
+  /** A finished piece waiting at the studio; `pickup_deadline` is what says there is a leg. */
+  const finished = (over = {}) => booking({
+    status: 'completed', can_cancel: false, can_edit: false,
+    pickup_deadline: '2099-01-01T12:00:00+00:00', ...over,
+  })
+
+  const link = (wrapper, method) => wrapper.find(`[data-test="handover-${method}"]`)
+
+  it('offers both ways out before one is picked', async () => {
+    globalThis.__booking = finished()
+    const wrapper = await mount()
+    await flushPromises()
+
+    expect(link(wrapper, 'pickup').attributes('href')).toBe('/bookings/55/delivery?method=pickup')
+    expect(link(wrapper, 'delivery').attributes('href')).toBe('/bookings/55/delivery?method=delivery')
+    expect(wrapper.find('[data-test="handover-refund"]').exists()).toBe(false)
+  })
+
+  it('keeps pickup reachable after delivery was chosen, and says what comes back', async () => {
+    globalThis.__booking = finished({
+      delivery_method: 'delivery', delivery_status: 'getting_ready',
+      delivery_fee: '50.00', delivery_fee_wallet_applied: '20.00',
+    })
+    const wrapper = await mount()
+    await flushPromises()
+
+    expect(link(wrapper, 'pickup').attributes('href')).toBe('/bookings/55/delivery?method=pickup')
+    expect(link(wrapper, 'delivery').exists()).toBe(false)
+    // Only the wallet slice was ever taken, so only that slice is promised back.
+    expect(wrapper.find('[data-test="handover-refund"]').text()).toContain('20.00 SAR')
+  })
+
+  it('promises nothing back when the wallet paid nothing', async () => {
+    globalThis.__booking = finished({
+      delivery_method: 'delivery', delivery_status: 'getting_ready',
+      delivery_fee: '50.00', delivery_fee_wallet_applied: '0.00',
+    })
+    const wrapper = await mount()
+    await flushPromises()
+
+    expect(link(wrapper, 'pickup').exists()).toBe(true)
+    expect(wrapper.find('[data-test="handover-refund"]').exists()).toBe(false)
+  })
+
+  it('keeps delivery reachable after pickup was chosen', async () => {
+    globalThis.__booking = finished({ delivery_method: 'pickup', delivery_status: 'awaiting_pickup' })
+    const wrapper = await mount()
+    await flushPromises()
+
+    expect(link(wrapper, 'delivery').attributes('href')).toBe('/bookings/55/delivery?method=delivery')
+    expect(link(wrapper, 'pickup').exists()).toBe(false)
+  })
+
+  it('closes the choice once the piece has been handed over', async () => {
+    globalThis.__booking = finished({ delivery_method: 'delivery', delivery_status: 'completed' })
+    const wrapper = await mount()
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="handover"]').exists()).toBe(false)
+  })
+
+  it('never offers it for a workshop with no handover leg at all', async () => {
+    globalThis.__booking = finished({ pickup_deadline: null })
+    const wrapper = await mount()
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="handover"]').exists()).toBe(false)
+  })
+
+  it('does not send a piece back to be painted once it is on its way somewhere', async () => {
+    const paintable = [{ id: 4, title: 'Paint Your Cup', image: null }]
+    globalThis.__booking = finished({ paintable_at: paintable, people_count: 3 })
+    const free = await mount()
+    await flushPromises()
+    // The party that made the pieces is the party coming back to paint them.
+    expect(free.find('a[href="/workshops/4/book?people=3"]').exists()).toBe(true)
+
+    globalThis.__booking = finished({ paintable_at: paintable, delivery_method: 'pickup', delivery_status: 'awaiting_pickup' })
+    const chosen = await mount()
+    await flushPromises()
+    expect(chosen.find('a[href^="/workshops/4/book"]').exists()).toBe(false)
+  })
+})
+
+describe('booking detail — copy that has to be the server\'s', () => {
+  it('promises no turnaround the API never sent', async () => {
+    globalThis.__booking = booking({ status: 'preparing', can_cancel: false, can_edit: false })
+    const wrapper = await mount()
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Your piece is being finished with care.')
+    expect(wrapper.text()).not.toContain('five to seven days')
+  })
+
+  it('states the booking\'s own collection deadline, not a hard-coded week', async () => {
+    const deadline = new Date(Date.now() + 3 * 86400000 + 3600000).toISOString()
+    globalThis.__booking = booking({ status: 'completed', can_cancel: false, can_edit: false, pickup_deadline: deadline })
+    const wrapper = await mount()
+    await flushPromises()
+
+    const notice = wrapper.find('[data-test="hold-notice"]').text()
+    expect(notice).toContain('3 more day(s)')
+    expect(notice).toContain(`on ${deadline.slice(0, 10)}`)
+    expect(notice).not.toContain('seven days')
+  })
+
+  it('says nothing about collecting once the piece is on a van', async () => {
+    globalThis.__booking = booking({
+      status: 'completed', can_cancel: false, can_edit: false,
+      pickup_deadline: new Date(Date.now() + 3 * 86400000).toISOString(),
+      delivery_method: 'delivery', delivery_status: 'on_the_way',
+    })
+    const wrapper = await mount()
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="hold-notice"]').exists()).toBe(false)
+  })
+})
+
 describe('booking detail — photo upload', () => {
   const attending = (over = {}) => booking({ status: 'attending', ...over })
 

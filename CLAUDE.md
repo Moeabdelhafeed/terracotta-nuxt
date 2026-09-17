@@ -297,30 +297,42 @@ upload — `mediaAsset(key, defaultPath)`. Every call site does; the seeds live 
 Adding a key means adding its seed file, or it can never provision itself — a
 `mediaAsset(key)` with no default renders nothing on a backend that has never seen it.
 
-**A key keeps the first file it ever saw.** Seeding only fires when the backend has no such
-key, so changing a `fallback` after a page has been visited once changes nothing: the CMS
-still serves the original upload, and the new file is only what a *fresh* backend would get.
-To correct one, delete the key in the Media CMS (or `MediaItem` row) and reload the page —
+**A key keeps the first file it ever saw.** Seeding is decided on the *value*, not the key:
+a key whose file is gone — absent, a null morph, or an empty `image_api` — seeds again on
+the next visit, so a row emptied in the CMS restores itself. But a key that still holds a
+file keeps it, so changing a `fallback` after a page has been visited once changes nothing.
+To correct one, clear its file in the Media CMS (or delete the `MediaItem` row) and reload —
 it re-seeds from the current default. This is how `hero_materials` ended up holding the
 shop's photograph: the page was opened once while its fallback still pointed at
 `/seed/hero-shop.webp`.
 
 **Both seeders are client-side and write-gated.** They fire from the browser, so a page
-has to actually be visited, and they post to endpoints the backend only exposes when
-`IS_TESTING=true`. A production install with writes closed will not provision itself:
-either open them for the first pass, or seed against dev and copy the rows over.
+has to actually be visited, and they post to endpoints the backend puts behind its
+`content-seeding` middleware (`ALLOW_CONTENT_SEEDING`). That flag **defaults to true,
+production included** — the whole point is that a live install can be seeded exactly once,
+when the app first pushes its content in. It used to be `IS_TESTING`, which meant a
+production site could never seed itself at all. Once the real content is in, the backend
+switches it off in its Deploy panel and these endpoints 403 from then on: either seed
+during the first pass, or seed against dev and copy the rows over.
 
 **Watch the locale on a fronted host.** Seeds post with a forced `Accept-Language`, and a
 CDN that rewrites that header (Hostinger does) files them under the wrong locale. Seed
 from local against the target API rather than through the deployed site.
 
-## Env vars
+## Configuration
 
-`.env` is gitignored. Required (or defaults exist in `runtimeConfig.public`):
-- `NUXT_PUBLIC_X_API_TOKEN` — Laravel API token.
-- `NUXT_PUBLIC_BASE_URL` — Laravel base URL (default `http://localhost:8000`).
-- `NUXT_PUBLIC_TRANSLATIONS_MODE` — `local` or `remote` (default `remote`).
-- `NUXT_OG_IMAGE_SECRET` — for `@nuxtjs/seo` OG image generation.
+**Everything non-secret lives in [nuxt.config.ts](nuxt.config.ts)**, committed, so a fresh
+clone runs with no `.env` at all — the API base, translations mode, and the `SITE_URL` /
+`SITE_NAME` constants at the top of the file (those two resolve at build time, for
+`@nuxtjs/seo` and nuxt-i18n, so a deploy variable cannot override them). Anything in
+`runtimeConfig` still takes a `NUXT_*` override on a deploy.
+
+**`.env` holds only secrets**, because this repository is public — see
+[.env.example](.env.example):
+- `NUXT_X_API_TOKEN` — Laravel API token, server-side only (injected by the Nitro proxy).
+- `NUXT_OG_IMAGE_SECRET` — signs generated OG images.
+
+Never move those two into `nuxt.config.ts`.
 
 ## Coding conventions
 

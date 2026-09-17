@@ -1,0 +1,4212 @@
+{
+  "@@locale": "en",
+  "@@last_modified": "2026-04-20T00:00:00Z",
+  "common_cancel": "Cancel",
+  "common_done": "Done",
+  "common_ok": "OK",
+  "common_error": "Error",
+  "common_success": "Success",
+  "common_retry": "Retry",
+  "common_loading": "Loading...",
+  "common_select_time": "Select Time",
+  "auth_sign_in": "Sign In",
+  "auth_remember_me": "Keep me signed in",
+  "auth_sign_out": "Sign Out",
+  "auth_register": "Register",
+  "auth_forgot_password": "Forgot Password?",
+  "auth_enter_otp": "Enter the {digits}-digit code sent to your phone",
+  "@auth_enter_otp": {
+    "placeholders": {
+      "digits": {
+        "type": "int",
+        "example": "6"
+      }
+    }
+  },
+  "auth_welcome_back": "Welcome back, {name}",
+  "@auth_welcome_back": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Ada"
+      }
+    }
+  },
+  "auth_first_name_field_title": "First Name",
+  "auth_last_name_field_title": "Last Name",
+  "auth_phone_number_field_title": "Phone Number",
+  "auth_password_field_title": "Password",
+  "auth_confirm_password_field_title": "Confirm Password",
+  "auth_enter_first_name_hint": "Enter your first name",
+  "auth_enter_last_name_hint": "Enter your last name",
+  "auth_enter_phone_number_hint": "Enter your phone number",
+  "auth_enter_middle_name_hint": "Enter your middle name",
+  "auth_enter_father_name_hint": "Enter your father's name",
+  "auth_enter_full_name_hint": "Enter your full name",
+  "auth_enter_password_hint": "Enter your password",
+  "auth_enter_confirm_password_hint": "Confirm your password",
+  "cart_items": "{count, plural, =0{Your cart is empty} one{{count} item} other{{count} items}}",
+  "@cart_items": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notifications_count": "{count, plural, =0{No new notifications} one{{count} new notification} other{{count} new notifications}}",
+  "@notifications_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "validator_contains_inappropriate_language": "Contains inappropriate language",
+  "validator_field_is_required": "This field is required",
+  "validator_invalid_format": "Invalid format",
+  "validator_must_be_at_least_n_characters": "Must be at least {n} characters",
+  "@validator_must_be_at_least_n_characters": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "validator_must_be_at_most_n_characters": "Must be at most {n} characters",
+  "@validator_must_be_at_most_n_characters": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "validator_must_be_at_least_n": "Must be at least {n}",
+  "@validator_must_be_at_least_n": {
+    "placeholders": {
+      "n": {
+        "type": "num",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "validator_must_be_at_most_n": "Must be at most {n}",
+  "@validator_must_be_at_most_n": {
+    "placeholders": {
+      "n": {
+        "type": "num",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "validator_first_name_cannot_be_empty": "First name cannot be empty",
+  "validator_first_name_must_be_at_least_3_characters": "First name must be at least 3 characters long",
+  "validator_first_name_must_be_less_than_50_characters": "First name must be less than 50 characters",
+  "validator_first_name_must_contain_only_letters_and_spaces": "First name must contain only letters and spaces",
+  "validator_last_name_cannot_be_empty": "Last name cannot be empty",
+  "validator_last_name_must_be_at_least_3_characters": "Last name must be at least 3 characters long",
+  "validator_last_name_must_be_less_than_50_characters": "Last name must be less than 50 characters",
+  "validator_last_name_must_contain_only_letters_and_spaces": "Last name must contain only letters and spaces",
+  "validator_middle_name_cannot_be_empty": "Middle name cannot be empty",
+  "validator_middle_name_must_be_at_least_3_characters": "Middle name must be at least 3 characters long",
+  "validator_middle_name_must_be_less_than_50_characters": "Middle name must be less than 50 characters",
+  "validator_middle_name_must_contain_only_letters_and_spaces": "Middle name must contain only letters and spaces",
+  "validator_father_name_cannot_be_empty": "Father's name cannot be empty",
+  "validator_father_name_must_be_at_least_3_characters": "Father's name must be at least 3 characters long",
+  "validator_father_name_must_be_less_than_50_characters": "Father's name must be less than 50 characters",
+  "validator_father_name_must_contain_only_letters_and_spaces": "Father's name must contain only letters and spaces",
+  "validator_full_name_cannot_be_empty": "Full name cannot be empty",
+  "validator_full_name_must_be_less_than_100_characters": "Full name must be less than 100 characters",
+  "validator_full_name_must_contain_only_letters_and_spaces": "Full name must contain only letters and spaces",
+  "validator_full_name_must_have_at_least_n_parts": "Full name must have at least {count} parts",
+  "@validator_full_name_must_have_at_least_n_parts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "validator_name_must_use_arabic_letters": "Name must use Arabic letters",
+  "validator_name_must_use_latin_letters": "Name must use English letters",
+  "validator_phone_number_cannot_be_empty": "Phone number cannot be empty",
+  "validator_phone_number_must_contain_only_digits": "Phone number must contain only digits",
+  "validator_phone_number_is_too_short": "Phone number is too short",
+  "validator_phone_number_is_too_long": "Phone number is too long",
+  "validator_invalid_country_code": "Invalid country code",
+  "validator_password_cannot_be_empty": "Password cannot be empty",
+  "validator_password_must_be_at_least_6_characters": "Password must be at least 6 characters long",
+  "validator_password_must_contain_at_least_one_uppercase_letter": "Password must contain at least one uppercase letter",
+  "validator_password_must_contain_at_least_one_lowercase_letter": "Password must contain at least one lowercase letter",
+  "validator_password_must_contain_at_least_one_number": "Password must contain at least one number",
+  "validator_password_must_contain_at_least_one_special_character": "Password must contain at least one special character",
+  "validator_confirm_password_cannot_be_empty": "Confirm password cannot be empty",
+  "validator_confirm_password_must_be_the_same_as_password": "Confirm password must be the same as password",
+  "validator_gender_cannot_be_empty": "Gender cannot be empty",
+  "validator_email_cannot_be_empty": "Email cannot be empty",
+  "validator_email_must_be_valid": "Email must be valid",
+  "validator_age_cannot_be_empty": "Age cannot be empty",
+  "validator_age_must_be_at_least_12": "Age must be at least 12 years old",
+  "validator_age_must_be_less_than_100": "Age must be less than 100 years old",
+  "validator_username_cannot_be_empty": "Username cannot be empty",
+  "validator_username_must_be_at_least_3_characters": "Username must be at least 3 characters long",
+  "validator_username_must_be_less_than_20_characters": "Username must be less than 20 characters",
+  "validator_username_must_be_valid": "Username must be valid",
+  "validator_otp_cannot_be_empty": "OTP cannot be empty",
+  "validator_otp_must_be_n_digits": "OTP must be {length} digits",
+  "@validator_otp_must_be_n_digits": {
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
+  "validator_date_of_birth_cannot_be_empty": "Date of birth cannot be empty",
+  "validator_date_of_birth_must_be_valid": "Date of birth must be between 1900 and the current date",
+  "validator_date_cannot_be_empty": "Date cannot be empty",
+  "validator_date_must_be_in_the_future": "Date must be in the future",
+  "validator_date_must_be_in_the_past": "Date must be in the past",
+  "validator_age_at_least_n_years": "Must be at least {years} years old",
+  "@validator_age_at_least_n_years": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
+  "validator_age_under_n_years": "Must be {years} years old or younger",
+  "@validator_age_under_n_years": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
+  "validator_passport_number_cannot_be_empty": "Passport number cannot be empty",
+  "validator_passport_number_must_be_at_least_3_characters": "Passport number must be at least 3 characters long",
+  "validator_passport_number_must_be_less_than_50_characters": "Passport number must be less than 50 characters",
+  "validator_passport_expiry_date_cannot_be_empty": "Passport expiry date cannot be empty",
+  "validator_passport_expiry_date_must_be_at_least_6_months_from_now": "Passport expiry date must be at least 6 months from now",
+  "validator_number_cannot_be_empty": "Number cannot be empty",
+  "validator_must_be_a_valid_number": "Must be a valid number",
+  "validator_must_be_a_valid_integer": "Must be a valid integer",
+  "validator_list_cannot_be_empty": "Please select at least one item",
+  "validator_list_must_have_at_least": "Please select at least {n} items",
+  "@validator_list_must_have_at_least": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "validator_list_must_have_at_most": "Please select at most {n} items",
+  "@validator_list_must_have_at_most": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "validator_card_number_cannot_be_empty": "Card number cannot be empty",
+  "validator_card_number_must_be_valid": "Card number is invalid",
+  "validator_card_expiry_cannot_be_empty": "Card expiry cannot be empty",
+  "validator_card_expiry_must_be_valid": "Card expiry must be MM/YY or MM/YYYY",
+  "validator_card_expiry_must_be_mm_yy": "Card expiry must be MM/YY",
+  "validator_card_expiry_month_invalid": "Month must be between 01 and 12",
+  "validator_card_expiry_must_be_in_the_future": "Card has expired",
+  "validator_card_cvv_cannot_be_empty": "CVV cannot be empty",
+  "validator_card_cvv_must_be_valid": "CVV must be 3 or 4 digits",
+  "validator_card_cvv_must_be_n_digits": "CVV must be {length} digits",
+  "@validator_card_cvv_must_be_n_digits": {
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
+  "validator_latitude_cannot_be_empty": "Latitude cannot be empty",
+  "validator_latitude_must_be_valid": "Latitude must be between -90 and 90",
+  "validator_longitude_cannot_be_empty": "Longitude cannot be empty",
+  "validator_longitude_must_be_valid": "Longitude must be between -180 and 180",
+  "validator_postal_code_cannot_be_empty": "Postal code cannot be empty",
+  "validator_postal_code_must_be_valid": "Postal code is invalid",
+  "validator_ip_address_cannot_be_empty": "IP address cannot be empty",
+  "validator_ip_address_must_be_valid": "IP address is invalid",
+  "validator_port_cannot_be_empty": "Port cannot be empty",
+  "validator_port_must_be_valid": "Port must be between 1 and 65535",
+  "validator_mac_address_cannot_be_empty": "MAC address cannot be empty",
+  "validator_mac_address_must_be_valid": "MAC address is invalid",
+  "validator_iban_cannot_be_empty": "IBAN cannot be empty",
+  "validator_iban_must_be_valid": "IBAN is invalid",
+  "validator_iban_length_for_country": "A {country} IBAN must be {length} characters",
+  "@validator_iban_length_for_country": {
+    "placeholders": {
+      "country": {
+        "type": "String",
+        "example": "JO"
+      },
+      "length": {
+        "type": "int"
+      }
+    }
+  },
+  "validator_vin_cannot_be_empty": "VIN cannot be empty",
+  "validator_vin_must_be_valid": "VIN is invalid",
+  "validator_file_size_cannot_be_empty": "File size is missing",
+  "validator_file_size_too_large": "File is too large",
+  "validator_file_name_cannot_be_empty": "File name cannot be empty",
+  "validator_file_name_invalid": "File name contains invalid characters",
+  "validator_file_extension_not_allowed": "File extension is not allowed",
+  "validator_url_cannot_be_empty": "URL cannot be empty",
+  "validator_url_must_be_valid": "URL must be valid",
+  "validator_url_must_start_with_http_or_https": "URL must start with http:// or https://",
+  "validator_image_url_cannot_be_empty": "Image URL cannot be empty",
+  "validator_image_url_must_be_valid": "Image URL must be valid",
+  "validator_video_url_cannot_be_empty": "Video URL cannot be empty",
+  "validator_video_url_must_be_valid": "Video URL must be valid",
+  "media_failed_to_pick_image": "Failed to pick image",
+  "media_failed_to_pick_images": "Failed to pick images",
+  "media_failed_to_pick_video": "Failed to pick video",
+  "media_failed_to_pick_videos": "Failed to pick videos",
+  "media_failed_to_compress_image": "Failed to compress image",
+  "media_image_too_large_compression_failed": "Image too large, compression failed",
+  "nav_page_not_found": "Page not found",
+  "nav_go_home": "Go Home",
+  "nav_exit_confirm": "Swipe again to exit",
+  "api_status_continue": "Continue",
+  "api_status_switching_protocols": "Switching Protocols",
+  "api_status_processing": "Processing",
+  "api_status_early_hints": "Early Hints",
+  "api_status_ok": "OK",
+  "api_status_created": "Created",
+  "api_status_accepted": "Accepted",
+  "api_status_non_authoritative_information": "Non-Authoritative Information",
+  "api_status_no_content": "No Content",
+  "api_status_reset_content": "Reset Content",
+  "api_status_partial_content": "Partial Content",
+  "api_status_multi_status": "Multi-Status",
+  "api_status_already_reported": "Already Reported",
+  "api_status_im_used": "IM Used",
+  "api_status_multiple_choices": "Multiple Choices",
+  "api_status_moved_permanently": "Moved Permanently",
+  "api_status_found": "Found",
+  "api_status_see_other": "See Other",
+  "api_status_not_modified": "Not Modified",
+  "api_status_use_proxy": "Use Proxy",
+  "api_status_temporary_redirect": "Temporary Redirect",
+  "api_status_permanent_redirect": "Permanent Redirect",
+  "api_status_bad_request": "Bad Request",
+  "api_status_unauthorized": "Unauthorized",
+  "api_status_payment_required": "Payment Required",
+  "api_status_forbidden": "Forbidden",
+  "api_status_not_found": "Not Found",
+  "api_status_method_not_allowed": "Method Not Allowed",
+  "api_status_not_acceptable": "Not Acceptable",
+  "api_status_proxy_authentication_required": "Proxy Authentication Required",
+  "api_status_request_timeout": "Request Timeout",
+  "api_status_conflict": "Conflict",
+  "api_status_gone": "Gone",
+  "api_status_length_required": "Length Required",
+  "api_status_precondition_failed": "Precondition Failed",
+  "api_status_payload_too_large": "Payload Too Large",
+  "api_status_uri_too_long": "URI Too Long",
+  "api_status_unsupported_media_type": "Unsupported Media Type",
+  "api_status_range_not_satisfiable": "Range Not Satisfiable",
+  "api_status_expectation_failed": "Expectation Failed",
+  "api_status_misdirected_request": "Misdirected Request",
+  "api_status_validation_error": "Validation Error",
+  "api_status_locked": "Locked",
+  "api_status_failed_dependency": "Failed Dependency",
+  "api_status_too_early": "Too Early",
+  "api_status_upgrade_required": "Upgrade Required",
+  "api_status_precondition_required": "Precondition Required",
+  "api_status_too_many_requests": "Too Many Requests",
+  "api_status_request_header_fields_too_large": "Request Header Fields Too Large",
+  "api_status_unavailable_for_legal_reasons": "Unavailable For Legal Reasons",
+  "api_status_internal_server_error": "Internal Server Error",
+  "api_status_not_implemented": "Not Implemented",
+  "api_status_bad_gateway": "Bad Gateway",
+  "api_status_service_unavailable": "Service Unavailable",
+  "api_status_gateway_timeout": "Gateway Timeout",
+  "api_status_http_version_not_supported": "HTTP Version Not Supported",
+  "api_status_variant_also_negotiates": "Variant Also Negotiates",
+  "api_status_insufficient_storage": "Insufficient Storage",
+  "api_status_loop_detected": "Loop Detected",
+  "api_status_not_extended": "Not Extended",
+  "api_status_network_authentication_required": "Network Authentication Required",
+  "api_status_network_error": "Network Error",
+  "api_status_timeout": "Timeout",
+  "api_status_cancelled": "Cancelled",
+  "api_status_unknown_error": "Unknown Error",
+  "country_jordan": "Jordan",
+  "country_united_states": "United States",
+  "country_united_kingdom": "United Kingdom",
+  "country_saudi_arabia": "Saudi Arabia",
+  "country_united_arab_emirates": "United Arab Emirates",
+  "country_kuwait": "Kuwait",
+  "country_qatar": "Qatar",
+  "country_bahrain": "Bahrain",
+  "country_oman": "Oman",
+  "country_egypt": "Egypt",
+  "country_lebanon": "Lebanon",
+  "country_syria": "Syria",
+  "country_iraq": "Iraq",
+  "country_palestine": "Palestine",
+  "country_yemen": "Yemen",
+  "country_libya": "Libya",
+  "country_tunisia": "Tunisia",
+  "country_algeria": "Algeria",
+  "country_morocco": "Morocco",
+  "country_sudan": "Sudan",
+  "country_turkey": "Turkey",
+  "country_iran": "Iran",
+  "country_pakistan": "Pakistan",
+  "country_afghanistan": "Afghanistan",
+  "country_india": "India",
+  "country_bangladesh": "Bangladesh",
+  "country_sri_lanka": "Sri Lanka",
+  "country_nepal": "Nepal",
+  "country_myanmar": "Myanmar",
+  "country_thailand": "Thailand",
+  "country_vietnam": "Vietnam",
+  "country_cambodia": "Cambodia",
+  "country_laos": "Laos",
+  "country_malaysia": "Malaysia",
+  "country_singapore": "Singapore",
+  "country_indonesia": "Indonesia",
+  "country_philippines": "Philippines",
+  "country_china": "China",
+  "country_japan": "Japan",
+  "country_south_korea": "South Korea",
+  "country_north_korea": "North Korea",
+  "country_mongolia": "Mongolia",
+  "country_taiwan": "Taiwan",
+  "country_hong_kong": "Hong Kong",
+  "country_macau": "Macau",
+  "country_canada": "Canada",
+  "country_mexico": "Mexico",
+  "country_brazil": "Brazil",
+  "country_argentina": "Argentina",
+  "country_chile": "Chile",
+  "country_peru": "Peru",
+  "country_colombia": "Colombia",
+  "country_venezuela": "Venezuela",
+  "country_ecuador": "Ecuador",
+  "country_bolivia": "Bolivia",
+  "country_paraguay": "Paraguay",
+  "country_uruguay": "Uruguay",
+  "country_guyana": "Guyana",
+  "country_suriname": "Suriname",
+  "country_french_guiana": "French Guiana",
+  "country_germany": "Germany",
+  "country_france": "France",
+  "country_italy": "Italy",
+  "country_spain": "Spain",
+  "country_portugal": "Portugal",
+  "country_netherlands": "Netherlands",
+  "country_belgium": "Belgium",
+  "country_switzerland": "Switzerland",
+  "country_austria": "Austria",
+  "country_sweden": "Sweden",
+  "country_norway": "Norway",
+  "country_denmark": "Denmark",
+  "country_finland": "Finland",
+  "country_iceland": "Iceland",
+  "country_poland": "Poland",
+  "country_czech_republic": "Czech Republic",
+  "country_slovakia": "Slovakia",
+  "country_hungary": "Hungary",
+  "country_romania": "Romania",
+  "country_bulgaria": "Bulgaria",
+  "country_croatia": "Croatia",
+  "country_slovenia": "Slovenia",
+  "country_serbia": "Serbia",
+  "country_montenegro": "Montenegro",
+  "country_bosnia_and_herzegovina": "Bosnia and Herzegovina",
+  "country_north_macedonia": "North Macedonia",
+  "country_albania": "Albania",
+  "country_greece": "Greece",
+  "country_cyprus": "Cyprus",
+  "country_malta": "Malta",
+  "country_ireland": "Ireland",
+  "country_luxembourg": "Luxembourg",
+  "country_monaco": "Monaco",
+  "country_liechtenstein": "Liechtenstein",
+  "country_san_marino": "San Marino",
+  "country_vatican_city": "Vatican City",
+  "country_andorra": "Andorra",
+  "country_russia": "Russia",
+  "country_ukraine": "Ukraine",
+  "country_belarus": "Belarus",
+  "country_moldova": "Moldova",
+  "country_estonia": "Estonia",
+  "country_latvia": "Latvia",
+  "country_lithuania": "Lithuania",
+  "country_georgia": "Georgia",
+  "country_armenia": "Armenia",
+  "country_azerbaijan": "Azerbaijan",
+  "country_kazakhstan": "Kazakhstan",
+  "country_uzbekistan": "Uzbekistan",
+  "country_kyrgyzstan": "Kyrgyzstan",
+  "country_tajikistan": "Tajikistan",
+  "country_turkmenistan": "Turkmenistan",
+  "country_australia": "Australia",
+  "country_new_zealand": "New Zealand",
+  "country_south_africa": "South Africa",
+  "country_nigeria": "Nigeria",
+  "country_kenya": "Kenya",
+  "country_ghana": "Ghana",
+  "country_ethiopia": "Ethiopia",
+  "country_unknown": "Unknown",
+  "country_angola": "Angola",
+  "country_burkina_faso": "Burkina Faso",
+  "country_benin": "Benin",
+  "country_botswana": "Botswana",
+  "country_democratic_republic_of_the_congo": "Democratic Republic of the Congo",
+  "country_central_african_republic": "Central African Republic",
+  "country_congo": "Congo",
+  "country_cote_d_ivoire": "Côte d'Ivoire",
+  "country_cameroon": "Cameroon",
+  "country_cape_verde": "Cape Verde",
+  "country_djibouti": "Djibouti",
+  "country_western_sahara": "Western Sahara",
+  "country_eritrea": "Eritrea",
+  "country_fiji": "Fiji",
+  "country_micronesia": "Micronesia",
+  "country_gabon": "Gabon",
+  "country_gambia": "Gambia",
+  "country_guinea": "Guinea",
+  "country_equatorial_guinea": "Equatorial Guinea",
+  "country_guinea_bissau": "Guinea-Bissau",
+  "country_kiribati": "Kiribati",
+  "country_comoros": "Comoros",
+  "country_liberia": "Liberia",
+  "country_lesotho": "Lesotho",
+  "country_madagascar": "Madagascar",
+  "country_marshall_islands": "Marshall Islands",
+  "country_mali": "Mali",
+  "country_mauritania": "Mauritania",
+  "country_mauritius": "Mauritius",
+  "country_malawi": "Malawi",
+  "country_mozambique": "Mozambique",
+  "country_namibia": "Namibia",
+  "country_new_caledonia": "New Caledonia",
+  "country_niger": "Niger",
+  "country_nauru": "Nauru",
+  "country_french_polynesia": "French Polynesia",
+  "country_papua_new_guinea": "Papua New Guinea",
+  "country_palau": "Palau",
+  "country_solomon_islands": "Solomon Islands",
+  "country_seychelles": "Seychelles",
+  "country_sierra_leone": "Sierra Leone",
+  "country_senegal": "Senegal",
+  "country_somalia": "Somalia",
+  "country_sao_tome_and_principe": "São Tomé and Príncipe",
+  "country_eswatini": "Eswatini",
+  "country_chad": "Chad",
+  "country_togo": "Togo",
+  "country_tonga": "Tonga",
+  "country_tuvalu": "Tuvalu",
+  "country_tanzania": "Tanzania",
+  "country_uganda": "Uganda",
+  "country_vanuatu": "Vanuatu",
+  "country_samoa": "Samoa",
+  "country_zambia": "Zambia",
+  "country_zimbabwe": "Zimbabwe",
+  "nationality_jordan": "Jordanian",
+  "nationality_united_states": "American",
+  "nationality_united_kingdom": "British",
+  "nationality_saudi_arabia": "Saudi",
+  "nationality_united_arab_emirates": "Emirati",
+  "nationality_kuwait": "Kuwaiti",
+  "nationality_qatar": "Qatari",
+  "nationality_bahrain": "Bahraini",
+  "nationality_oman": "Omani",
+  "nationality_egypt": "Egyptian",
+  "nationality_lebanon": "Lebanese",
+  "nationality_syria": "Syrian",
+  "nationality_iraq": "Iraqi",
+  "nationality_palestine": "Palestinian",
+  "nationality_yemen": "Yemeni",
+  "nationality_libya": "Libyan",
+  "nationality_tunisia": "Tunisian",
+  "nationality_algeria": "Algerian",
+  "nationality_morocco": "Moroccan",
+  "nationality_sudan": "Sudanese",
+  "nationality_turkey": "Turkish",
+  "nationality_iran": "Iranian",
+  "nationality_pakistan": "Pakistani",
+  "nationality_afghanistan": "Afghan",
+  "nationality_india": "Indian",
+  "nationality_bangladesh": "Bangladeshi",
+  "nationality_sri_lanka": "Sri Lankan",
+  "nationality_nepal": "Nepali",
+  "nationality_myanmar": "Burmese",
+  "nationality_thailand": "Thai",
+  "nationality_vietnam": "Vietnamese",
+  "nationality_cambodia": "Cambodian",
+  "nationality_laos": "Lao",
+  "nationality_malaysia": "Malaysian",
+  "nationality_singapore": "Singaporean",
+  "nationality_indonesia": "Indonesian",
+  "nationality_philippines": "Filipino",
+  "nationality_china": "Chinese",
+  "nationality_japan": "Japanese",
+  "nationality_south_korea": "South Korean",
+  "nationality_north_korea": "North Korean",
+  "nationality_mongolia": "Mongolian",
+  "nationality_taiwan": "Taiwanese",
+  "nationality_hong_kong": "Hong Konger",
+  "nationality_macau": "Macanese",
+  "nationality_canada": "Canadian",
+  "nationality_mexico": "Mexican",
+  "nationality_brazil": "Brazilian",
+  "nationality_argentina": "Argentine",
+  "nationality_chile": "Chilean",
+  "nationality_peru": "Peruvian",
+  "nationality_colombia": "Colombian",
+  "nationality_venezuela": "Venezuelan",
+  "nationality_ecuador": "Ecuadorian",
+  "nationality_bolivia": "Bolivian",
+  "nationality_paraguay": "Paraguayan",
+  "nationality_uruguay": "Uruguayan",
+  "nationality_guyana": "Guyanese",
+  "nationality_suriname": "Surinamese",
+  "nationality_french_guiana": "French Guianese",
+  "nationality_germany": "German",
+  "nationality_france": "French",
+  "nationality_italy": "Italian",
+  "nationality_spain": "Spanish",
+  "nationality_portugal": "Portuguese",
+  "nationality_netherlands": "Dutch",
+  "nationality_belgium": "Belgian",
+  "nationality_switzerland": "Swiss",
+  "nationality_austria": "Austrian",
+  "nationality_sweden": "Swedish",
+  "nationality_norway": "Norwegian",
+  "nationality_denmark": "Danish",
+  "nationality_finland": "Finnish",
+  "nationality_iceland": "Icelandic",
+  "nationality_poland": "Polish",
+  "nationality_czech_republic": "Czech",
+  "nationality_slovakia": "Slovak",
+  "nationality_hungary": "Hungarian",
+  "nationality_romania": "Romanian",
+  "nationality_bulgaria": "Bulgarian",
+  "nationality_croatia": "Croatian",
+  "nationality_slovenia": "Slovenian",
+  "nationality_serbia": "Serbian",
+  "nationality_montenegro": "Montenegrin",
+  "nationality_bosnia_and_herzegovina": "Bosnian",
+  "nationality_north_macedonia": "Macedonian",
+  "nationality_albania": "Albanian",
+  "nationality_greece": "Greek",
+  "nationality_cyprus": "Cypriot",
+  "nationality_malta": "Maltese",
+  "nationality_ireland": "Irish",
+  "nationality_luxembourg": "Luxembourgish",
+  "nationality_monaco": "Monégasque",
+  "nationality_liechtenstein": "Liechtensteiner",
+  "nationality_san_marino": "Sammarinese",
+  "nationality_vatican_city": "Vatican",
+  "nationality_andorra": "Andorran",
+  "nationality_russia": "Russian",
+  "nationality_ukraine": "Ukrainian",
+  "nationality_belarus": "Belarusian",
+  "nationality_moldova": "Moldovan",
+  "nationality_estonia": "Estonian",
+  "nationality_latvia": "Latvian",
+  "nationality_lithuania": "Lithuanian",
+  "nationality_georgia": "Georgian",
+  "nationality_armenia": "Armenian",
+  "nationality_azerbaijan": "Azerbaijani",
+  "nationality_kazakhstan": "Kazakh",
+  "nationality_uzbekistan": "Uzbek",
+  "nationality_kyrgyzstan": "Kyrgyz",
+  "nationality_tajikistan": "Tajik",
+  "nationality_turkmenistan": "Turkmen",
+  "nationality_australia": "Australian",
+  "nationality_new_zealand": "New Zealander",
+  "nationality_south_africa": "South African",
+  "nationality_nigeria": "Nigerian",
+  "nationality_kenya": "Kenyan",
+  "nationality_ghana": "Ghanaian",
+  "nationality_ethiopia": "Ethiopian",
+  "nationality_unknown": "Unknown",
+  "nationality_angola": "Angolan",
+  "nationality_burkina_faso": "Burkinabé",
+  "nationality_benin": "Beninese",
+  "nationality_botswana": "Botswanan",
+  "nationality_democratic_republic_of_the_congo": "Congolese",
+  "nationality_central_african_republic": "Central African",
+  "nationality_congo": "Congolese",
+  "nationality_cote_d_ivoire": "Ivorian",
+  "nationality_cameroon": "Cameroonian",
+  "nationality_cape_verde": "Cape Verdean",
+  "nationality_djibouti": "Djiboutian",
+  "nationality_western_sahara": "Sahrawi",
+  "nationality_eritrea": "Eritrean",
+  "nationality_fiji": "Fijian",
+  "nationality_micronesia": "Micronesian",
+  "nationality_gabon": "Gabonese",
+  "nationality_gambia": "Gambian",
+  "nationality_guinea": "Guinean",
+  "nationality_equatorial_guinea": "Equatorial Guinean",
+  "nationality_guinea_bissau": "Bissau-Guinean",
+  "nationality_kiribati": "I-Kiribati",
+  "nationality_comoros": "Comorian",
+  "nationality_liberia": "Liberian",
+  "nationality_lesotho": "Basotho",
+  "nationality_madagascar": "Malagasy",
+  "nationality_marshall_islands": "Marshallese",
+  "nationality_mali": "Malian",
+  "nationality_mauritania": "Mauritanian",
+  "nationality_mauritius": "Mauritian",
+  "nationality_malawi": "Malawian",
+  "nationality_mozambique": "Mozambican",
+  "nationality_namibia": "Namibian",
+  "nationality_new_caledonia": "New Caledonian",
+  "nationality_niger": "Nigerien",
+  "nationality_nauru": "Nauruan",
+  "nationality_french_polynesia": "French Polynesian",
+  "nationality_papua_new_guinea": "Papua New Guinean",
+  "nationality_palau": "Palauan",
+  "nationality_solomon_islands": "Solomon Islander",
+  "nationality_seychelles": "Seychellois",
+  "nationality_sierra_leone": "Sierra Leonean",
+  "nationality_senegal": "Senegalese",
+  "nationality_somalia": "Somali",
+  "nationality_sao_tome_and_principe": "São Toméan",
+  "nationality_eswatini": "Swazi",
+  "nationality_chad": "Chadian",
+  "nationality_togo": "Togolese",
+  "nationality_tonga": "Tongan",
+  "nationality_tuvalu": "Tuvaluan",
+  "nationality_tanzania": "Tanzanian",
+  "nationality_uganda": "Ugandan",
+  "nationality_vanuatu": "Ni-Vanuatu",
+  "nationality_samoa": "Samoan",
+  "nationality_zambia": "Zambian",
+  "nationality_zimbabwe": "Zimbabwean",
+  "timezone_pacific_pago_pago": "Pago Pago",
+  "timezone_pacific_honolulu": "Honolulu",
+  "timezone_pacific_marquesas": "Marquesas",
+  "timezone_america_anchorage": "Anchorage",
+  "timezone_america_los_angeles": "Los Angeles",
+  "timezone_america_denver": "Denver",
+  "timezone_america_chicago": "Chicago",
+  "timezone_america_mexico_city": "Mexico City",
+  "timezone_america_bogota": "Bogota",
+  "timezone_america_lima": "Lima",
+  "timezone_america_new_york": "New York",
+  "timezone_america_toronto": "Toronto",
+  "timezone_america_caracas": "Caracas",
+  "timezone_america_santiago": "Santiago",
+  "timezone_america_st_johns": "St. John's",
+  "timezone_america_argentina_buenos_aires": "Buenos Aires",
+  "timezone_america_sao_paulo": "Sao Paulo",
+  "timezone_america_noronha": "Fernando de Noronha",
+  "timezone_atlantic_cape_verde": "Praia",
+  "timezone_africa_accra": "Accra",
+  "timezone_europe_dublin": "Dublin",
+  "timezone_europe_lisbon": "Lisbon",
+  "timezone_europe_london": "London",
+  "timezone_africa_nouakchott": "Nouakchott",
+  "timezone_atlantic_reykjavik": "Reykjavik",
+  "timezone_africa_algiers": "Algiers",
+  "timezone_europe_amsterdam": "Amsterdam",
+  "timezone_europe_berlin": "Berlin",
+  "timezone_africa_casablanca": "Casablanca",
+  "timezone_africa_kinshasa": "Kinshasa",
+  "timezone_africa_lagos": "Lagos",
+  "timezone_europe_madrid": "Madrid",
+  "timezone_europe_paris": "Paris",
+  "timezone_europe_rome": "Rome",
+  "timezone_europe_stockholm": "Stockholm",
+  "timezone_africa_tunis": "Tunis",
+  "timezone_europe_zurich": "Zurich",
+  "timezone_europe_athens": "Athens",
+  "timezone_asia_beirut": "Beirut",
+  "timezone_africa_cairo": "Cairo",
+  "timezone_asia_jerusalem": "Jerusalem",
+  "timezone_africa_johannesburg": "Johannesburg",
+  "timezone_africa_khartoum": "Khartoum",
+  "timezone_europe_kyiv": "Kyiv",
+  "timezone_africa_tripoli": "Tripoli",
+  "timezone_africa_addis_ababa": "Addis Ababa",
+  "timezone_asia_amman": "Amman",
+  "timezone_asia_baghdad": "Baghdad",
+  "timezone_asia_damascus": "Damascus",
+  "timezone_asia_qatar": "Doha",
+  "timezone_europe_istanbul": "Istanbul",
+  "timezone_asia_kuwait": "Kuwait City",
+  "timezone_asia_bahrain": "Manama",
+  "timezone_africa_mogadishu": "Mogadishu",
+  "timezone_europe_moscow": "Moscow",
+  "timezone_africa_nairobi": "Nairobi",
+  "timezone_asia_riyadh": "Riyadh",
+  "timezone_asia_aden": "Sanaa",
+  "timezone_asia_tehran": "Tehran",
+  "timezone_asia_dubai": "Dubai",
+  "timezone_asia_muscat": "Muscat",
+  "timezone_asia_kabul": "Kabul",
+  "timezone_asia_almaty": "Almaty",
+  "timezone_asia_karachi": "Karachi",
+  "timezone_asia_tashkent": "Tashkent",
+  "timezone_asia_colombo": "Colombo",
+  "timezone_asia_kolkata": "Delhi",
+  "timezone_asia_kathmandu": "Kathmandu",
+  "timezone_asia_dhaka": "Dhaka",
+  "timezone_asia_yangon": "Yangon",
+  "timezone_asia_bangkok": "Bangkok",
+  "timezone_asia_ho_chi_minh": "Ho Chi Minh",
+  "timezone_asia_jakarta": "Jakarta",
+  "timezone_asia_hong_kong": "Hong Kong",
+  "timezone_asia_kuala_lumpur": "Kuala Lumpur",
+  "timezone_asia_manila": "Manila",
+  "timezone_australia_perth": "Perth",
+  "timezone_asia_shanghai": "Shanghai",
+  "timezone_asia_singapore": "Singapore",
+  "timezone_asia_taipei": "Taipei",
+  "timezone_asia_seoul": "Seoul",
+  "timezone_asia_tokyo": "Tokyo",
+  "timezone_australia_adelaide": "Adelaide",
+  "timezone_australia_darwin": "Darwin",
+  "timezone_australia_brisbane": "Brisbane",
+  "timezone_pacific_guam": "Guam",
+  "timezone_australia_melbourne": "Melbourne",
+  "timezone_pacific_port_moresby": "Port Moresby",
+  "timezone_australia_sydney": "Sydney",
+  "timezone_australia_lord_howe": "Lord Howe",
+  "timezone_pacific_guadalcanal": "Honiara",
+  "timezone_pacific_auckland": "Auckland",
+  "timezone_pacific_fiji": "Suva",
+  "timezone_pacific_chatham": "Chatham",
+  "timezone_pacific_apia": "Apia",
+  "timezone_pacific_tongatapu": "Nuku'alofa",
+  "timezone_pacific_kiritimati": "Kiritimati",
+  "text_field_req_min_length": "At least {length} characters",
+  "@text_field_req_min_length": {
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
+  "text_field_req_uppercase": "Contains an uppercase letter",
+  "text_field_req_lowercase": "Contains a lowercase letter",
+  "text_field_req_digit": "Contains a number",
+  "text_field_req_special_char": "Contains a special character",
+  "text_field_req_no_spaces": "No spaces",
+  "text_field_reveal_password_title": "Reveal password?",
+  "text_field_reveal_password_message": "Your screen is being recorded or shared — anyone watching will see what you typed.",
+  "text_field_reveal": "Reveal",
+  "text_field_cancel": "Cancel",
+  "text_field_word": "word",
+  "text_field_words": "words",
+  "text_field_chars": "chars",
+  "text_field_caps_lock_on": "Caps Lock is on",
+  "text_field_strength_weak": "Weak",
+  "text_field_strength_medium": "Medium",
+  "text_field_strength_strong": "Strong",
+  "text_field_clear_all": "Clear All",
+  "text_field_generate_password": "Generate password",
+  "text_field_undo": "Undo",
+  "text_field_redo": "Redo",
+  "text_field_clear": "Clear",
+  "text_field_voice_input": "Voice input",
+  "text_field_hold_to_reveal": "Hold to reveal password",
+  "text_field_toggle_visibility": "Show or hide password",
+  "text_field_profanity_warning": "May contain inappropriate language",
+  "text_field_name_parts_progress": "{count} of {total} name parts",
+  "@text_field_name_parts_progress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "text_field_password_hint": "Enter your password",
+  "text_field_password_create_hint": "Create a password",
+  "text_field_password_confirm_hint": "Confirm your password",
+  "text_field_screen_capture_warning": "Screen is being recorded or shared — input stays hidden",
+  "text_field_email_domain_not_allowed": "Only {domains} addresses are accepted",
+  "@text_field_email_domain_not_allowed": {
+    "placeholders": {
+      "domains": {
+        "type": "String",
+        "example": "gmail.com"
+      }
+    }
+  },
+  "text_field_email_domain_unreachable": "This email domain can't receive mail",
+  "text_field_password_breached": "This password appeared in {count} data breaches — pick another",
+  "@text_field_password_breached": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "phone_field_preferred_countries": "Preferred",
+  "phone_field_all_countries": "All countries",
+  "phone_field_length_exact": "Phone number must be {count} digits",
+  "@phone_field_length_exact": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "phone_field_length_range": "Phone number must be {min}–{max} digits",
+  "@phone_field_length_range": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "phone_field_mobile_length_exact": "Mobile number must be {count} digits",
+  "@phone_field_mobile_length_exact": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "phone_field_mobile_length_range": "Mobile number must be {min}–{max} digits",
+  "@phone_field_mobile_length_range": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "phone_field_mobile_prefix": "Mobile numbers start with {prefixes}",
+  "@phone_field_mobile_prefix": {
+    "placeholders": {
+      "prefixes": {
+        "type": "String",
+        "example": "77, 78, 79"
+      }
+    }
+  },
+  "amount_field_preferred_currencies": "Preferred",
+  "amount_field_all_currencies": "All currencies",
+  "measurement_field_preferred_units": "Common",
+  "measurement_field_all_units": "All units",
+  "date_field_incomplete": "Incomplete date — use {format}",
+  "@date_field_incomplete": {
+    "placeholders": {
+      "format": {
+        "type": "String",
+        "example": "DD/MM/YYYY"
+      }
+    }
+  },
+  "date_field_impossible": "That date doesn't exist",
+  "date_field_min_date": "Date must be on or after {date}",
+  "@date_field_min_date": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "date_field_max_date": "Date must be on or before {date}",
+  "@date_field_max_date": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "date_field_min_days_ahead": "Pick a date at least {days} days from now",
+  "@date_field_min_days_ahead": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "date_field_max_days_ahead": "Pick a date within the next {days} days",
+  "@date_field_max_days_ahead": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "date_field_weekday_not_allowed": "That day of the week isn't available",
+  "date_field_date_unavailable": "That date isn't available",
+  "date_field_must_be_after": "Must be after {date}",
+  "@date_field_must_be_after": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "date_field_must_be_before": "Must be before {date}",
+  "@date_field_must_be_before": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "date_field_expiry_min_months": "Must be valid for at least {months} more months",
+  "@date_field_expiry_min_months": {
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+  "date_field_age_months": "{months, plural, one{1 month old} other{{months} months old}}",
+  "@date_field_age_months": {
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+  "date_field_age_days": "{days, plural, one{1 day old} other{{days} days old}}",
+  "@date_field_age_days": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "date_field_age_years": "{years} years old",
+  "@date_field_age_years": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
+  "date_field_hijri": "{date} AH",
+  "@date_field_hijri": {
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "28 Rajab 1445"
+      }
+    }
+  },
+  "date_field_pick_date": "Pick a date",
+  "date_field_day_word": "DD",
+  "date_field_month_word": "MM",
+  "date_field_year_word": "YYYY",
+  "date_field_year2_word": "YY",
+  "date_range_start": "Start date",
+  "date_range_end": "End date",
+  "date_range_nights": "{nights} nights",
+  "@date_range_nights": {
+    "placeholders": {
+      "nights": {
+        "type": "int"
+      }
+    }
+  },
+  "time_field_hour_word": "HH",
+  "time_field_minute_word": "mm",
+  "time_field_required": "Time cannot be empty",
+  "time_field_incomplete": "Incomplete time — use {format}",
+  "@time_field_incomplete": {
+    "placeholders": {
+      "format": {
+        "type": "String",
+        "example": "HH:mm"
+      }
+    }
+  },
+  "time_field_min_time": "Time must be at or after {time}",
+  "@time_field_min_time": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "time_field_max_time": "Time must be at or before {time}",
+  "@time_field_max_time": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "time_field_outside_window": "Time must be between {start} and {end}",
+  "@time_field_outside_window": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "time_field_interval": "Time must be on {minutes}-minute steps",
+  "@time_field_interval": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "time_field_pick_time": "Pick a time",
+  "time_field_format_24": "24h",
+  "time_field_format_12": "12h",
+  "time_field_second_word": "ss",
+  "time_field_now": "Now",
+  "time_field_must_be_after": "Must be after {time}",
+  "@time_field_must_be_after": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "time_range_start": "Start time",
+  "time_range_end": "End time",
+  "time_range_duration": "{hours}h {minutes}m",
+  "@time_range_duration": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "datetime_field_date": "Date",
+  "datetime_field_time": "Time",
+  "login_field_hint": "Email or phone number",
+  "national_id_field_hint": "Enter national ID",
+  "national_id_required": "National ID is required",
+  "national_id_length": "Must be {length} digits",
+  "@national_id_length": {
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
+  "national_id_generic": "Enter a valid ID number",
+  "national_id_prefix": "Invalid ID prefix",
+  "national_id_checksum": "Invalid ID number",
+  "national_id_birthdate": "The embedded birth date is invalid",
+  "national_id_governorate": "Unknown governorate code",
+  "national_id_dob_mismatch": "ID doesn't match the birth date",
+  "national_id_citizens_only": "Citizens only",
+  "national_id_residents_only": "Residents only",
+  "national_id_born": "Born {date}",
+  "@national_id_born": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "national_id_male": "Male",
+  "national_id_female": "Female",
+  "national_id_citizen": "Citizen",
+  "national_id_resident": "Resident",
+  "address_field_area": "Area / District",
+  "address_field_area_hint": "Neighborhood or district",
+  "address_field_city_hint": "Enter city",
+  "address_field_line2_hint": "Apartment, floor, landmark",
+  "address_field_enter": "Enter {label}",
+  "@address_field_enter": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "address_field_type_home": "Home",
+  "address_field_type_work": "Work",
+  "address_field_type_other": "Other",
+  "address_field_recipient": "Recipient name",
+  "address_field_recipient_hint": "Who receives this",
+  "address_field_phone": "Contact phone",
+  "location_field_label": "Exact location",
+  "location_field_latitude": "Latitude",
+  "location_field_longitude": "Longitude",
+  "location_field_use_current": "Use current location",
+  "location_field_pick_map": "Pick on map",
+  "location_field_unavailable": "Location unavailable — check GPS and permissions",
+  "location_field_confirm": "Confirm location",
+  "location_field_lat_range": "Latitude must be between -90 and 90",
+  "location_field_lng_range": "Longitude must be between -180 and 180",
+  "address_field_notes": "Delivery notes (optional)",
+  "address_field_notes_hint": "Leave at the door, ring twice…",
+  "address_field_country": "Country",
+  "address_field_street": "Street address",
+  "address_field_street_hint": "Street name and number",
+  "address_field_line2": "Apartment, suite, building (optional)",
+  "address_field_city": "City",
+  "address_field_state": "State",
+  "address_field_governorate": "Governorate",
+  "address_field_emirate": "Emirate",
+  "address_field_region": "Region",
+  "address_field_county": "County",
+  "address_field_postal_code": "Postal code",
+  "address_field_zip_code": "ZIP code",
+  "address_field_postcode": "Postcode",
+  "address_field_field_required": "{label} is required",
+  "@address_field_field_required": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "address_field_postal_invalid": "Enter a valid {label}",
+  "@address_field_postal_invalid": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "address_field_select_state": "Select {label}",
+  "@address_field_select_state": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "duration_field_required": "Duration is required",
+  "duration_field_incomplete": "Enter a complete duration",
+  "duration_field_min": "Must be at least {duration}",
+  "@duration_field_min": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "duration_field_max": "Must be at most {duration}",
+  "@duration_field_max": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "duration_field_step": "Minutes must be in {step}-minute steps",
+  "@duration_field_step": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "duration_field_minutes": "{minutes}m",
+  "@duration_field_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "duration_field_seconds": "{seconds}s",
+  "@duration_field_seconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "duration_field_pick": "Pick duration",
+  "duration_field_hours_word": "Hours",
+  "duration_field_minutes_word": "Minutes",
+  "duration_field_seconds_word": "Seconds",
+  "percent_field_hint": "Enter percentage",
+  "percent_field_required": "Percentage is required",
+  "percent_field_range": "Must be between {min} and {max}",
+  "@percent_field_range": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "percent_field_min": "Must be at least {min}",
+  "@percent_field_min": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "percent_field_max": "Must be at most {max}",
+  "@percent_field_max": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "plate_field_hint": "Enter plate number",
+  "plate_field_required": "Plate number is required",
+  "plate_field_invalid": "Invalid plate number",
+  "crypto_field_hint": "Enter wallet address",
+  "crypto_field_required": "Wallet address is required",
+  "crypto_field_invalid": "Invalid {network} address",
+  "@crypto_field_invalid": {
+    "placeholders": {
+      "network": {
+        "type": "String"
+      }
+    }
+  },
+  "vin_field_hint": "Enter VIN",
+  "vin_field_required": "VIN is required",
+  "vin_field_length": "VIN is 17 characters",
+  "vin_field_checksum": "Invalid VIN (check digit mismatch)",
+  "vin_field_year": "Model year {year}",
+  "@vin_field_year": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "ip_field_hint": "Enter IP or hostname",
+  "ip_field_required": "Address is required",
+  "ip_field_invalid_ip": "Invalid IP address",
+  "ip_field_invalid_host": "Invalid hostname",
+  "ip_field_invalid_port": "Invalid port",
+  "promo_field_hint": "Enter promo code",
+  "promo_field_apply": "Apply",
+  "promo_field_remove": "Remove code",
+  "promo_field_empty": "Enter a code first",
+  "swift_field_hint": "Enter SWIFT / BIC",
+  "swift_field_required": "SWIFT / BIC is required",
+  "swift_field_length": "BIC is 8 or 11 characters",
+  "swift_field_bank": "Bank code is 4 letters",
+  "swift_field_country": "Unknown country code",
+  "swift_field_country_not_allowed": "Country not supported",
+  "swift_field_location": "Invalid location code",
+  "swift_field_branch": "Invalid branch code",
+  "swift_field_iban_mismatch": "BIC country doesn't match the IBAN",
+  "swift_field_head_office": "Head office",
+  "swift_field_test_warning": "Test BIC — not for live payments",
+  "tags_field_hint": "Add a tag…",
+  "tags_field_min": "Add at least {count} tags",
+  "@tags_field_min": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tags_field_too_long": "Max {max} characters",
+  "@tags_field_too_long": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "tags_field_max_reached": "Maximum {max} tags reached",
+  "@tags_field_max_reached": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "tags_field_not_allowed": "Pick from the suggestions",
+  "drop_down_select_option": "Select an option",
+  "drop_down_select_options": "Select options",
+  "drop_down_search": "Search",
+  "drop_down_no_results": "No results found",
+  "drop_down_create_new": "Create \"{query}\"",
+  "@drop_down_create_new": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "drop_down_select_all": "Select All",
+  "drop_down_clear_all": "Clear All",
+  "drop_down_selected_count": "Selected {count}",
+  "@drop_down_selected_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "drop_down_selected_of_max": "{count}/{max} selected",
+  "@drop_down_selected_of_max": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "drop_down_load_failed": "Couldn't load options",
+  "drop_down_more_items": "{labels} (+{count} more)",
+  "@drop_down_more_items": {
+    "placeholders": {
+      "labels": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "drop_down_tap_to_open": "Double tap to open",
+  "drop_down_tap_to_close": "Double tap to close",
+  "drop_down_clear_selection": "Clear selection",
+  "change_password_current_label": "Current password",
+  "change_password_current_hint": "Enter current password",
+  "change_password_new_label": "New password",
+  "change_password_confirm_label": "Confirm new password",
+  "change_password_same_as_current": "New password must be different from your current password",
+  "bank_field_holder_label": "Account holder",
+  "bank_field_holder_hint": "Full name on the account",
+  "otp_form_sent_to": "Code sent to {destination}",
+  "@otp_form_sent_to": {
+    "placeholders": {
+      "destination": {
+        "type": "String"
+      }
+    }
+  },
+  "otp_form_no_code": "Didn't receive the code?",
+  "otp_form_resend": "Resend",
+  "otp_form_resend_in": "Resend in {seconds}s",
+  "@otp_form_resend_in": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "contact_form_message_label": "Message",
+  "contact_form_message_hint": "Write your message",
+  "contact_form_message_required": "Message is required",
+  "field_hint_email": "Enter your email",
+  "field_hint_phone": "Enter phone number",
+  "field_hint_username": "Choose a username",
+  "field_hint_passport": "Enter passport number",
+  "field_hint_cardholder": "Name on card",
+  "field_hint_search": "Search",
+  "common_skip": "Skip",
+  "common_something_went_wrong": "Something went wrong",
+  "common_try_again": "Try again",
+  "common_contact_support": "Contact support",
+  "common_close": "Close",
+  "common_pause": "Pause",
+  "common_resume": "Resume",
+  "common_continue": "Continue",
+  "common_dismiss": "Dismiss",
+  "banner_update_title": "Update available",
+  "banner_update_message": "A newer version of the app is ready to install.",
+  "banner_update_action": "Update",
+  "banner_offline_message": "Changes you make will sync once you're back online.",
+  "common_expand": "Expand",
+  "common_collapse": "Collapse",
+  "common_undo": "Undo",
+  "common_dismissed": "Dismissed",
+  "common_clear": "Clear",
+  "common_clear_all": "Clear all",
+  "common_remove": "Remove",
+  "common_save": "Save",
+  "common_saving": "Saving…",
+  "common_edit": "Edit",
+  "common_add": "Add",
+  "common_delete": "Delete",
+  "common_copy": "Copy",
+  "common_copied_to_clipboard": "Copied to clipboard",
+  "common_no_results": "No results",
+  "common_refresh": "Refresh",
+  "common_search": "Search",
+  "common_share": "Share",
+  "common_next": "Next",
+  "common_count": "Qty {count}",
+  "@common_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "common_back": "Back",
+  "error_support_email_unconfigured": "Support email isn't set up yet.",
+  "error_diagnostics": "Diagnostics",
+  "error_report_failed": "Couldn't send the report. Please try again.",
+  "coming_soon_eta_label": "Expected",
+  "coming_soon_body_plain": "We're working on it. Check back soon.",
+  "coming_soon_change_email": "Use a different email",
+  "pdf_bookmark_count": "{count, plural, =1{{count} bookmark} other{{count} bookmarks}}",
+  "@pdf_bookmark_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "common_settings": "Settings",
+  "common_open_settings": "Open settings",
+  "common_paste": "Paste",
+  "common_stop": "Stop",
+  "common_previous": "Previous",
+  "common_reset": "Reset",
+  "common_later": "Later",
+  "common_update": "Update",
+  "common_open": "Open",
+  "common_submit": "Submit",
+  "common_help": "Help",
+  "pdf_unlock": "Unlock",
+  "pdf_previous_page": "Previous page",
+  "pdf_next_page": "Next page",
+  "pdf_reset_zoom": "Reset zoom",
+  "wizard_clear_draft": "Clear draft",
+  "faq_all": "All",
+  "faq_recent": "Recent",
+  "faq_still_need_help": "Still need help?",
+  "coming_soon_save_failed": "Could not save your email. Please try again.",
+  "media_rotate": "Rotate",
+  "media_realign": "Re-align",
+  "media_selected_count": "{count} of {max} selected",
+  "@media_selected_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "pdf_go": "Go",
+  "pdf_previous_match": "Previous match",
+  "pdf_next_match": "Next match",
+  "pdf_forget": "Forget this document",
+  "pdf_outline": "Outline",
+  "pdf_bookmarks": "Bookmarks",
+  "scanner_title": "Scan code",
+  "drawer_expand": "Expand",
+  "wizard_submit_failed": "Submit failed",
+  "sheet_confirm_title": "Are you sure?",
+  "sheet_confirm": "Confirm",
+  "sheet_delete_title": "Delete this item?",
+  "sheet_delete_message": "This action cannot be undone.",
+  "sheet_logout_title": "Log out?",
+  "sheet_logout_message": "You can sign back in at any time.",
+  "sheet_logout_confirm": "Log out",
+  "sheet_discard_title": "Discard changes?",
+  "sheet_discard_message": "Your unsaved changes will be lost.",
+  "sheet_discard_confirm": "Discard",
+  "sheet_got_it": "Got it",
+  "sheet_filters": "Filters",
+  "sheet_apply": "Apply",
+  "sheet_reset": "Reset",
+  "common_tap_to_retry": "Tap to retry",
+  "button_tooltip_add": "Add",
+  "button_tooltip_copy": "Copy",
+  "button_tooltip_delete": "Delete",
+  "button_tooltip_edit": "Edit",
+  "button_tooltip_filter": "Filter",
+  "button_tooltip_more": "More",
+  "button_tooltip_refresh": "Refresh",
+  "button_tooltip_search": "Search",
+  "button_tooltip_send": "Send",
+  "button_tooltip_add_favorite": "Add to favorites",
+  "button_tooltip_remove_favorite": "Remove from favorites",
+  "button_tooltip_start_voice_input": "Start voice input",
+  "button_tooltip_stop_listening": "Stop listening",
+  "button_read_more": "Read more",
+  "button_show_less": "Show less",
+  "button_icon_semantic_label": "Icon button",
+  "button_result_success": "Success",
+  "button_result_failed": "Failed",
+  "social_button_continue_with": "Continue with {provider}",
+  "@social_button_continue_with": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "drop_down_gender_label": "Gender",
+  "drop_down_gender_hint": "Select gender",
+  "drop_down_hour_label": "Hour",
+  "drop_down_hour_hint": "Select hour",
+  "drop_down_language_label": "Language",
+  "drop_down_language_hint": "Select language",
+  "drop_down_month_label": "Month",
+  "drop_down_month_hint": "Select month",
+  "drop_down_theme_label": "Theme",
+  "drop_down_theme_hint": "Select theme",
+  "drop_down_year_label": "Year",
+  "drop_down_year_hint": "Select year",
+  "drop_down_country_hint": "Country",
+  "drop_down_state_hint": "Select a governorate / region",
+  "drop_down_city_hint": "Select a city / area",
+  "drop_down_currency_hint": "Select currency",
+  "drop_down_unit_hint": "Select unit",
+  "drop_down_color_format_label": "Format",
+  "drop_down_color_format_hint": "Select format",
+  "drop_down_day_label": "Day",
+  "drop_down_day_hint": "Select day",
+  "drop_down_weekday_label": "Weekday",
+  "drop_down_weekday_hint": "Select weekday",
+  "drop_down_nationality_hint": "Nationality",
+  "drop_down_timezone_hint": "Select timezone",
+  "drop_down_blood_type_label": "Blood type",
+  "drop_down_blood_type_hint": "Select blood type",
+  "drop_down_marital_status_label": "Marital status",
+  "drop_down_marital_status_hint": "Select status",
+  "drop_down_education_label": "Education",
+  "drop_down_education_hint": "Select level",
+  "drop_down_sort_by_label": "Sort by",
+  "drop_down_sort_by_hint": "Sort by",
+  "drop_down_duration_label": "Duration",
+  "drop_down_duration_hint": "Select duration",
+  "drop_down_recurrence_label": "Repeat",
+  "drop_down_recurrence_hint": "Select repeat",
+  "language_name_en": "English",
+  "language_name_ar": "Arabic",
+  "gender_male": "Male",
+  "gender_female": "Female",
+  "gender_other": "Other",
+  "gender_prefer_not_to_say": "Prefer not to say",
+  "marital_single": "Single",
+  "marital_married": "Married",
+  "marital_divorced": "Divorced",
+  "marital_widowed": "Widowed",
+  "education_primary": "Primary",
+  "education_middle": "Middle school",
+  "education_secondary": "High school",
+  "education_diploma": "Diploma",
+  "education_bachelor": "Bachelor's",
+  "education_master": "Master's",
+  "education_doctorate": "Doctorate",
+  "sort_newest": "Newest",
+  "sort_oldest": "Oldest",
+  "sort_price_low_high": "Price: low to high",
+  "sort_price_high_low": "Price: high to low",
+  "sort_name_az": "Name: A–Z",
+  "sort_name_za": "Name: Z–A",
+  "sort_rating": "Highest rated",
+  "sort_relevance": "Most relevant",
+  "recurrence_none": "Does not repeat",
+  "recurrence_daily": "Daily",
+  "recurrence_weekly": "Weekly",
+  "recurrence_monthly": "Monthly",
+  "recurrence_yearly": "Yearly",
+  "duration_minutes": "{n} min",
+  "@duration_minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "duration_hours": "{n} h",
+  "@duration_hours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "duration_days": "{n} d",
+  "@duration_days": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "theme_mode_system": "System",
+  "theme_mode_light": "Light",
+  "theme_mode_dark": "Dark",
+  "bank_field_iban_label": "IBAN",
+  "bank_field_swift_bic_label": "SWIFT / BIC",
+  "card_field_number_label": "Card number",
+  "card_field_expiry_label": "Expiry",
+  "card_field_cvv_label": "CVV",
+  "color_field_picker_title": "Pick a color",
+  "color_field_required": "Enter a color",
+  "color_field_invalid_format": "Use {hint}",
+  "@color_field_invalid_format": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "url_field_https_required": "Use a secure https:// link",
+  "url_field_scheme_not_allowed": "Link type \"{scheme}\" isn’t allowed",
+  "@url_field_scheme_not_allowed": {
+    "placeholders": {
+      "scheme": {
+        "type": "String"
+      }
+    }
+  },
+  "url_field_domain_not_allowed": "Link must be on {domains}",
+  "@url_field_domain_not_allowed": {
+    "placeholders": {
+      "domains": {
+        "type": "String"
+      }
+    }
+  },
+  "url_field_domain_blocked": "Links to {host} aren’t allowed",
+  "@url_field_domain_blocked": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "url_field_lookalike_host": "Address uses lookalike characters — check it carefully",
+  "url_field_punycode_host": "Encoded international domain — check it carefully",
+  "url_field_dismiss_paste": "Dismiss",
+  "stepper_increase": "Increase",
+  "stepper_decrease": "Decrease",
+  "otp_field_must_be_n_chars": "Code must be {length} characters",
+  "@otp_field_must_be_n_chars": {
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
+  "scroll_to_top": "Scroll to top",
+  "scroll_progress": "Scroll progress",
+  "scroll_new_items": "{count} new",
+  "@scroll_new_items": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "list_page": "Page {page}",
+  "@list_page": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "stack_card_of": "Card {index} of {total}",
+  "@stack_card_of": {
+    "placeholders": {
+      "index": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "stack_layer_of": "Item {index} of {total}",
+  "@stack_layer_of": {
+    "placeholders": {
+      "index": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "stack_swipe_left": "Swipe left",
+  "stack_swipe_right": "Swipe right",
+  "stack_swipe_up": "Swipe up",
+  "stack_swipe_down": "Swipe down",
+  "list_page_of": "Page {page} of {total}",
+  "@list_page_of": {
+    "placeholders": {
+      "page": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "list_previous_page": "Previous page",
+  "list_next_page": "Next page",
+  "list_more_pages": "More pages",
+  "list_section_index": "Section index",
+  "list_load_more": "Load more",
+  "list_empty_title": "Nothing here yet",
+  "list_clear_selection": "Clear selection",
+  "list_selected_count": "{count} selected",
+  "@list_selected_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "badge_count_notifications": "{count} notifications",
+  "@badge_count_notifications": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "badge_new_notification": "New notification",
+  "text_read_more": "Read more",
+  "text_read_less": "Read less",
+  "checkbox_select_all": "Select All",
+  "checkbox_semantic_label": "Checkbox",
+  "switch_on": "On",
+  "switch_off": "Off",
+  "switch_dark_mode": "Dark mode",
+  "switch_notifications": "Push notifications",
+  "switch_biometric": "Biometric unlock",
+  "switch_biometric_desc": "Face ID / fingerprint on launch",
+  "switch_analytics": "Share usage data",
+  "switch_analytics_desc": "Anonymous analytics that help improve the app",
+  "switch_crash_reports": "Send crash reports",
+  "switch_haptics": "Haptic feedback",
+  "indicator_page_of": "Page {index} of {total}",
+  "indicator_go_to_page": "Go to page {index}",
+  "indicator_story_segment": "Story {index} of {total}",
+  "indicator_story_playing": "playing",
+  "indicator_story_paused": "paused",
+  "@indicator_page_of": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "@indicator_go_to_page": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "@indicator_story_segment": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "stepper_step_of": "Step {index} of {total}",
+  "stepper_current": "current step",
+  "stepper_completed": "completed",
+  "stepper_upcoming": "not started",
+  "stepper_error": "needs attention",
+  "stepper_disabled": "unavailable",
+  "@stepper_step_of": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "slider_volume": "Volume",
+  "slider_muted": "Muted",
+  "slider_brightness": "Brightness",
+  "slider_text_size": "Text size",
+  "slider_playback_speed": "Playback speed",
+  "slider_quality": "Quality",
+  "slider_quality_low": "Low",
+  "slider_quality_medium": "Medium",
+  "slider_quality_high": "High",
+  "slider_quality_ultra": "Ultra",
+  "slider_price_range": "Price range",
+  "slider_age_range": "Age range",
+  "slider_years": "yrs",
+  "slider_distance": "Distance",
+  "slider_unit_km": "km",
+  "slider_unit_mi": "mi",
+  "slider_min_rating": "Minimum rating",
+  "slider_any": "Any",
+  "toggle_group_overflow_tooltip": "More options",
+  "toggle_group_overflow_label": "{count} more options",
+  "@toggle_group_overflow_label": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "empty_no_results_title": "No results for “{query}”",
+  "@empty_no_results_title": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "empty_no_results_subtitle": "Try a different spelling, or fewer words.",
+  "empty_clear_search": "Clear search",
+  "empty_offline_title": "You're offline",
+  "empty_offline_subtitle": "Check your connection and try again.",
+  "empty_failed_title": "Something went wrong",
+  "empty_failed_subtitle": "We couldn't load this. Try again in a moment.",
+  "empty_retry": "Try again",
+  "avatar_more_count": "{count} more",
+  "@avatar_more_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rating_semantic_label": "Rating",
+  "rating_value_out_of": "{value} out of {count}",
+  "@rating_value_out_of": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "radio_semantic_label": "Radio option",
+  "radio_yes": "Yes",
+  "radio_no": "No",
+  "consent_prefix": "I agree to the ",
+  "consent_terms": "Terms of Service",
+  "consent_and": " and ",
+  "consent_privacy": "Privacy Policy",
+  "consent_required": "You must accept the terms to continue",
+  "checkbox_age_confirm": "I confirm I am {age} or older",
+  "@checkbox_age_confirm": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "checkbox_age_required": "You must confirm your age to continue",
+  "checkbox_acknowledge_required": "You must acknowledge this to continue",
+  "checkbox_marketing_opt_in": "Send me offers and product updates",
+  "checkbox_dont_show_again": "Don't show this again",
+  "checkbox_save_card": "Save this card for future payments",
+  "checkbox_default_address": "Set as default address",
+  "checkbox_same_as_billing": "Shipping address same as billing",
+  "toggle_group_semantic_label": "Toggle group",
+  "toggle_group_sort_asc": "Ascending",
+  "toggle_group_sort_desc": "Descending",
+  "toggle_group_format_bold": "Bold",
+  "toggle_group_format_italic": "Italic",
+  "toggle_group_format_underline": "Underline",
+  "toggle_group_format_strikethrough": "Strikethrough",
+  "toggle_group_align_start": "Align start",
+  "toggle_group_align_center": "Align center",
+  "toggle_group_align_end": "Align end",
+  "toggle_group_align_justify": "Justify",
+  "toggle_group_channel_push": "Push",
+  "toggle_group_channel_email": "Email",
+  "toggle_group_channel_sms": "SMS",
+  "toggle_group_daypart_morning": "Morning",
+  "toggle_group_daypart_afternoon": "Afternoon",
+  "toggle_group_daypart_evening": "Evening",
+  "toggle_group_daypart_night": "Night",
+  "toggle_group_count_any": "Any",
+  "segmented_control_semantic_label": "Segmented control",
+  "segmented_control_view_list": "List",
+  "segmented_control_view_grid": "Grid",
+  "segmented_control_period_day": "Day",
+  "segmented_control_period_week": "Week",
+  "segmented_control_period_month": "Month",
+  "segmented_control_period_year": "Year",
+  "segmented_control_view_map": "Map",
+  "segmented_control_status_all": "All",
+  "segmented_control_status_active": "Active",
+  "segmented_control_status_archived": "Archived",
+  "segmented_control_time_12h": "12h",
+  "segmented_control_time_24h": "24h",
+  "dialog_confirm": "Confirm",
+  "dialog_enter_text_hint": "Enter text...",
+  "dialog_closing_in": "Closing in {seconds}s",
+  "@dialog_closing_in": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "popup_opened_semantic": "Popup opened",
+  "popup_closed_semantic": "Popup closed",
+  "drawer_no_results": "No results found",
+  "drawer_no_items_match": "No items match \"{query}\"",
+  "@drawer_no_items_match": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "video_load_failed": "Failed to load video",
+  "video_player": "Video player",
+  "video_play": "Play",
+  "video_pause": "Pause",
+  "video_replay": "Replay from the start",
+  "video_mute": "Mute",
+  "video_unmute": "Unmute",
+  "video_enter_fullscreen": "Enter fullscreen",
+  "video_exit_fullscreen": "Exit fullscreen",
+  "video_settings": "Playback settings",
+  "video_screenshot": "Take a screenshot",
+  "video_next": "Next video",
+  "video_previous": "Previous video",
+  "video_seek": "Playback position",
+  "video_playback_speed": "Playback speed",
+  "video_subtitles": "Subtitles",
+  "video_audio_track": "Audio track",
+  "video_quality": "Quality",
+  "video_lock_screen": "Lock screen",
+  "video_unlock_screen": "Unlock screen",
+  "video_up_next": "Up next",
+  "video_cancel_autoplay": "Cancel",
+  "video_play_now": "Play now",
+  "video_subtitles_on": "Subtitles on",
+  "video_subtitles_off": "Subtitles off",
+  "video_chapters": "Chapters",
+  "video_replay_start": "Play from start",
+  "video_zoom_fill": "Fill the frame",
+  "video_zoom_fit": "Fit the frame",
+  "video_sleep_timer": "Sleep timer",
+  "video_sleep_off": "No timer",
+  "video_sleep_minutes": "{count} min",
+  "@video_sleep_minutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "video_sleep_end": "End of this video",
+  "video_loop_set_a": "Loop from here",
+  "video_loop_set_b": "Loop to here",
+  "video_loop_clear": "Clear loop",
+  "video_subtitle_delay": "Subtitle delay",
+  "video_subtitle_earlier": "Earlier",
+  "video_subtitle_later": "Later",
+  "video_subtitle_reset": "In sync",
+  "video_cast": "Play on another screen",
+  "video_subtitle_size": "Subtitle size",
+  "video_subtitle_smaller": "Smaller",
+  "video_subtitle_larger": "Larger",
+  "video_subtitle_normal": "Normal",
+  "audio_play": "Play",
+  "audio_pause": "Pause",
+  "audio_loading": "Loading",
+  "audio_error": "Could not play this audio",
+  "audio_skip_back": "Back {count} seconds",
+  "@audio_skip_back": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "audio_skip_forward": "Forward {count} seconds",
+  "@audio_skip_forward": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "audio_speed": "Playback speed",
+  "audio_loop": "Repeat",
+  "audio_timeline": "Position",
+  "audio_waveform": "Scrub the audio",
+  "audio_retry": "Try again",
+  "audio_next": "Next track",
+  "audio_previous": "Previous track",
+  "audio_sleep": "Sleep timer",
+  "audio_sleep_off": "Sleep timer off",
+  "audio_sleep_end": "Stop at end of track",
+  "audio_sleep_minutes": "Stop in {minutes} minutes",
+  "@audio_sleep_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "audio_sleep_short_minutes": "{minutes}m",
+  "audio_sleep_short_end": "End",
+  "@audio_sleep_short_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "video_off": "Off",
+  "video_seek_forward": "Skip forward {seconds} seconds",
+  "@video_seek_forward": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "video_seek_back": "Skip back {seconds} seconds",
+  "@video_seek_back": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "video_no_audio_device": "No audio output device",
+  "animation_load_failed": "Failed to load animation",
+  "animation_not_found": "Animation not found",
+  "animation_access_denied": "Access denied",
+  "animation_network_error": "Network error",
+  "animation_invalid_file": "Invalid animation file",
+  "animation_play": "Play",
+  "animation_pause": "Pause",
+  "animation_replay": "Replay from the start",
+  "animation_seek": "Playback position",
+  "animation_percent_played": "{percent}% played",
+  "@animation_percent_played": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "animation_playback_speed": "Playback speed",
+  "animation_speed_multiplier": "{rate}x",
+  "@animation_speed_multiplier": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "animation_paused_reduced_motion": "Paused — reduce motion is on",
+  "scanner_camera_access_blocked": "Camera access blocked",
+  "scanner_camera_permission_required": "Camera permission required",
+  "scanner_open_settings_hint": "Open Settings to allow camera access for this app.",
+  "scanner_allow_camera_hint": "Allow camera access to scan codes.",
+  "scanner_open_settings": "Open settings",
+  "scanner_grant_access": "Grant access",
+  "scanner_use_this_code": "Use this code",
+  "scanner_torch_on": "Turn on the light",
+  "scanner_torch_off": "Turn off the light",
+  "scanner_flip_camera": "Switch camera",
+  "scanner_zoom": "Zoom",
+  "scanner_hint": "Point the camera at a code",
+  "scanner_camera_failed": "Camera unavailable",
+  "scanner_camera_failed_hint": "The camera could not be started.",
+  "scanner_retry": "Try again",
+  "scanner_pending_code": "Scanned code",
+  "scanner_empty_value": "(no data)",
+  "scanner_rejected": "Not a code this screen accepts",
+  "scanner_from_image": "Scan from an image",
+  "scanner_image_no_code": "No code found in that image",
+  "scanner_scan_again": "Scan again",
+  "legal_section_label": "Legal & information",
+  "legal_version": "Version {version}",
+  "@legal_version": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "legal_version_build": "Version {version} · Build {build}",
+  "@legal_version_build": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "build": {
+        "type": "String"
+      }
+    }
+  },
+  "legal_title_about": "About",
+  "legal_title_privacy": "Privacy Policy",
+  "legal_title_tos": "Terms of Service",
+  "legal_title_licenses": "Open-source Licenses",
+  "legal_title_eula": "End User License Agreement",
+  "legal_title_refund": "Refund & Cancellation",
+  "legal_title_credits": "Credits",
+  "legal_title_contact": "Contact & Support",
+  "legal_page_unavailable": "{title} is unavailable",
+  "@legal_page_unavailable": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "legal_page_load_failed": "Couldn't load {title}",
+  "@legal_page_load_failed": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "legal_page_disabled_body": "This page is currently disabled.",
+  "legal_check_connection_body": "Check your connection and try again.",
+  "maintenance_default_title": "We'll be right back",
+  "maintenance_default_message": "The service is temporarily unavailable. Please check back shortly.",
+  "maintenance_scheduled_message": "We are performing scheduled maintenance. Please try again later.",
+  "maintenance_eta_any_moment": "any moment now",
+  "maintenance_eta_hours_minutes": "in ~{hours}h {minutes}m",
+  "@maintenance_eta_hours_minutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "maintenance_eta_minutes": "in ~{minutes} min",
+  "@maintenance_eta_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "maintenance_eta_seconds": "in ~{seconds}s",
+  "@maintenance_eta_seconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "maintenance_back_eta": "Back {eta}",
+  "@maintenance_back_eta": {
+    "placeholders": {
+      "eta": {
+        "type": "String"
+      }
+    }
+  },
+  "maintenance_retry_in_seconds": "Retry in {seconds}s",
+  "@maintenance_retry_in_seconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "connectivity_offline": "You're offline",
+  "connectivity_offline_queued": "You're offline — {count} queued",
+  "@connectivity_offline_queued": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "connectivity_back_online": "Back online",
+  "connectivity_vpn_warning": "VPN detected — may impact some features",
+  "connectivity_vpn_blocked": "VPN must be disabled to continue",
+  "connectivity_quality_offline": "Offline",
+  "connectivity_quality_poor": "Poor",
+  "connectivity_quality_fair": "Fair",
+  "connectivity_quality_good": "Good",
+  "connectivity_quality_excellent": "Excellent",
+  "connectivity_quality_unknown": "Unknown",
+  "connectivity_type_offline": "Offline",
+  "connectivity_type_wifi": "Wi-Fi",
+  "connectivity_type_ethernet": "Ethernet",
+  "connectivity_type_mobile": "Mobile data",
+  "connectivity_type_vpn": "VPN",
+  "connectivity_type_other": "Other",
+  "preferences_app_role_title": "Color theme",
+  "preferences_app_role_subtitle": "Which palette the app wears",
+  "preferences_reveal_shape_title": "Switch animation",
+  "preferences_reveal_shape_subtitle": "The shape the reveal takes when the theme changes",
+  "preferences_reveal_direction_title": "Animation direction",
+  "preferences_reveal_direction_subtitle": "Which way that shape moves",
+  "preferences_color_saturation_title": "Color saturation",
+  "preferences_color_saturation_subtitle": "How vivid the palette renders",
+  "preferences_saturation_muted": "Muted",
+  "preferences_saturation_normal": "Normal",
+  "preferences_saturation_vibrant": "Vibrant",
+  "preferences_dynamic_color_title": "Dynamic color",
+  "preferences_dynamic_color_subtitle": "Use system accent color (Android 12+).",
+  "preferences_theme_title": "Theme",
+  "preferences_theme_subtitle": "Light · Dark · Match system",
+  "preferences_theme_light": "Light",
+  "preferences_theme_dark": "Dark",
+  "preferences_theme_system": "System",
+  "preferences_language_title": "Language",
+  "preferences_language_subtitle": "App display language",
+  "preferences_font_scale_small": "Small",
+  "preferences_font_scale_default": "Default",
+  "preferences_font_scale_large": "Large",
+  "preferences_font_scale_extra_large": "Extra large",
+  "preferences_font_scale_huge": "Huge",
+  "preferences_font_size_title": "Font size",
+  "preferences_font_size_subtitle": "Composes with system text scaling",
+  "preferences_font_preview_sample": "The quick brown fox jumps over the lazy dog.",
+  "preferences_reset_to_defaults": "Reset to defaults",
+  "preferences_reset_confirm_title": "Reset display preferences?",
+  "preferences_reset_confirm_body": "Theme, saturation, font size, dynamic color, and reveal animation revert to defaults. Language and onboarding state are untouched.",
+  "preferences_reset_action": "Reset",
+  "wizard_back": "Back",
+  "wizard_next": "Next",
+  "wizard_submit": "Submit",
+  "wizard_discard_draft_title": "Discard draft?",
+  "wizard_discard_draft_body": "Closing will keep your progress saved so you can pick up later.",
+  "wizard_keep_draft": "Keep draft",
+  "wizard_discard": "Discard",
+  "date_range_preset_today": "Today",
+  "date_range_preset_last_7_days": "Last 7 days",
+  "date_range_preset_last_30_days": "Last 30 days",
+  "date_range_preset_this_month": "This month",
+  "date_range_preset_last_month": "Last month",
+  "date_range_select_range": "Select range",
+  "date_range_select_date_range": "Select Date Range",
+  "date_picker_previous_month": "Previous month",
+  "date_picker_next_month": "Next month",
+  "date_picker_previous_year": "Previous year",
+  "date_picker_next_year": "Next year",
+  "date_picker_previous_years": "Earlier years",
+  "date_picker_next_years": "Later years",
+  "date_picker_choose_month": "Choose month",
+  "date_picker_choose_year": "Choose year",
+  "date_picker_today": "Today",
+  "date_picker_selected": "Selected",
+  "date_picker_range_start": "Range start",
+  "date_picker_range_end": "Range end",
+  "date_picker_in_range": "In range",
+  "date_picker_unavailable": "Unavailable",
+  "date_picker_min_range_days": "Select a range of at least {days} days",
+  "@date_picker_min_range_days": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "date_picker_max_range_days": "Select a range of at most {days} days",
+  "@date_picker_max_range_days": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "date_picker_hour": "Hour",
+  "date_picker_minute": "Minute",
+  "date_picker_month": "Month",
+  "date_picker_day": "Day",
+  "date_picker_year": "Year",
+  "date_picker_second": "Second",
+  "date_picker_select_time_range": "Select a time range",
+  "date_picker_type_a_date": "Type a date",
+  "date_picker_pick_from_calendar": "Pick from the calendar",
+  "date_picker_period": "AM or PM",
+  "date_picker_select_time": "Select time",
+  "date_picker_select_date_time": "Select date and time",
+  "date_picker_select_month_year": "Select month and year",
+  "date_picker_select_year": "Select year",
+  "date_picker_events": "{count} events",
+  "@date_picker_events": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "date_picker_close": "Close picker",
+  "date_field_select_date": "Select date",
+  "faq_help_center": "Help center",
+  "faq_search_hint": "Search help…",
+  "faq_no_matching_answers": "No matching answers",
+  "faq_was_this_helpful": "Was this helpful?",
+  "faq_marked_helpful": "Marked helpful",
+  "faq_feedback_recorded": "Feedback recorded",
+  "faq_helpful": "Helpful",
+  "faq_not_helpful": "Not helpful",
+  "faq_load_failed": "Failed to load help center",
+  "faq_no_articles_yet": "No help articles yet",
+  "faq_thanks_marked_helpful": "Thanks — you marked this helpful",
+  "faq_thanks_feedback_recorded": "Thanks — feedback recorded",
+  "coming_soon_this_feature": "This feature",
+  "coming_soon_title": "Coming soon",
+  "coming_soon_feature_on_the_way": "{feature} is on the way",
+  "@coming_soon_feature_on_the_way": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "coming_soon_body": "We're working on it. Want a heads-up the moment it lands?",
+  "coming_soon_enter_email": "Enter your email",
+  "coming_soon_email_invalid": "That email doesn't look right",
+  "coming_soon_notify_me": "Notify me",
+  "coming_soon_success_title": "You're on the list",
+  "coming_soon_success_body": "We'll email {email} when it ships.",
+  "@coming_soon_success_body": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "nav_back_to_home": "Back to home",
+  "nav_page_not_found_body": "The page you're looking for doesn't exist or has moved.",
+  "nav_go_back": "Go back",
+  "nav_tab_position": "Tab {index} of {total}",
+  "@nav_tab_position": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "nav_breadcrumbs": "Breadcrumbs",
+  "nav_breadcrumbs_hidden": "{count, plural, one{1 more step} other{{count} more steps}}",
+  "@nav_breadcrumbs_hidden": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "nav_copy_url": "Copy URL",
+  "nav_path_copied": "Path copied — done",
+  "error_diagnostics_copied": "Diagnostics copied to clipboard",
+  "error_no_email_app": "No email app available",
+  "error_default_message": "We hit an unexpected error. You can try again — if it keeps happening, send us the diagnostics so we can fix it.",
+  "error_report_sent": "Report sent — thanks",
+  "error_report_this": "Report this",
+  "error_copy_diagnostics": "Copy diagnostics",
+  "error_email_support": "Email support",
+  "error_offline_hint": "You're offline. The error may go away once you reconnect.",
+  "error_boundary_release_title": "This part didn't load",
+  "error_boundary_release_body": "Try again in a moment.",
+  "error_boundary_fallback_title": "Something went wrong",
+  "media_file_too_large": "File is {size} MB; max {max} MB.",
+  "@media_file_too_large": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "media_extension_not_allowed": "Only {extensions} allowed.",
+  "@media_extension_not_allowed": {
+    "placeholders": {
+      "extensions": {
+        "type": "String"
+      }
+    }
+  },
+  "media_image_too_small": "Image must be at least {side}px on the shortest side.",
+  "@media_image_too_small": {
+    "placeholders": {
+      "side": {
+        "type": "int"
+      }
+    }
+  },
+  "media_image_too_large": "Image must be at most {side}px on the longest side.",
+  "@media_image_too_large": {
+    "placeholders": {
+      "side": {
+        "type": "int"
+      }
+    }
+  },
+  "media_wrong_aspect_ratio": "Aspect ratio {ratio} — expected {expected}.",
+  "@media_wrong_aspect_ratio": {
+    "placeholders": {
+      "ratio": {
+        "type": "String"
+      },
+      "expected": {
+        "type": "String"
+      }
+    }
+  },
+  "media_photo": "Photo",
+  "media_video": "Video",
+  "media_file": "File",
+  "media_gallery": "Gallery",
+  "media_camera": "Camera",
+  "media_clipboard": "Clipboard",
+  "media_browse": "Browse",
+  "media_record": "Record",
+  "media_image_copied": "Image copied to clipboard",
+  "media_video_copied": "Video copied to clipboard",
+  "media_file_copied": "File copied to clipboard",
+  "media_copy_failed": "Copy failed",
+  "media_copy_image_tooltip": "Copy image to clipboard",
+  "media_copy_video_tooltip": "Copy video to clipboard",
+  "media_copy_file_tooltip": "Copy file to clipboard",
+  "media_trim_video": "Trim video",
+  "media_choose_file": "Choose file",
+  "media_add_attachment": "Add attachment",
+  "media_crop_review_title": "Review",
+  "media_crop_review_subtitle": "Tap a tile to crop. Red tiles must be cropped to continue.",
+  "media_must_crop": "Must crop",
+  "media_new_badge": "NEW",
+  "media_existing_badge": "EARLIER",
+  "media_crop_title": "Crop",
+  "media_clipboard_empty": "Clipboard (empty)",
+  "media_add_photo": "Add a photo",
+  "media_add_video": "Add a video",
+  "media_add_file": "Add a file",
+  "media_item_of": "Item {index} of {total}",
+  "media_remove_item": "Remove",
+  "media_download_item": "Download",
+  "media_new_item": "Not uploaded yet",
+  "media_existing_item": "Already uploaded",
+  "media_uploading": "Uploading",
+  "media_reorder_hint": "Drag to reorder",
+  "@media_item_of": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "media_limit_dropped": "{count} not added — the limit is {max}",
+  "media_duplicate_skipped": "Already added",
+  "media_preparing": "Preparing…",
+  "media_upload_cancel": "Stop uploading",
+  "media_upload_cancelled": "Upload stopped",
+  "media_upload_retry": "Upload again",
+  "media_share": "Share",
+  "media_more_actions": "More actions",
+  "media_move_left": "Move left",
+  "media_move_right": "Move right",
+  "media_moved_to": "Moved to position {index}",
+  "@media_limit_dropped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "@media_moved_to": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "media_gallery_subtitle": "Choose from your photos",
+  "media_camera_subtitle": "Take a new photo",
+  "media_clipboard_subtitle": "Paste what you copied",
+  "media_browse_subtitle": "Choose from your files",
+  "media_cannot_preview_bytes": "Cannot preview this — it has not been saved yet",
+  "media_recent": "Recent",
+  "media_limit_reached": "Limit reached",
+  "media_open_failed": "Open failed: {message}",
+  "@media_open_failed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "media_url_copied": "URL copied to clipboard",
+  "media_play_pause": "Play / pause",
+  "pdf_resumed_at_page": "Resumed at page {page}",
+  "@pdf_resumed_at_page": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "pdf_start_over": "Start over",
+  "pdf_save_dialog_title": "Save PDF",
+  "pdf_downloading_percent": "Downloading… {percent}%",
+  "@pdf_downloading_percent": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "pdf_load_failed": "Failed to load PDF",
+  "pdf_password_required": "Password required",
+  "pdf_not_found": "PDF not found",
+  "pdf_load_failed_detail": "Check the source URL or your connection.",
+  "pdf_encrypted_detail": "The document is encrypted. Provide a password to continue.",
+  "pdf_not_found_detail": "The file at this URL returned 404.",
+  "pdf_rotate_90": "Rotate 90°",
+  "pdf_save_as": "Save as…",
+  "pdf_print": "Print",
+  "pdf_page_count": "{count, plural, one{{count} page} other{{count} pages}}",
+  "@pdf_page_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pdf_zoom_out": "Zoom out",
+  "pdf_zoom_in": "Zoom in",
+  "pdf_jump_to_page": "Jump to page",
+  "pdf_page_of": "Page {page} of {total}",
+  "@pdf_page_of": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "pdf_no_bookmarks": "No bookmarks yet for this document",
+  "pdf_page_number": "Page {page}",
+  "@pdf_page_number": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "pdf_remove_bookmark": "Remove bookmark",
+  "pdf_bookmark_page": "Bookmark page",
+  "pdf_bookmark_list_hint": "long-press for list",
+  "pdf_page_count_short": "{count} pp",
+  "@pdf_page_count_short": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pdf_match_of": "Match {index} of {total}",
+  "@pdf_match_of": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "pdf_no_matches": "No matches",
+  "pdf_searching": "Searching",
+  "pdf_open_document": "Open {name}",
+  "@pdf_open_document": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pdf_no_outline": "No outline / TOC in this PDF",
+  "pdf_no_recent_documents": "No documents opened yet",
+  "feedback_title": "Send feedback",
+  "feedback_subtitle": "We read everything. Tell us what's up.",
+  "feedback_type_label": "Type",
+  "feedback_severity_label": "Severity",
+  "feedback_description_label": "Description",
+  "feedback_description_hint": "What happened? What did you expect?",
+  "feedback_description_required": "Description is required",
+  "feedback_repro_label": "Steps to reproduce",
+  "feedback_repro_hint": "1. Open …\n2. Tap …\n3. See …",
+  "feedback_email_label": "Email (optional)",
+  "feedback_email_invalid": "That email doesn't look right",
+  "feedback_attachments_label": "Attachments",
+  "feedback_diagnostics_label": "Diagnostics",
+  "feedback_diagnostics_hint": "Device, app version, and recent activity. Helps us reproduce.",
+  "feedback_pick_gallery": "From gallery",
+  "feedback_pick_camera": "From camera",
+  "feedback_submit": "Send",
+  "feedback_submitting": "Sending…",
+  "feedback_success_title": "Thanks for the heads-up",
+  "feedback_success_body": "We got it. We'll follow up at your email if you left one.",
+  "feedback_cooldown_title": "Slow down",
+  "feedback_cooldown_hint": "Hold on a moment before sending another.",
+  "feedback_offline_queued_title": "You're offline",
+  "feedback_offline_queued_body": "Saved for later — will send when you reconnect.",
+  "feedback_failure_title": "Couldn't send",
+  "feedback_failure_body": "Something blocked the submission. Try again?",
+  "feedback_disabled": "Feedback is unavailable.",
+  "feedback_send_feedback": "Send feedback",
+  "feedback_attachment_too_large": "Attachment too large after compression",
+  "feedback_type_bug": "Bug",
+  "feedback_type_bug_subtitle": "Something is broken or wrong",
+  "feedback_type_suggestion": "Suggestion",
+  "feedback_type_suggestion_subtitle": "Idea for an improvement",
+  "feedback_type_question": "Question",
+  "feedback_type_question_subtitle": "Need help figuring something out",
+  "feedback_type_other": "Other",
+  "feedback_type_other_subtitle": "Anything else",
+  "feedback_severity_low": "Low",
+  "feedback_severity_low_subtitle": "Minor — easy workaround",
+  "feedback_severity_medium": "Medium",
+  "feedback_severity_medium_subtitle": "Affects normal flow",
+  "feedback_severity_high": "High",
+  "feedback_severity_high_subtitle": "Hard to work around",
+  "feedback_severity_blocking": "Blocking",
+  "feedback_severity_blocking_subtitle": "Cannot use the app",
+  "feedback_error_no_email_app": "No email app available",
+  "feedback_error_email_open_failed": "Failed to open email: {error}",
+  "@feedback_error_email_open_failed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "feedback_error_no_endpoint": "No feedback endpoint configured",
+  "update_hard_title": "Update required",
+  "update_hard_message": "You're running an older version. Update to keep using the app.",
+  "update_hard_button": "Update now",
+  "update_soft_title": "New version available",
+  "update_soft_message": "A newer version is ready. Update for the latest improvements.",
+  "update_soft_update_button": "Update",
+  "update_soft_later_button": "Maybe later",
+  "update_soft_skip_button": "Skip this version",
+  "update_version_label": "Version",
+  "update_unavailable_title": "Update unavailable",
+  "update_unavailable_message": "We can't open the store right now. Try again from your home screen.",
+  "onboarding_skip": "Skip",
+  "onboarding_next": "Next",
+  "onboarding_back": "Back",
+  "onboarding_get_started": "Let's start",
+  "onboarding_allow": "Allow",
+  "onboarding_not_now": "Not now",
+  "onboarding_permission_denied_hint": "You can change this later in Settings.",
+  "onboarding_make_title": "Make your piece by hand",
+  "onboarding_make_body": "Pick a workshop, sit with the instructor, and shape or paint a clay piece that is yours.",
+  "onboarding_workshop_title": "The workshop experience",
+  "onboarding_workshop_body": "Hands-on sessions led by instructors. Shape or paint your piece, step by step, inside the studio.",
+  "onboarding_track_title": "Follow your order, step by step",
+  "onboarding_track_body": "From the kiln, to ready, to your front door — a notification reaches you at every change.",
+  "notifications_channel_transactional_name": "Orders & Transactions",
+  "notifications_channel_transactional_description": "Order updates, receipts, delivery notifications.",
+  "notifications_channel_messages_name": "Messages",
+  "notifications_channel_messages_description": "Direct messages, mentions, chat notifications.",
+  "notifications_channel_promo_name": "Promotions",
+  "notifications_channel_promo_description": "Marketing, promotions, and special offers.",
+  "notifications_channel_system_name": "System & Security",
+  "notifications_channel_system_description": "App updates, security alerts, critical messages.",
+  "notifications_channel_general_name": "General",
+  "notifications_channel_general_description": "Miscellaneous notifications.",
+  "validator_form_invalid": "Form is invalid",
+  "field_hint_name": "Your name",
+  "field_label_email": "Email",
+  "field_label_password": "Password",
+  "field_label_confirm_password": "Confirm password",
+  "field_label_phone": "Phone",
+  "field_label_name": "Name",
+  "field_label_username": "Username",
+  "field_label_url": "URL",
+  "field_label_code": "Code",
+  "field_label_number": "Number",
+  "auth_login_title": "Welcome back",
+  "auth_login_subtitle": "See every available workshop and book the slot that suits you.",
+  "auth_no_account_prompt": "Don't have an account?",
+  "auth_create_account": "Create one",
+  "auth_register_title": "Welcome to Terracotta",
+  "auth_have_account_prompt": "Already have an account?",
+  "auth_otp_title": "Enter the code",
+  "auth_otp_resend": "Resend code",
+  "auth_verify": "Verify",
+  "auth_register_success_title": "Your account is ready",
+  "auth_continue": "Continue",
+  "auth_forgot_title": "Enter your phone number",
+  "auth_forgot_subtitle": "We'll send you a code to reset your password.",
+  "auth_send_code": "Send code",
+  "auth_reset_title": "Change your password",
+  "auth_new_password": "New password",
+  "auth_change": "Change",
+  "auth_error_generic": "Something went wrong. Please try again.",
+  "auth_otp_subtitle": "We sent a {digits}-digit code to your phone.",
+  "auth_dev_otp_title": "Your verification code",
+  "auth_verify_card_title": "Verify your number",
+  "auth_verify_card_body": "Enter the code we sent you to book a workshop or place an order.",
+  "auth_verify_card_cta": "Verify now",
+  "auth_verify_needed_title": "Verify your number first",
+  "auth_verify_needed_confirm": "Verify now",
+  "auth_verify_sent": "We sent you a new code",
+  "auth_verify_needed_book": "Booking a workshop needs a verified number. It takes a moment.",
+  "auth_verify_needed_buy": "Placing an order needs a verified number. It takes a moment.",
+  "@auth_otp_subtitle": {
+    "placeholders": {
+      "digits": {
+        "type": "int"
+      }
+    }
+  },
+  "auth_otp_resend_timer": "Resend code {timer}",
+  "@auth_otp_resend_timer": {
+    "placeholders": {
+      "timer": {
+        "type": "String"
+      }
+    }
+  },
+  "auth_confirm_password": "Confirm password",
+  "auth_full_name": "Full name",
+  "auth_policy_agree": "I agree to the Terms and Privacy Policy",
+  "auth_policy_required": "You must accept the terms to continue",
+  "auth_register_success_body": "Every workshop sets its own deadline for cancelling or rescheduling. You will see yours on the booking itself.",
+  "home_greeting": "Good evening, {name}",
+  "@home_greeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "nav_tab_gallery": "Gallery",
+  "nav_tab_workshops": "Workshops",
+  "nav_tab_shop": "Shop",
+  "nav_tab_profile": "Profile",
+  "booking_status_pending_payment": "Awaiting payment",
+  "booking_no_cancel_title": "This session cannot be cancelled",
+  "booking_no_cancel_body": "It starts too soon to fall inside the cancellation window. Book it and the seat is yours to keep — you will not be able to cancel or reschedule it afterwards.",
+  "booking_no_cancel_confirm": "Book it anyway",
+  "booking_cancel_policy": "Cancel before {when} and the full amount goes back to your Terracotta balance.",
+  "@booking_cancel_policy": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_cancel_policy_none": "This session starts too soon to be cancelled or rescheduled.",
+  "booking_time_to": "to",
+  "money_currency": "SAR",
+  "home_title": "Home",
+  "home_continue_workshop": "Continue your workshop",
+  "home_live_order": "Your order",
+  "home_live_workshop": "Happening now",
+  "home_live_order_eta": "Arriving {when}",
+  "@home_live_order_eta": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "home_live_workshop_until": "Until {time}",
+  "@home_live_workshop_until": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "home_live_show_code": "Show my code",
+  "home_next_booking": "Your next workshop",
+  "home_next_booking_when": "{date} · {time}",
+  "@home_next_booking_when": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "home_live_items": "{count, plural, =1{1 piece} other{{count} pieces}}",
+  "@home_live_items": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "home_featured": "Featured pieces",
+  "home_offers": "Latest offers",
+  "home_browse_categories": "Browse categories",
+  "home_see_all": "See all",
+  "home_see_all_count": "See all ({count})",
+  "@home_see_all_count": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "home_badge_featured": "Featured",
+  "page_section_title": "Terracotta",
+  "page_terms": "Terms and conditions",
+  "page_privacy": "Privacy policy",
+  "page_returns": "Returns and exchanges",
+  "page_shipping": "Shipping and delivery",
+  "page_about": "About Terracotta",
+  "page_missing": "Nothing here yet",
+  "page_missing_body": "The studio has not written this page.",
+  "shop_discount_badge": "-{percent}%",
+  "@shop_discount_badge": {
+    "description": "How much a sale price takes off, on a product card badge.",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "gallery_title": "Terracotta moments",
+  "gallery_subtitle": "Pieces made by visitors like you — every picture is clay turning into something real.",
+  "gallery_counts": "{photos} photos · {videos} videos",
+  "@gallery_counts": {
+    "placeholders": {
+      "photos": {
+        "type": "int"
+      },
+      "videos": {
+        "type": "int"
+      }
+    }
+  },
+  "gallery_counts_photos": "{photos} photos",
+  "@gallery_counts_photos": {
+    "placeholders": {
+      "photos": {
+        "type": "int"
+      }
+    }
+  },
+  "gallery_counts_videos": "{videos} videos",
+  "@gallery_counts_videos": {
+    "placeholders": {
+      "videos": {
+        "type": "int"
+      }
+    }
+  },
+  "gallery_album_empty": "No photos in this album yet",
+  "gallery_empty": "No albums yet",
+  "workshop_title": "Terracotta workshops",
+  "workshop_studio_location": "The studio",
+  "workshop_open_in_maps": "Open in Maps",
+  "workshop_map_pending": "The map opens here once the studio's key is wired.",
+  "workshop_no_location": "The studio has not published a location yet.",
+  "workshop_subtitle": "See every available workshop and book the slot that suits you.",
+  "workshop_tab_mine": "My workshops",
+  "workshop_tab_book": "Book a workshop",
+  "workshop_book": "Book",
+  "workshop_location": "Location",
+  "workshop_price_per_person": "{price} per person",
+  "@workshop_price_per_person": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "workshop_seats_per_session": "{count} per session",
+  "@workshop_seats_per_session": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workshop_duration_hour": "1 hour",
+  "workshop_duration_minutes": "{minutes} min",
+  "@workshop_duration_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "workshop_gift": "Gift",
+  "workshop_wallet_balance": "Terracotta balance",
+  "workshop_view_transactions": "View transactions",
+  "workshop_not_specified": "Not specified",
+  "workshop_empty": "No workshops available right now",
+  "booking_pick_slot": "Pick a time",
+  "booking_people_count": "{count} people",
+  "@booking_people_count": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_session_time": "Session {start} to {end}",
+  "@booking_session_time": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_seats_left": "{left} / {total} seats",
+  "@booking_seats_left": {
+    "placeholders": {
+      "left": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_for_people": "Booking for {count}",
+  "@booking_for_people": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_pick_pieces": "Pick your pieces",
+  "booking_selected_pieces": "Selected pieces {count}",
+  "@booking_selected_pieces": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "booking_pieces_range": "Choose between {min} and {max} pieces",
+  "@booking_pieces_range": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "booking_pieces_exact": "Choose {count} pieces",
+  "@booking_pieces_exact": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "booking_pieces_total": "Total",
+  "booking_pieces_min_only": "Choose at least {min} pieces",
+  "@booking_pieces_min_only": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "booking_pieces_empty": "This workshop has no pieces yet.",
+  "booking_piece_untitled": "Piece",
+  "booking_piece_painting_on": "Booked in to paint · {workshop}, {date}",
+  "@booking_piece_painting_on": {
+    "placeholders": {
+      "workshop": {},
+      "date": {}
+    }
+  },
+  "booking_piece_painted_at": "Painted at {workshop}",
+  "@booking_piece_painted_at": {
+    "placeholders": {
+      "workshop": {}
+    }
+  },
+  "booking_own_pieces": "My pieces",
+  "booking_own_piece_made_on": "Made {date}",
+  "@booking_own_piece_made_on": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_own_pieces_hint": "Pieces you made yourself, ready to be painted.",
+  "booking_confirmed_title": "Your workshop is booked!",
+  "booking_confirmed_body": "You can cancel or reschedule up to {when}, and the full amount returns to your Terracotta balance.",
+  "booking_track": "Track booking",
+  "booking_detail_confirmed": "Booking confirmed",
+  "booking_scan_on_arrival": "Show this code when you arrive — {days} to go.",
+  "@booking_scan_on_arrival": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_scan_code": "Scan code",
+  "booking_qr_instructions": "Show this QR when you arrive to check in.",
+  "booking_reschedule": "Edit",
+  "booking_reschedule_title": "Change your time",
+  "booking_change": "Change",
+  "booking_cancel": "Cancel",
+  "booking_cancel_title": "Cancel booking",
+  "booking_cancel_confirm": "Are you sure you want to cancel this booking?",
+  "booking_yes": "Yes",
+  "booking_no": "No",
+  "booking_close": "Close",
+  "booking_with_celebration": "With a celebration",
+  "booking_add_celebration": "Add a celebration",
+  "booking_remove_celebration": "Remove the celebration",
+  "booking_my_bookings": "My bookings",
+  "booking_empty": "You have no bookings yet",
+  "booking_slot_full": "Full",
+  "booking_slot_conflict": "You already have a booking then",
+  "checkout_title": "Payment",
+  "checkout_confirm_and_pay": "Confirm and pay",
+  "checkout_subtotal": "Subtotal",
+  "checkout_discount": "Discount",
+  "checkout_delivery_fee": "Delivery",
+  "checkout_vat": "VAT included ({rate})",
+  "@checkout_vat": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "checkout_total": "Total",
+  "checkout_wallet_applied": "Terracotta balance",
+  "checkout_amount_due": "Amount due",
+  "checkout_already_settled": "Already covered by your balance",
+  "checkout_discount_code": "Discount code",
+  "checkout_discount_code_hint": "SAVE10",
+  "checkout_apply": "Apply",
+  "checkout_free": "Free",
+  "checkout_code_off_percent": "{value}% off",
+  "@checkout_code_off_percent": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "checkout_code_off_fixed": "{amount} off",
+  "@checkout_code_off_fixed": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "checkout_code_min_order": "on orders over {amount}",
+  "@checkout_code_min_order": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "checkout_pay_method": "Payment method",
+  "checkout_open_order": "You already have an order awaiting payment. Finish or cancel it first.",
+  "checkout_open_order_action": "View my orders",
+  "checkout_hold_expired": "The hold on this order has run out. Please start again.",
+  "shop_browse_sub_categories": "Browse {category}",
+  "@shop_browse_sub_categories": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "shop_no_results": "Nothing matches that",
+  "shop_results_count": "{count, plural, =0{No results} one{{count} result} other{{count} results}}",
+  "@shop_results_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shop_filters": "Filters",
+  "shop_filter_featured": "Featured only",
+  "shop_filter_on_sale": "On sale",
+  "shop_filter_apply": "Show results",
+  "shop_filter_clear": "Clear",
+  "shop_title": "Terracotta shop",
+  "shop_subtitle": "Handmade pieces, ready to take home.",
+  "shop_materials": "Raw materials and tools",
+  "shop_materials_subtitle": "Clay, glazes and the tools the studio works with",
+  "shop_materials_cta": "Shop materials",
+  "shop_materials_one_basket": "Materials go in the same basket as everything else.",
+  "shop_search_hint": "Search...",
+  "shop_my_cart": "My cart",
+  "shop_my_favorites": "My favourites",
+  "shop_my_orders": "My orders",
+  "shop_browse_category": "Browse {category}",
+  "@shop_browse_category": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "shop_you_may_like": "You may also like",
+  "shop_category": "Category",
+  "shop_colour": "Colour",
+  "shop_size": "Size",
+  "shop_add_to_cart": "Add",
+  "shop_quantity": "Qty {count}",
+  "@shop_quantity": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "shop_filter": "Filter",
+  "shop_empty": "Nothing here yet",
+  "shop_favorites_empty": "No favourites yet",
+  "shop_orders_empty": "No orders yet",
+  "order_number": "Order #{number}",
+  "@order_number": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "order_placed_on": "Placed {date}",
+  "@order_placed_on": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "order_items_count": "{count, plural, =0{No items} =1{1 item} other{{count} items}}",
+  "@order_items_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "order_status_awaiting_payment": "Awaiting payment",
+  "order_status_pending": "Confirmed",
+  "order_status_preparing": "Being packed",
+  "order_status_out_for_delivery": "On the way",
+  "order_status_completed": "Delivered",
+  "order_status_cancelled": "Cancelled",
+  "order_status_unknown": "Being processed",
+  "order_items_heading": "What you ordered",
+  "order_delivery_heading": "Delivery",
+  "order_delivery_to": "Delivering to",
+  "order_delivery_notes": "Note for the courier",
+  "order_short_address": "Short address",
+  "order_quantity": "{count} × {price}",
+  "@order_quantity": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "order_pay_now": "Pay now",
+  "order_pay_before": "Pay before {time}",
+  "@order_pay_before": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "order_cancel": "Cancel order",
+  "order_cancel_title": "Cancel this order?",
+  "order_cancel_body": "Anything already paid comes back as Terracotta balance, not to your card. This cannot be undone.",
+  "order_cancel_refunded": "{amount} is back in your Terracotta balance.",
+  "@order_cancel_refunded": {
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "order_cancel_yes": "Yes, cancel it",
+  "order_cancel_no": "Keep it",
+  "order_cancelled_on": "Cancelled {date}",
+  "@order_cancelled_on": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "order_not_found": "This order could not be opened",
+  "order_settled": "Paid in full",
+  "order_confirmed_title": "Your order is placed!",
+  "order_confirmed_body": "We are preparing it now. You can follow it from your orders at any time.",
+  "order_track": "Track order",
+  "shop_orders_empty_body": "Anything you order from the studio shows up here.",
+  "pieces_title": "My pieces",
+  "pieces_empty": "Nothing made yet",
+  "pieces_empty_body": "Pieces you make at the studio are kept here, ready to be painted.",
+  "pieces_no_source": "Not available right now",
+  "pieces_no_source_body": "The studio is not taking pieces back at the moment. Yours are safe.",
+  "pieces_made_on": "Made {date}",
+  "@pieces_made_on": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "pieces_untitled": "Untitled piece",
+  "pieces_painted": "Painted",
+  "pieces_available": "Ready to paint",
+  "pieces_paint_price": "Paint one for {amount}",
+  "@pieces_paint_price": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "shop_cart_empty": "Your cart is empty",
+  "shop_line_item": "{title} x {count}",
+  "@shop_line_item": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "shop_checkout": "Confirm payment",
+  "delivery_piece_ready": "Your piece is ready",
+  "delivery_piece_ready_body": "Your piece is ready for pickup or delivery.",
+  "delivery_deliver": "Deliver",
+  "delivery_pickup": "Pick up",
+  "delivery_paint_it": "Paint my cup",
+  "delivery_paint_pick_title": "Where would you like to paint it?",
+  "delivery_phone": "Delivery phone number",
+  "delivery_warning_title": "Heads up",
+  "delivery_warning_body": "{left} left to collect your piece or ask for delivery. After that the studio cannot hold it.",
+  "@delivery_warning_body": {
+    "placeholders": {
+      "left": {
+        "type": "String"
+      }
+    }
+  },
+  "delivery_fee_line": "Piece delivery",
+  "delivery_confirm_and_pay": "Confirm delivery and pay",
+  "delivery_close": "Close",
+  "gift_title": "Gift a balance",
+  "gift_amount": "Gift {amount}",
+  "@gift_amount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "gift_recipient_name": "Recipient name",
+  "gift_recipient_phone": "Recipient phone",
+  "gift_recipient_phone_hint": "05XXXXXXXX",
+  "gift_message": "Message",
+  "gift_hero_body": "Send a balance to someone you love, for pottery and ceramics workshops",
+  "gift_purchased_body": "Copy the link and send it to whoever the gift is for, to enjoy Terracotta workshops",
+  "gift_recipient_hint": "Sara",
+  "gift_message_hint": "Write your message here...",
+  "gift_confirm_and_pay": "Confirm gift and pay",
+  "gift_purchased_title": "Gift purchased!",
+  "gift_share_link": "Share the link",
+  "gift_empty": "You have not sent any gifts yet",
+  "gift_tab_send": "Send a gift",
+  "gift_tab_mine": "My gifts",
+  "gift_state_claimed": "Claimed",
+  "gift_state_unclaimed": "Not claimed yet",
+  "gift_state_unpaid": "Not paid",
+  "gift_copy_link": "Copy link",
+  "gift_link_copied": "Link copied",
+  "gift_for": "For {name}",
+  "gift_from": "From {name}",
+  "@gift_from": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "gift_from_someone": "A gift you claimed",
+  "gift_filter_all": "All",
+  "gift_filter_sent": "Sent",
+  "gift_filter_received": "Claimed",
+  "gift_none_sent": "You have not sent any gifts yet",
+  "gift_none_received": "You have not claimed any gifts yet",
+  "gift_state_cancelled": "Expired unpaid",
+  "@gift_for": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "profile_title": "My account",
+  "profile_edit": "Edit profile",
+  "profile_addresses": "My addresses",
+  "profile_wallet": "My wallet",
+  "profile_notifications": "Notifications",
+  "profile_orders": "My orders",
+  "profile_devices": "Devices",
+  "profile_change_password": "Change password",
+  "profile_logout": "Sign out",
+  "profile_delete_account": "Delete account",
+  "profile_delete_warning": "This permanently deletes your account. It cannot be undone.",
+  "profile_add_address": "Add an address",
+  "profile_set_default": "Set as default",
+  "profile_default": "Default",
+  "profile_no_addresses": "No saved addresses",
+  "profile_no_notifications": "No notifications",
+  "profile_mark_all_read": "Mark all read",
+  "profile_no_devices": "No other devices",
+  "profile_revoke": "Sign out this device",
+  "profile_this_device": "This device",
+  "profile_no_transactions": "No transactions yet",
+  "wallet_empty_body": "Everything added to your balance, and everything taken from it, shows up here.",
+  "wallet_reason_delivery_fee": "Delivery fee",
+  "wallet_reason_booking_cancelled": "Cancelled booking refund",
+  "wallet_reason_booking_payment": "Workshop booking",
+  "wallet_reason_order_payment": "Shop order",
+  "wallet_reason_gift": "Gift balance",
+  "wallet_reason_booking_rescheduled": "Booking changed",
+  "wallet_reason_shop_order_cancelled": "Cancelled order",
+  "wallet_reason_admin_adjustment": "Adjusted by the studio",
+  "wallet_reason_gift_purchase": "Gift bought",
+  "wallet_reason_booking_absent": "No-show refund",
+  "wallet_credit": "Added to balance",
+  "wallet_debit": "Taken from balance",
+  "wallet_balance_after": "Balance after: {amount}",
+  "@wallet_balance_after": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "profile_order_detail": "Order details",
+  "profile_cancel_order": "Cancel order",
+  "auth_reset_subtitle": "You can now set a new password for your account.",
+  "auth_otp_subtitle_phone": "We sent a {digits}-digit code to {phone}",
+  "@auth_otp_subtitle_phone": {
+    "placeholders": {
+      "digits": {
+        "type": "int"
+      },
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "auth_otp_incomplete": "Enter the full verification code",
+  "shop_product_details": "Product details",
+  "shop_dimension_height": "height",
+  "shop_dimension_width": "width",
+  "shop_dimension_length": "length",
+  "shop_dimension_unit": "cm",
+  "color_name_black": "Black",
+  "color_name_white": "White",
+  "color_name_grey": "Grey",
+  "color_name_beige": "Beige",
+  "color_name_brown": "Brown",
+  "color_name_terracotta": "Terracotta",
+  "color_name_orange": "Orange",
+  "color_name_red": "Red",
+  "color_name_pink": "Pink",
+  "color_name_purple": "Purple",
+  "color_name_navy": "Navy",
+  "color_name_blue": "Blue",
+  "color_name_teal": "Teal",
+  "color_name_green": "Green",
+  "color_name_olive": "Olive",
+  "color_name_yellow": "Yellow",
+  "profile_sign_out_title": "Sign out?",
+  "profile_sign_out_message": "You will need your phone number and password to get back in. Nothing in your cart or bookings is lost.",
+  "profile_delete_confirm": "Delete permanently",
+  "profile_delete_message": "Your bookings, orders and Terracotta balance go with it. This happens straight away and cannot be undone.",
+  "profile_current_password": "Current password",
+  "profile_current_password_hint": "Enter your current password",
+  "profile_password_changed": "Your password has been changed.",
+  "profile_change_password_message": "You will stay signed in on this device.",
+  "profile_edit_name": "Edit name",
+  "profile_name_label": "Your name",
+  "profile_name_hint": "Enter your name",
+  "profile_name_updated": "Your name has been updated.",
+  "shop_remove_line_title": "Take it out?",
+  "shop_remove_line_message": "{title} will be taken out of your cart. You can always add it again.",
+  "@shop_remove_line_message": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_status_confirmed": "Confirmed",
+  "booking_status_completed": "Done",
+  "booking_status_cancelled": "Cancelled",
+  "booking_status_expired": "Expired",
+  "booking_mine_empty": "You have not booked a workshop yet.",
+  "booking_meta": "{people} · {date} · {time}",
+  "@booking_meta": {
+    "placeholders": {
+      "people": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_people_unit": "{count, plural, one{person} other{people}}",
+  "booking_no_slots": "No sessions on this day.",
+  "booking_pick_people": "How many are coming?",
+  "booking_slot_seats": "{left} of {total}",
+  "@booking_slot_seats": {
+    "placeholders": {
+      "left": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_slot_label": "Workshop from {start} to {end}",
+  "@booking_slot_label": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_full_up": "Fully booked",
+  "@booking_people_unit": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkout_workshop_line": "{title} for {people}",
+  "@checkout_workshop_line": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "people": {
+        "type": "String"
+      }
+    }
+  },
+  "celebration_title": "Celebrate with Terracotta",
+  "celebration_body": "Balloons, a little cake and the room set for it — we take care of the whole thing while you make your piece.",
+  "celebration_add_price": "Add for {price}",
+  "@celebration_add_price": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_party": "{count, plural, one{1 person} other{{count} people}}",
+  "@booking_party": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkout_use_wallet": "Use my Terracotta balance",
+  "checkout_wallet_covers": "Covers {amount} of it",
+  "@checkout_wallet_covers": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "checkout_left_to_pay": "Left to pay",
+  "auth_session_expired_title": "Your session has ended",
+  "auth_session_expired_message": "You were signed out. Sign in again to reach your cart, bookings and balance.",
+  "auth_sign_in_required_title": "Sign in to continue",
+  "auth_sign_in_required_message": "This one needs an account. Sign in to reach your cart, bookings and balance.",
+  "auth_continue_as_guest": "Browse as a guest",
+  "auth_or": "or",
+  "profile_guest": "Guest",
+  "profile_guest_hint": "Sign in to keep your cart, bookings and balance.",
+  "shop_out_of_stock": "Out of stock",
+  "shop_stock_left": "{count, plural, =1{1 left} other{{count} left}}",
+  "@shop_stock_left": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shop_max_reached": "{count, plural, =1{Only 1 available} other{Only {count} available}}",
+  "@shop_max_reached": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shop_max_per_order": "100 per order is the most we can take",
+  "transfer_title": "Bring your picks with you?",
+  "transfer_body": "You collected these before signing in. They live on this phone only — we can move them to your account now.",
+  "transfer_basket": "{count, plural, =1{1 piece in your basket} other{{count} pieces in your basket}}",
+  "@transfer_basket": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "auth_needed_title": "One step left",
+  "auth_needed_booking": "Sign in to confirm this booking. Your date, your seats and everything you picked are kept exactly as they are.",
+  "auth_needed_cart": "Sign in to pay. Your basket, your addresses and your saved pieces come with you.",
+  "auth_needed_confirm": "Sign in",
+  "auth_needed_later": "Not now",
+  "transfer_addresses": "{count, plural, =1{1 saved address} other{{count} saved addresses}}",
+  "@transfer_addresses": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "transfer_saved": "{count, plural, =1{1 saved piece} other{{count} saved pieces}}",
+  "@transfer_saved": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "transfer_confirm": "Move them to my account",
+  "transfer_skip": "Not these",
+  "transfer_discard_title": "Leave them behind?",
+  "transfer_discard_body": "They only live on this phone, so they will be gone once you continue. Nothing is charged either way.",
+  "transfer_discard_confirm": "Leave them",
+  "transfer_done": "{count, plural, =1{1 piece moved over} other{{count} pieces moved over}}",
+  "@transfer_done": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "transfer_partial": "{count, plural, =1{1 piece could not be moved — the studio has run out} other{{count} pieces could not be moved — the studio has run out}}",
+  "@transfer_partial": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cart_stock_title": "Some pieces ran out",
+  "cart_stock_body": "The studio sold some of these while you were browsing. Here is what changed:",
+  "cart_stock_line_left": "{title}: you have {wanted}, only {left} left",
+  "@cart_stock_line_left": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "wanted": {
+        "type": "int"
+      },
+      "left": {
+        "type": "int"
+      }
+    }
+  },
+  "cart_stock_line_gone": "{title}: sold out",
+  "@cart_stock_line_gone": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "cart_stock_fix": "Fix my basket for me",
+  "cart_stock_fix_note": "We will lower what we can and take out what is gone.",
+  "cart_stock_keep": "Leave it as it is",
+  "cart_stock_keep_note": "You can change it yourself. Checkout stays closed until you do.",
+  "cart_stock_fixed": "Your basket is ready",
+  "cart_line_over": "Only {left} left",
+  "@cart_line_over": {
+    "placeholders": {
+      "left": {
+        "type": "int"
+      }
+    }
+  },
+  "booking_absent_title": "You did not attend",
+  "booking_absent_body": "You did not attend, and the amount will be returned to your in-app balance to use later.",
+  "booking_attending_title": "Attending",
+  "booking_attending_body": "Your attendance is recorded — you are in the workshop now.",
+  "booking_upload_piece": "Upload a photo of your piece",
+  "booking_upload_remaining": "Upload the remaining photos",
+  "booking_status_attending": "Attending",
+  "booking_status_absent": "Did not attend",
+  "booking_status_preparing": "Being prepared",
+  "booking_preparing_title": "Being prepared",
+  "booking_preparing_body": "Your piece is being finished with care.",
+  "booking_preparing_body_in": "Your piece is being finished with care — ready in {span}.",
+  "@booking_preparing_body_in": {
+    "placeholders": {
+      "span": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_preparing_body_painted": "Your piece is being prepared; the details will be confirmed shortly.",
+  "booking_cancelled_title": "Cancelled",
+  "booking_cancelled_body": "The workshop has been cancelled. We will let you know about any updates or another date.",
+  "booking_packing_title": "Being wrapped",
+  "booking_packing_body": "Your piece is being wrapped and made ready for delivery.",
+  "booking_on_the_way_title": "Out for delivery",
+  "booking_on_the_way_body": "Your piece is on its way to you and will arrive soon.",
+  "booking_handed_over_title": "Delivered",
+  "booking_handed_over_body": "The workshop is finished and the piece is yours.",
+  "delivery_status_awaiting_pickup": "Ready to collect",
+  "delivery_status_getting_ready": "Being wrapped",
+  "delivery_status_on_the_way": "Out for delivery",
+  "delivery_status_completed": "Delivered",
+  "address_add": "Add an address",
+  "address_edit": "Edit address",
+  "address_save": "Save address",
+  "address_default": "Default",
+  "address_make_default": "Make default",
+  "address_delete": "Delete",
+  "address_delete_title": "Delete this address?",
+  "address_delete_body": "You can add it again any time. Nothing else changes.",
+  "address_short_label": "Short national address",
+  "address_short_hint": "ABCD1234",
+  "address_short_help": "Eight characters — four letters then four digits. We will fill the rest in for you.",
+  "address_short_find": "Find",
+  "address_short_invalid": "Four letters then four digits, like ABCD1234.",
+  "address_short_not_found": "We could not find that code. You can type the address below instead.",
+  "address_short_unavailable": "Lookup is not available right now. You can type the address below instead.",
+  "address_short_too_fast": "Give it a moment before trying again.",
+  "address_short_found": "Found it — check the details below.",
+  "address_or_manual": "or enter it yourself",
+  "address_label_field": "Name this address",
+  "address_label_hint": "Home, work…",
+  "address_city": "City",
+  "address_street": "Street",
+  "address_district": "District",
+  "address_building": "Building number",
+  "address_additional": "Additional number",
+  "address_postal": "Postal code",
+  "address_unit": "Unit number",
+  "address_notes": "Notes for the courier",
+  "address_phone": "Phone for the courier",
+  "address_pin": "Pin on the map",
+  "address_pin_set": "Location set",
+  "address_pin_missing": "Drop a pin so the courier can find you.",
+  "address_saved": "Address saved",
+  "address_deleted": "Address deleted",
+  "address_required": "{field} is needed",
+  "@address_required": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "address_digits_exactly": "{count} digits",
+  "@address_digits_exactly": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "address_hint_street": "e.g. Abi Al Karam Street",
+  "address_hint_district": "e.g. Al Dhobbat",
+  "address_hint_building": "4359",
+  "address_hint_additional": "2817",
+  "address_hint_postal": "12627",
+  "address_hint_unit": "12",
+  "address_hint_phone": "05XXXXXXXX",
+  "address_hint_notes": "Blue door, second floor",
+  "address_pin_fallback": "Map is unavailable — we set your city centre for now.",
+  "address_unnamed": "Saved address",
+  "address_building_short": "Bldg {n}",
+  "@address_building_short": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "address_unit_short": "Unit {n}",
+  "@address_unit_short": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "address_postal_short": "P.O. {n}",
+  "@address_postal_short": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "delivery_pickup_confirm_title": "Collect it yourself?",
+  "delivery_pickup_confirm_body": "We will hold your piece at the studio, and you can switch back to delivery any time before you collect it.",
+  "delivery_pickup_confirm_body_refund": "We will hold your piece at the studio. {amount} goes back to your Terracotta balance — not to your card — and you can switch back any time before you collect it.",
+  "@delivery_pickup_confirm_body_refund": {
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "delivery_pickup_credited": "{amount} is back in your Terracotta balance.",
+  "@delivery_pickup_credited": {
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "delivery_pickup_done": "You will collect it from the studio.",
+  "delivery_pickup_confirm_yes": "Yes, I will collect it",
+  "delivery_chose_pickup": "You are collecting this from the studio",
+  "delivery_chose_delivery": "This piece is being delivered to you",
+  "delivery_switch_to_delivery": "Have it delivered instead",
+  "delivery_switch_to_pickup": "Collect it myself instead",
+  "delivery_where_title": "Where should we send it?",
+  "delivery_change_address": "Send it somewhere else",
+  "delivery_add_address": "Add a new address",
+  "delivery_no_address": "You have no saved address yet.",
+  "delivery_continue": "Continue to payment",
+  "complaint_title": "Contact us",
+  "complaint_new": "New complaint",
+  "complaint_mine": "My complaints",
+  "complaint_empty": "You have not sent anything yet.",
+  "complaint_empty_body": "If something went wrong with an order or a booking, tell us and we will come back to you.",
+  "complaint_type": "Subject",
+  "complaint_reference": "Order or booking number (optional)",
+  "complaint_reference_hint": "38079300",
+  "complaint_message": "Details",
+  "complaint_message_hint": "Tell us what happened…",
+  "complaint_name": "Your name",
+  "complaint_contact": "Phone or email to reach you",
+  "complaint_send": "Send",
+  "complaint_sent": "We have your message, and we will come back to you.",
+  "complaint_type_order": "A shop order",
+  "complaint_type_workshop": "A workshop",
+  "complaint_type_delivery": "Delivery",
+  "complaint_type_payment": "Payment",
+  "complaint_type_other": "Something else",
+  "complaint_status_new": "New",
+  "complaint_status_in_progress": "In progress",
+  "complaint_status_resolved": "Resolved",
+  "complaint_status_closed": "Closed",
+  "@booking_confirmed_body": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_confirmed_body_final": "This session starts too soon to be cancelled or rescheduled.",
+  "booking_piece_label": "Name this piece",
+  "booking_piece_label_hint": "My cup",
+  "booking_piece_label_required": "Give every person a name.",
+  "booking_name_taken": "Somebody else already has this name.",
+  "booking_piece_name_taken": "Another piece already has this name.",
+  "booking_photos_left": "{count} photo(s) left",
+  "@booking_photos_left": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_photos_full": "That's every photo for this booking.",
+  "booking_piece_number": "Piece {index}",
+  "@booking_piece_number": {
+    "placeholders": {
+      "index": {}
+    }
+  },
+  "booking_piece_needs_photo": "Add at least one photo of this piece.",
+  "booking_piece_hint": "Piece {index}",
+  "@booking_piece_hint": {
+    "placeholders": {
+      "index": {}
+    }
+  },
+  "booking_person_name_hint": "Their name",
+  "booking_all_named": "Everyone on this booking already has a piece. Add more photos to one of them below.",
+  "booking_piece_name": "Name",
+  "booking_piece_renamed": "Name changed",
+  "booking_add_photos_for": "Add photos for {name}",
+  "@booking_add_photos_for": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_edit_person_name": "Edit the person’s name",
+  "booking_edit_piece_name": "Edit the piece’s name",
+  "booking_photos_old": "Earlier",
+  "booking_save": "Save",
+  "booking_done": "Done",
+  "booking_person_hint": "Person {index}",
+  "@booking_person_hint": {
+    "placeholders": {
+      "index": {}
+    }
+  },
+  "booking_next": "Next",
+  "booking_back": "Back",
+  "booking_upload_photos": "Add photos",
+  "booking_upload_send": "Upload",
+  "booking_photos_uploaded": "Photos uploaded.",
+  "booking_scan_on_arrival_soon": "Show this code when you arrive — starting shortly.",
+  "booking_filter_all": "All",
+  "booking_add_more_photos": "Add more",
+  "booking_photo_removed": "Photo removed.",
+  "booking_piece_removed": "Piece removed.",
+  "booking_remove_photo_title": "Remove this photo?",
+  "booking_remove_photo_body": "It is the only way to replace it — there is no swap.",
+  "booking_remove_piece_title": "Remove {label}?",
+  "@booking_remove_piece_title": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "booking_remove_piece_body": "Every photo of it goes too.",
+  "booking_piece_photo_count": "{count, plural, one{1 photo} other{{count} photos}}",
+  "@booking_piece_photo_count": {
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "scan_desk_title": "Front desk",
+  "scan_today": "Today",
+  "scan_no_sessions": "No sessions booked today",
+  "scan_no_sessions_body": "Nobody has booked a workshop for this day yet.",
+  "scan_scan_code": "Scan a code",
+  "scan_enter_code": "Enter code",
+  "scan_code_hint": "8 digits",
+  "scan_start_session": "Start session",
+  "scan_finish_session": "Finish session",
+  "scan_start_warning_title": "Start the session?",
+  "scan_start_warning_body": "Everyone who has not been scanned in is marked absent. This cannot be undone, and a no-show is not refunded.",
+  "scan_finish_warning_title": "Finish the session?",
+  "scan_finish_warning_body": "Everyone attending moves on to the next stage.",
+  "scan_session_closed": "Check-in closed",
+  "scan_session_closed_at": "Finished at {time}",
+  "@scan_session_closed_at": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "scan_check_in_closed_body": "This session has been finished, so nobody else can be checked in to it.",
+  "scan_pieces_progress": "{done} of {expected} pieces",
+  "@scan_pieces_progress": {
+    "placeholders": {
+      "done": {},
+      "expected": {}
+    }
+  },
+  "scan_finish_missing_title": "Some pieces have not been photographed",
+  "scan_finish_missing_body": "Once you finish, no photo can be added to these bookings. Find these customers first.",
+  "scan_finish_all_done": "Everyone has photographed their pieces.",
+  "scan_missing_row": "{name} — {done} of {expected}",
+  "@scan_missing_row": {
+    "placeholders": {
+      "name": {},
+      "done": {},
+      "expected": {}
+    }
+  },
+  "scan_finish_anyway": "Finish anyway",
+  "scan_session_started": "Session started.",
+  "scan_session_finished": "Session finished.",
+  "scan_arrived": "{arrived} of {total} arrived",
+  "@scan_arrived": {
+    "placeholders": {
+      "arrived": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "scan_how_many_title": "How many arrived?",
+  "scan_how_many_body": "{name} booked for {count}. Nothing is saved until you say.",
+  "@scan_how_many_body": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "scan_confirm_count": "Check in",
+  "scan_checked_in": "{name} checked in",
+  "@scan_checked_in": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "scan_already_in": "{name} is already checked in",
+  "@scan_already_in": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "scan_point_camera": "Point the camera at the customer’s code",
+  "scan_camera_denied": "The camera is not available. Type the code instead.",
+  "scan_sign_out": "Sign out",
+  "scan_seats": "{booked} of {capacity}",
+  "@scan_seats": {
+    "placeholders": {
+      "booked": {
+        "type": "String"
+      },
+      "capacity": {
+        "type": "String"
+      }
+    }
+  },
+  "scan_previous_day": "Previous day",
+  "scan_next_day": "Next day",
+  "scan_back_to_today": "Back to today",
+  "scan_not_today": "Sessions can only be started or finished on the day they run.",
+  "booking_unit_days": "{count, plural, one{1 day} other{{count} days}}",
+  "@booking_unit_days": {
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "booking_unit_hours": "{count, plural, one{1 hour} other{{count} hours}}",
+  "@booking_unit_hours": {
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "booking_unit_days_hours": "{days} and {hours}",
+  "@booking_unit_days_hours": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      },
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "profile_notif_filter_all": "All",
+  "profile_notif_filter_unread": "Unread",
+  "profile_notif_filter_bookings": "Bookings",
+  "profile_notif_filter_reminders": "Reminders",
+  "profile_notif_filter_pieces": "Pieces",
+  "profile_notif_filter_orders": "Orders",
+  "profile_notif_filter_gifts": "Gifts",
+  "profile_notif_filter_wallet": "Wallet",
+  "profile_notif_none_in_filter": "Nothing here right now",
+  "gift_claim_title": "A gift for you",
+  "gift_claim_from": "From {name}",
+  "@gift_claim_from": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "gift_claim_to": "To {name}",
+  "@gift_claim_to": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "gift_claim_cta": "Add to my wallet",
+  "gift_claim_signed_out": "Sign in to add it to your wallet.",
+  "gift_claim_already": "This gift has already been claimed.",
+  "gift_claim_unavailable": "This gift cannot be claimed.",
+  "gift_claim_done_title": "It is in your wallet",
+  "gift_claim_done_body": "{amount} was added. Your balance is now {balance}.",
+  "@gift_claim_done_body": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "balance": {
+        "type": "String"
+      }
+    }
+  },
+  "gift_claim_open_wallet": "Open my wallet",
+  "gift_claim_not_found": "We could not find this gift. The link may be wrong, or the person sending it may not have finished paying for it yet.",
+  "gift_claim_browse": "Browse the studio",
+  "booking_reschedule_confirm_title": "Move this booking?",
+  "booking_reschedule_confirm_body": "Your seats move to the new time. The old one is released.",
+  "booking_reschedule_confirm_yes": "Move it",
+  "workshop_price_per_piece": "Priced per piece",
+  "workshop_piece_hold": "You will have {days} to collect your piece once it is ready.",
+  "@workshop_piece_hold": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "workshop_audience_women": "Women only",
+  "workshop_audience_men": "Men only",
+  "workshop_audience_couples": "Couples",
+  "workshop_audience_kids": "Kids",
+  "workshop_audience_families": "Families",
+  "workshop_audience_mixed": "Everyone welcome",
+  "shop_in_cart_already": "{count} of this already in your cart.",
+  "@shop_in_cart_already": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "shop_cart_full_for_item": "That is all we can add — you already have {count} of this in your cart.",
+  "@shop_cart_full_for_item": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "address_city_required": "Pick a city — it sets the delivery fee.",
+  "address_zones_empty": "We could not load the cities. Pull to try again.",
+  "checkout_address_required": "Choose where this is going.",
+  "shop_sort_label": "Order",
+  "shop_sort_default": "The studio’s order",
+  "shop_sort_newest": "Newest first",
+  "shop_sort_price_asc": "Price: low to high",
+  "shop_sort_price_desc": "Price: high to low",
+  "booking_slot_current": "Your current time",
+  "shop_price_range": "Price",
+  "shop_price_min": "From",
+  "shop_price_max": "To",
+  "shop_price_range_invalid": "“To” cannot be below “From”.",
+  "profile_contact_us": "Contact us",
+  "profile_contact_body": "Reach the studio directly, or follow along.",
+  "profile_contact_social": "Follow the studio",
+  "profile_contact_empty": "The studio has not published a way to reach it yet.",
+  "complaint_send_title": "Send a complaint",
+  "settings_language": "Language",
+  "settings_text_size": "Text size",
+  "settings_notifications": "Notifications",
+  "settings_notifications_on": "On — you will hear about your bookings and orders.",
+  "settings_notifications_off": "Off. Turn them on to hear about your bookings and orders.",
+  "settings_notifications_open": "Open notification settings",
+  "settings_version": "Version {version}",
+  "@settings_version": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "auth_identifier_unsupported": "This studio signs in with a credential this app cannot ask for yet. Please get in touch.",
+  "settings_theme": "Appearance",
+  "settings_theme_note": "The studio’s design is drawn light. Dark is built to match it.",
+  "profile_notif_signed_out": "Sign in to see your notifications",
+  "profile_notif_signed_out_body": "Booking confirmations, order updates and studio news all land here.",
+  "scan_no_sessions_day": "No sessions booked that day",
+  "scan_no_sessions_body_day": "Nobody has booked a workshop for that day yet."
+}

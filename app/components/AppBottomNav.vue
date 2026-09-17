@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="fixed inset-x-0 bottom-5 z-50 flex justify-center px-4 transition-all duration-500"
+    class="fixed inset-x-0 bottom-6 z-50 flex justify-center px-3 transition-all duration-500"
     :class="
       visible
         ? 'translate-y-0 opacity-100'
@@ -8,39 +8,46 @@
     "
     :aria-hidden="!visible"
   >
+    <!-- The app's bar, to its own measurements: a solid terracotta slab at 11, its
+         destinations 54 square inside 10 of padding, and the current one lit by white
+         at 16% behind a 5-corner square.
+         The app draws no edge on it because an app screen is never terracotta. This one
+         floats over `HomeHero`'s panel and `PageBar`, which are the *same* token, so
+         without the hairline the bar dissolves into them. A ring rather than a border:
+         it costs the flex row no width. -->
     <ul
-      class="flex max-w-full items-center gap-1 overflow-x-auto scrollbar-none rounded-2xl border border-white/10 bg-brand-ink/85 p-1.5 text-sm text-white shadow-lg backdrop-blur-md"
+      class="flex max-w-full items-center gap-1.5 overflow-x-auto scrollbar-none rounded-control bg-brand-terracotta p-2.5 text-sm text-white ring-1 ring-white/10"
     >
       <li v-for="item in items" :key="item.to">
         <NuxtLink
           :to="item.to"
-          class="block whitespace-nowrap rounded-xl px-4 py-2.5 transition-colors"
+          class="flex h-[54px] items-center whitespace-nowrap rounded-[5px] px-4 transition-colors"
           :class="
             isActive(item.to)
-              ? 'bg-white text-brand-ink'
-              : 'text-white/75 hover:text-white'
+              ? 'bg-white/15 text-white'
+              : 'text-white/70 hover:bg-white/10 hover:text-white'
           "
           >{{ item.label }}</NuxtLink
         >
       </li>
 
-      <li aria-hidden="true" class="mx-1 h-5 w-px bg-white/15" />
+      <li aria-hidden="true" class="mx-1 h-6 w-px bg-white/20" />
 
       <li>
         <NuxtLink
           to="/cart"
-          class="relative flex size-10 items-center justify-center rounded-xl transition-colors"
+          class="relative flex size-[54px] items-center justify-center rounded-[5px] transition-colors"
           :class="
             isActive('/cart')
-              ? 'bg-white text-brand-ink'
-              : 'text-white/75 hover:text-white'
+              ? 'bg-white/15 text-white'
+              : 'text-white/70 hover:bg-white/10 hover:text-white'
           "
           :aria-label="t('nav_cart', 'Cart', 'عربيتي')"
         >
-          <LucideShoppingCart class="size-4" />
+          <LucideShoppingCart class="size-[26px]" />
           <span
             v-if="cartCount > 0"
-            class="absolute -top-0.5 -end-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-blush px-1 text-[10px] font-semibold text-brand-ink"
+            class="absolute top-2 end-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-blush px-1 text-[10px] font-semibold text-brand-ink"
             dir="ltr"
             >{{ cartCount > 99 ? "99+" : cartCount }}</span
           >

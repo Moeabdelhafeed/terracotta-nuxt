@@ -1,5 +1,5 @@
 <template>
-  <div class="skeleton" :class="rounded ? 'rounded-full' : 'rounded-md'" aria-hidden="true" />
+  <div class="skeleton" :class="rounded ? 'rounded-full' : 'rounded-field'" aria-hidden="true" />
 </template>
 
 <script setup>

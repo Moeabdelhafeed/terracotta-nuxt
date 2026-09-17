@@ -2,14 +2,14 @@
   <NuxtLink
     v-if="isRegistered"
     to="/notifications"
-    class="relative flex size-10 items-center justify-center rounded-xl transition-colors"
-    :class="active ? 'bg-white text-brand-ink' : 'text-white/75 hover:text-white'"
+    class="relative flex size-[54px] items-center justify-center rounded-[5px] transition-colors"
+    :class="active ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'"
     :aria-label="t('nav_notifications', 'Notifications', 'الإشعارات')"
   >
-    <LucideBell class="size-4" />
+    <LucideBell class="size-[26px]" />
     <span
       v-if="unreadCount > 0"
-      class="absolute -top-0.5 -end-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-blush px-1 text-[10px] font-semibold text-brand-ink"
+      class="absolute top-2 end-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-blush px-1 text-[10px] font-semibold text-brand-ink"
       dir="ltr"
     >{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
   </NuxtLink>

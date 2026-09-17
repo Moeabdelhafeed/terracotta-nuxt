@@ -55,6 +55,15 @@ useSeoMeta({
 });
 
 // The piece itself, as a shopping result: name, picture, price and whether it can be had.
+const crumbs = computed(() =>
+  productCrumbs({
+    product: product.value,
+    sectionTo: '/shop',
+    sectionLabel: t('nav_shop', 'Shop', 'المتجر', { subGroup: 'general' }),
+    t,
+  }),
+)
+
 useSchemaOrg([
   defineProduct({
     name: () => product.value?.title ?? "",

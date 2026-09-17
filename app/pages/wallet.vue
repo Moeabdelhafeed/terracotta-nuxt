@@ -34,19 +34,19 @@
             </h2>
             <ul class="mt-3 flex flex-col gap-2 text-sm text-muted-foreground">
               <li class="flex gap-2">
-                <LucideCheck class="mt-0.5 size-4 shrink-0 text-brand-green" />
+                <LucideCheck class="mt-0.5 size-4 shrink-0 text-success" />
                 {{ t('wallet_rule_credit', 'Your balance is store credit for Terracotta — it cannot be withdrawn as cash.', 'رصيدك هو رصيد شراء داخل تيراكوتا — لا يمكن سحبه نقدًا.') }}
               </li>
               <li class="flex gap-2">
-                <LucideCheck class="mt-0.5 size-4 shrink-0 text-brand-green" />
+                <LucideCheck class="mt-0.5 size-4 shrink-0 text-success" />
                 {{ t('wallet_rule_refunds', 'Refunds and gifts you receive land here automatically.', 'الاستردادات والهدايا التي تصلك تُضاف هنا تلقائيًا.') }}
               </li>
               <li class="flex gap-2">
-                <LucideCheck class="mt-0.5 size-4 shrink-0 text-brand-green" />
+                <LucideCheck class="mt-0.5 size-4 shrink-0 text-success" />
                 {{ t('wallet_rule_spend', 'Spend it by switching the wallet on at checkout — it covers as much of the total as it can.', 'استخدمه بتفعيل خيار المحفظة عند الدفع — يغطي أكبر قدر ممكن من المبلغ.') }}
               </li>
               <li class="flex gap-2">
-                <LucideCheck class="mt-0.5 size-4 shrink-0 text-brand-green" />
+                <LucideCheck class="mt-0.5 size-4 shrink-0 text-success" />
                 {{ t('wallet_rule_cancel', 'Cancelling a workshop refunds its full price; cancelling a shop order refunds only what the wallet paid.', 'إلغاء الورشة يعيد كامل قيمتها؛ إلغاء طلب المتجر يعيد ما دفعته المحفظة فقط.') }}
               </li>
             </ul>
@@ -56,7 +56,9 @@
         <section class="rounded-2xl border bg-card p-5">
           <h2 class="font-display text-base font-semibold text-foreground">{{ t('transactions', 'Transactions', 'العمليات') }}</h2>
 
-          <div v-if="pending && !transactions.length" class="mt-4 grid gap-3 lg:grid-cols-2" aria-busy="true">
+          <AppLoadError v-if="error" :error="error" :retry="refresh" class="mt-4" />
+
+          <div v-else-if="pending && !transactions.length" class="mt-4 grid gap-3 lg:grid-cols-2" aria-busy="true">
             <AppSkeleton v-for="n in 4" :key="n" class="h-16 w-full" />
           </div>
 
@@ -78,7 +80,7 @@
               </div>
               <span
                 class="shrink-0 font-medium"
-                :class="tx.type === 'credit' ? 'text-brand-green' : 'text-destructive'"
+                :class="tx.type === 'credit' ? 'text-success' : 'text-destructive'"
                 dir="ltr"
               >{{ tx.type === 'credit' ? '+' : '−' }}{{ format(tx.amount) }}</span>
             </li>
@@ -121,7 +123,7 @@ const { format } = usePrice()
 const { formatDate } = useDateFormat()
 
 const currentPage = computed(() => Math.max(1, Number(route.query.page ?? 1)))
-const { balance, transactions, lastPage, pending } = useWallet({ page: currentPage, perPage: 10 })
+const { balance, transactions, lastPage, pending, error, refresh } = useWallet({ page: currentPage, perPage: 10 })
 
 const pageNumbers = computed(() => {
   const from = Math.max(1, currentPage.value - 2)

@@ -71,11 +71,34 @@
         </li>
       </ul>
 
+      <!-- A failed request and an empty catalogue are two different things, and neither is
+           a page with nothing on it. -->
+      <AppLoadError
+        v-else-if="error"
+        data-test="workshops-error"
+        :error="error"
+        :retry="refresh"
+      />
+
+      <p
+        v-else-if="!workshops.length"
+        class="rounded-card border border-dashed p-10 text-center text-sm text-muted-foreground"
+        data-test="workshops-empty"
+      >
+        {{
+          t(
+            "workshops_empty",
+            "No workshops are running just now. Check back soon.",
+            "لا توجد ورشات متاحة حاليًا. تابعنا قريبًا.",
+          )
+        }}
+      </p>
+
       <ul v-else class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <li
           v-for="workshop in workshops"
           :key="workshop.id"
-          class="group flex h-full flex-col overflow-hidden rounded-3xl border bg-card transition-shadow hover:shadow-lg"
+          class="group flex h-full flex-col overflow-hidden rounded-3xl border bg-card transition-colors hover:border-brand-rust"
         >
           <NuxtLink
             :to="`/workshops/${workshop.id}`"
@@ -179,10 +202,11 @@
 </template>
 
 <script setup>
-const { workshops, pending } = useWorkshops();
+const { workshops, pending, error, refresh } = useWorkshops();
 const { t } = useLang("web", "home");
 const { format } = usePrice();
 const { activeCount } = useActiveBookingsCount();
+
 
 const typeLabel = (type) =>
   ({

@@ -186,8 +186,15 @@
             {{ t("my_complaints", "My complaints", "شكاواي") }}
           </h2>
 
+          <AppLoadError
+            v-if="error"
+            :error="error"
+            :retry="refresh"
+            class="mt-4"
+          />
+
           <div
-            v-if="pending && !complaints.length"
+            v-else-if="pending && !complaints.length"
             class="mt-4 grid gap-3 lg:grid-cols-2"
             aria-busy="true"
           >
@@ -275,6 +282,8 @@ const { formatDate } = useDateFormat();
 const {
   complaints,
   pending,
+  error,
+  refresh,
   send,
   submitting,
   errors,
@@ -301,8 +310,8 @@ const err = (field) => fieldError(errors.value, field);
 const statusClass = (status) =>
   ({
     new: "bg-brand-mist text-brand-ink",
-    in_progress: "bg-amber-100 text-amber-800",
-    resolved: "bg-brand-green/15 text-brand-green",
+    in_progress: "bg-warning/15 text-warning",
+    resolved: "bg-success/15 text-success",
     closed: "bg-muted text-muted-foreground",
   })[status] ?? "bg-muted text-muted-foreground";
 

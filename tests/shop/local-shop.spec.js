@@ -131,6 +131,27 @@ describe('local cart writes', () => {
     expect(localCartIds.value).toEqual([{ id: 12, quantity: 100 }])
   })
 
+  it('the same piece in another glaze is another line, keyed by the hex', async () => {
+    const cart = useLocalCart()
+    await cart.add(11, 1, '#81341a')
+    await cart.add(11, 2, '#345a4a')
+    await cart.add(11, 1, '#81341a')
+    await flushPromises()
+
+    expect(localCartIds.value).toEqual([
+      { id: 11, quantity: 2, color: '#81341a' },
+      { id: 11, quantity: 2, color: '#345a4a' },
+    ])
+    expect(cart.items.value.map((line) => line.id)).toEqual(['11::#81341a', '11::#345a4a'])
+    expect(cart.items.value[0].color).toBe('#81341a')
+
+    await cart.update('11::#345a4a', 5)
+    expect(localCartIds.value[1]).toEqual({ id: 11, quantity: 5, color: '#345a4a' })
+
+    await cart.remove('11::#81341a')
+    expect(localCartIds.value).toEqual([{ id: 11, quantity: 5, color: '#345a4a' }])
+  })
+
   it('update sets the quantity outright and remove drops the line', async () => {
     const cart = useLocalCart()
     await cart.add(12, 1)
@@ -202,6 +223,17 @@ describe('pushLocalShopToServer', () => {
 
     api.table['POST /api/shop/cart'] = (opts) => ({ success: true, message: 'ok', errors: null, data: { id: 1, quantity: opts.body.quantity } })
     api.table['POST /api/shop/favorites/{id}'] = { success: true, message: 'ok', errors: null, data: null }
+  })
+
+  it('replays the glaze with the line', async () => {
+    localCartIds.value = [{ id: 11, quantity: 1, color: '#81341a' }]
+    await flushPromises()
+
+    await pushLocalShopToServer(api.useApi())
+
+    expect(api.calls.filter((call) => call.url === '/api/shop/cart').map((call) => call.body)).toEqual([
+      { shop_product_id: 11, quantity: 1, color: '#81341a' },
+    ])
   })
 
   it('keeps the stores when there is nothing to replay', async () => {

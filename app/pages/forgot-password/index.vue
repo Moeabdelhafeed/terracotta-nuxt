@@ -11,7 +11,7 @@
           :key="kind"
           type="button"
           size="sm"
-          class="rounded-xl"
+          class="rounded-control"
           :variant="form.type === kind ? 'default' : 'outline'"
           @click="form.type = kind"
         >{{ labelFor(kind) }}</Button>
@@ -31,7 +31,7 @@
           v-model="form.identifier"
           :type="identifierInputType"
           :placeholder="identifierPlaceholder"
-          class="h-12 rounded-xl text-base"
+          class="h-12 rounded-field text-base"
           required
         />
         <span v-if="checking" class="text-xs text-muted-foreground">{{ t('checking', 'Checking...', 'جارٍ التحقق...') }}</span>
@@ -48,7 +48,7 @@
             :key="ch"
             type="button"
             size="sm"
-            class="rounded-xl"
+            class="rounded-control"
             :variant="form.channel === ch ? 'default' : 'outline'"
             @click="form.channel = ch"
           >
@@ -61,7 +61,7 @@
       <Button
         type="submit"
         size="lg"
-        class="h-13 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+        class="h-13 w-full rounded-control bg-brand-rust text-base hover:bg-brand-rust/90"
         :disabled="loading || checking || exists === false || (exists && availableChannels.length === 0)"
       >
         {{ loading ? t('sending', 'Sending...', 'جارٍ الإرسال...') : t('send_otp', 'Verify', 'تحقق') }}
@@ -87,7 +87,15 @@ const availableChannels = ref([])
 const client = useApi()
 // `type` = which kind of identifier was typed (declared, never guessed).
 // `channel` = where the reset code should be sent, when the account has both.
-const form = ref({ identifier: '', type: defaultIdentifierType.value, channel: '' })
+const route = useRoute()
+const redirectTarget = computed(() => safeAuthRedirect(route.query.redirect))
+// Prefilled from the screen that sent them here, so an identifier already typed on
+// sign-in is not asked for a second time.
+const form = ref({
+  identifier: route.query.identifier?.toString() ?? '',
+  type: route.query.type?.toString() || defaultIdentifierType.value,
+  channel: ''
+})
 
 watch(identifierTypes, (list) => {
   if (list.length && !list.includes(form.value.type)) form.value.type = list[0]
@@ -142,7 +150,11 @@ const onSubmit = async () => {
     })
     navigateTo({
       name: 'forgot-password-verify',
-      query: { identifier: form.value.identifier, type: form.value.type }
+      query: {
+        identifier: form.value.identifier,
+        type: form.value.type,
+        ...(redirectTarget.value === '/' ? {} : { redirect: redirectTarget.value })
+      }
     })
   } catch (error) {
     errors.value = error.data?.errors ?? {}

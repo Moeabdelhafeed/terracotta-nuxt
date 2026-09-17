@@ -206,6 +206,22 @@
                   <p v-if="piece.made_on" class="text-xs text-muted-foreground">
                     {{ piece.made_on }}
                   </p>
+                  <!-- Already painted is DONE, not broken — the studio's mint. -->
+                  <span
+                    class="mt-2 inline-block rounded-field px-2 py-0.5 text-xs font-medium"
+                    :class="
+                      piece.is_available_to_paint === false
+                        ? 'bg-success/15 text-success'
+                        : 'bg-brand-rust/10 text-brand-rust'
+                    "
+                    :data-piece-status="piece.id"
+                  >
+                    {{
+                      piece.is_available_to_paint === false
+                        ? t("piece_painted", "Painted", "ملوّنة")
+                        : t("piece_ready_to_paint", "Ready to paint", "جاهزة للتلوين")
+                    }}
+                  </span>
                 </div>
               </li>
             </ul>
@@ -269,6 +285,24 @@
                 t("book_now", "Book", "احجز")
               }}</NuxtLink>
             </Button>
+
+            <!-- How long the studio holds a finished piece, said before the flow is
+                 entered rather than on its last step. -->
+            <p
+              v-if="workshop.has_delivery"
+              class="mt-3 flex items-start gap-2 text-xs text-muted-foreground"
+              data-test="piece-hold-note"
+            >
+              <LucideInfo class="mt-px size-3.5 shrink-0" />
+              {{
+                t(
+                  "pickup_window_note",
+                  "You'll have :n days to collect your piece once it's ready.",
+                  "أمامك :n يوم لاستلام قطعتك بعد أن تصبح جاهزة.",
+                  { n: workshop.piece_warning_days ?? 7 },
+                )
+              }}
+            </p>
 
             <Button
               v-if="workshop.location_url"

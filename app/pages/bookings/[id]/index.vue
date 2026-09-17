@@ -105,17 +105,23 @@
               <p class="mt-1 text-sm text-muted-foreground">{{ panel.body }}</p>
             </div>
             <Button
-              v-if="state === 'ready'"
+              v-if="holdNotice"
               type="button"
               size="icon"
               variant="ghost"
-              class="size-9 shrink-0 rounded-xl text-destructive"
+              class="size-9 shrink-0 rounded-control text-destructive"
               :aria-label="t('pickup_warning_title', 'Notice', 'تحذير')"
               @click="warningOpen = true"
             >
               <LucideTriangleAlert class="size-5" />
             </Button>
           </section>
+
+          <!-- The one thing on this frame a customer can lose a piece by not reading, so
+               it is on the page rather than behind the mark that reopens it. -->
+          <p v-if="holdNotice" class="rounded-card bg-destructive/10 p-4 text-sm text-destructive" data-test="hold-notice">
+            {{ holdNotice }}
+          </p>
 
           <!-- A held booking still needs paying; the countdown is the server's, not ours. -->
           <CheckoutPaymentHold
@@ -129,18 +135,30 @@
             @expired="refresh"
           />
 
-          <!-- Piece ready (rourY / vONkg): pickup or delivery, and the paint-it-again upsell. -->
-          <div v-if="state === 'ready' && !booking.delivery_method" class="flex flex-col gap-3 sm:flex-row lg:flex-col">
-            <Button as-child class="h-12 flex-1 rounded-xl bg-brand-green px-8 text-base hover:bg-brand-green/90">
-              <NuxtLink :to="`/bookings/${booking.id}/delivery?method=pickup`">{{ t('choose_pickup', 'Pick it up', 'استلام') }}</NuxtLink>
-            </Button>
-            <Button as-child class="h-12 flex-1 rounded-xl bg-brand-rust px-8 text-base hover:bg-brand-rust/90">
-              <NuxtLink :to="`/bookings/${booking.id}/delivery?method=delivery`">{{ t('choose_delivery', 'Have it delivered', 'توصيل') }}</NuxtLink>
+          <!-- Piece ready (rourY / vONkg): pickup or delivery, and the paint-it-again upsell.
+               Both ways stay reachable after one is picked — the other takes the place of
+               the pair, worded as a switch. -->
+          <div v-if="handover.length" class="flex flex-col gap-3 sm:flex-row lg:flex-col" data-test="handover">
+            <Button
+              v-for="option in handover"
+              :key="option.method"
+              as-child
+              class="h-12 flex-1 rounded-control px-8 text-base"
+              :class="option.accent"
+            >
+              <NuxtLink :to="`/bookings/${booking.id}/delivery?method=${option.method}`" :data-test="`handover-${option.method}`">
+                {{ option.label }}
+              </NuxtLink>
             </Button>
           </div>
 
-          <Button v-if="paintable" as-child class="h-12 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90">
-            <NuxtLink :to="`/workshops/${paintable.id}/book`">{{ t('paint_this_piece', 'Paint my piece', 'لوني الكوب') }}</NuxtLink>
+          <p v-if="switchRefund" class="rounded-card bg-success/10 p-4 text-sm text-success" data-test="handover-refund">
+            {{ t('pickup_refunds_fee', 'The :amount delivery fee goes back to your Terracotta balance. Asking for delivery again later is charged at the rate on the day.', 'ستعاد رسوم التوصيل :amount إلى رصيدك في تيراكوتا. وإذا طلبت التوصيل لاحقًا فستُحتسب الرسوم من جديد بسعر اليوم.', { amount: format(booking.delivery_fee_wallet_applied) }) }}
+          </p>
+
+          <!-- A piece already on its way somewhere is not also going back to be painted. -->
+          <Button v-if="paintable && !booking.delivery_method" as-child class="h-12 w-full rounded-control bg-brand-rust text-base hover:bg-brand-rust/90">
+            <NuxtLink :to="`/workshops/${paintable.id}/book?people=${booking.people_count}`">{{ t('paint_this_piece', 'Paint my piece', 'لوني الكوب') }}</NuxtLink>
           </Button>
 
           <!-- Actions -->
@@ -157,7 +175,7 @@
               v-if="booking.can_edit"
               type="button"
               variant="outline"
-              class="h-12 flex-1 rounded-xl border-amber-400 text-amber-700 hover:bg-amber-50"
+              class="h-12 flex-1 rounded-control border-warning/40 text-warning hover:bg-warning/10"
               @click="openReschedule"
             >{{ t('reschedule', 'Change the time', 'تغير موعد') }}</Button>
 
@@ -191,14 +209,11 @@
       </template>
     </BookingSheet>
 
-    <!-- Seven-day pickup notice (aiejA / ZoX5e) — informational, nothing is forfeited. -->
+    <!-- Collection deadline (aiejA / ZoX5e) — the booking's own `pickup_deadline`, which
+         the studio sets per workshop as `piece_warning_days`. -->
     <BookingSheet :open="warningOpen" :title="t('pickup_warning_title', 'Notice', 'تحذير')" @close="warningOpen = false">
       <template #icon><LucideTriangleAlert class="size-5" /></template>
-      <p class="text-sm text-muted-foreground">
-        {{ booking.is_pickup_overdue
-          ? t('pickup_overdue', 'The usual seven days have passed. Your piece is still with us — come by or ask for delivery and we will sort it out.', 'مضت المدة المعتادة وهي سبعة أيام. قطعتك ما زالت لدينا — مر علينا أو اطلب التوصيل وسنرتب الأمر.')
-          : t('pickup_deadline_note', 'Please collect your piece or ask for delivery within seven days, so we can keep the studio shelves clear.', 'نرجو استلام قطعتك أو طلب توصيلها خلال سبعة أيام حتى تبقى رفوف الاستوديو متاحة.') }}
-      </p>
+      <p class="text-sm text-muted-foreground">{{ holdNotice }}</p>
       <template #footer>
         <Button type="button" variant="outline" class="h-12 flex-1 rounded-xl" @click="warningOpen = false">{{ t('close', 'Close', 'اغلاق') }}</Button>
       </template>
@@ -289,7 +304,84 @@ const workshop = ref(null)
 const apply = (res) => { set(res?.data ?? res) }
 
 const state = computed(() => bookingState(booking.value))
-const paintable = computed(() => booking.value?.paintable_at?.[0] ?? null)
+
+// An option with no id has no schedule to send anyone to.
+const paintable = computed(() => booking.value?.paintable_at?.find((option) => option.id) ?? null)
+
+/**
+ * The ways the finished piece can still leave. Nothing chosen yet draws both; once one is
+ * chosen the OTHER stays, worded as a switch — the choice is the customer's until the
+ * piece is handed over, and switching back to pickup credits the delivery fee.
+ */
+const handover = computed(() => {
+  if (!canChooseHandover(booking.value)) return []
+  const pickup = {
+    method: 'pickup',
+    accent: 'bg-brand-green hover:bg-brand-green/90',
+    label: t('choose_pickup', 'Pick it up', 'استلام'),
+    switchLabel: t('switch_to_pickup', 'Collect it myself instead', 'سأستلمها بنفسي بدلًا من ذلك'),
+  }
+  const delivery = {
+    method: 'delivery',
+    accent: 'bg-brand-rust hover:bg-brand-rust/90',
+    label: t('choose_delivery', 'Have it delivered', 'توصيل'),
+    switchLabel: t('switch_to_delivery', 'Have it delivered instead', 'اطلب توصيلها بدلًا من ذلك'),
+  }
+
+  const chosen = booking.value.delivery_method
+  if (!chosen) return [pickup, delivery]
+  const other = chosen === 'pickup' ? delivery : pickup
+  return [{ ...other, label: other.switchLabel }]
+})
+
+/** Only the wallet slice was ever taken, so only that slice can come back. */
+const switchRefund = computed(
+  () =>
+    booking.value?.delivery_method === 'delivery' &&
+    handover.value.length > 0 &&
+    !!booking.value.delivery_fee_wallet_applied &&
+    !isZeroMoney(booking.value.delivery_fee_wallet_applied),
+)
+
+/**
+ * How long the studio will still hold the piece, from the booking's own `pickup_deadline`
+ * — the per-workshop `piece_warning_days` counted from completion. Null when nothing is
+ * running.
+ */
+const holdDaysLeft = computed(() => {
+  const hours = hoursUntil(booking.value?.pickup_deadline)
+  return hours === null ? null : Math.floor(hours / 24)
+})
+
+/**
+ * The server goes on sending `pickup_deadline` after the piece has left, so a warning
+ * gated on that field alone tells a customer the studio will stop holding a piece which
+ * is already on a van. Only the two frames where it is still at the studio.
+ */
+const holdNotice = computed(() => {
+  if (!['ready', 'awaiting_pickup'].includes(state.value)) return ''
+  if (!booking.value || holdDaysLeft.value === null) return ''
+  if (booking.value.is_pickup_overdue) {
+    return t(
+      'pickup_overdue_real',
+      'The time we could hold your piece has passed. It is still with us — come by or ask for delivery and we will sort it out.',
+      'انتهت المدة التي يمكننا خلالها الاحتفاظ بقطعتك. ما زالت لدينا — مر علينا أو اطلب التوصيل وسنرتب الأمر.',
+    )
+  }
+  return holdDaysLeft.value >= 1
+    ? t(
+        'pickup_days_left',
+        'You have :n more day(s) to collect your piece or ask for delivery — until :at. After that the studio cannot hold it.',
+        'أمامك :n يوم لاستلام قطعتك أو طلب توصيلها — حتى :at. بعد ذلك لا يمكن للاستوديو الاحتفاظ بها.',
+        { n: holdDaysLeft.value, at: formatDate(booking.value.pickup_deadline) },
+      )
+    : t(
+        'pickup_last_day',
+        'Today is the last day to collect your piece or ask for delivery — until :at. After that the studio cannot hold it.',
+        'اليوم آخر يوم لاستلام قطعتك أو طلب توصيلها — حتى :at. بعد ذلك لا يمكن للاستوديو الاحتفاظ بها.',
+        { at: formatDate(booking.value.pickup_deadline) },
+      )
+})
 
 const qrOpen = ref(false)
 const warningOpen = ref(false)
@@ -302,7 +394,7 @@ const panel = computed(() => {
   return {
     pending_payment: {
       icon: resolveComponent('LucideTimer'),
-      tone: 'bg-amber-100 text-amber-700',
+      tone: 'bg-warning/15 text-warning',
       title: t('panel_pending_title', 'Seat held', 'المقعد محجوز مؤقتًا'),
       body: t('panel_pending_body', 'We are holding your seat — complete the payment before the timer runs out.', 'نحتفظ لك بالمقعد — أكمل الدفع قبل انتهاء الوقت.'),
     },
@@ -328,7 +420,10 @@ const panel = computed(() => {
       icon: resolveComponent('LucideFlame'),
       tone: 'bg-brand-rust/10 text-brand-rust',
       title: t('panel_preparing_title', 'Being prepared', 'قيد التحضير'),
-      body: t('panel_preparing_body', 'Your piece is being finished with care and will be ready in five to seven days.', 'جارٍ تجهيز قطعتك بعناية، وستكون جاهزة خلال 5 إلى 7 أيام.'),
+      // WITH NO NUMBER IN IT. Nothing on the booking says when a piece will be fired —
+      // there is no `ready_at` server-side — so a turnaround here is a commitment the
+      // studio never made.
+      body: t('panel_preparing_body_plain', 'Your piece is being finished with care.', 'جاري تجهيز قطعتك بعناية.'),
     },
     ready: {
       icon: resolveComponent('LucidePackageCheck'),

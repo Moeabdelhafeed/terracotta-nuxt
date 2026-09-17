@@ -137,6 +137,8 @@
         </li>
       </ul>
 
+      <AppLoadError v-else-if="error" :error="error" :retry="refresh" />
+
       <ul
         v-else-if="products.length"
         class="grid grid-cols-2 gap-5 lg:grid-cols-4"
@@ -147,7 +149,11 @@
       </ul>
 
       <p v-else class="text-muted-foreground">
-        {{ t("nothing_here", "Nothing here yet.", "لا يوجد شيء هنا بعد") }}
+        {{
+          route.query.search
+            ? t("no_results", "Nothing matched that search.", "لا نتائج مطابقة لبحثك.")
+            : t("nothing_here", "Nothing here yet.", "لا يوجد شيء هنا بعد")
+        }}
       </p>
 
       <!-- Real links, so a page is shareable and crawlable rather than a click handler. -->
@@ -224,7 +230,7 @@ const subCategoryId = computed(() =>
 );
 const currentPage = computed(() => Math.max(1, Number(route.query.page ?? 1)));
 
-const { products, lastPage, total, pending } = useMaterials(
+const { products, lastPage, total, pending, error, refresh } = useMaterials(
   computed(() => productApiQuery(route.query)),
 );
 

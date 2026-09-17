@@ -72,7 +72,15 @@
         <AppSkeleton v-for="n in 3" :key="n" class="h-16 w-full !rounded-2xl" />
       </div>
 
-      <p v-else-if="!slots.length" class="mt-4 rounded-2xl border border-dashed p-6 text-center text-sm text-muted-foreground">
+      <!-- A failed request is not an empty day: the customer is told which one it was. -->
+      <div v-else-if="slotsError" class="mt-4 rounded-card border border-dashed p-6 text-center text-sm" data-test="slots-error">
+        <p class="text-destructive">{{ slotsError }}</p>
+        <Button type="button" variant="outline" class="mt-3 h-10 rounded-control" @click="loadSlots">
+          {{ t('retry', 'Try again', 'إعادة المحاولة') }}
+        </Button>
+      </div>
+
+      <p v-else-if="!slots.length" class="mt-4 rounded-card border border-dashed p-6 text-center text-sm text-muted-foreground">
         {{ t('booking_no_slots', 'No sessions run on this day. Try another date.', 'لا توجد جلسات في هذا اليوم. جرب تاريخًا آخر.') }}
       </p>
 
@@ -99,9 +107,16 @@
 
             <!-- Booking this session now lands inside its own cancellation window, so the
                  booking would arrive already uncancellable — said before it is picked. -->
-            <span v-if="slot.is_non_cancellable" class="flex items-start gap-1.5 text-xs text-amber-700" data-test="slot-no-cancel">
+            <span v-if="slot.is_non_cancellable" class="flex items-start gap-1.5 text-xs text-warning" data-test="slot-no-cancel">
               <LucideAlertCircle class="mt-px size-3.5 shrink-0" />
               {{ t('slot_no_cancel', "This session is too close to book and still cancel — you won't be able to cancel or move it.", 'هذه الجلسة قريبة جدًا: لن تتمكن من إلغاء الحجز أو تغيير موعده.') }}
+            </span>
+
+            <!-- Still cancellable, but the window closes before the session does — the
+                 deadline is worth knowing before the seat is taken, not after. -->
+            <span v-else-if="slot.cancel_until" class="flex items-start gap-1.5 text-xs text-muted-foreground" data-test="slot-cancel-until">
+              <LucideClock class="mt-px size-3.5 shrink-0" />
+              {{ t('slot_cancel_until', 'Cancel or move it free until :at.', 'يمكنك الإلغاء أو تغيير الموعد مجانًا حتى :at.', { at: formatDate(slot.cancel_until) }) }}
             </span>
           </button>
         </li>
@@ -132,6 +147,7 @@ const slotId = defineModel('slotId', { type: Number, default: null })
 const slot = defineModel('slot', { type: Object, default: null })
 
 const { t, code } = useLang('web', 'bookings')
+const { formatDate } = useDateFormat()
 const availability = useWorkshopBooking(() => props.workshop.id)
 
 const maxSeats = ref(props.workshop.max_people_per_booking ?? 1)
@@ -140,6 +156,7 @@ const slots = ref([])
 const loadingCalendar = ref(true)
 const loadingSlots = ref(false)
 const loadError = ref('')
+const slotsError = ref('')
 
 const peopleCap = computed(() => Math.min(props.workshop.max_people_per_booking ?? 1, maxSeats.value))
 const peopleOptions = computed(() => Array.from({ length: Math.max(peopleCap.value, 1) }, (_, i) => i + 1))
@@ -175,8 +192,15 @@ const loadCalendar = async () => {
 const loadSlots = async () => {
   if (!date.value) { slots.value = []; return }
   loadingSlots.value = true
+  slotsError.value = ''
   try {
     slots.value = await availability.slots(date.value, people.value)
+  } catch (err) {
+    // Without this a failure reads as "no sessions run on this day", which sends the
+    // customer hunting through a calendar that is fine.
+    slots.value = []
+    slotsError.value = normalizeApiError(err).message
+      || t('slots_failed', 'Could not load this day’s sessions. Please try again.', 'تعذّر تحميل جلسات هذا اليوم. حاول مرة أخرى.')
   } finally {
     loadingSlots.value = false
   }

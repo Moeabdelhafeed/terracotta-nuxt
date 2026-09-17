@@ -25,16 +25,27 @@ export const notificationTitle = (notification, t) => {
   return t('notification_fallback_title', 'Update from Terracotta', 'تحديث من تيراكوتا')
 }
 
-export const useNotifications = ({ page = ref(1), perPage = 20, unreadOnly = ref(false) } = {}) => {
+/**
+ * The slices `GET /api/notifications` will answer for. The server owns the list —
+ * anything else is a 422 keyed to `filter` — and `all` is sent as nothing at all, which
+ * is the same answer with one less thing to be wrong.
+ */
+export const NOTIFICATION_FILTERS = ['all', 'unread', 'bookings', 'reminders', 'pieces', 'orders', 'gifts', 'wallet']
+
+export const useNotifications = ({ page = ref(1), perPage = 20, unreadOnly = ref(false), filter = ref('all') } = {}) => {
   const api = useApi()
   const { user } = useSanctumAuth()
   const isRegistered = computed(() => !!user.value && !(user.value?.data?.is_guest ?? user.value?.is_guest))
 
-  const query = computed(() => ({
-    page: toValue(page),
-    per_page: perPage,
-    ...(toValue(unreadOnly) ? { unread_only: 1 } : {}),
-  }))
+  const query = computed(() => {
+    const slice = toValue(filter)
+    return {
+      page: toValue(page),
+      per_page: perPage,
+      ...(toValue(unreadOnly) ? { unread_only: 1 } : {}),
+      ...(slice && slice !== 'all' ? { filter: slice } : {}),
+    }
+  })
 
   const { data, pending, error, refresh } = useApiFetch('/api/notifications', {
     key: 'notifications',
@@ -42,9 +53,16 @@ export const useNotifications = ({ page = ref(1), perPage = 20, unreadOnly = ref
     immediate: isRegistered.value,
     transform: (res) => {
       const payload = res?.data ?? {}
-      return { unread: payload.unread_count ?? 0, ...unwrapList(payload.notifications) }
+      // `filter_counts` is a SIBLING of `data` and always counts the whole inbox, never
+      // the slice on screen — which is the only reason a tab can be labelled before
+      // anyone opens it. A parser handed `data` alone cannot see it.
+      return {
+        unread: payload.unread_count ?? 0,
+        counts: res?.meta?.filter_counts ?? null,
+        ...unwrapList(payload.notifications),
+      }
     },
-    default: () => ({ unread: 0, items: [], page: 1, lastPage: 1, total: 0 }),
+    default: () => ({ unread: 0, counts: null, items: [], page: 1, lastPage: 1, total: 0 }),
   })
 
   watch(data, (value) => { if (value) unreadCount.value = value.unread ?? 0 }, { immediate: true })
@@ -64,6 +82,7 @@ export const useNotifications = ({ page = ref(1), perPage = 20, unreadOnly = ref
   return {
     notifications: computed(() => asList(data.value?.items)),
     unreadCount,
+    filterCounts: computed(() => data.value?.counts ?? null),
     lastPage: computed(() => data.value?.lastPage ?? 1),
     total: computed(() => data.value?.total ?? 0),
     pending,

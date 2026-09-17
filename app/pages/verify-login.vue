@@ -1,181 +1,153 @@
 <template>
-  <div class="flex min-h-svh items-center justify-center bg-muted/40 p-6">
-    <Card class="w-full max-w-sm">
-      <CardHeader>
-        <CardTitle class="text-2xl">{{
-          t("verify_login_title", "Enter code", "أدخل الرمز")
-        }}</CardTitle>
-        <CardDescription class="break-words">
-          {{
-            t(
-              "enter_otp_sent_to",
-              "Enter the OTP sent to :target.",
-              "أدخل الرمز المرسل إلى :target.",
-              { target: identifier },
-            )
-          }}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form class="flex flex-col gap-4" @submit.prevent="onSubmit">
-          <div class="grid gap-2">
-            <Label for="otp">{{ t("otp", "OTP", "الرمز") }}</Label>
-            <Input
-              id="otp"
-              v-model="otp"
-              type="text"
-              inputmode="numeric"
-              placeholder="123456"
-              required
-            />
-            <span v-if="errors.otp" class="text-xs text-red-500">{{
-              errors.otp[0]
-            }}</span>
-            <span v-if="errors.identifier" class="text-xs text-red-500">{{
-              errors.identifier[0]
-            }}</span>
-          </div>
-          <p v-if="restoredNotice" class="text-xs text-green-600">
-            {{
-              t("account_restored", "Account restored.", "تم استعادة الحساب.")
-            }}
-          </p>
-          <p v-if="errors.device_id" class="text-xs text-red-500">
-            {{ errors.device_id[0] }}
-          </p>
-          <p v-if="errors.platform" class="text-xs text-red-500">
-            {{ errors.platform[0] }}
-          </p>
-          <p v-if="errors.fcm_token" class="text-xs text-red-500">
-            {{ errors.fcm_token[0] }}
-          </p>
-          <Button type="submit" class="w-full" :disabled="loading || resending">
-            {{
-              loading
-                ? t("verifying", "Verifying...", "جارٍ التحقق...")
-                : t("verify", "Verify", "تحقق")
-            }}
-          </Button>
-        </form>
-      </CardContent>
-      <CardFooter class="justify-center text-sm">
-        <button
-          type="button"
-          class="font-medium underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:opacity-50 disabled:no-underline"
-          :disabled="cooldown > 0 || resending || loading"
-          @click="resend"
-        >
-          {{
-            resending
-              ? t("sending", "Sending...", "جارٍ الإرسال...")
-              : cooldown > 0
-                ? t(
-                    "resend_in_seconds",
-                    "Resend in :seconds s",
-                    "إعادة الإرسال خلال :seconds ث",
-                    { seconds: cooldown },
-                  )
-                : t("resend_otp", "Resend OTP", "إعادة إرسال الرمز")
-          }}
-        </button>
-      </CardFooter>
-    </Card>
-  </div>
+  <AuthScreen
+    :back="{ name: 'login' }"
+    :title="t('verify_login_title', 'Enter code', 'أدخل الرمز')"
+    :subtitle="
+      t(
+        'enter_otp_sent_to',
+        'We sent a code to :target.',
+        'أرسلنا رمزًا إلى :target.',
+        { target: identifier },
+      )
+    "
+  >
+    <form class="flex flex-col gap-6" @submit.prevent="onSubmit">
+      <div class="flex flex-col items-center gap-2">
+        <AuthOtpInput v-model="otp" :length="OTP_LENGTH" @complete="onSubmit" />
+        <span v-if="errors.otp" class="text-xs text-destructive">{{ errors.otp[0] }}</span>
+        <span v-if="errors.identifier" class="text-xs text-destructive">{{ errors.identifier[0] }}</span>
+        <span v-if="errors.device_id" class="text-xs text-destructive">{{ errors.device_id[0] }}</span>
+        <span v-if="errors.platform" class="text-xs text-destructive">{{ errors.platform[0] }}</span>
+        <span v-if="errors.fcm_token" class="text-xs text-destructive">{{ errors.fcm_token[0] }}</span>
+        <p v-if="restoredNotice" class="text-xs text-success">
+          {{ t('account_restored', 'Account restored.', 'تم استعادة الحساب.') }}
+        </p>
+      </div>
+
+      <Button
+        type="submit"
+        size="lg"
+        class="h-13 w-full rounded-control bg-brand-rust text-base hover:bg-brand-rust/90"
+        :disabled="loading || resending || otp.length < OTP_LENGTH"
+      >
+        {{ loading ? t('verifying', 'Verifying...', 'جارٍ التحقق...') : t('verify', 'Verify', 'تحقق') }}
+      </Button>
+
+      <button
+        type="button"
+        class="mx-auto rounded-control bg-brand-rust/10 px-4 py-2 text-sm font-medium text-brand-rust transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+        :disabled="cooldown > 0 || resending || loading"
+        @click="resend"
+      >
+        {{
+          resending
+            ? t('sending', 'Sending...', 'جارٍ الإرسال...')
+            : cooldown > 0
+              ? t('resend_in_seconds', 'Resend in :seconds s', 'إعادة الإرسال خلال :seconds ث', { seconds: cooldown })
+              : t('resend_otp', 'Resend OTP', 'إعادة إرسال الرمز')
+        }}
+      </button>
+    </form>
+  </AuthScreen>
 </template>
 
 <script setup>
 definePageMeta({
-  middleware: ["require-pre-auth"],
-  name: "verify-login",
-});
+  middleware: ['require-pre-auth'],
+  name: 'verify-login',
+})
 
-const RESEND_COOLDOWN = 120;
+const OTP_LENGTH = 6
+const RESEND_COOLDOWN = 120
 
-const route = useRoute();
-const identifier = ref(String(route.query.identifier ?? ""));
-const identifierType = ref(String(route.query.type ?? ""));
-const otp = ref("");
-const errors = ref({});
-const loading = ref(false);
-const resending = ref(false);
-const restoredNotice = ref(false);
-const cooldown = ref(0);
-let timer = null;
+const route = useRoute()
+const identifier = ref(String(route.query.identifier ?? ''))
+const identifierType = ref(String(route.query.type ?? ''))
+const redirectTarget = computed(() => safeAuthRedirect(route.query.redirect))
+const otp = ref('')
+const errors = ref({})
+const loading = ref(false)
+const resending = ref(false)
+const restoredNotice = ref(false)
+const cooldown = ref(0)
+let timer = null
 
-const client = useApi();
-const { user, refreshIdentity } = useSanctumAuth();
-const { t } = useLang("web", "auth");
+const client = useApi()
+const { user, refreshIdentity } = useSanctumAuth()
+const { t } = useLang('web', 'auth')
 
 const startCooldown = () => {
-  cooldown.value = RESEND_COOLDOWN;
-  if (timer) clearInterval(timer);
+  cooldown.value = RESEND_COOLDOWN
+  if (timer) clearInterval(timer)
   timer = setInterval(() => {
-    cooldown.value--;
+    cooldown.value--
     if (cooldown.value <= 0) {
-      clearInterval(timer);
-      timer = null;
+      clearInterval(timer)
+      timer = null
     }
-  }, 1000);
-};
+  }, 1000)
+}
 
 onUnmounted(() => {
-  if (timer) clearInterval(timer);
-});
+  if (timer) clearInterval(timer)
+})
 
 const persistTokenId = (tokenId) => {
-  if (tokenId == null || !import.meta.client) return;
-  document.cookie = `current_token_id=${tokenId}; path=/; SameSite=Lax; max-age=${60 * 60 * 24 * 365}`;
-};
+  if (tokenId == null || !import.meta.client) return
+  document.cookie = `current_token_id=${tokenId}; path=/; SameSite=Lax; max-age=${60 * 60 * 24 * 365}`
+}
 
 const onSubmit = async () => {
+  if (loading.value) return
   if (!identifier.value) {
-    navigateTo({ name: "login" });
-    return;
+    navigateTo({ name: 'login' })
+    return
   }
-  errors.value = {};
-  restoredNotice.value = false;
-  loading.value = true;
+  errors.value = {}
+  restoredNotice.value = false
+  loading.value = true
   try {
-    if (user.value?.data?.is_guest) user.value = null;
-    const res = await client("/api/verify-login", {
-      method: "POST",
+    if (user.value?.data?.is_guest) user.value = null
+    const res = await client('/api/verify-login', {
+      method: 'POST',
       body: {
         identifier: identifier.value,
         type: identifierType.value,
         otp: otp.value,
+        ...authDeviceMeta(),
       },
-    });
-    const data = res?.data ?? res ?? {};
-    const token = data.token;
-    if (token) {
-      const sanctum = useSanctumAppConfig();
-      await sanctum?.tokenStorage?.set?.(useNuxtApp(), token);
+    })
+    const data = res?.data ?? res ?? {}
+    if (data.token) {
+      const sanctum = useSanctumAppConfig()
+      await sanctum?.tokenStorage?.set?.(useNuxtApp(), data.token)
     }
-    persistTokenId(data.token_id);
-    if (data.account_restored) restoredNotice.value = true;
-    await refreshIdentity();
-    navigateTo({ name: "home" });
+    persistTokenId(data.token_id)
+    if (data.account_restored) restoredNotice.value = true
+    await refreshIdentity()
+    navigateTo(redirectTarget.value)
   } catch (error) {
-    errors.value = error.data?.errors ?? {};
+    errors.value = error.data?.errors ?? {}
+    otp.value = ''
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const resend = async () => {
-  if (cooldown.value > 0 || resending.value) return;
-  errors.value = {};
-  resending.value = true;
+  if (cooldown.value > 0 || resending.value) return
+  errors.value = {}
+  resending.value = true
   try {
-    await client("/api/login", {
-      method: "POST",
+    await client('/api/login', {
+      method: 'POST',
       body: { identifier: identifier.value, type: identifierType.value },
-    });
-    startCooldown();
+    })
+    startCooldown()
   } catch (error) {
-    errors.value = error.data?.errors ?? {};
+    errors.value = error.data?.errors ?? {}
   } finally {
-    resending.value = false;
+    resending.value = false
   }
-};
+}
 </script>

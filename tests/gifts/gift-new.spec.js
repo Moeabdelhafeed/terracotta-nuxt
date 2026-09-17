@@ -38,6 +38,8 @@ const { api, lang, sanctum, navigate } = await vi.hoisted(async () => {
         share_url: 'https://terracotta-ksa.com/gift/tok',
         payment_expires_at: null,
       }),
+      'POST /api/gifts/{id}/pay': envelope({ id: 10, payment_status: 'paid', amount_due: '0.00' }),
+      'GET /api/wallet/transactions': envelope({ balance: '300.00', transactions: [] }),
     }),
     lang: createLang('en'),
     sanctum: createSanctumState({ id: 1, name: 'Buyer', is_guest: false, wallet_balance: '500.00' }),
@@ -63,6 +65,7 @@ describe('/gifts/new', () => {
   beforeEach(() => {
     api.calls.length = 0
     navigate.mockClear()
+    sanctum.refreshIdentity.mockClear()
     api.table['GET /api/gifts/package'] = { success: true, message: 'ok', errors: null, data: { amount: '200.00', is_active: true } }
   })
 
@@ -124,6 +127,75 @@ describe('/gifts/new', () => {
 
     expect(wrapper.findComponent({ name: 'CheckoutPaymentHold' }).exists()).toBe(true)
     expect(navigate).not.toHaveBeenCalled()
+  })
+
+  /**
+   * The buyer paid, went to their profile, and read the balance they had before. Both
+   * surfaces the site reads one from have to be refetched the moment the gift settles.
+   */
+  it('refetches the identity and the wallet ledger once the gift is paid', async () => {
+    const { envelope } = await import('../helpers/mockApi')
+    api.table['POST /api/gifts'] = envelope({
+      id: 10, recipient_name: 'Sara', amount: '200.00', subtotal: '200.00', discount_amount: '0.00',
+      total_price: '200.00', wallet_applied: '0.00', amount_due: '200.00', payment_status: 'unpaid',
+      status: 'awaiting_payment', token: 'tok', share_url: 'https://terracotta-ksa.com/gift/tok',
+      payment_expires_at: new Date(Date.now() + 14 * 60000).toISOString(),
+    })
+
+    const wrapper = await mount()
+    await flushPromises()
+    wrapper.find('#recipient_name').setValue('Sara')
+    await wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    const walletReadsBefore = api.calls.filter((c) => c.url === '/api/wallet/transactions').length
+    await wrapper.findAll('button').find((b) => b.text().includes('Pay now')).trigger('click')
+    await flushPromises()
+
+    expect(api.calls.some((c) => c.url === '/api/gifts/10/pay')).toBe(true)
+    expect(sanctum.refreshIdentity).toHaveBeenCalled()
+    expect(api.calls.filter((c) => c.url === '/api/wallet/transactions').length).toBeGreaterThan(walletReadsBefore)
+    expect(navigate).toHaveBeenCalledWith({ path: '/gifts/10', query: { new: '1' } })
+  })
+
+  it('refetches them for a gift the wallet covered in full, which has no pay step', async () => {
+    const { envelope } = await import('../helpers/mockApi')
+    api.table['POST /api/gifts'] = envelope({
+      id: 9, recipient_name: 'Sara', amount: '200.00', subtotal: '200.00', discount_amount: '0.00',
+      total_price: '200.00', wallet_applied: '200.00', amount_due: '0.00', payment_status: 'paid',
+      status: 'paid', token: 'tok', share_url: 'https://terracotta-ksa.com/gift/tok', payment_expires_at: null,
+    })
+
+    const wrapper = await mount()
+    await flushPromises()
+    const walletReadsBefore = api.calls.filter((c) => c.url === '/api/wallet/transactions').length
+
+    wrapper.find('#recipient_name').setValue('Sara')
+    await wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(sanctum.refreshIdentity).toHaveBeenCalled()
+    expect(api.calls.filter((c) => c.url === '/api/wallet/transactions').length).toBeGreaterThan(walletReadsBefore)
+  })
+
+  it('offers a retry when the quote cannot be had, instead of an endless skeleton', async () => {
+    const { apiError, envelope } = await import('../helpers/mockApi')
+    api.table['POST /api/gifts/quote'] = apiError(500, {}, 'Server error')
+
+    const wrapper = await mount()
+    await flushPromises()
+    expect(wrapper.find('[data-test="quote-failed"]').exists()).toBe(true)
+
+    api.table['POST /api/gifts/quote'] = envelope({
+      subtotal: '200.00', discount_amount: '0.00', discount_code: null, delivery_fee: '0.00',
+      total_price: '200.00', vat_rate: '0.00', vat_amount: '0.00', wallet_applied: '0.00',
+      amount_due: '200.00', gift_value: '200.00',
+    })
+    await wrapper.findAll('button').find((b) => b.text().includes('Try again')).trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="quote-failed"]').exists()).toBe(false)
+    expect(wrapper.text()).toContain('200.00 SAR')
   })
 
   it('renders the server 422 for recipient_name and message next to their fields', async () => {

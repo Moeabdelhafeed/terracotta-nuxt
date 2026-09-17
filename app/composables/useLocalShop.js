@@ -10,6 +10,16 @@ export const localCartIds = useLocalStorage("terracotta:cart", []);
 export const localFavoriteIds = useLocalStorage("terracotta:favorites", []);
 
 /**
+ * What separates two lines. The same piece in another glaze is another line — the hex
+ * string itself is the variant id the cart takes, so it is all there is to key on. A line
+ * with no colourway keeps the bare product id, which is what the server's own line id
+ * looks like and what every caller already passes.
+ */
+const lineKey = (entry) =>
+  entry.color ? `${entry.id}::${entry.color}` : entry.id;
+
+
+/**
  * The server cannot see localStorage, so it renders an empty basket; the browser fills
  * these refs at module-eval time, before Vue hydrates. Reads therefore stay empty until
  * hydration is done — `initOnMounted` does not cover this, since vueuse runs its callback
@@ -112,8 +122,9 @@ export const useLocalCart = () => {
       const unitPrice = product.sale_price ?? product.price;
       return [
         {
-          id: entry.id,
+          id: lineKey(entry),
           product,
+          color: entry.color ?? null,
           quantity: entry.quantity,
           unit_price: unitPrice,
           line_total: fromHalalas(toHalalas(unitPrice) * entry.quantity),
@@ -148,21 +159,33 @@ export const useLocalCart = () => {
       HARD_MAX_QUANTITY,
     );
 
-  const write = (productId, quantity) => {
+  const write = (productId, color, quantity) => {
     const capped = Math.max(1, Math.min(quantity, maxFor(productId)));
-    const existing = localCartIds.value.find((entry) => entry.id === productId);
+    const key = lineKey({ id: productId, color });
+    const existing = localCartIds.value.some(
+      (entry) => lineKey(entry) === key,
+    );
     localCartIds.value = existing
       ? localCartIds.value.map((entry) =>
-          entry.id === productId ? { ...entry, quantity: capped } : entry,
+          lineKey(entry) === key ? { ...entry, quantity: capped } : entry,
         )
-      : [...localCartIds.value, { id: productId, quantity: capped }];
+      : [
+          ...localCartIds.value,
+          color
+            ? { id: productId, quantity: capped, color }
+            : { id: productId, quantity: capped },
+        ];
     return capped;
   };
 
+  const entryFor = (lineId) =>
+    localCartIds.value.find((entry) => lineKey(entry) === lineId);
+
   /** Mirrors `POST /api/shop/cart`: an existing line is incremented, not replaced. */
-  const add = async (productId, quantity = 1) => {
-    const existing = localCartIds.value.find((entry) => entry.id === productId);
-    const next = write(productId, (existing?.quantity ?? 0) + quantity);
+  const add = async (productId, quantity = 1, color = null) => {
+    const key = lineKey({ id: productId, color });
+    const existing = entryFor(key);
+    const next = write(productId, color, (existing?.quantity ?? 0) + quantity);
     return {
       success: true,
       message: t(
@@ -171,23 +194,24 @@ export const useLocalCart = () => {
         "تمت الإضافة إلى عربيتك.",
       ),
       errors: null,
-      data: { id: productId, quantity: next },
+      data: { id: key, quantity: next },
     };
   };
 
-  const update = async (productId, quantity) => {
-    const next = write(productId, quantity);
+  const update = async (lineId, quantity) => {
+    const entry = entryFor(lineId);
+    const next = write(entry?.id ?? lineId, entry?.color ?? null, quantity);
     return {
       success: true,
       message: t("cart_updated", "Cart updated.", "تم تحديث العربية."),
       errors: null,
-      data: { id: productId, quantity: next },
+      data: { id: lineId, quantity: next },
     };
   };
 
-  const remove = async (productId) => {
+  const remove = async (lineId) => {
     localCartIds.value = localCartIds.value.filter(
-      (entry) => entry.id !== productId,
+      (entry) => lineKey(entry) !== lineId,
     );
     return {
       success: true,
@@ -276,7 +300,11 @@ export const pushLocalShopToServer = async (api) => {
       await attempt(() =>
         api("/api/shop/cart", {
           method: "POST",
-          body: { shop_product_id: line.id, quantity: line.quantity },
+          body: {
+            shop_product_id: line.id,
+            quantity: line.quantity,
+            ...(line.color ? { color: line.color } : {}),
+          },
         }),
       )
     )

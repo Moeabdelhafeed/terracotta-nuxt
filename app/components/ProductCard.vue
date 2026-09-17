@@ -1,39 +1,41 @@
 <template>
   <NuxtLink
     :to="`${base}/${product.id}`"
-    class="group block overflow-hidden rounded-2xl border bg-card"
+    class="group block overflow-hidden rounded-card border bg-card"
+    :class="{ 'opacity-55': soldOut }"
   >
-    <div
-      class="relative aspect-square overflow-hidden"
-      :class="{ 'opacity-60': soldOut }"
-    >
+    <div class="relative aspect-square overflow-hidden bg-brand-container">
       <AppImage
         v-if="product.image?.image_api"
         :src="product.image"
         :alt="product.title"
         class="size-full object-cover transition-transform duration-500 group-hover:scale-105"
-        :class="{ grayscale: soldOut }"
       />
-      <span
-        v-if="discount"
-        class="absolute top-3 rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground ltr:left-3 rtl:right-3"
-        >{{ t("discount_percent", "-:n%", "-:n٪", { n: discount }) }}</span
-      >
 
-      <ShopFavoriteButton
-        class="absolute top-3 ltr:right-3 rtl:left-3"
-        :product="product"
-      />
+      <!-- The heart and the saving share the start corner, stacked; «مميز» keeps the
+           end one. They are different facts — the price talking and the studio talking —
+           so a piece can carry either, both or neither and nothing has to move. -->
+      <div
+        class="absolute top-3 flex flex-col items-start gap-1.5 ltr:left-3 rtl:right-3"
+      >
+        <ShopFavoriteButton :product="product" />
+
+        <span
+          v-if="discount"
+          class="rounded-[6px] bg-success px-2 py-0.5 text-xs font-bold text-success-foreground"
+          >{{ t("discount_percent", "-:n%", "-:n٪", { n: discount }) }}</span
+        >
+      </div>
 
       <span
         v-if="product.is_featured"
-        class="absolute bottom-3 rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground ltr:left-3 rtl:right-3"
+        class="absolute top-3 rounded-[6px] bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground ltr:right-3 rtl:left-3"
         >{{ t("featured", "Featured", "مميز") }}</span
       >
 
       <span
         v-if="soldOut"
-        class="absolute inset-x-3 bottom-3 rounded-md bg-brand-ink/85 py-1 text-center text-xs font-medium text-white"
+        class="absolute bottom-3 rounded-[6px] bg-brand-ink/85 px-2 py-0.5 text-xs font-medium text-white ltr:left-3 rtl:right-3"
         >{{
           t("sold_out", "Sold out", "نفدت الكمية", { subGroup: "shop" })
         }}</span
@@ -41,7 +43,7 @@
     </div>
 
     <div class="p-3">
-      <p class="truncate text-sm font-medium">{{ product.title }}</p>
+      <p class="truncate text-sm">{{ product.title }}</p>
 
       <p class="mt-1 flex flex-wrap items-baseline gap-x-2">
         <span

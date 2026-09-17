@@ -17,7 +17,9 @@
           {{ t('my_gallery_description', 'Photos of the pieces you made in workshops.', 'صور القطع التي صنعتها في الورشات.') }}
         </p>
 
-        <div v-if="pending" class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6" aria-busy="true">
+        <AppLoadError v-if="error" :error="error" :retry="refresh" />
+
+        <div v-else-if="pending" class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6" aria-busy="true">
           <AppSkeleton v-for="n in 12" :key="n" class="aspect-square w-full rounded-xl" />
         </div>
 
@@ -75,7 +77,7 @@ const { t } = useLang('web', 'profile')
 const PER_PAGE = 12
 const currentPage = computed(() => Math.max(1, Number(route.query.page ?? 1)))
 
-const { data, pending } = useApiFetch('/api/workshops/images', {
+const { data, pending, error, refresh } = useApiFetch('/api/workshops/images', {
   key: 'my-workshop-photos',
   query: { page: currentPage, per_page: PER_PAGE },
 })

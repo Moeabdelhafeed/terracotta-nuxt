@@ -1,7 +1,8 @@
 /**
  * The basket (`/api/shop/cart`) and the quote → checkout → pay flow on top of it.
  *
- * One line per product, no colour, no variants. The cart is not a reservation: every
+ * One line per product AND colourway — the hex string is the variant id the cart takes,
+ * so the same piece in another glaze is another line. The cart is not a reservation: every
  * fetch re-reads `line.in_stock` / `available_stock`, and checkout is blocked while any
  * line cannot be fulfilled. Lines are kept through checkout — the server empties the cart
  * only when the order is paid (or settled on creation), so that is when we refetch.
@@ -10,6 +11,17 @@ export const HARD_MAX_QUANTITY = 100;
 
 export const lineMax = (line) =>
   Math.min(line?.product?.max_quantity ?? HARD_MAX_QUANTITY, HARD_MAX_QUANTITY);
+
+/**
+ * How many of one piece the basket already holds, across every colourway — the server's
+ * cap is on the product, not on the line, so two glazes of the same mug share it.
+ */
+export const quantityOf = (items, productId) =>
+  asList(items).reduce(
+    (sum, line) =>
+      line.product?.id === productId ? sum + (line.quantity ?? 0) : sum,
+    0,
+  );
 
 export const useCart = () => {
   const api = useApi();
@@ -45,11 +57,11 @@ export const useCart = () => {
   );
 
   /** `POST` increments an existing line; the server answers the line it touched. */
-  const add = async (productId, quantity = 1) => {
-    if (!isRegistered.value) return local.add(productId, quantity);
+  const add = async (productId, quantity = 1, color = null) => {
+    if (!isRegistered.value) return local.add(productId, quantity, color);
     const res = await api("/api/shop/cart", {
       method: "POST",
-      body: { shop_product_id: productId, quantity },
+      body: { shop_product_id: productId, quantity, ...(color ? { color } : {}) },
     });
     await refresh();
     return res;

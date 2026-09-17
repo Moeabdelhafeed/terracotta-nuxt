@@ -2,7 +2,7 @@
   <div ref="root" class="relative flex gap-2" dir="ltr">
     <button
       type="button"
-      class="group flex h-12 shrink-0 items-center gap-1.5 rounded-xl border border-input bg-transparent px-3 text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+      class="group flex h-12 shrink-0 items-center gap-1.5 rounded-field border border-input bg-transparent px-3 text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
       @click="open = !open"
     >
       <span class="text-base leading-none">{{ flag(country.iso2) }}</span>
@@ -20,14 +20,14 @@
       type="tel"
       inputmode="numeric"
       :placeholder="placeholder"
-      class="h-12 min-w-0 flex-1 rounded-xl border border-input bg-transparent px-4 text-base shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+      class="h-12 min-w-0 flex-1 rounded-field border border-input bg-transparent px-4 text-base outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
       v-bind="$attrs"
       @input="digits = $event.target.value.replace(/\D/g, '')"
     />
 
     <div
       v-if="open"
-      class="absolute start-0 top-full z-50 mt-2 w-full min-w-0 overflow-hidden rounded-xl border bg-popover text-popover-foreground shadow-lg sm:w-72"
+      class="absolute start-0 top-full z-50 mt-2 w-full min-w-0 overflow-hidden rounded-card border bg-popover text-popover-foreground sm:w-72"
     >
       <input
         v-model="search"

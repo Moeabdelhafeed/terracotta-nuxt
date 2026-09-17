@@ -2,11 +2,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
-import { h } from 'vue'
+import { h, ref } from 'vue'
 
 const inMinutes = (m) => new Date(Date.now() + m * 60000).toISOString()
 
-const { api, lang, sanctum, toast, showError, refreshNuxtData, picker } = await vi.hoisted(async () => {
+const { api, lang, sanctum, toast, showError, refreshNuxtData, picker, walletRefresh } = await vi.hoisted(async () => {
   const { vi: v } = await import('vitest')
   const { createApiMock, envelope, createLang, createSanctumState } = await import('../helpers/mockApi')
   return {
@@ -15,6 +15,7 @@ const { api, lang, sanctum, toast, showError, refreshNuxtData, picker } = await 
       'GET /api/workshops/{id}/price': () => globalThis.__quote(),
       'POST /api/workshops/{id}/bookings': () => globalThis.__create(),
       'POST /api/workshops/bookings/{id}/pay': () => envelope({ ...globalThis.__booking, payment_status: 'paid', amount_due: '0.00' }),
+      'GET /api/wallet/transactions': () => envelope({ balance: '125.00', transactions: [] }),
     }),
     lang: createLang('en'),
     sanctum: createSanctumState({ id: 1, name: 'Sara', is_guest: false, wallet_balance: '100.00' }),
@@ -22,6 +23,7 @@ const { api, lang, sanctum, toast, showError, refreshNuxtData, picker } = await 
     showError: v.fn(),
     refreshNuxtData: v.fn(),
     picker: { refreshCalendar: v.fn(), refreshSlots: v.fn() },
+    walletRefresh: v.fn(),
   }
 })
 
@@ -33,6 +35,7 @@ mockNuxtImport('useSanctumAuth', () => () => sanctum)
 mockNuxtImport('useToast', () => () => toast)
 mockNuxtImport('showError', () => showError)
 mockNuxtImport('refreshNuxtData', () => refreshNuxtData)
+mockNuxtImport('useWallet', () => () => ({ balance: ref('125.00'), transactions: ref([]), refresh: walletRefresh }))
 mockNuxtImport('useRoute', () => () => ({ params: { id: '1' }, query: {}, fullPath: '/workshops/1/book' }))
 
 const BookPage = (await import('~/pages/workshops/[id]/book.vue')).default
@@ -106,6 +109,8 @@ beforeEach(() => {
   globalThis.__quote = () => ({ success: true, message: 'ok', errors: null, data: quote() })
   globalThis.__booking = { id: 55, ...quote() }
   globalThis.__create = () => ({ success: true, message: 'ok', errors: null, data: globalThis.__booking })
+  sanctum.refreshIdentity.mockClear()
+  walletRefresh.mockClear()
   vi.useFakeTimers({ shouldAdvanceTime: true })
 })
 
@@ -294,5 +299,37 @@ describe('workshop booking — the hold lapsing', () => {
     expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('the seat was released'))
     expect(picker.refreshCalendar).toHaveBeenCalled()
     expect(picker.refreshSlots).toHaveBeenCalled()
+  })
+})
+
+describe('workshop booking — the balance after paying', () => {
+  /** The customer paid, went to their profile, and read the number they had before. */
+  it('re-asks for the balance when the hold is settled at /pay', async () => {
+    globalThis.__booking = { id: 55, ...quote({ amount_due: '190.00' }), payment_status: 'unpaid', payment_expires_at: inMinutes(14) }
+
+    const wrapper = await mount()
+    await toPayStep(wrapper)
+    await byText(wrapper, 'Confirm the booking and pay').trigger('click')
+    await flushPromises()
+    expect(sanctum.refreshIdentity).not.toHaveBeenCalled()
+
+    await byText(wrapper, 'Pay now').trigger('click')
+    await flushPromises()
+
+    expect(sanctum.refreshIdentity).toHaveBeenCalled()
+    expect(walletRefresh).toHaveBeenCalled()
+  })
+
+  it('re-asks for it on a create the wallet already settled — there is no /pay on that path', async () => {
+    globalThis.__booking = { id: 55, ...quote({ wallet_applied: '190.00', amount_due: '0.00' }), payment_status: 'paid', payment_expires_at: null }
+
+    const wrapper = await mount()
+    await toPayStep(wrapper)
+    await byText(wrapper, 'Confirm the booking and pay').trigger('click')
+    await flushPromises()
+
+    expect(api.calls.some((call) => call.url.endsWith('/pay'))).toBe(false)
+    expect(sanctum.refreshIdentity).toHaveBeenCalled()
+    expect(walletRefresh).toHaveBeenCalled()
   })
 })

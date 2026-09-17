@@ -297,7 +297,7 @@
             />
             <CheckoutWalletToggle
               v-if="!booking"
-              v-model="useWallet"
+              v-model="payWithWallet"
               :disabled="creating"
             />
 
@@ -441,14 +441,17 @@ const toast = useToast();
 const bookingApi = useWorkshopBooking(() => route.params.id);
 
 const step = ref("when");
-const people = ref(1);
+// The people who made the pieces are the people coming back to paint them, so a booking
+// that sends its party size here opens on it rather than asking again. The picker's own
+// `max_available_seats` still narrows it.
+const people = ref(Math.max(1, Number(route.query.people) || 1));
 const date = ref("");
 const slotId = ref(null);
 const slot = ref(null);
 const lines = ref([]);
 const withCelebration = ref(false);
 const discountCode = ref("");
-const useWallet = ref(false);
+const payWithWallet = ref(false);
 const celebrationOpen = ref(false);
 const picker = ref(null);
 
@@ -536,7 +539,7 @@ const loadQuote = async () => {
       booking_date: date.value,
       people_count: people.value,
       with_celebration: withCelebration.value ? 1 : 0,
-      use_wallet: useWallet.value ? 1 : 0,
+      use_wallet: payWithWallet.value ? 1 : 0,
       discount_code: discountCode.value || undefined,
       products: catalogue.value ? lines.value : [],
     });
@@ -560,7 +563,7 @@ const scheduleQuote = () => {
   quoteTimer = setTimeout(loadQuote, 350);
 };
 watch(
-  [slotId, date, people, withCelebration, useWallet, discountCode, lines, step],
+  [slotId, date, people, withCelebration, payWithWallet, discountCode, lines, step],
   scheduleQuote,
   { deep: true },
 );
@@ -576,7 +579,7 @@ const createBooking = async () => {
       booking_date: date.value,
       people_count: people.value,
       with_celebration: withCelebration.value,
-      use_wallet: useWallet.value,
+      use_wallet: payWithWallet.value,
       discount_code: discountCode.value || undefined,
       ...(catalogue.value ? { products: productsBody(lines.value) } : {}),
     });
@@ -612,6 +615,11 @@ const payBooking = () =>
     method: "POST",
   });
 
+// Both surfaces of the balance go stale the moment the wallet pays for anything: the
+// toggle reads it off the Sanctum identity, the wallet page off its own ledger.
+const { refreshIdentity } = useSanctumAuth();
+const { refresh: refreshWallet } = useWallet();
+
 const onPaid = (res) => {
   booking.value = res?.data ?? booking.value;
   step.value = "done";
@@ -633,11 +641,16 @@ const onExpired = async () => {
   await picker.value?.refreshSlots();
 };
 
-// Own pieces are claimed at booking, so the workshop detail behind us is stale.
+// Landing on `done` is the one seam both paid paths cross — `/pay`, and a create the
+// wallet or a full discount already settled. Own pieces are claimed at booking, so the
+// workshop detail behind us is stale; so is the balance, on both surfaces that show it.
 watch(
   () => step.value === "done",
   (done) => {
-    if (done) refreshNuxtData(`workshop-${route.params.id}`);
+    if (!done) return;
+    refreshNuxtData(`workshop-${route.params.id}`);
+    refreshIdentity();
+    refreshWallet();
   },
 );
 

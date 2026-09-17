@@ -10,7 +10,9 @@
         </Button>
       </div>
 
-      <ul v-if="(pending || !mounted) && !favorites.length" class="mt-10 grid grid-cols-2 gap-5 lg:grid-cols-4" aria-busy="true">
+      <AppLoadError v-if="error" :error="error" :retry="refresh" class="mt-10" />
+
+      <ul v-else-if="(pending || !mounted) && !favorites.length" class="mt-10 grid grid-cols-2 gap-5 lg:grid-cols-4" aria-busy="true">
         <li v-for="n in 4" :key="n">
           <ProductCardSkeleton />
         </li>
@@ -52,7 +54,7 @@ definePageMeta({
  * A visitor without an account gets the same list out of localStorage.
  */
 const { t } = useLang('web', 'shop')
-const { favorites, pending } = useFavorites()
+const { favorites, pending, error, refresh } = useFavorites()
 
 // The local list only exists after hydration; without this the empty panel flashes.
 const mounted = useMounted()

@@ -2,7 +2,7 @@
   <button
     v-if="other"
     type="button"
-    class="flex items-center gap-2 whitespace-nowrap rounded-xl bg-white/10 px-4 py-2.5 text-white/85 transition-colors hover:bg-white/20 hover:text-white"
+    class="flex h-[54px] items-center gap-2 whitespace-nowrap rounded-[5px] bg-white/15 px-4 text-white transition-colors hover:bg-white/25"
     :aria-label="t('language', 'Language', 'اللغة')"
     @click="setLanguage(other.code)"
   >
@@ -10,7 +10,7 @@
       v-if="other.image?.image_api"
       :src="other.image"
       :alt="other.code"
-      class="size-4 rounded-sm object-cover"
+      class="size-[18px] rounded-[4px] object-cover"
     />
     {{ other.native_name ?? other.name }}
   </button>
