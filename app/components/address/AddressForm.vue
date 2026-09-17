@@ -29,14 +29,15 @@
 
     <div class="grid gap-2">
       <Label for="delivery_zone_id">{{ t('address_city', 'City', 'المدينة') }}</Label>
-      <select
-        id="delivery_zone_id"
-        v-model="form.delivery_zone_id"
-        class="h-12 w-full rounded-xl border border-input bg-transparent px-4 text-base outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-      >
-        <option :value="null">{{ t('address_city_other', 'Other city', 'مدينة أخرى') }}</option>
-        <option v-for="zone in zones" :key="zone.id" :value="zone.id">{{ zone.name }}</option>
-      </select>
+      <Select v-model="zoneChoice">
+        <SelectTrigger id="delivery_zone_id" class="h-12 w-full text-base">
+          {{ zoneById(form.delivery_zone_id)?.name ?? t('address_city_other', 'Other city', 'مدينة أخرى') }}
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem :value="NO_ZONE">{{ t('address_city_other', 'Other city', 'مدينة أخرى') }}</SelectItem>
+          <SelectItem v-for="zone in zones" :key="zone.id" :value="String(zone.id)">{{ zone.name }}</SelectItem>
+        </SelectContent>
+      </Select>
       <p class="text-xs text-muted-foreground">{{ feeHint }}</p>
       <span v-if="err('delivery_zone_id')" class="text-xs text-destructive">{{ err('delivery_zone_id') }}</span>
     </div>
@@ -175,6 +176,20 @@ const mapSrc = computed(() => {
   const lng = Number(form.value.lng)
   const d = 0.01
   return `https://www.openstreetmap.org/export/embed.html?bbox=${lng - d},${lat - d},${lng + d},${lat + d}&layer=mapnik&marker=${lat},${lng}`
+})
+
+/**
+ * A city outside the delivery zones is `null` on the record, and the zone ids are numbers,
+ * but a Select item carries a non-empty string — so the choice is bridged here rather than
+ * letting either shape leak into the other.
+ */
+const NO_ZONE = 'other'
+
+const zoneChoice = computed({
+  get: () => (form.value.delivery_zone_id == null ? NO_ZONE : String(form.value.delivery_zone_id)),
+  set: (value) => {
+    form.value.delivery_zone_id = value === NO_ZONE ? null : Number(value)
+  },
 })
 
 const feeHint = computed(() => {

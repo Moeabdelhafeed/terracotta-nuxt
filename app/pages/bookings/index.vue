@@ -58,22 +58,23 @@
         <label class="sr-only" for="bookings-sort">{{
           t("sort_by", "Sort by", "ترتيب حسب")
         }}</label>
-        <select
-          id="bookings-sort"
-          data-test="sort-select"
-          class="h-10 rounded-xl border border-input bg-transparent px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-          :value="activeSort"
-          @change="
-            apply({
-              sort:
-                $event.target.value === 'newest' ? null : $event.target.value,
-            })
+        <Select
+          :model-value="activeSort"
+          @update:model-value="
+            (value) => apply({ sort: value === 'newest' ? null : value })
           "
         >
-          <option v-for="option in BOOKING_SORTS" :key="option" :value="option">
-            {{ sortLabel(option) }}
-          </option>
-        </select>
+          <!-- The label, not <SelectValue>: reka only learns an item's text once its
+               portal has mounted, so a closed trigger would render empty on first paint. -->
+          <SelectTrigger id="bookings-sort" data-test="sort-select" class="h-10 text-sm">
+            {{ sortLabel(activeSort) }}
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem v-for="option in BOOKING_SORTS" :key="option" :value="option">
+              {{ sortLabel(option) }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div

@@ -26,16 +26,22 @@
             <Label for="complaint_type">{{
               t("complaint_type", "What is this about?", "موضوع الشكوى")
             }}</Label>
-            <select
-              id="complaint_type"
-              v-model="form.type"
-              data-test="complaint-type"
-              class="h-12 w-full rounded-xl border border-input bg-transparent px-4 text-base outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-            >
-              <option v-for="type in COMPLAINT_TYPES" :key="type" :value="type">
-                {{ complaintTypeLabel(type, t) }}
-              </option>
-            </select>
+            <Select v-model="form.type">
+              <!-- The label, not <SelectValue>: reka only learns an item's text once its
+                   portal has mounted, so a closed trigger would render empty. -->
+              <SelectTrigger
+                id="complaint_type"
+                data-test="complaint-type"
+                class="h-12 w-full text-base"
+              >
+                {{ complaintTypeLabel(form.type, t) }}
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="type in COMPLAINT_TYPES" :key="type" :value="type">
+                  {{ complaintTypeLabel(type, t) }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
             <span v-if="err('type')" class="text-xs text-destructive">{{
               err("type")
             }}</span>

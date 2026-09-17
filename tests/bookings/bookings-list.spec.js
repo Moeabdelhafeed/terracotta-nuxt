@@ -118,10 +118,20 @@ describe('/bookings filters', () => {
     const page = await mount({ sort: 'session_soonest' })
     await flushPromises()
     const select = page.find('[data-test="sort-select"]')
-    expect(select.element.value).toBe('session_soonest')
+    expect(select.text()).toContain('Nearest session')
 
+    // A shadcn/reka Select, so the choice is made in a portal rather than by setting a
+    // value on the element: press the trigger, then pick the option by its role.
     const push = spyOnPush(page)
-    await select.setValue('newest')
+    await select.trigger('pointerdown', { button: 0, ctrlKey: false })
+    await flushPromises()
+
+    const newest = [...document.querySelectorAll('[role="option"]')].find((o) =>
+      o.textContent.includes('Newest booked'),
+    )
+    newest.dispatchEvent(new window.PointerEvent('pointerup', { bubbles: true }))
+    await flushPromises()
+
     expect(push).toHaveBeenCalledWith({ query: {} })
   })
 })

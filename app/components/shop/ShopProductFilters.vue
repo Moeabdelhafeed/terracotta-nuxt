@@ -13,19 +13,23 @@
         />
       </div>
 
-      <select
-        v-model="sort"
-        data-test="product-sort"
-        :aria-label="t('sort_by', 'Sort by', 'ترتيب حسب')"
-        class="h-12 rounded-xl border border-input bg-transparent px-4 text-base outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-      >
-        <option value="">
-          {{ t("sort_curated", "Studio order", "ترتيب الاستوديو") }}
-        </option>
-        <option v-for="option in SORTS" :key="option" :value="option">
-          {{ sortLabel(option) }}
-        </option>
-      </select>
+      <Select v-model="sort">
+        <SelectTrigger
+          data-test="product-sort"
+          :aria-label="t('sort_by', 'Sort by', 'ترتيب حسب')"
+          class="h-12 text-base"
+        >
+          {{ sortLabel(sort) }}
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem :value="CURATED">
+            {{ t("sort_curated", "Studio order", "ترتيب الاستوديو") }}
+          </SelectItem>
+          <SelectItem v-for="option in SORTS" :key="option" :value="option">
+            {{ sortLabel(option) }}
+          </SelectItem>
+        </SelectContent>
+      </Select>
 
       <Button
         :variant="featured ? 'default' : 'outline'"
@@ -199,16 +203,24 @@ const { categories } = useShopCategories();
 const featured = computed(() => props.query.featured === "1");
 const onSale = computed(() => props.query.sale === "1");
 
+/**
+ * The studio's own catalogue order is "no sort" on the wire, but a Select item cannot
+ * carry an empty value — reka rejects one — so it travels under a name and is turned
+ * back into `null` on the way out.
+ */
+const CURATED = "curated";
+
 const sortLabel = (value) =>
   ({
+    [CURATED]: t("sort_curated", "Studio order", "ترتيب الاستوديو"),
     newest: t("sort_newest", "Newest first", "الأحدث أولاً"),
     price_asc: t("sort_price_asc", "Price: low to high", "السعر: من الأقل"),
     price_desc: t("sort_price_desc", "Price: high to low", "السعر: من الأعلى"),
   })[value] ?? value;
 
 const sort = computed({
-  get: () => (SORTS.includes(props.query.sort) ? props.query.sort : ""),
-  set: (value) => emit("apply", { sort: value || null }),
+  get: () => (SORTS.includes(props.query.sort) ? props.query.sort : CURATED),
+  set: (value) => emit("apply", { sort: value === CURATED ? null : value }),
 });
 
 // Typed values stay local until they settle, so a three-digit budget is one request and

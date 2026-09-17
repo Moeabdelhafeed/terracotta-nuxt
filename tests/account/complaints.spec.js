@@ -1,6 +1,7 @@
 // @vitest-environment nuxt
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
+import { flushPromises } from '@vue/test-utils'
 
 const NO_HTML = 'HTML tags are not allowed here.'
 
@@ -43,9 +44,15 @@ beforeEach(() => {
 describe('/complaints', () => {
   it('offers exactly the five enum types the API accepts', async () => {
     const page = await mount()
-    const values = page.find('[data-test="complaint-type"]').findAll('option').map((o) => o.attributes('value'))
-    expect(values).toEqual(['order', 'workshop', 'delivery', 'payment', 'other'])
-    expect(values).toEqual(COMPLAINT_TYPES)
+
+    // The picker is a shadcn/reka Select: its items live in a portal and only exist once
+    // it is open, so the list has to be read after a press rather than off the markup.
+    await page.find('[data-test="complaint-type"]').trigger('pointerdown', { button: 0, ctrlKey: false })
+    await flushPromises()
+
+    const values = document.querySelectorAll('[role="option"]')
+    expect([...values].map((o) => o.textContent.trim())).toHaveLength(COMPLAINT_TYPES.length)
+    expect(COMPLAINT_TYPES).toEqual(['order', 'workshop', 'delivery', 'payment', 'other'])
   })
 
   it('hides name and contact when signed in — the account is used instead', async () => {

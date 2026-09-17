@@ -75,20 +75,33 @@ describe('productApiQuery', () => {
 })
 
 describe('ShopProductFilters', () => {
+  // A shadcn/reka Select: its items live in a portal and only exist while it is open, so
+  // a choice is a press on the trigger followed by a press on the option.
+  const pick = async (select, label) => {
+    await select.trigger('pointerdown', { button: 0, ctrlKey: false })
+    await flushPromises()
+    const option = [...document.querySelectorAll('[role="option"]')].find((o) =>
+      o.textContent.includes(label),
+    )
+    option.dispatchEvent(new window.PointerEvent('pointerup', { bubbles: true }))
+    await flushPromises()
+  }
+
   it('defaults the sort control to the studio order', async () => {
     const wrapper = await mount()
-    expect(wrapper.find('[data-test="product-sort"]').element.value).toBe('')
+    expect(wrapper.find('[data-test="product-sort"]').text()).toContain('Studio order')
   })
 
   it('asks for a sort by name, and clears it back to the studio order', async () => {
     const wrapper = await mount({ sort: 'price_asc' })
     const select = wrapper.find('[data-test="product-sort"]')
-    expect(select.element.value).toBe('price_asc')
+    expect(select.text()).toContain('Price: low to high')
 
-    await select.setValue('price_desc')
+    await pick(select, 'Price: high to low')
     expect(wrapper.emitted('apply').at(-1)[0]).toEqual({ sort: 'price_desc' })
 
-    await select.setValue('')
+    // The studio's own order is `null` on the wire, never the name it travels under.
+    await pick(select, 'Studio order')
     expect(wrapper.emitted('apply').at(-1)[0]).toEqual({ sort: null })
   })
 })
