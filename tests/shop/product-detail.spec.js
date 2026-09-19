@@ -24,7 +24,7 @@ mockNuxtImport('useSanctumAuth', () => () => sanctum)
 mockNuxtImport('useToast', () => () => toast)
 mockNuxtImport('useRoute', () => () => ({ params: { id: '11' }, query: {}, fullPath: '/shop/11' }))
 
-const ProductDetailView = (await import('~/components/shop/ProductDetailView.vue')).default
+const ProductDetailView = (await import('~/components/ProductDetailView.vue')).default
 
 const product = (over = {}) => ({
   id: 11,
