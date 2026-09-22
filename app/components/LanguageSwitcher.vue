@@ -1,18 +1,20 @@
 <template>
+  <!-- An icon, as the app draws it (`Icons.translate_rounded`): the same cell as the bell
+       and the cart, so the row of controls reads as one. The language it switches TO is
+       named for screen readers, since the glyph alone does not say which. -->
   <button
     v-if="other"
     type="button"
-    class="flex h-[54px] items-center gap-2 whitespace-nowrap rounded-[5px] bg-white/15 px-4 text-white transition-colors hover:bg-white/25"
-    :aria-label="t('language', 'Language', 'اللغة')"
+    class="flex size-[54px] items-center justify-center rounded-[5px] text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+    :aria-label="
+      t('switch_to_language', 'Switch to :language', 'التبديل إلى :language', {
+        language: other.native_name ?? other.name,
+      })
+    "
+    :title="other.native_name ?? other.name"
     @click="setLanguage(other.code)"
   >
-    <AppImage
-      v-if="other.image?.image_api"
-      :src="other.image"
-      :alt="other.code"
-      class="size-[18px] rounded-[4px] object-cover"
-    />
-    {{ other.native_name ?? other.name }}
+    <LucideLanguages class="size-[26px]" />
   </button>
 </template>
 

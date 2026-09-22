@@ -38,7 +38,19 @@ const booking = (over = {}) => ({
 })
 
 const mount = () => mountSuspended(BookingPage, {
-  global: { stubs: { PageBar: true, AppImage: true, BookingSheet: true, BookingSlotPicker: true } },
+  global: {
+    stubs: {
+      PageBar: true,
+      AppImage: true,
+      BookingSlotPicker: true,
+      // Renders its slots: a bare `true` stub drops them, and the uploader now lives
+      // inside this sheet, so nothing under test would exist.
+      BookingSheet: {
+        props: ['open', 'title', 'busy', 'wide'],
+        template: '<div v-if="open"><slot /><slot name="footer" /></div>',
+      },
+    },
+  },
 })
 
 const byText = (wrapper, text) => wrapper.findAll('button').find((b) => b.text().includes(text))
@@ -65,6 +77,35 @@ describe('booking detail — what the server permits', () => {
 
     expect(byText(wrapper, 'Cancel the booking')).toBeDefined()
     expect(byText(wrapper, 'Change the time')).toBeDefined()
+  })
+
+  // The map is «where the studio is», and it is only worth walking to while the session
+  // is still ahead. Afterwards it is the PIECE that travels.
+  it('points the way to the studio only while there is still a session to attend', async () => {
+    globalThis.__booking = booking({ location_url: 'https://maps.example/studio' })
+    const confirmed = await mount()
+    await flushPromises()
+    expect(confirmed.text()).toContain('The location')
+
+    globalThis.__booking = booking({ status: 'preparing', can_cancel: false, can_edit: false, location_url: 'https://maps.example/studio' })
+    const preparing = await mount()
+    await flushPromises()
+    expect(preparing.text()).not.toContain('The location')
+  })
+
+  // The code is the booking's reference as well as its pass — the digits read out at the
+  // counter when a piece is collected — so it outlives the session and goes only when the
+  // booking does.
+  it('keeps the check-in code after the session and drops it on a cancelled booking', async () => {
+    globalThis.__booking = booking({ status: 'preparing', can_cancel: false, can_edit: false })
+    const preparing = await mount()
+    await flushPromises()
+    expect(byText(preparing, 'Check-in code')).toBeDefined()
+
+    globalThis.__booking = booking({ status: 'cancelled', can_cancel: false, can_edit: false })
+    const cancelled = await mount()
+    await flushPromises()
+    expect(byText(cancelled, 'Check-in code')).toBeUndefined()
   })
 
   it('a finished booking offers neither', async () => {
@@ -94,6 +135,18 @@ describe('booking detail — the handover choice stays the customer\'s', () => {
     expect(link(wrapper, 'pickup').attributes('href')).toBe('/bookings/55/delivery?method=pickup')
     expect(link(wrapper, 'delivery').attributes('href')).toBe('/bookings/55/delivery?method=delivery')
     expect(wrapper.find('[data-test="handover-refund"]').exists()).toBe(false)
+  })
+
+  // The frame draws its illustration and still offers the ways out: the drawing replaces
+  // the panel in the aside, never the buttons under it.
+  it('draws the finished piece without taking the ways out with it', async () => {
+    globalThis.__booking = finished()
+    const wrapper = await mount()
+    await flushPromises()
+
+    expect(wrapper.find('img[src="/booking-ready.png"]').exists()).toBe(true)
+    expect(link(wrapper, 'pickup').exists()).toBe(true)
+    expect(link(wrapper, 'delivery').exists()).toBe(true)
   })
 
   it('keeps pickup reachable after delivery was chosen, and says what comes back', async () => {
@@ -172,6 +225,18 @@ describe('booking detail — copy that has to be the server\'s', () => {
     expect(wrapper.text()).not.toContain('five to seven days')
   })
 
+  // The app's own frame promises the money back here. This backend states the opposite in
+  // as many words — a no-show keeps the seat they booked — so the promise cannot be made.
+  it('promises a no-show no refund, and keeps the code the desk can still scan', async () => {
+    globalThis.__booking = booking({ status: 'absent', can_cancel: false, can_edit: false })
+    const wrapper = await mount()
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('the desk can still check you in')
+    expect(wrapper.text()).not.toMatch(/refund|balance/i)
+    expect(byText(wrapper, 'Check-in code')).toBeDefined()
+  })
+
   it('states the booking\'s own collection deadline, not a hard-coded week', async () => {
     const deadline = new Date(Date.now() + 3 * 86400000 + 3600000).toISOString()
     globalThis.__booking = booking({ status: 'completed', can_cancel: false, can_edit: false, pickup_deadline: deadline })
@@ -197,18 +262,124 @@ describe('booking detail — copy that has to be the server\'s', () => {
   })
 })
 
+describe('booking detail — a piece is its photographs', () => {
+  const shot = (id) => ({ id, image_api: `https://cdn.example/${id}.webp`, url: `${id}.webp`, type: 'webp', blurhash: null })
+
+  it('prints each photograph under the piece it belongs to, not in a wall of its own', async () => {
+    globalThis.__booking = booking({
+      status: 'completed', can_cancel: false, can_edit: false, pickup_deadline: null,
+      images: [shot(1), shot(2), shot(3)],
+      pieces: [
+        { id: 7, label: 'mohammad', images: [shot(1), shot(2)] },
+        { id: 8, label: '  ', images: [shot(3)] },
+      ],
+    })
+    const wrapper = await mount()
+    await flushPromises()
+
+    const cards = wrapper.findAll('[data-test="piece"]')
+    expect(cards).toHaveLength(2)
+    expect(cards[0].text()).toContain('mohammad')
+    expect(cards[0].findAll('app-image-stub')).toHaveLength(2)
+    // A blank name is still a piece, and still carries its own picture.
+    expect(cards[1].text()).toContain('Piece')
+    expect(cards[1].findAll('app-image-stub')).toHaveLength(1)
+
+    // Nothing is left over, so there is no second gallery beside the names.
+    expect(wrapper.text()).not.toContain('Your photos')
+  })
+
+  // The run is ONE piece's angles. Sliding from this cup's second shot into somebody
+  // else's pictures is not what the tap meant.
+  it('opens a photograph full size, on its own piece\'s run', async () => {
+    globalThis.__booking = booking({
+      status: 'completed', can_cancel: false, can_edit: false, pickup_deadline: null,
+      images: [shot(1), shot(2), shot(3)],
+      pieces: [
+        { id: 7, label: 'mohammad', images: [shot(1), shot(2)] },
+        { id: 8, label: 'sara', images: [shot(3)] },
+      ],
+    })
+    const wrapper = await mount()
+    await flushPromises()
+
+    await wrapper.findAll('[data-test="piece"]')[0].findAll('button')[1].trigger('click')
+    await flushPromises()
+
+    const counter = document.querySelector('[data-test="lightbox-counter"]')
+    expect(counter?.textContent?.trim()).toBe('2 / 2')
+
+    document.querySelector('[data-test="lightbox-close"]').click()
+    await flushPromises()
+  })
+
+  it('still shows a photograph the server sends with no piece behind it', async () => {
+    globalThis.__booking = booking({
+      status: 'completed', can_cancel: false, can_edit: false, pickup_deadline: null,
+      images: [shot(1), shot(9)],
+      pieces: [{ id: 7, label: 'mohammad', images: [shot(1)] }],
+    })
+    const wrapper = await mount()
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Your photos')
+  })
+})
+
 describe('booking detail — photo upload', () => {
   const attending = (over = {}) => booking({ status: 'attending', ...over })
 
+  /** The stubbed sheet renders in place, so everything stays under the wrapper. */
+  let host = null
+  beforeEach(() => { host = null })
+  const sheet = () => host
+  const openUpload = async (wrapper) => {
+    host = wrapper.element
+    const trigger = wrapper.find('[data-test="open-upload"]')
+    if (trigger.exists()) await trigger.trigger('click')
+    await flushPromises()
+  }
+
   /** Create a piece card, name it, and attach `count` photos to it. */
   const addPiece = async (wrapper, label, count) => {
-    await wrapper.find('[data-test="add-piece"]').trigger('click')
-    const card = wrapper.findAll('[data-test="draft-piece"]').at(-1)
-    await card.find('input[type="text"], input:not([type])').setValue(label)
-    const input = card.find('input[type="file"]')
+    await openUpload(wrapper)
+
+    // Opening the sheet already creates the first blank card, so only reach for "Add a
+    // piece" when the last one has been filled in.
+    const last = () => {
+      const all = sheet().querySelectorAll('[data-draft-label] input, input[data-draft-label]')
+      return all[all.length - 1]
+    }
+    if (last()?.value) {
+      const add = [...sheet().querySelectorAll('button')].find((b) => b.textContent.includes('Add a piece'))
+      if (!add) throw new Error('cannot add another piece: the booking is at its ceiling')
+      add.click()
+      await flushPromises()
+    }
+
+    const name = last()
+    name.value = label
+    name.dispatchEvent(new Event('input', { bubbles: true }))
+    await flushPromises()
+
+    const key = (name.closest('[data-draft-label]') ?? name).getAttribute('data-draft-label')
+    const input = sheet().querySelector(`input[type="file"][data-draft-files="${key}"]`)
     const files = Array.from({ length: count }, (_, i) => new File(['x'], `${label}-${i}.png`, { type: 'image/png' }))
-    Object.defineProperty(input.element, 'files', { value: files, configurable: true })
-    await input.trigger('change')
+    Object.defineProperty(input, 'files', { value: files, configurable: true })
+    input.dispatchEvent(new Event('change', { bubbles: true }))
+    await flushPromises()
+  }
+
+  /**
+   * The upload control. In the sheet's footer while naming pieces; on the page itself
+   * when the only thing staged is another angle of a piece already kept.
+   */
+  const clickUpload = async (wrapper) => {
+    const root = wrapper?.element ?? host
+    const btn = [...root.querySelectorAll('button')].find((b) => b.textContent.trim() === 'Upload')
+    if (!btn) throw new Error('no Upload control on screen')
+    btn.click()
+    await flushPromises()
   }
 
   const post = () => api.calls.find((call) => call.url === '/api/workshops/bookings/55/images')
@@ -241,7 +412,8 @@ describe('booking detail — photo upload', () => {
     const wrapper = await mount()
     await flushPromises()
 
-    expect(wrapper.find('[data-test="upload"]').text()).toContain('5 photo(s) left')
+    await openUpload(wrapper)
+    expect(sheet().textContent).toContain('5 photo(s) left')
   })
 
   it('never takes more photos than are left, however many are picked', async () => {
@@ -250,8 +422,7 @@ describe('booking detail — photo upload', () => {
     await flushPromises()
 
     await addPiece(wrapper, 'Mug', 3)
-    await byText(wrapper, 'Upload').trigger('click')
-    await flushPromises()
+    await clickUpload()
 
     expect(post().body.getAll('images[]')).toHaveLength(1)
   })
@@ -261,7 +432,8 @@ describe('booking detail — photo upload', () => {
     const wrapper = await mount()
     await flushPromises()
 
-    expect(wrapper.find('[data-test="piece-progress"]').text()).toBe('1 of 2 named')
+    await openUpload(wrapper)
+    expect(sheet().querySelector('[data-test="piece-progress"]').textContent.trim()).toBe('1 of 2 named')
   })
 
   it('gives two pieces of the same name two distinct keys', async () => {
@@ -272,8 +444,7 @@ describe('booking detail — photo upload', () => {
     await addPiece(wrapper, 'mug', 3)
     await addPiece(wrapper, 'mug', 2)
 
-    await byText(wrapper, 'Upload').trigger('click')
-    await flushPromises()
+    await clickUpload()
 
     const body = post().body
     expect(body.getAll('images[]')).toHaveLength(5)
@@ -296,8 +467,7 @@ describe('booking detail — photo upload', () => {
     Object.defineProperty(input.element, 'files', { value: [new File(['x'], 'angle.png', { type: 'image/png' })], configurable: true })
     await input.trigger('change')
 
-    await byText(wrapper, 'Upload').trigger('click')
-    await flushPromises()
+    await clickUpload(wrapper)
 
     const body = post().body
     expect(body.getAll('piece_ids[]')).toEqual(['7'])
@@ -317,26 +487,23 @@ describe('booking detail — photo upload', () => {
     await addPiece(wrapper, 'one', 1)
     await addPiece(wrapper, 'two', 1)
 
-    expect(wrapper.findAll('[data-test="draft-piece"]')).toHaveLength(2)
-    expect(wrapper.find('[data-test="add-piece"]').attributes('disabled')).toBeDefined()
-    expect(wrapper.find('[data-test="ceiling-note"]').text()).toContain('You bought 2 piece(s)')
-
-    await wrapper.find('[data-test="add-piece"]').trigger('click')
-    expect(wrapper.findAll('[data-test="draft-piece"]')).toHaveLength(2)
+    expect(sheet().querySelectorAll('[data-draft-label]')).toHaveLength(2)
+    // Gone, not greyed: there is nothing to press once the booking is full.
+    expect(sheet().querySelector('[data-test="add-piece"]')).toBeNull()
+    expect(sheet().querySelector('[data-test="ceiling-note"]').textContent).toContain('You bought 2 piece(s)')
     expect(post()).toBeUndefined()
   })
 
-  it('lets a make_your_piece booking go past its guide', async () => {
+  it('holds a make_your_piece booking to one piece per person', async () => {
     globalThis.__booking = attending({ people_count: 2, expected_piece_count: 2, products: [] })
     const wrapper = await mount()
     await flushPromises()
 
     await addPiece(wrapper, 'one', 1)
     await addPiece(wrapper, 'two', 1)
-    await addPiece(wrapper, 'three', 1)
 
-    expect(wrapper.findAll('[data-test="draft-piece"]')).toHaveLength(3)
-    expect(wrapper.find('[data-test="add-piece"]').attributes('disabled')).toBeUndefined()
+    expect(sheet().querySelectorAll('[data-draft-label]')).toHaveLength(2)
+    expect(sheet().querySelector('[data-test="add-piece"]')).toBeNull()
   })
 
   it('surfaces a refusal whose body carries a message but no field errors', async () => {
@@ -348,8 +515,7 @@ describe('booking detail — photo upload', () => {
     await flushPromises()
     await addPiece(wrapper, 'Mug', 1)
 
-    await byText(wrapper, 'Upload').trigger('click')
-    await flushPromises()
+    await clickUpload()
 
     expect(wrapper.text()).toContain('You can only upload photos while you are attending the workshop.')
   })
@@ -363,9 +529,27 @@ describe('booking detail — photo upload', () => {
     await flushPromises()
     await addPiece(wrapper, 'Mug', 1)
 
-    await byText(wrapper, 'Upload').trigger('click')
-    await flushPromises()
+    await clickUpload()
 
     expect(wrapper.find('[data-test="upload"]').text()).toContain('That piece belongs to another booking.')
+  })
+})
+
+/**
+ * `paint_your_piece` and `make_your_candle` carry a seat price of "0.00" — the money is in
+ * the pieces the customer picks. Printing that price reads as free, which is the opposite
+ * of what the session costs, so those two say so in words instead.
+ */
+describe('workshop pricing — where the money actually is', () => {
+  const hasPieceCatalogue = (workshop) =>
+    workshop.type === 'paint_your_piece' || workshop.type === 'make_your_candle'
+
+  it('prices the catalogue types by the pieces, never by the seat', () => {
+    expect(hasPieceCatalogue({ type: 'paint_your_piece', price: '0.00' })).toBe(true)
+    expect(hasPieceCatalogue({ type: 'make_your_candle', price: '0.00' })).toBe(true)
+  })
+
+  it('prices a throwing session by the seat', () => {
+    expect(hasPieceCatalogue({ type: 'make_your_piece', price: '200.00' })).toBe(false)
   })
 })

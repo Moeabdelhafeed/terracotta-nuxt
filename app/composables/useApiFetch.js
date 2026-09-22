@@ -41,7 +41,7 @@ export const useApiFetch = (url, options = {}) => {
     return useSanctumFetch(url, shared)
   }
   const { baseUrl, translationsMode } = useRuntimeConfig().public
-  const { deviceId, platform, fcmToken } = useDevice()
+  const { deviceId, platform } = useDevice()
   const lang = useCookie('lang')
   const i18nLocale = useCookie('i18n_locale')
   return useFetch(url, {
@@ -50,9 +50,6 @@ export const useApiFetch = (url, options = {}) => {
       const headers = new Headers(opts.headers)
       if (deviceId.value) headers.set('X-Device-Id', deviceId.value)
       if (platform.value) headers.set('X-Platform', platform.value)
-      if (fcmToken.value && (platform.value === 'ios' || platform.value === 'android')) {
-        headers.set('X-FCM-Token', fcmToken.value)
-      }
       if (!headers.has('Accept-Language')) {
         const code = translationsMode === 'local'
           ? (i18nLocale.value ?? lang.value?.code ?? 'en')

@@ -10,7 +10,7 @@
     <!-- Opened by hand: the gift is behind it, and tapping the mark is the opening of it. -->
     <AppCurtain
       :label="t('gift_open', 'Tap to open your gift', 'اضغط لفتح هديتك')"
-      color="#F07272"
+      color="#E7938D"
       @opened="celebrate = true"
     />
 
@@ -24,7 +24,7 @@
 
     <main
       ref="root"
-      class="relative isolate flex min-h-svh flex-col items-center justify-center overflow-hidden bg-[#FC8B8B] px-6 py-16 text-white"
+      class="relative isolate flex min-h-svh flex-col items-center justify-center overflow-hidden bg-brand-blush px-6 py-16 text-white"
     >
       <!-- The line the rest of the site is drawn with. Decorative only. -->
       <svg
@@ -75,7 +75,7 @@
           </p>
 
           <p
-            class="mt-4 font-display text-5xl font-black leading-none text-[#FC8B8B]"
+            class="mt-4 font-display text-5xl font-black leading-none text-brand-blush"
           >
             {{ format(gift.amount) }}
           </p>
@@ -128,7 +128,7 @@
             <Button
               as-child
               size="lg"
-              class="h-14 w-full rounded-2xl bg-[#FC8B8B] text-base text-white hover:bg-[#fb7a7a]"
+              class="h-14 w-full rounded-2xl bg-brand-blush text-base text-white hover:bg-brand-blush"
             >
               <NuxtLink to="/wallet">{{
                 t("gift_go_wallet", "Go to my wallet", "الذهاب إلى محفظتي")
@@ -140,7 +140,7 @@
              response, deliberately. -->
           <p
             v-else-if="!gift.is_claimable"
-            class="rounded-2xl bg-brand-rust/10 px-4 py-4 text-sm font-medium text-brand-rust"
+            class="rounded-2xl bg-brand-blush/15 px-4 py-4 text-sm font-medium text-brand-blush"
           >
             {{
               t(
@@ -157,7 +157,7 @@
             <Button
               v-if="canRedeem"
               size="lg"
-              class="h-14 w-full rounded-2xl bg-[#FC8B8B] text-base text-white hover:bg-[#fb7a7a]"
+              class="h-14 w-full rounded-2xl bg-brand-blush text-base text-white hover:bg-brand-blush"
               :disabled="redeeming"
               @click="claim"
             >
@@ -171,7 +171,7 @@
             <Button
               v-else
               size="lg"
-              class="h-14 w-full rounded-2xl bg-[#FC8B8B] text-base text-white hover:bg-[#fb7a7a]"
+              class="h-14 w-full rounded-2xl bg-brand-blush text-base text-white hover:bg-brand-blush"
               @click="goSignIn"
             >
               {{
@@ -298,7 +298,7 @@ definePageMeta({
 
 // The gift page has a ground of its own, unlike the rest of the site. Set on the body too
 // so an overscroll bounce does not flash white behind it.
-useHead({ bodyAttrs: { class: "bg-[#FC8B8B]" } });
+useHead({ bodyAttrs: { class: "bg-brand-blush" } });
 
 const route = useRoute();
 const { t } = useLang("web", "home");
@@ -336,10 +336,10 @@ const { redeem } = useGifts();
  * it is not — no error, no event. So the page waits a moment and, if it is still the one
  * in front, sends the visitor to the store for their platform instead.
  */
-const { platform } = useDevice();
+const { os } = useDevice();
 
 const appLink = computed(() =>
-  ["ios", "android"].includes(platform.value)
+  ["ios", "android"].includes(os.value)
     ? (gift.value?.deep_link ?? null)
     : null,
 );
@@ -350,7 +350,7 @@ const storeFor = (device) =>
   )?.url;
 
 const openInApp = () => {
-  const store = storeFor(platform.value);
+  const store = storeFor(os.value);
   window.location.href = appLink.value;
   if (!store) return;
   setTimeout(() => {

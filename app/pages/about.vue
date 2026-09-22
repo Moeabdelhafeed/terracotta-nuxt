@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main class="bg-background">
     <PageHero
       media-key="hero_about"
       fallback="/seed/hero-about.webp"
@@ -25,7 +25,7 @@
         </div>
 
         <div>
-          <p class="text-xs uppercase tracking-[0.25em] text-brand-rust/70">
+          <p class="text-xs uppercase tracking-[0.25em] text-brand-terracotta/70">
             {{ t('about_story_eyebrow', 'Our story', 'قصتنا') }}
           </p>
           <h2 class="mt-5 font-display text-3xl font-semibold leading-tight sm:text-4xl">
@@ -81,7 +81,7 @@
         </div>
 
         <div class="lg:order-1">
-          <p class="text-xs uppercase tracking-[0.25em] text-brand-rust/70">
+          <p class="text-xs uppercase tracking-[0.25em] text-brand-terracotta/70">
             {{ t('about_craft_eyebrow', 'The craft', 'الحرفة') }}
           </p>
           <h2 class="mt-5 font-display text-3xl font-semibold leading-tight sm:text-4xl">

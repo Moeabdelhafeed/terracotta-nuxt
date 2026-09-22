@@ -29,12 +29,12 @@ export const usePage = (slug) => {
   const lang = useCookie('lang')
   const i18nLocale = useCookie('i18n_locale')
 
-  const { data, pending, error, refresh } = useApiFetch(() => `/api/pages/${toValue(slug)}`, {
+  const { data, pending, status, error, refresh } = useApiFetch(() => `/api/pages/${toValue(slug)}`, {
     key: `page-${toValue(slug)}`,
     transform: (res) => res?.data ?? null,
     default: () => null,
     watch: [lang, i18nLocale],
   })
 
-  return { page: computed(() => data.value ?? null), pending, error, refresh }
+  return { page: computed(() => data.value ?? null), pending, status, error, refresh }
 }

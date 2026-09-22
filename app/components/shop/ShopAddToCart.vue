@@ -11,7 +11,7 @@
 
       <Button
         type="button"
-        class="h-12 flex-1 bg-brand-rust text-base hover:bg-brand-rust/90"
+        class="h-12 flex-1 rounded-xl bg-brand-terracotta text-base hover:bg-brand-terracotta/90"
         :disabled="soldOut || full || pending"
         @click="onAdd"
       >
@@ -47,7 +47,6 @@
 const props = defineProps({
   product: { type: Object, required: true },
   /** The chosen glaze, as the bare hex the cart takes as its variant id. */
-  colour: { type: String, default: null },
 })
 
 const { t } = useLang('web', 'shop')
@@ -80,7 +79,7 @@ const onAdd = async () => {
   pending.value = true
   error.value = ''
   try {
-    const res = await add(props.product.id, quantity.value, props.colour)
+    const res = await add(props.product.id, quantity.value)
     added.value = true
     toast.success(res?.message || t('added_to_cart', 'Added to your cart.', 'تمت الإضافة إلى عربيتك.'))
   } catch (err) {

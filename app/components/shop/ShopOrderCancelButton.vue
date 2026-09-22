@@ -1,16 +1,16 @@
 <template>
   <template v-if="order.can_cancel">
-    <Button type="button" variant="outline" class="h-12 rounded-xl border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive" :disabled="pending" @click="open = true">
+    <Button type="button" variant="outline" class="h-12 rounded-xl border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive hover:text-white hover:text-destructive" :disabled="pending" @click="open = true">
       {{ t('cancel_order', 'Cancel order', 'إلغاء الطلب') }}
     </Button>
 
     <Teleport to="body">
-      <div v-if="open" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4" role="dialog" aria-modal="true">
-        <div class="absolute inset-0 bg-black/50" @click="pending || (open = false)" />
-        <div class="relative w-full max-w-md rounded-2xl border bg-background p-6 shadow-lg">
+      <div v-if="open" class="fixed inset-0 z-[60] flex items-center justify-center p-4" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-black/50" @click="pending || (open = false)" />
+        <div class="relative max-h-[90svh] w-full max-w-md overflow-y-auto rounded-2xl border bg-background p-6 shadow-lg">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <span class="flex size-9 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust">
+              <span class="flex size-9 items-center justify-center rounded-xl bg-brand-terracotta/10 text-brand-terracotta">
                 <LucidePackageX class="size-4" />
               </span>
               <h2 class="font-display text-lg font-semibold text-foreground">{{ t('cancel_order', 'Cancel order', 'إلغاء الطلب') }}</h2>
@@ -69,6 +69,8 @@ const { format } = usePrice()
 const { submit, pending, error } = useSubmit()
 
 const open = ref(false)
+
+useModalScrollLock(open)
 
 const isPaid = computed(() => props.order.payment_status === 'paid')
 

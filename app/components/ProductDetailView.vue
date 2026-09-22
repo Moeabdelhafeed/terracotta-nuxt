@@ -30,7 +30,7 @@
   </main>
 
   <main v-else-if="product">
-    <PageBar :crumbs="crumbs" />
+    <PageBar :crumbs="crumbs" :back="sectionTo" />
 
     <div class="mx-auto max-w-6xl px-6 py-16">
       <div class="grid gap-10 lg:grid-cols-2 lg:items-start">
@@ -39,7 +39,7 @@
             <AppImage v-if="active" :src="active" :alt="product.title" class="aspect-square w-full object-cover" />
           </div>
 
-          <ul v-if="shots.length > 1" class="mt-3 flex gap-3 overflow-x-auto pb-1">
+          <ul v-if="shots.length > 1" class="mt-3 flex gap-3 overflow-x-auto scrollbar-none pb-1">
             <li v-for="(shot, index) in shots" :key="index">
               <button
                 type="button"
@@ -80,23 +80,28 @@
 
             <div v-if="colours.length" class="mt-6">
               <p class="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                {{ t('colour', 'Colour', 'اللون') }}<template v-if="selectedName"> · {{ selectedName }}</template>
+                {{ t('colours_available', 'Colours', 'الألوان') }}
               </p>
 
-              <!-- The hex IS the variant id the cart takes, so picking one here is what
-                   keeps the glaze on the line the customer ends up paying for. -->
+              <!--
+                A legend, not a picker. `shop_cart_items` has no colour column and
+                `POST /api/shop/cart` accepts none, so there is no glaze to choose and
+                nothing a choice could change — these say what the piece comes in. They
+                were drawn as buttons with a selected ring, which promised a variant the
+                studio cannot sell separately.
+              -->
               <ul class="mt-2 flex flex-wrap items-center gap-2">
-                <li v-for="colour in colours" :key="colour.hex">
-                  <button
-                    type="button"
-                    class="block size-7 rounded-[6px] border transition-transform hover:scale-110"
-                    :class="colour.hex === selectedColour ? 'ring-2 ring-primary ring-offset-2 ring-offset-card' : ''"
+                <li v-for="colour in colours" :key="colour.hex" class="group relative">
+                  <span
+                    class="block size-7 rounded-[6px] border"
                     :style="{ backgroundColor: colour.hex }"
-                    :title="colour.name"
-                    :aria-label="colour.name"
-                    :aria-pressed="colour.hex === selectedColour"
-                    @click="pickedColour = colour.hex"
                   />
+                  <!-- The name on hover, under the swatch it belongs to. -->
+                  <span
+                    class="pointer-events-none absolute start-1/2 top-full z-10 mt-1.5 -translate-x-1/2 whitespace-nowrap rounded-md bg-brand-ink px-2 py-1 text-[11px] font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 rtl:translate-x-1/2"
+                    role="tooltip"
+                  >{{ colour.name }}</span>
+                  <span class="sr-only">{{ colour.name }}</span>
                 </li>
               </ul>
             </div>
@@ -108,7 +113,7 @@
               </div>
             </dl>
 
-            <ShopAddToCart class="mt-8" :product="product" :colour="selectedColour" />
+            <ShopAddToCart class="mt-8" :product="product" />
           </div>
         </aside>
       </div>
@@ -225,21 +230,6 @@ const colours = computed(() =>
     const hex = colour.hex ?? colour.color ?? colour
     return { hex, name: colour.name ?? nameFor(hex) }
   }),
-)
-
-/**
- * Derived rather than synced, for the same reason `active` is: a watcher would not reset
- * when the product changes under a client-side navigation. The first glaze is the default
- * the app already sends, so a customer who never touches a swatch still buys a glazed piece.
- */
-const pickedColour = ref(null)
-const selectedColour = computed(() =>
-  colours.value.some((colour) => colour.hex === pickedColour.value)
-    ? pickedColour.value
-    : (colours.value[0]?.hex ?? null),
-)
-const selectedName = computed(
-  () => colours.value.find((colour) => colour.hex === selectedColour.value)?.name ?? '',
 )
 
 const dimensions = computed(() => {

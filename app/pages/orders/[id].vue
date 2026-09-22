@@ -1,20 +1,11 @@
 <template>
-  <main class="min-h-svh bg-background pb-28">
+  <main class="bg-background">
+    <PageBar :crumbs="crumbs" />
     <div class="mx-auto max-w-6xl px-6 py-16">
       <div class="flex flex-col gap-5">
-        <div class="flex items-center justify-between">
-          <NuxtLink
-            to="/orders"
-            class="flex size-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground -ms-2 rtl:-scale-x-100"
-            :aria-label="t('back_to_orders', 'Back to my orders', 'عودة للطلبات')"
-          >
-            <LucideArrowLeft class="size-5" />
-          </NuxtLink>
-          <h1 class="font-display text-lg font-semibold text-foreground">
-            {{ t('order_number', 'Order #:id', 'الطلب رقم :id', { id: route.params.id }) }}
-          </h1>
-          <span class="size-10" />
-        </div>
+        <h1 class="font-display text-3xl font-semibold sm:text-4xl">
+          {{ t('order_number', 'Order #:id', 'الطلب رقم :id', { id: route.params.id }) }}
+        </h1>
 
         <div v-if="!order" class="grid gap-4 lg:grid-cols-[1fr_20rem] lg:items-start" aria-busy="true">
           <AppSkeleton v-for="n in 4" :key="n" class="h-28 w-full rounded-2xl!" />
@@ -24,7 +15,7 @@
           <div class="flex items-center justify-between gap-3 rounded-2xl border bg-card p-5">
             <div class="flex flex-col gap-1">
               <ShopOrderStatusBadge :status="order.status" />
-              <span class="text-xs text-muted-foreground">{{ formatDate(order.created_at) }}</span>
+              <span class="text-xs text-muted-foreground">{{ formatDate(order.created_at, { hour12: false }) }}</span>
             </div>
             <span class="font-display text-lg font-black text-primary sm:text-xl">{{ format(order.total_price) }}</span>
           </div>
@@ -50,7 +41,7 @@
                   </div>
                   <div v-if="order.delivery_short_address">
                     <dt class="text-xs text-muted-foreground">{{ t('delivery_short_address', 'Short address', 'العنوان المختصر') }}</dt>
-                    <dd class="mt-0.5 font-medium tracking-wide text-foreground" dir="ltr">{{ order.delivery_short_address }}</dd>
+                    <dd class="mt-0.5 font-medium tracking-wide text-foreground"><bdi>{{ order.delivery_short_address }}</bdi></dd>
                   </div>
                   <div v-if="order.delivery_zone">
                     <dt class="text-xs text-muted-foreground">{{ t('delivery_zone', 'Zone', 'المنطقة') }}</dt>
@@ -58,7 +49,7 @@
                   </div>
                   <div v-if="order.delivery_phone">
                     <dt class="text-xs text-muted-foreground">{{ t('delivery_phone', 'Phone', 'رقم الهاتف') }}</dt>
-                    <dd class="mt-0.5 text-foreground" dir="ltr">{{ order.delivery_phone }}</dd>
+                    <dd class="mt-0.5 text-foreground"><bdi>{{ order.delivery_phone }}</bdi></dd>
                   </div>
                   <div v-if="order.delivery_notes">
                     <dt class="text-xs text-muted-foreground">{{ t('delivery_notes', 'Notes', 'ملاحظات') }}</dt>
@@ -71,7 +62,7 @@
                   :href="mapUrl"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="mt-4 flex items-center gap-2 text-sm font-medium text-brand-rust underline-offset-4 hover:underline"
+                  class="mt-4 flex items-center gap-2 text-sm font-medium text-brand-terracotta underline-offset-4 hover:underline"
                 >
                   <LucideMapPin class="size-4" />
                   {{ t('open_in_maps', 'Open in maps', 'افتح في الخرائط') }}
@@ -104,6 +95,7 @@
 
 <script setup>
 definePageMeta({
+  // Entered from somewhere, with its own way back in the header — the site's
   middleware: ['auth-mode', 'require-registered', 'verified'],
   name: 'order',
 })
@@ -115,6 +107,14 @@ definePageMeta({
  */
 const route = useRoute()
 const { t } = useLang('web', 'shop')
+
+// The order sits under the orders list, which sits under the profile.
+const crumbs = computed(() => [
+  { to: '/', label: t('nav_home', 'Home', 'الرئيسية', { subGroup: 'general' }) },
+  { to: '/profile', label: t('nav_profile', 'Profile', 'حسابي', { subGroup: 'general' }) },
+  { to: '/orders', label: t('orders_title', 'My orders', 'طلباتي') },
+  { label: t('order_number', 'Order #:id', 'الطلب رقم :id', { id: route.params.id }) },
+])
 const { format } = usePrice()
 const { formatDate } = useDateFormat()
 const toast = useToast()

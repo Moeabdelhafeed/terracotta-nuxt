@@ -1,10 +1,10 @@
 <template>
   <label
     class="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border bg-card p-4 transition-colors"
-    :class="{ 'border-brand-rust/50 bg-brand-mist/40': enabled, 'cursor-not-allowed opacity-60': disabled || !hasBalance }"
+    :class="{ 'border-primary/50 bg-brand-mist/40': enabled, 'cursor-not-allowed opacity-60': disabled || !hasBalance }"
   >
     <span class="flex items-center gap-3">
-      <span class="flex size-9 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust">
+      <span class="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
         <LucideWallet class="size-4" />
       </span>
       <span class="flex flex-col">

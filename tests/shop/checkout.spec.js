@@ -51,8 +51,26 @@ const order = (over = {}) => ({
   can_cancel: true, items: [line()], created_at: '2026-09-01T10:00:00+00:00', ...over,
 })
 
-const mount = () => mountSuspended(CheckoutPage, {
-  global: { stubs: { PageBar: true, AddressPicker: true, AppImage: true } },
+/**
+ * The real picker selects the customer's default address as soon as it has the book, and
+ * the page will not place an order without one. A bare `true` stub never emits, so it
+ * stands in for a customer with no saved address — which is its own test below.
+ */
+const addressPickerStub = {
+  props: ['modelValue'],
+  emits: ['update:modelValue'],
+  template: '<div />',
+  mounted() { this.$emit('update:modelValue', 4) },
+}
+
+const mount = ({ address = true } = {}) => mountSuspended(CheckoutPage, {
+  global: {
+    stubs: {
+      PageBar: true,
+      AppImage: true,
+      AddressPicker: address ? addressPickerStub : true,
+    },
+  },
 })
 
 const placeButton = (wrapper) => wrapper.findAll('button').find((b) => b.text().includes('Confirm payment') || b.text().includes('Placing'))
@@ -110,6 +128,21 @@ describe('checkout — when the order may be placed', () => {
 
     release()
     await flushPromises()
+  })
+})
+
+describe('checkout — with no saved address', () => {
+  it('holds the order back rather than letting the server answer with a raw field error', async () => {
+    const wrapper = await mount({ address: false })
+    await flushPromises()
+
+    expect(placeButton(wrapper).attributes('disabled')).toBeDefined()
+    expect(wrapper.text()).toContain('Choose a delivery address to continue.')
+
+    await placeButton(wrapper).trigger('click')
+    await flushPromises()
+
+    expect(api.calls.filter((c) => c.path === '/api/shop/cart/checkout')).toHaveLength(0)
   })
 })
 

@@ -28,7 +28,7 @@
                 class="size-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
             </div>
-            <p class="mt-3 text-sm font-medium text-brand-rust">{{ category.title }}</p>
+            <p class="mt-3 text-sm font-medium text-brand-terracotta">{{ category.title }}</p>
           </NuxtLink>
         </li>
       </ul>

@@ -6,7 +6,7 @@
       type="button"
       variant="outline"
       :disabled="loading || pending === p"
-      class="w-full justify-center gap-2"
+      class="h-12 w-full justify-center gap-2 rounded-xl"
       @click="onClick(p)"
     >
       <span

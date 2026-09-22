@@ -1,17 +1,17 @@
 <template>
-  <main class="min-h-svh bg-background pb-28">
+  <main class="bg-background">
     <PageBar :crumbs="crumbs" />
 
     <div class="mx-auto max-w-6xl px-6 py-16">
       <header class="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 class="font-display text-3xl font-semibold sm:text-4xl">{{ t('gifts_title', 'My gifts', 'هداياي') }}</h1>
-          <p class="mt-2 text-muted-foreground">
+          <p class="mt-3 text-muted-foreground">
             {{ t('gifts_subtitle_both', 'Credit you have gifted and credit you have claimed, newest first.', 'الرصيد الذي أهديته والرصيد الذي استلمته، الأحدث أولًا.') }}
           </p>
         </div>
 
-        <Button as-child class="h-12 rounded-control bg-brand-rust text-base hover:bg-brand-rust/90">
+        <Button as-child class="h-12 rounded-xl bg-brand-terracotta text-base hover:bg-brand-terracotta/90">
           <NuxtLink to="/gifts/new">
             <LucideGift class="size-4" />
             {{ t('gift_new_cta', 'Gift credit', 'اهداء رصيد') }}
@@ -28,7 +28,7 @@
       <AppLoadError v-else-if="error && !entries.length" class="mt-10" :error="error" :retry="refresh" />
 
       <section v-else-if="!entries.length" class="mx-auto mt-10 max-w-xl rounded-card border bg-card p-10 text-center">
-        <span class="mx-auto flex size-14 items-center justify-center rounded-field bg-brand-rust/10 text-brand-rust">
+        <span class="mx-auto flex size-14 items-center justify-center rounded-field bg-brand-terracotta/10 text-brand-terracotta">
           <LucideGift class="size-6" />
         </span>
         <h2 class="mt-5 font-display text-xl font-semibold">
@@ -37,7 +37,7 @@
         <p class="mt-2 text-sm text-muted-foreground">
           {{ t('gifts_empty_body', 'Send a credit gift to someone you love, to enjoy our pottery and ceramics workshops.', 'أرسل هدية رصيد لأحبائك للاستمتاع بورشات الفخار والسيراميك') }}
         </p>
-        <Button as-child class="mt-6 h-12 rounded-control bg-brand-rust px-8 text-base hover:bg-brand-rust/90">
+        <Button as-child class="mt-6 h-12 rounded-xl bg-brand-terracotta px-8 text-base hover:bg-brand-terracotta/90">
           <NuxtLink to="/gifts/new">{{ t('gift_new_cta', 'Gift credit', 'اهداء رصيد') }}</NuxtLink>
         </Button>
       </section>
@@ -49,9 +49,9 @@
           <li v-for="tab in tabs" :key="tab.key">
             <Button
               size="sm"
-              class="rounded-control"
+              class="rounded-xl"
               :variant="tab.key === only ? 'default' : 'outline'"
-              :class="tab.key === only ? 'bg-brand-rust hover:bg-brand-rust/90' : ''"
+              :class="tab.key === only ? 'bg-brand-terracotta hover:bg-brand-terracotta/90' : ''"
               :data-direction="tab.key"
               @click="only = tab.key"
             >
@@ -94,6 +94,9 @@ definePageMeta({
   name: 'gifts',
 })
 
+useHead({ htmlAttrs: { class: 'gift-tone' } })
+
+
 const { t } = useLang('web', 'gifts')
 const { history } = useGifts()
 
@@ -112,7 +115,11 @@ const shown = computed(() => entries.value.filter(
   (entry) => only.value === 'all' || (entry.direction ?? 'sent') === only.value,
 ))
 
-const crumbs = computed(() => [{ label: t('gifts_title', 'My gifts', 'هداياي') }])
+const crumbs = computed(() => [
+  { to: '/', label: t('nav_home', 'Home', 'الرئيسية', { subGroup: 'general' }) },
+  { to: '/profile', label: t('nav_profile', 'Profile', 'حسابي', { subGroup: 'general' }) },
+  { label: t('gifts_title', 'My gifts', 'هداياي') },
+])
 
 useSeoMeta({ title: () => t('gifts_title', 'My gifts', 'هداياي'), robots: 'noindex, nofollow' })
 </script>

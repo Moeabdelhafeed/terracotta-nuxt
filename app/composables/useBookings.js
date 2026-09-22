@@ -38,6 +38,21 @@ export const daysUntil = (ymd, today = todayInStudio()) => {
   return Math.round((at(ymd) - at(today)) / 86400000);
 };
 
+/**
+ * Hours from now to a session, from its studio wall-clock date + start time. Riyadh is a
+ * fixed UTC+3 with no DST, so the instant is the wall clock less three hours.
+ *
+ * A countdown that only counts calendar days told somebody with a session at 19:00 that
+ * it was "0 day(s) to go" at lunchtime, which reads as already over rather than today.
+ */
+export const hoursUntilSession = (ymd, startTime) => {
+  if (!ymd) return null;
+  const [y, m, d] = ymd.split("-").map(Number);
+  const [hh = 0, mm = 0] = String(startTime ?? "00:00").split(":").map(Number);
+  const at = Date.UTC(y, m - 1, d, hh - 3, mm);
+  return Number.isNaN(at) ? null : Math.floor((at - Date.now()) / 3600000);
+};
+
 /** Weekday / day / month labels for a `YYYY-MM-DD` — a calendar date, so no timezone is involved. */
 export const dateParts = (ymd, code = "en") => {
   const [y, m, d] = ymd.split("-").map(Number);
@@ -54,15 +69,43 @@ export const dateParts = (ymd, code = "en") => {
   };
 };
 
+/**
+ * «السبت، ٣ أكتوبر» / "Saturday, October 3" — the locale's own order, not one assembled
+ * by hand. Building it as `month day weekday` printed «أكتوبر 3 السبت», which is not how
+ * either language says a date; the app takes the pattern from the locale
+ * (`DateFormat.MMMMEEEEd`) and so does this.
+ */
 export const formatBookingDate = (ymd, code = "en") => {
   if (!ymd) return "";
-  const { weekday, day, month } = dateParts(ymd, code);
-  return `${month} ${day} ${weekday}`;
+  const [y, m, d] = ymd.split("-").map(Number);
+  const locale = code === "ar" ? "ar-u-ca-gregory-nu-latn" : code;
+  return new Intl.DateTimeFormat(locale, {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(y, m - 1, d)));
 };
 
-/** The API's `"13:00"` strings, joined — displayed as-is. */
-export const formatSlotTime = (start, end) =>
-  [start, end].filter(Boolean).join(" – ");
+/**
+ * The API's `"13:00"` wall-clock strings, read the way the studio says them: 12-hour with
+ * am/pm, in Arabic «م»/«ص». Latin digits in both locales — the app prints «2:30 م», not
+ * «٢:٣٠ م». Anchored on a fixed UTC date so the zone can never shift the hour.
+ */
+export const formatClock = (value, code = "en") => {
+  if (!value) return "";
+  const [hours, minutes] = String(value).split(":");
+  if (hours === undefined || minutes === undefined) return "";
+  return new Intl.DateTimeFormat(`${code}-u-nu-latn`, {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(2000, 0, 1, Number(hours), Number(minutes))));
+};
+
+export const formatSlotTime = (start, end, code = "en") =>
+  [start, end].filter(Boolean).map((value) => formatClock(value, code)).join(" – ");
 
 /** Σ quantity bounds for a catalogue workshop, scaled by the party size. */
 export const catalogueBounds = (workshop, peopleCount) => {
@@ -78,9 +121,19 @@ export const isCatalogueType = (type) =>
   type === "paint_your_piece" || type === "make_your_candle";
 
 /**
+ * The studio stops the collection clock while a piece is booked into a painting session —
+ * it is holding that piece deliberately, so `pickup_deadline` comes back null exactly as
+ * it does for a candle. The two cannot be told apart from the deadline alone, and reading
+ * "no deadline" as "handed over" told a customer their piece was already theirs while it
+ * sat on a shelf at the studio.
+ */
+export const isAwaitingPainting = (booking) =>
+  asList(booking?.pieces).some((piece) => piece.painting_session?.is_upcoming);
+
+/**
  * One key for the badge, the illustration and the copy. `completed` splits by the delivery
- * choice, and a workshop with no delivery step (candle: `pickup_deadline` is never set)
- * reads as delivered the moment it completes.
+ * choice, and a workshop with no handover step at all (a candle, which is never given a
+ * pickup deadline) reads as delivered the moment it completes.
  */
 export const bookingState = (booking) => {
   if (!booking) return "confirmed";
@@ -89,6 +142,7 @@ export const bookingState = (booking) => {
     return booking.delivery_status === "completed"
       ? "delivered"
       : booking.delivery_status;
+  if (isAwaitingPainting(booking)) return "ready";
   return booking.pickup_deadline === null ? "delivered" : "ready";
 };
 
@@ -100,7 +154,10 @@ export const bookingState = (booking) => {
 export const hasDeliveryStep = (booking) =>
   !!booking &&
   booking.status === "completed" &&
-  (booking.pickup_deadline !== null || booking.delivery_method !== null);
+  (booking.pickup_deadline !== null ||
+    booking.delivery_method !== null ||
+    // The deadline is suspended, not absent: the piece is still the studio's to hand over.
+    isAwaitingPainting(booking));
 
 /**
  * Whether the handover choice is still the customer's to make. The spec keeps it

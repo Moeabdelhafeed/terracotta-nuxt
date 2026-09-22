@@ -48,7 +48,7 @@ const LABELS = () => ({
 
 const TONES = {
   done: 'border-brand-green bg-brand-green text-white',
-  current: 'border-brand-rust bg-brand-rust/10 text-brand-rust',
+  current: 'border-brand-terracotta bg-brand-terracotta/10 text-brand-terracotta',
   todo: 'border-border bg-card text-muted-foreground',
   stopped: 'border-destructive bg-destructive text-white',
 }

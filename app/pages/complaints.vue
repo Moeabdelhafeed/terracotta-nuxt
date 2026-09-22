@@ -1,5 +1,5 @@
 <template>
-  <main class="min-h-svh bg-background pb-28">
+  <main class="bg-background">
     <PageBar :crumbs="crumbs" />
     <div class="mx-auto max-w-6xl px-6 py-16">
       <div class="flex flex-col gap-5">
@@ -32,7 +32,7 @@
               <SelectTrigger
                 id="complaint_type"
                 data-test="complaint-type"
-                class="h-12 w-full text-base"
+                class="h-12 w-full rounded-xl text-base"
               >
                 {{ complaintTypeLabel(form.type, t) }}
               </SelectTrigger>
@@ -173,7 +173,7 @@
           <Button
             type="submit"
             data-test="complaint-submit"
-            class="h-12 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90 sm:col-span-2 sm:justify-self-start sm:px-10"
+            class="h-12 rounded-xl bg-brand-terracotta text-base hover:bg-brand-terracotta/90 sm:col-span-2 sm:justify-self-start sm:px-10"
             :disabled="submitting"
           >
             {{
@@ -204,7 +204,7 @@
             class="mt-4 grid gap-3 lg:grid-cols-2"
             aria-busy="true"
           >
-            <AppSkeleton v-for="n in 2" :key="n" class="h-24 w-full" />
+            <AppSkeleton v-for="n in 2" :key="n" class="h-24 w-full !rounded-2xl" />
           </div>
 
           <p
@@ -299,6 +299,7 @@ const {
 
 const crumbs = computed(() => [
   { label: t("home", "Home", "الرئيسية"), to: "/" },
+  { label: t("nav_profile", "Profile", "حسابي", { subGroup: "general" }), to: "/profile" },
   { label: t("complaints_title", "Complaints", "الشكاوى") },
 ]);
 

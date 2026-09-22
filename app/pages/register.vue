@@ -16,7 +16,7 @@
         <p class="text-sm leading-relaxed text-muted-foreground">
           {{ t('register_success_body', 'Every workshop sets its own deadline for cancelling or rescheduling. You will see yours on the booking itself.', 'لكل ورشة موعد نهائي خاص بها للإلغاء أو تغيير الموعد، وستجده على الحجز نفسه.') }}
         </p>
-        <Button size="lg" class="h-13 w-full rounded-control bg-brand-rust text-base hover:bg-brand-rust/90" @click="onContinue">
+        <Button size="lg" class="h-13 w-full rounded-control bg-brand-terracotta text-base hover:bg-brand-terracotta/90" @click="onContinue">
           {{ t('continue', 'Continue', 'استكمال') }}
         </Button>
       </div>
@@ -73,7 +73,7 @@
           </span>
           <NuxtLink
             to="/login"
-            class="text-xs font-medium text-brand-rust underline-offset-4 hover:underline"
+            class="text-xs font-medium text-brand-terracotta underline-offset-4 hover:underline"
           >{{ t('go_to_login', 'Go to login', 'الذهاب لتسجيل الدخول') }}</NuxtLink>
         </template>
         <span v-if="emailDomainRejected" class="text-xs text-destructive">
@@ -125,7 +125,7 @@
           <button
             type="button"
             data-test="open-terms"
-            class="text-brand-rust underline-offset-4 hover:underline"
+            class="text-brand-terracotta underline-offset-4 hover:underline"
             @click.prevent="termsOpen = true"
           >{{ termsPage?.name || t('terms_and_conditions', 'Terms & Conditions', 'الشروط والأحكام') }}</button>
           {{ t('and', 'and', 'و') }}
@@ -133,17 +133,20 @@
             v-if="privacyPage"
             to="/privacy"
             target="_blank"
-            class="text-brand-rust underline-offset-4 hover:underline"
+            class="text-brand-terracotta underline-offset-4 hover:underline"
           >{{ privacyPage.name }}</NuxtLink>
           <span v-else>{{ t('privacy_policy', 'Privacy Policy', 'سياسة الخصوصية') }}</span>
         </Label>
         </div>
         <span v-if="errors.policy_agreed" class="text-xs text-destructive">{{ errors.policy_agreed[0] }}</span>
       </div>
+
+      <AuthFormError :message="formError" />
+
       <Button
         type="submit"
         size="lg"
-        class="h-13 w-full rounded-control bg-brand-rust text-base hover:bg-brand-rust/90"
+        class="h-13 w-full rounded-control bg-brand-terracotta text-base hover:bg-brand-terracotta/90"
         :disabled="loading || identifierTaken || checking"
       >
         {{ loading ? t('creating', 'Creating...', 'جارٍ الإنشاء...') : t('create_account', 'Create account', 'إنشاء حساب') }}
@@ -153,7 +156,7 @@
       <span class="text-muted-foreground">{{ t('have_account', 'Have account?', 'لديك حساب؟') }}&nbsp;</span>
       <NuxtLink
         :to="{ path: '/login', query: redirectTarget === '/' ? {} : { redirect: redirectTarget } }"
-        class="font-medium text-brand-rust underline-offset-4 hover:underline"
+        class="font-medium text-brand-terracotta underline-offset-4 hover:underline"
       >
         {{ t('sign_in', 'Sign in', 'تسجيل الدخول') }}
       </NuxtLink>
@@ -180,6 +183,8 @@ const route = useRoute()
 const redirectTarget = computed(() => safeAuthRedirect(route.query.redirect))
 
 const errors = ref({})
+// 429 from the auth throttle and 403 carry a message and no `errors` map.
+const formError = ref('')
 const loading = ref(false)
 const created = ref(false)
 const checking = ref(false)
@@ -267,6 +272,7 @@ const buildBody = () => {
 
 const onSubmit = async () => {
   errors.value = {}
+  formError.value = ''
   if (!form.value.policy_agreed) {
     errors.value = { policy_agreed: [t('policy_required', 'Accept the terms to continue.', 'وافق على الشروط للمتابعة.')] }
     return
@@ -303,7 +309,9 @@ const onSubmit = async () => {
     if (registered.verified_at || registered.is_verified) created.value = true
     else navigateTo({ name: 'verify' })
   } catch (error) {
-    errors.value = error.data?.errors ?? {}
+    const normalized = normalizeApiError(error)
+    errors.value = normalized.errors
+    formError.value = Object.keys(normalized.errors).length ? '' : normalized.message
   } finally {
     loading.value = false
   }

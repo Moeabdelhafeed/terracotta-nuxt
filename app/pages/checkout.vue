@@ -1,17 +1,17 @@
 <template>
-  <main class="min-h-svh bg-background pb-28">
+  <main class="bg-background">
     <PageBar :crumbs="crumbs" />
 
     <div class="mx-auto max-w-6xl px-6 py-16">
       <h1 class="font-display text-3xl font-semibold sm:text-4xl">{{ t('checkout_title', 'Checkout', 'الدفع') }}</h1>
 
       <!-- The open hold the server refused a second checkout for: pay it or cancel it. -->
-      <section v-if="resumed && order" class="mx-auto mt-8 max-w-xl rounded-3xl border border-brand-rust/40 bg-brand-mist/40 p-6 sm:p-8">
+      <section v-if="resumed && order" class="mt-8 rounded-3xl border border-brand-terracotta/40 bg-brand-mist/40 p-6 sm:p-8">
         <h2 class="font-display text-xl font-semibold">{{ t('open_hold_title', 'An order is already waiting for payment', 'لديك طلب بانتظار الدفع') }}</h2>
         <p class="mt-2 text-sm text-muted-foreground">{{ error || t('open_hold_body', 'Pay or cancel it before placing a new one.', 'ادفعه أو ألغِه قبل إنشاء طلب جديد.') }}</p>
 
         <div class="mt-5 flex flex-wrap items-center gap-3">
-          <NuxtLink :to="`/orders/${order.id}`" class="text-sm font-medium text-brand-rust underline-offset-4 hover:underline">
+          <NuxtLink :to="`/orders/${order.id}`" class="text-sm font-medium text-brand-terracotta underline-offset-4 hover:underline">
             {{ t('open_hold_link', 'Order #:id', 'الطلب رقم :id', { id: order.id }) }}
           </NuxtLink>
           <ShopOrderStatusBadge :status="order.status" />
@@ -32,14 +32,14 @@
       </section>
 
       <!-- The order this session created, held and waiting for the pay call. -->
-      <section v-else-if="order" class="mx-auto mt-8 flex max-w-xl flex-col gap-6">
+      <section v-else-if="order" class="mt-8 flex flex-col gap-6">
         <div v-if="settled" class="rounded-3xl border bg-card p-8 text-center">
           <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-green/10 text-brand-green">
             <LucideCheckCircle2 class="size-6" />
           </span>
           <p class="mt-4 font-display text-2xl font-semibold">{{ t('order_placed_title', 'Your order is placed', 'تم تأكيد طلبك') }}</p>
           <p class="mt-2 text-sm text-muted-foreground">{{ t('order_placed_body', 'We will start preparing it right away.', 'سنبدأ بتجهيزه فورًا.') }}</p>
-          <Button as-child class="mt-6 h-12 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90">
+          <Button as-child class="mt-6 h-12 rounded-xl bg-brand-terracotta text-base hover:bg-brand-terracotta/90">
             <NuxtLink :to="`/orders/${order.id}`">{{ t('view_order', 'View the order', 'عرض الطلب') }}</NuxtLink>
           </Button>
         </div>
@@ -55,17 +55,22 @@
             @paid="onPaid"
             @expired="reset"
           />
+
+          <!-- The hold is sitting on stock, on the wallet slice it took and on a use of
+               the discount code for the whole window. A customer who decides not to pay
+               could only walk away and leave all three locked until it expired. -->
+          <ShopOrderCancelButton :order="order" :cancel="cancelOpen" @cancelled="reset" />
         </template>
       </section>
 
       <!-- Empty cart: nothing to quote, nothing to place. -->
       <div v-else-if="!lines.length && !cartLoading" class="mx-auto mt-8 max-w-xl rounded-3xl border bg-card p-8 text-center sm:p-12">
-        <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-rust/10 text-brand-rust">
+        <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-terracotta/10 text-brand-terracotta">
           <LucideShoppingBag class="size-6" />
         </span>
         <p class="mt-4 font-display text-xl font-semibold">{{ t('cart_empty_title', 'Your cart is empty', 'عربيتك فاضية', { subGroup: 'shop' }) }}</p>
         <p class="mt-2 text-sm text-muted-foreground">{{ t('checkout_empty_body', 'There is nothing to pay for yet.', 'لا يوجد ما يُدفع بعد.') }}</p>
-        <Button as-child class="mt-6 h-12 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90">
+        <Button as-child class="mt-6 h-12 rounded-xl bg-brand-terracotta text-base hover:bg-brand-terracotta/90">
           <NuxtLink to="/shop">{{ t('browse_shop', 'Browse the shop', 'تصفح المتجر', { subGroup: 'shop' }) }}</NuxtLink>
         </Button>
       </div>
@@ -115,7 +120,7 @@
 
           <Button
             type="button"
-            class="h-12 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+            class="h-12 w-full rounded-xl bg-brand-terracotta text-base hover:bg-brand-terracotta/90"
             :disabled="!canPlace"
             @click="place"
           >
@@ -171,9 +176,27 @@ const placing = ref(false)
 const lines = cart.items
 const cartLoading = cart.pending
 
-const addressError = computed(() => fieldError(errors.value, 'address_id'))
+// The server takes either an `address_id` or a lat/lng/phone triple, so with no address
+// chosen it answers 422 keyed on `lat`/`lng`/`phone` — nowhere near the address section,
+// and worded as raw Laravel ("The lat field is required when address id is not present.").
+// The quote succeeds regardless, since it falls back to the app-wide delivery fee, so the
+// summary rendered and the button looked ready. Say it here instead, and hold the button.
+const missingAddress = computed(() => !addressId.value)
+
+const addressError = computed(
+  () =>
+    fieldError(errors.value, 'address_id') ||
+    fieldError(errors.value, 'lat') ||
+    fieldError(errors.value, 'phone') ||
+    // Only once there is something to buy, so it does not flash while the cart loads.
+    (missingAddress.value && !!quote.value
+      ? t('address_required', 'Choose a delivery address to continue.', 'اختر عنوان التوصيل للمتابعة.')
+      : ''),
+)
 const cartError = computed(() => fieldError(errors.value, 'cart'))
-const canPlace = computed(() => !placing.value && !quoting.value && !!quote.value && cart.canCheckout.value)
+const canPlace = computed(() =>
+  !placing.value && !quoting.value && !!quote.value && cart.canCheckout.value && !missingAddress.value,
+)
 const quoteFailed = computed(() => !quote.value && !quoting.value && !!error.value)
 
 const place = async () => {

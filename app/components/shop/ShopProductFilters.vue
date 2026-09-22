@@ -17,7 +17,7 @@
         <SelectTrigger
           data-test="product-sort"
           :aria-label="t('sort_by', 'Sort by', 'ترتيب حسب')"
-          class="h-12 text-base"
+          class="h-12 rounded-xl text-base"
         >
           {{ sortLabel(sort) }}
         </SelectTrigger>
@@ -63,7 +63,7 @@
           inputmode="decimal"
           min="0"
           :max="PRICE_CEILING"
-          class="h-8 w-20 rounded-lg border-0 px-2 text-sm shadow-none focus-visible:ring-0"
+          class="h-10 w-20 rounded-lg border-0 px-2 text-sm shadow-none focus-visible:ring-0 sm:h-8"
           :placeholder="t('price_min', 'Min', 'من')"
           :aria-label="t('price_min', 'Min', 'من')"
         />
@@ -75,7 +75,7 @@
           inputmode="decimal"
           min="0"
           :max="PRICE_CEILING"
-          class="h-8 w-20 rounded-lg border-0 px-2 text-sm shadow-none focus-visible:ring-0"
+          class="h-10 w-20 rounded-lg border-0 px-2 text-sm shadow-none focus-visible:ring-0 sm:h-8"
           :placeholder="t('price_max', 'Max', 'إلى')"
           :aria-label="t('price_max', 'Max', 'إلى')"
         />

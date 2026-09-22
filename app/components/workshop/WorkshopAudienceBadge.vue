@@ -1,7 +1,12 @@
 <template>
   <span
     v-if="label"
-    class="inline-flex w-fit items-center gap-1.5 rounded-md bg-brand-blush/40 px-3 py-1 text-xs font-medium text-brand-rust"
+    class="inline-flex w-fit items-center gap-1.5 px-2 py-0.5 text-xs font-medium"
+    :class="
+      onColor
+        ? 'rounded-full bg-white/20 text-white'
+        : 'rounded-md bg-primary/10 px-3 py-1 text-primary'
+    "
     :data-audience="audience"
   >
     <LucideUsers class="size-3.5" />{{ label }}
@@ -16,6 +21,10 @@
  */
 const props = defineProps({
   audience: { type: String, default: "mixed" },
+  /** On a card painted in the workshop's own colour, the pill is the card's ink at 18%.
+   *  Off it, the pill tints `--primary` — which the workshop page rebinds to the
+   *  workshop's own colour, so the badge follows whatever the page is painted in. */
+  onColor: { type: Boolean, default: false },
 });
 
 const { t } = useLang("web", "home");

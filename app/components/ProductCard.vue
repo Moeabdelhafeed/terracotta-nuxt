@@ -1,7 +1,7 @@
 <template>
   <NuxtLink
-    :to="`${base}/${product.id}`"
-    class="group block overflow-hidden rounded-card border bg-card"
+    :to="`${shelf}/${product.id}`"
+    class="group block overflow-hidden rounded-card border bg-card transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
     :class="{ 'opacity-55': soldOut }"
   >
     <div class="relative aspect-square overflow-hidden bg-brand-container">
@@ -74,13 +74,27 @@ const props = defineProps({
 const { t } = useLang("web", "home");
 const { format } = usePrice();
 
+/**
+ * Where this card links. `base` is right whenever the list itself knows which shelf it
+ * came from, but the favourites list does not — the two storefronts share one table, so a
+ * hearted bag of clay arrives in the same payload as a hearted mug. `section` on the
+ * product settles it when the API sends one; until it does, a favourited material still
+ * links into /shop and 404s there, because `show()` filters by section.
+ */
+const shelf = computed(() =>
+  props.product?.section === "materials" ? "/materials" : props.base,
+);
+
 // Sold out stays in the list, greyed — hiding it hides the reason it cannot be bought.
 const soldOut = computed(() => props.product.in_stock === false);
 
+// Truncated, not rounded, and in halalas: rounding up printed "-24%" beside 65.00 and
+// 49.50, which is 23.8% — a number the customer cannot verify against the two prices
+// sitting next to it.
 const discount = computed(() => {
-  const price = Number(props.product.price ?? 0);
-  const sale = Number(props.product.sale_price ?? 0);
+  const price = toHalalas(props.product.price);
+  const sale = toHalalas(props.product.sale_price);
   if (!price || !sale || sale >= price) return 0;
-  return Math.round(((price - sale) / price) * 100);
+  return Math.floor(((price - sale) * 100) / price);
 });
 </script>

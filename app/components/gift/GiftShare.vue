@@ -11,7 +11,7 @@
     </div>
 
     <div class="flex flex-col gap-3 sm:flex-row">
-      <Button type="button" class="h-12 flex-1 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90" @click="share">
+      <Button type="button" class="h-12 flex-1 rounded-xl bg-brand-terracotta text-base hover:bg-brand-terracotta/90" @click="share">
         <LucideShare2 class="size-4" />
         {{ t('gift_share', 'Share the link', 'مشاركة الرابط') }}
       </Button>

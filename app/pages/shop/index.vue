@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main class="bg-background">
     <PageHero
       media-key="hero_shop"
       fallback="/seed/hero-shop.webp"
@@ -22,6 +22,8 @@
 
     <div class="mx-auto max-w-6xl px-6 py-16">
       <!-- Cart / favourites / orders, the three shortcuts the store home carries. -->
+      <GiftWalletGiftRow class="mb-8" />
+
       <ShopQuickTiles class="mb-10 sm:max-w-md" />
 
       <!--
@@ -29,7 +31,7 @@
       per category, same as the home page — and the row scrolls sideways rather than
       wrapping into an uneven block.
     -->
-      <div class="mb-6 -mx-6 overflow-x-auto px-6 pb-2 pt-2">
+      <div class="mb-6 -mx-6 overflow-x-auto scrollbar-none px-6 pb-2 pt-2">
         <ul class="flex w-max gap-4 sm:gap-5">
           <li>
             <button
@@ -38,10 +40,10 @@
               @click="pick(null)"
             >
               <span
-                class="flex aspect-square items-center justify-center rounded-2xl bg-brand-rust/10 ring-2 ring-offset-2 ring-offset-background transition group-hover:brightness-95"
+                class="flex aspect-square items-center justify-center rounded-2xl bg-brand-terracotta/10 ring-2 ring-offset-2 ring-offset-background transition group-hover:brightness-95"
                 :class="categoryId ? 'ring-transparent' : 'ring-primary'"
               >
-                <LucideShapes class="size-6 text-brand-rust" />
+                <LucideShapes class="size-6 text-brand-terracotta" />
               </span>
               <span
                 class="mt-2 block truncate text-xs font-medium transition-colors"
@@ -71,7 +73,7 @@
                   :alt="category.title"
                   class="size-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
-                <LucideShapes v-else class="size-6 text-brand-rust" />
+                <LucideShapes v-else class="size-6 text-brand-terracotta" />
               </span>
               <span
                 class="mt-2 block truncate text-xs font-medium transition-colors"
@@ -138,13 +140,18 @@
         </li>
       </ul>
 
-      <p v-else class="text-muted-foreground">
-        {{
-          route.query.search
-            ? t("no_results", "Nothing matched that search.", "لا نتائج مطابقة لبحثك.")
-            : t("nothing_here", "Nothing here yet.", "لا يوجد شيء هنا بعد")
-        }}
-      </p>
+      <div
+        v-else
+        class="mx-auto flex w-full max-w-xl flex-col items-center gap-3 rounded-card border bg-card p-10 text-center"
+      >
+        <p class="text-sm text-muted-foreground">
+          {{
+            route.query.search
+              ? t("no_results", "Nothing matched that search.", "لا نتائج مطابقة لبحثك.")
+              : t("nothing_here", "Nothing here yet.", "لا يوجد شيء هنا بعد")
+          }}
+        </p>
+      </div>
 
       <!-- Real links, so a page is shareable and crawlable rather than a click handler. -->
       <nav

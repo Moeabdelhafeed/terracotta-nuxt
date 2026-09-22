@@ -1,30 +1,20 @@
 <template>
-  <section v-if="greeting || booking" class="mx-auto max-w-3xl px-6 pt-14">
+  <section v-if="greeting" class="mx-auto max-w-6xl px-6 pt-14">
     <p v-if="greeting" class="font-display text-2xl font-semibold sm:text-3xl">{{ greeting }}</p>
 
-    <template v-if="booking">
-      <h2 class="mt-6 font-display text-lg font-semibold text-brand-rust">
-        {{ t('resume_workshop', 'Resume your workshop', 'استكمل ورشتك') }}
-      </h2>
-
-      <!-- The same card the bookings list uses: `current_booking` carries the fields it
-           reads, and the date/time are the API's own studio-time strings either way. -->
-      <BookingCard :booking="booking" class="mt-3" />
-    </template>
   </section>
 </template>
 
 <script setup>
 /**
- * The signed-in visitor's welcome: a greeting by their local hour, and the nearest
- * upcoming confirmed booking (`current_booking` from `GET /api/home`, `null` for a guest
- * or for someone with nothing booked).
+ * The signed-in visitor's welcome — the greeting, by their own local hour.
+ *
+ * The next booking used to sit here too, off `GET /api/home`'s `current_booking`, and it
+ * was the SAME row the live strip draws from the bookings list. One of them had to go,
+ * and the strip's is the one the app keeps: it answers the workshops page as well.
  */
-const { currentBooking } = useHome()
 const { user } = useSanctumAuth()
 const { t } = useLang('web', 'home')
-
-const booking = computed(() => currentBooking.value)
 
 const name = computed(() => {
   const record = user.value?.data ?? user.value
@@ -37,11 +27,16 @@ const name = computed(() => {
 const hour = ref(null)
 onMounted(() => { hour.value = new Date().getHours() })
 
+/**
+ * The hour greets everyone; the name is only there for somebody who has one. A guest gets
+ * the salutation on its own rather than nothing at all — and the line under it says what
+ * signing in would keep.
+ */
 const greeting = computed(() => {
-  if (hour.value === null || !name.value) return ''
+  if (hour.value === null) return ''
   const salutation = hour.value < 12
     ? t('good_morning', 'Good morning', 'صباح الخير')
     : t('good_evening', 'Good evening', 'مساء الخير')
-  return `${salutation}, ${name.value}`
+  return name.value ? `${salutation}, ${name.value}` : salutation
 })
 </script>

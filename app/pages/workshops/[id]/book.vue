@@ -10,9 +10,12 @@
   </main>
 
   <main v-else-if="workshop">
-    <PageBar :crumbs="crumbs" />
+    <PageBar :crumbs="crumbs" :back="`/workshops/${route.params.id}`" />
 
-    <div class="mx-auto max-w-6xl px-6 py-16">
+    <div
+      class="mx-auto max-w-6xl px-6 py-16"
+      :style="{ '--primary': workshopColour(workshop) }"
+    >
       <!-- Success (rDHVc / BhI1o / C75dHn) -->
       <section
         v-if="step === 'done'"
@@ -53,7 +56,7 @@
         </p>
         <Button
           as-child
-          class="mt-8 h-12 rounded-xl bg-brand-rust px-8 text-base hover:bg-brand-rust/90"
+          class="mt-8 h-12 rounded-xl bg-primary px-8 text-base hover:bg-primary/90"
         >
           <NuxtLink :to="`/bookings/${booking.id}`">{{
             t("track_booking", "Track my booking", "تتبع الحجز")
@@ -66,69 +69,37 @@
           {{ workshop.title }}
         </h1>
 
-        <ol class="mt-6 flex flex-wrap gap-2 text-sm">
-          <li v-for="(name, index) in stepNames" :key="name.key">
-            <span
-              class="rounded-xl px-3 py-1"
-              :class="
-                index === stepIndex
-                  ? 'bg-brand-rust text-white'
-                  : 'bg-brand-mist text-muted-foreground'
-              "
-              >{{ index + 1 }}. {{ name.label }}</span
-            >
-          </li>
-        </ol>
 
         <!-- Step 1 — people, date, slot (oDD24 / uA4fJ / Kzosl) -->
-        <section
-          v-show="step === 'when'"
-          class="mt-10 grid gap-8 lg:grid-cols-[1.5fr_1fr] lg:items-start"
-        >
-          <div>
-            <BookingSlotPicker
-              ref="picker"
-              :workshop="workshop"
-              v-model:people="people"
-              v-model:date="date"
-              v-model:slot-id="slotId"
-              v-model:slot="slot"
-              :errors="allErrors"
-            />
+        <section v-show="step === 'when'" data-step="when" class="mt-10">
+          <BookingSlotPicker
+            ref="picker"
+            :workshop="workshop"
+            v-model:people="people"
+            v-model:date="date"
+            v-model:slot-id="slotId"
+            v-model:slot="slot"
+            :errors="allErrors"
+          />
 
-            <Button
-              type="button"
-              class="mt-10 h-12 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90 sm:w-auto sm:px-10"
-              :disabled="!slotId"
-              @click="goNext"
-            >
-              {{
-                catalogue
-                  ? t("next", "Next", "التالي")
-                  : t("to_payment", "Payment", "الدفع")
-              }}
-            </Button>
-          </div>
-
-          <aside class="flex flex-col gap-3">
-            <CheckoutSummary
-              :quote="quote"
-              :title="t('summary_title', 'Summary', 'الملخص')"
-            />
-            <p v-if="!quote" class="text-sm text-muted-foreground">
-              {{
-                t(
-                  "summary_awaiting_slot",
-                  "Pick a date and a session to see the price.",
-                  "اختر التاريخ والجلسة لعرض السعر.",
-                )
-              }}
-            </p>
-          </aside>
+          <Button
+            type="button"
+            class="mt-10 h-14 w-full justify-between rounded-2xl bg-primary px-6 text-base hover:bg-primary/90"
+            :disabled="!slotId"
+            @click="goNext"
+          >
+            <span class="size-5" />
+            {{
+              catalogue
+                ? t("next", "Next", "التالي")
+                : t("to_payment", "Payment", "الدفع")
+            }}
+            <LucideArrowRight class="size-5 rtl:-scale-x-100" />
+          </Button>
         </section>
 
         <!-- Step 2 — catalogue pieces (hDFHD / R2fBVR) -->
-        <section v-if="catalogue" v-show="step === 'pieces'" class="mt-10">
+        <section v-if="catalogue" v-show="step === 'pieces'" data-step="pieces" class="mt-10">
           <BookingPiecePicker
             v-model="lines"
             :workshop="workshop"
@@ -146,7 +117,7 @@
             >
             <Button
               type="button"
-              class="h-12 rounded-xl bg-brand-rust px-10 text-base hover:bg-brand-rust/90"
+              class="h-12 rounded-xl bg-primary px-10 text-base hover:bg-primary/90"
               :disabled="!piecesValid"
               @click="goPay"
               >{{ t("to_payment", "Payment", "الدفع") }}</Button
@@ -155,254 +126,284 @@
         </section>
 
         <!-- Step 3 — pay (hbg4J / FDjK9 / MEIJN) -->
+        <!-- Step 3 — pay (hbg4J / FDjK9 / MEIJN). One column, in the app's order:
+             what is being bought, what it costs, what it adds up to, then the buttons. -->
         <section
+          data-step="pay"
           v-show="step === 'pay'"
-          class="mt-10 grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-start"
+          class="mt-10 flex flex-col gap-4"
         >
-          <div>
-            <div class="rounded-3xl border bg-card p-6">
-              <div class="flex items-start justify-between gap-4">
-                <div>
-                  <h2 class="font-display text-xl font-semibold">
-                    {{ workshop.title
-                    }}<span v-if="withCelebration">
-                      {{
-                        t("with_celebration", "with a celebration", "مع احتفال")
-                      }}</span
-                    >
-                  </h2>
-                  <p class="mt-1 text-sm text-muted-foreground">
-                    {{ t("n_people", ":n people", ":n اشخاص", { n: people }) }}
-                    · {{ formatBookingDate(date, code) }} ·
-                    <span dir="ltr">{{
-                      formatSlotTime(slot?.start_time, slot?.end_time)
-                    }}</span>
-                  </p>
-                </div>
-                <p
-                  v-if="quote"
-                  class="font-display text-2xl font-black text-primary"
-                >
-                  {{ format(quote.total_price) }}
-                </p>
-              </div>
+          <!-- The celebration rides ABOVE the card it was added to, so taking it off is
+               where it was put on. -->
+          <button
+            v-if="withCelebration && !booking"
+            type="button"
+            class="relative -mb-10 flex h-20 items-start justify-center overflow-hidden rounded-2xl bg-brand-blush text-sm font-semibold text-white transition-colors hover:bg-brand-blush"
+            @click="withCelebration = false"
+          >
+            <!--
+              `-mb-8` tucks the bottom 32px of this button behind the card below it, so
+              only the top 48px is ever seen. Both the confetti and the label are sized to
+              that visible strip (`h-12`) rather than to the button — centring on the full
+              80px put the words low and looked like a mistake.
+            -->
+            <span
+              class="pointer-events-none absolute start-0 top-0 aspect-square h-12 bg-[url('/confetti.png')] bg-contain bg-no-repeat scale-200"
+              aria-hidden="true"
+            />
+            <span
+              class="pointer-events-none absolute end-0 top-0 aspect-square h-12 bg-[url('/confetti.png')] bg-contain bg-no-repeat scale-200"
+              aria-hidden="true"
+            />
+            <span class="relative flex h-12 mt-1 items-center">
+              {{ t("remove_celebration", "Remove the celebration", "ازالة الاحتفال") }}
+            </span>
+          </button>
 
-              <button
-                v-if="withCelebration"
-                type="button"
-                class="mt-4 inline-flex items-center gap-2 rounded-md bg-brand-blush/40 px-3 py-1 text-xs font-medium text-brand-rust"
-                @click="withCelebration = false"
-              >
-                <LucideX class="size-3.5" />{{
-                  t(
-                    "remove_celebration",
-                    "Remove the celebration",
-                    "ازالة الاحتفال",
-                  )
-                }}
-              </button>
+          <!-- The workshop card, exactly as the listing draws it: coloured band, art in
+               its own well at the end. One card for one workshop, everywhere it appears. -->
+          <div
+            class="relative z-10 flex min-h-[110px] overflow-hidden rounded-control p-1"
+            :style="{ backgroundColor: workshopColour(workshop) }"
+          >
+            <div class="flex min-w-0 flex-1 flex-col gap-1 pb-4 pe-2 ps-4 pt-4 text-white">
+              <h3 class="font-display text-xl font-semibold leading-snug">{{ workshop.title }}</h3>
 
-              <dl class="mt-6 flex flex-col gap-2 border-t pt-4 text-sm">
-                <div
-                  v-if="!catalogue"
-                  class="flex items-center justify-between gap-4"
-                >
-                  <dt class="text-muted-foreground">
-                    {{
-                      t(
-                        "line_workshop",
-                        ":title for :n people",
-                        ":title من :n اشخاص",
-                        { title: workshop.title, n: people },
-                      )
-                    }}
-                  </dt>
-                  <dd class="font-medium">
-                    {{ format(workshop.price) }} × {{ people }}
-                  </dd>
-                </div>
-                <div
-                  v-for="line in lines"
-                  :key="
-                    line.workshop_product_id ??
-                    `own-${line.workshop_booking_piece_id}`
-                  "
-                  class="flex items-center justify-between gap-4"
-                >
-                  <dt class="text-muted-foreground">
-                    {{ line.title }} × {{ line.quantity }}
-                  </dt>
-                  <dd class="font-medium">{{ format(line.price) }}</dd>
-                </div>
-                <div
-                  v-if="withCelebration"
-                  class="flex items-center justify-between gap-4"
-                >
-                  <dt class="text-muted-foreground">
-                    {{
-                      t("add_celebration", "Add a celebration", "اضافة احتفال")
-                    }}
-                  </dt>
-                  <dd class="font-medium">
-                    {{ format(workshop.celebration_price) }}
-                  </dd>
-                </div>
-              </dl>
+              <p class="text-xs leading-relaxed text-white/85">
+                {{ t("n_people", ":n people", ":n اشخاص", { n: people }) }} ·
+                {{ formatBookingDate(date, code) }} ·
+                {{ t("slot_from_to", "Session :from to :to", "ورشة من :from الى :to", {
+                  from: formatClock(slot?.start_time, code),
+                  to: formatClock(slot?.end_time, code),
+                }) }}
+              </p>
+
+              <p v-if="quote" class="mt-auto pt-2 font-display text-xl font-bold">
+                {{ format(quote.total_price) }}
+              </p>
             </div>
 
+            <div class="w-[101px] shrink-0 self-stretch overflow-hidden rounded-[6px]">
+              <AppImage
+                v-if="workshop.image?.image_api"
+                :src="workshop.image"
+                :alt="workshop.title"
+                class="size-full object-cover"
+              />
+              <div v-else class="size-full bg-white/45">
+                <img
+                  v-if="art"
+                  :src="art"
+                  alt=""
+                  class="size-full object-cover opacity-90 [filter:brightness(0)_invert(1)]"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- What the price is made of. The celebration is priced in the studio's coral,
+               the one colour that is not the workshop's. -->
+          <dl class="flex flex-col gap-3 rounded-2xl border bg-card p-5 text-sm">
+            <div v-if="!catalogue" class="flex items-center justify-between gap-4">
+              <dt>
+                {{ t("line_workshop", ":title for :n people", ":title من :n اشخاص", {
+                  title: workshop.title,
+                  n: people,
+                }) }}
+              </dt>
+              <dd class="font-display font-bold text-primary">{{ format(lineTotal(workshop.price, people)) }}</dd>
+            </div>
+
+            <div
+              v-for="line in lines"
+              :key="line.workshop_product_id ?? `own-${line.workshop_booking_piece_id}`"
+              class="flex items-center justify-between gap-4"
+            >
+              <dt>{{ line.title }} × {{ line.quantity }}</dt>
+              <dd class="font-display font-bold text-primary">{{ format(lineTotal(line.price, line.quantity)) }}</dd>
+            </div>
+
+            <div v-if="withCelebration" class="flex items-center justify-between gap-4">
+              <dt>{{ t("add_celebration", "Add a celebration", "اضافة احتفال") }}</dt>
+              <dd class="font-display font-bold text-brand-blush">{{ format(workshop.celebration_price) }}</dd>
+            </div>
+          </dl>
+
+          <!-- The session is inside its own cancellation window. Said at the till as well
+               as at the slot, because this is the screen where the money goes. -->
+          <p
+            v-if="slot && !slotCancellable(slot)"
+            class="flex items-start gap-2 text-sm text-warning"
+            data-test="pay-no-cancel"
+          >
+            <LucideLock class="mt-0.5 size-4 shrink-0" />
+            {{ t("slot_no_cancel_short", "This session starts sooner than it can be cancelled or moved.", "موعد هذه الجلسة أقرب من أن تُلغى أو يُغيَّر موعدها.") }}
+          </p>
+
+          <CheckoutWalletToggle
+            v-if="!booking && isRegistered"
+            v-model="payWithWallet"
+            :disabled="creating"
+          />
+
+          <CheckoutSummary :quote="quote ?? booking" />
+
+          <p v-if="collectionNote" class="flex items-start gap-2 rounded-2xl bg-brand-mist/60 p-4 text-sm text-muted-foreground">
+            <LucidePackage class="mt-0.5 size-4 shrink-0" />{{ collectionNote }}
+          </p>
+
+          <p v-if="workshop.location_url" class="text-sm">
+            <a
+              :href="workshop.location_url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1.5 text-primary underline"
+            >
+              <LucideMapPin class="size-4" />{{ t("the_location", "The location", "الموقع") }}
+            </a>
+          </p>
+
+          <span v-if="quoteMessage" class="text-xs text-destructive">{{ quoteMessage }}</span>
+          <span v-if="createError" class="text-xs text-destructive">{{ createError }}</span>
+
+          <!-- The hold: `amount_due === "0.00"` never gets here, it goes straight to done. -->
+          <CheckoutPaymentHold
+            v-if="booking"
+            :amount-due="booking.amount_due"
+            :payment-status="booking.payment_status"
+            :expires-at="booking.payment_expires_at"
+            :pay="payBooking"
+            :restart-to="`/workshops/${workshop.id}/book`"
+            @paid="onPaid"
+            @expired="onExpired"
+          />
+
+          <template v-else>
             <Button
-              v-if="hasCelebration && !withCelebration && !booking"
+              v-if="hasCelebration && !withCelebration"
               type="button"
-              variant="outline"
-              class="mt-4 h-12 w-full rounded-xl border-brand-blush bg-brand-blush/20 text-brand-rust hover:bg-brand-blush/40"
+              class="relative h-14 w-full overflow-hidden rounded-2xl bg-brand-blush text-base text-white hover:bg-brand-blush"
               @click="celebrationOpen = true"
             >
-              <LucideCake class="me-2 size-5" />{{
-                t("add_celebration", "Add a celebration", "اضافة احتفال")
+              <!-- The sheet's own confetti, a square at each end, so the button reads as
+                   the door to it. Decorative, and never in the way of the tap. -->
+              <span
+                class="pointer-events-none absolute inset-y-0 start-0 aspect-square bg-[url('/confetti.png')] bg-contain bg-no-repeat  scale-200"
+                aria-hidden="true"
+              />
+              <span
+                class="pointer-events-none absolute inset-y-0 end-0 aspect-square bg-[url('/confetti.png')] bg-contain bg-no-repeat scale-200"
+                aria-hidden="true"
+              />
+              <span class="relative">{{ t("add_celebration", "Add a celebration", "اضافة احتفال") }}</span>
+            </Button>
+
+            <Button
+              type="button"
+              class="h-14 w-full rounded-2xl bg-primary text-base hover:bg-primary/90"
+              :disabled="creating || !quote"
+              @click="createBooking"
+            >
+              {{
+                creating
+                  ? t("booking_saving", "Booking…", "جارٍ الحجز...")
+                  : t("confirm_and_pay", "Confirm the booking and pay", "تاكيد الحجز و الدفع")
               }}
             </Button>
 
-            <p
-              v-if="collectionNote"
-              class="mt-4 flex items-start gap-2 rounded-2xl bg-brand-mist/60 p-4 text-sm text-muted-foreground"
-            >
-              <LucidePackage class="mt-0.5 size-4 shrink-0" />{{
-                collectionNote
-              }}
-            </p>
-
-            <p
-              v-if="workshop.location_url"
-              class="mt-6 text-sm text-muted-foreground"
-            >
-              <a
-                :href="workshop.location_url"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center gap-1.5 text-primary underline"
-              >
-                <LucideMapPin class="size-4" />{{
-                  t("the_location", "The location", "الموقع")
-                }}
-              </a>
-            </p>
-          </div>
-
-          <aside class="flex flex-col gap-4">
-            <CheckoutDiscountCodeInput
-              v-if="!booking"
-              v-model="discountCode"
-              :errors="allErrors"
-              :disabled="creating"
-            />
-            <CheckoutWalletToggle
-              v-if="!booking"
-              v-model="payWithWallet"
-              :disabled="creating"
-            />
-
-            <CheckoutSummary
-              :quote="quote ?? booking"
-              :title="t('summary_title', 'Summary', 'الملخص')"
-            />
-
-            <span v-if="quoteMessage" class="text-xs text-destructive">{{
-              quoteMessage
-            }}</span>
-            <span v-if="createError" class="text-xs text-destructive">{{
-              createError
-            }}</span>
-
-            <!-- The hold: `amount_due === "0.00"` never gets here, it goes straight to done. -->
-            <CheckoutPaymentHold
-              v-if="booking"
-              :amount-due="booking.amount_due"
-              :payment-status="booking.payment_status"
-              :expires-at="booking.payment_expires_at"
-              :pay="payBooking"
-              :restart-to="`/workshops/${workshop.id}/book`"
-              @paid="onPaid"
-              @expired="onExpired"
-            />
-
-            <template v-else>
-              <Button
-                type="button"
-                variant="outline"
-                class="h-12 rounded-xl"
-                @click="step = catalogue ? 'pieces' : 'when'"
-                >{{ t("back", "Back", "رجوع") }}</Button
-              >
-              <Button
-                type="button"
-                class="h-12 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
-                :disabled="creating || !quote"
-                @click="createBooking"
-              >
-                {{
-                  creating
-                    ? t("booking_saving", "Booking…", "جارٍ الحجز...")
-                    : t(
-                        "confirm_and_pay",
-                        "Confirm the booking and pay",
-                        "تاكيد الحجز و الدفع",
-                      )
-                }}
-              </Button>
-            </template>
-          </aside>
+            <Button
+              type="button"
+              variant="ghost"
+              class="h-12 rounded-2xl"
+              @click="step = catalogue ? 'pieces' : 'when'"
+            >{{ t("back", "Back", "رجوع") }}</Button>
+          </template>
         </section>
       </template>
     </div>
 
+    <!-- The session is inside its own cancellation window: said ONCE, at the step where
+         the seat is actually taken, rather than as a line on every card. -->
+    <Teleport to="body">
+      <div
+        v-if="noCancelOpen"
+        class="fixed inset-0 z-[70] flex items-center justify-center p-6"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div class="fixed inset-0 bg-black/50" @click="noCancelOpen = false" />
+
+        <div class="relative w-full max-w-md rounded-sheet bg-background p-6 shadow-2xl">
+          <div class="flex items-start justify-between gap-4">
+            <h2 class="font-display text-lg font-bold">
+              {{ t("slot_no_cancel_title", "This session cannot be cancelled", "لا يمكن إلغاء هذه الجلسة") }}
+            </h2>
+            <button
+              type="button"
+              class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-mist text-primary transition-colors hover:text-foreground"
+              :aria-label="t('close', 'Close', 'إغلاق')"
+              @click="noCancelOpen = false"
+            >
+              <LucideX class="size-4" />
+            </button>
+          </div>
+
+          <p class="mt-3 text-sm leading-relaxed text-muted-foreground">
+            {{
+              t(
+                "slot_no_cancel_body",
+                "It starts sooner than the cancellation window allows. You can still book it, but you will not be able to cancel it or move it afterwards.",
+                "موعدها أقرب من مدة الإلغاء المسموحة. يمكنك الحجز، لكن لن تتمكن من الإلغاء أو تغيير الموعد بعدها.",
+              )
+            }}
+          </p>
+
+          <div class="mt-6 grid grid-cols-2 gap-3">
+            <Button
+              class="h-12 rounded-xl bg-primary text-base hover:bg-primary/90"
+              @click="confirmNoCancel"
+            >
+              {{ t("slot_no_cancel_confirm", "Book anyway", "احجز على أي حال") }}
+            </Button>
+            <Button variant="outline" class="h-12 rounded-xl text-base" @click="noCancelOpen = false">
+              {{ t("cancel", "Cancel", "إلغاء") }}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
     <!-- Celebration add-on (K7pta / h1Mfn / adW7i) -->
-    <BookingSheet
+    <BookingCelebrationSheet
       :open="celebrationOpen"
-      :title="
-        t('celebration_title', 'Celebrate with Terracotta', 'احتفل مع تيراكوتا')
+      :title="t('celebration_title', 'Celebrate with Terracotta', 'احتفل مع تيراكوتا')"
+      :confirm-label="
+        t('add_amount', 'Add :price', 'اضافة :price', {
+          price: format(workshop?.celebration_price),
+        })
       "
       @close="celebrationOpen = false"
+      @confirm="addCelebration"
     >
-      <template #icon><LucideCake class="size-5" /></template>
-      <p class="text-sm text-muted-foreground">
+      <p>
         {{
           t(
-            "celebration_body_1",
-            "Add a small party to your session: a cake, decorations and a corner set up for the occasion.",
-            "أضف احتفالًا صغيرًا إلى جلستك: كيكة وزينة وركن مجهّز للمناسبة.",
+            'celebration_body_1',
+            'Add a small party to your session: a cake, decorations and a corner set up for the occasion.',
+            'أضف احتفالًا صغيرًا إلى جلستك: كيكة وزينة وركن مجهّز للمناسبة.',
           )
         }}
       </p>
-      <p class="mt-3 text-sm text-muted-foreground">
+      <p>
         {{
           t(
-            "celebration_body_2",
-            "Tell us the occasion when you arrive and the team will take care of the rest.",
-            "أخبرنا بالمناسبة عند وصولك وسيتكفّل الفريق بالباقي.",
+            'celebration_body_2',
+            'Tell us the occasion when you arrive and the team will take care of the rest.',
+            'أخبرنا بالمناسبة عند وصولك وسيتكفّل الفريق بالباقي.',
           )
         }}
       </p>
-      <template #footer>
-        <Button
-          type="button"
-          variant="outline"
-          class="h-12 flex-1 rounded-xl"
-          @click="celebrationOpen = false"
-          >{{ t("close", "Close", "اغلاق") }}</Button
-        >
-        <Button
-          type="button"
-          class="h-12 flex-1 rounded-xl bg-brand-rust hover:bg-brand-rust/90"
-          @click="addCelebration"
-        >
-          {{
-            t("add_amount", "Add :price", "اضافة :price", {
-              price: format(workshop?.celebration_price),
-            })
-          }}
-        </Button>
-      </template>
-    </BookingSheet>
+    </BookingCelebrationSheet>
   </main>
 </template>
 
@@ -415,7 +416,9 @@
  * comes back with `amount_due` at zero is already paid — it skips the hold entirely.
  */
 definePageMeta({
-  middleware: ["auth-mode", "require-registered"],
+  // Not `require-registered`: a guest walks the whole stepper and is asked for an account
+  // at the pay button, where the account is what is actually missing.
+  middleware: ["auth-mode"],
   name: "workshop-book",
 });
 
@@ -436,7 +439,27 @@ watchEffect(() => {
 });
 
 const { t, code } = useLang("web", "bookings");
+
+/**
+ * The page bar, footer and scrollbar belong to the layout — `--chrome` is what they read.
+ *
+ * `:root:root`, not `:root`: on a cold load the stylesheet is served AFTER this tag, and
+ * at equal specificity the last rule wins — so the colour held on a click-in and was lost
+ * on a refresh. Doubling the selector wins on specificity, whatever the order.
+ */
+useHead(() => ({
+  style: workshop.value
+    ? [{ innerHTML: `:root:root{--chrome:${workshopColour(workshop.value)}}` }]
+    : [],
+}));
+const { isRegistered } = useIsRegistered();
+const { artFor } = useWorkshopArt();
+const art = computed(() => (workshop.value ? artFor(workshop.value) : null));
 const { format } = usePrice();
+
+// The breakdown has to add up to the total the server charges: printing a unit price
+// beside a "x 3" label showed 35 SAR over a total of 105.
+const lineTotal = (price, quantity) => fromHalalas(toHalalas(price) * (quantity ?? 1));
 const toast = useToast();
 const bookingApi = useWorkshopBooking(() => route.params.id);
 
@@ -450,7 +473,6 @@ const slotId = ref(null);
 const slot = ref(null);
 const lines = ref([]);
 const withCelebration = ref(false);
-const discountCode = ref("");
 const payWithWallet = ref(false);
 const celebrationOpen = ref(false);
 const picker = ref(null);
@@ -464,6 +486,33 @@ const createErrors = ref({});
 const createError = ref("");
 
 const catalogue = computed(() => isCatalogueType(workshop.value?.type));
+
+/**
+ * Arriving from «قطعي» with a piece already named (`?piece=2`): the reader chose that cup
+ * and the workshop to paint it at, so the picker two steps on opens holding it rather
+ * than making them find it again among the catalogue. Only ever a piece this workshop's
+ * own `own_pieces` actually offers — anything else is silently ignored.
+ */
+watch(
+  () => workshop.value,
+  (loaded) => {
+    const wanted = Number(route.query.piece)
+    if (!loaded || !wanted || lines.value.length) return
+
+    const block = loaded.own_pieces
+    const piece = asList(block?.pieces).find((candidate) => candidate.id === wanted)
+    if (!piece) return
+
+    lines.value = [{
+      workshop_booking_piece_id: piece.id,
+      quantity: 1,
+      title: piece.label ?? t("your_piece", "Your piece", "قطعتك"),
+      subtitle: null,
+      price: block?.price ?? "0.00",
+    }];
+  },
+  { immediate: true },
+);
 
 // `has_delivery` is the API's "this workshop leaves a piece behind" flag — false only for
 // make_your_candle, which the customer carries home the same evening and never collects.
@@ -517,9 +566,35 @@ const piecesValid = computed(() => {
   return totalPieces.value >= min && totalPieces.value <= max;
 });
 
-const goNext = () => {
+const noCancelOpen = ref(false);
+useModalScrollLock(noCancelOpen);
+
+/** Straight past the slot step, the customer having said yes or the slot being cancellable. */
+const advance = () => {
   step.value = catalogue.value ? "pieces" : "pay";
 };
+/**
+ * `is_non_cancellable` is the server's verdict at the moment the slots were fetched.
+ * `cancel_until` is the deadline itself, so a picker left open across that instant would
+ * otherwise go on promising a cancellation the customer can no longer make.
+ */
+const slotCancellable = (s) =>
+  !!s && !s.is_non_cancellable && (!s.cancel_until || new Date(s.cancel_until) > new Date());
+
+const goNext = () => {
+  // Asked once, here — the seat is taken from this step on.
+  if (slot.value && !slotCancellable(slot.value)) {
+    noCancelOpen.value = true;
+    return;
+  }
+  advance();
+};
+
+const confirmNoCancel = () => {
+  noCancelOpen.value = false;
+  advance();
+};
+
 const goPay = () => {
   step.value = "pay";
 };
@@ -540,7 +615,6 @@ const loadQuote = async () => {
       people_count: people.value,
       with_celebration: withCelebration.value ? 1 : 0,
       use_wallet: payWithWallet.value ? 1 : 0,
-      discount_code: discountCode.value || undefined,
       products: catalogue.value ? lines.value : [],
     });
     quote.value = res?.data ?? null;
@@ -563,13 +637,17 @@ const scheduleQuote = () => {
   quoteTimer = setTimeout(loadQuote, 350);
 };
 watch(
-  [slotId, date, people, withCelebration, payWithWallet, discountCode, lines, step],
+  [slotId, date, people, withCelebration, payWithWallet, lines, step],
   scheduleQuote,
   { deep: true },
 );
 onBeforeUnmount(() => clearTimeout(quoteTimer));
 
 const createBooking = async () => {
+  // The seat is held against an ACCOUNT, so this is the first step a guest cannot take.
+  // Asked here, the answer comes back to this page with the stepper still on screen.
+  if (!isRegistered.value) return useLoginPrompt().ask(route.fullPath);
+
   creating.value = true;
   createErrors.value = {};
   createError.value = "";
@@ -580,7 +658,6 @@ const createBooking = async () => {
       people_count: people.value,
       with_celebration: withCelebration.value,
       use_wallet: payWithWallet.value,
-      discount_code: discountCode.value || undefined,
       ...(catalogue.value ? { products: productsBody(lines.value) } : {}),
     });
     booking.value = res?.data ?? null;

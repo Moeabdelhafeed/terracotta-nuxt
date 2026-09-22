@@ -1,27 +1,29 @@
 <template>
-  <main class="min-h-svh bg-background pb-28">
+  <main class="bg-background">
+    <PageBar :crumbs="crumbs" />
     <div class="mx-auto max-w-6xl px-6 py-16">
       <div class="flex flex-col gap-5">
-        <div class="flex items-center justify-between">
-          <NuxtLink
-            to="/profile"
-            class="flex size-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground -ms-2 rtl:-scale-x-100"
-            :aria-label="t('back_to_profile', 'Back to profile', 'عودة للملف')"
-          >
-            <LucideArrowLeft class="size-5" />
-          </NuxtLink>
-          <h1 class="font-display text-lg font-semibold text-foreground">{{ t('wallet', 'Wallet', 'المحفظة') }}</h1>
-          <span class="size-10" />
-        </div>
+        <h1 class="font-display text-3xl font-semibold sm:text-4xl">
+          {{ t('wallet', 'Wallet', 'المحفظة') }}
+        </h1>
 
         <div class="grid gap-5 lg:grid-cols-2 lg:items-start">
           <div class="flex flex-col items-center gap-1 rounded-2xl border bg-card p-8">
             <span class="text-sm text-muted-foreground">{{ t('terracotta_balance', 'Terracotta balance', 'رصيد تيراكوتا') }}</span>
-            <span data-test="wallet-balance" class="font-display text-3xl font-semibold text-brand-rust">{{ format(balance) }}</span>
-            <Button as-child class="mt-4 h-12 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90">
-              <NuxtLink to="/gifts/new">
-                <LucideGift class="size-4" />
-                {{ t('gift_credit', 'Gift credit', 'اهداء رصيد') }}
+            <!-- `useWallet` keeps the last balance that arrived, so a failed refresh
+                 leaves the number the customer was reading rather than painting 0.00
+                 over it. The ledger below still reports the failure. -->
+            <span data-test="wallet-balance" class="font-display text-3xl font-semibold text-brand-terracotta">{{ format(balance) }}</span>
+            <!-- Blush, not terracotta: gifting carries the studio's pink everywhere else
+                 it appears. The drawn line sits in a square at the button's end, the way a
+                 chosen slot wears it. -->
+            <Button as-child class="mt-4 h-12 w-full rounded-xl bg-brand-blush text-base text-white hover:bg-brand-blush">
+              <NuxtLink to="/gifts/new" class="relative overflow-hidden">
+                <CardLineArt class="absolute inset-y-0 end-0 aspect-square h-full scale-125 [filter:brightness(0)_invert(1)]" />
+                <span class="relative flex items-center gap-2">
+                  <LucideGift class="size-4" />
+                  {{ t('gift_credit', 'Gift credit', 'اهداء رصيد') }}
+                </span>
               </NuxtLink>
             </Button>
           </div>
@@ -29,7 +31,7 @@
           <!-- Store credit is not cash — saying so here saves a support ticket per refund. -->
           <section class="rounded-2xl border bg-card p-5">
             <h2 class="flex items-center gap-2 font-display text-base font-semibold text-foreground">
-              <LucideInfo class="size-4 text-brand-rust" />
+              <LucideInfo class="size-4 text-brand-terracotta" />
               {{ t('wallet_how_it_works', 'How the wallet works', 'كيف تعمل المحفظة') }}
             </h2>
             <ul class="mt-3 flex flex-col gap-2 text-sm text-muted-foreground">
@@ -47,7 +49,16 @@
               </li>
               <li class="flex gap-2">
                 <LucideCheck class="mt-0.5 size-4 shrink-0 text-success" />
-                {{ t('wallet_rule_cancel', 'Cancelling a workshop refunds its full price; cancelling a shop order refunds only what the wallet paid.', 'إلغاء الورشة يعيد كامل قيمتها؛ إلغاء طلب المتجر يعيد ما دفعته المحفظة فقط.') }}
+                <!--
+                  A workshop and a shop order refund the SAME way, so the line must not
+                  claim they differ: `ShopOrderService::cancel()` credits the whole
+                  `total_price` on a paid order — goods after discount, delivery and the
+                  VAT inside them — and only the `wallet_applied` slice on a hold that was
+                  never paid, which is exactly what
+                  `WorkshopBookingService::refundToWallet()` does for a booking. What
+                  actually splits the two outcomes is paid vs unpaid, not workshop vs shop.
+                -->
+                {{ t('wallet_rule_cancel_v2', 'Cancelling a paid workshop or shop order returns the full amount to your wallet; cancelling an unpaid hold returns only the wallet credit it was holding.', 'إلغاء ورشة أو طلب مدفوع يعيد كامل المبلغ إلى محفظتك؛ وإلغاء حجز غير مدفوع يعيد ما حُجز من رصيد المحفظة فقط.') }}
               </li>
             </ul>
           </section>
@@ -59,7 +70,7 @@
           <AppLoadError v-if="error" :error="error" :retry="refresh" class="mt-4" />
 
           <div v-else-if="pending && !transactions.length" class="mt-4 grid gap-3 lg:grid-cols-2" aria-busy="true">
-            <AppSkeleton v-for="n in 4" :key="n" class="h-16 w-full" />
+            <AppSkeleton v-for="n in 4" :key="n" class="h-[90px] w-full !rounded-xl" />
           </div>
 
           <p v-else-if="!transactions.length" class="mt-4 text-sm text-muted-foreground">
@@ -68,7 +79,7 @@
 
           <ul v-else class="mt-4 grid gap-3 lg:grid-cols-2" data-test="wallet-ledger">
             <li v-for="tx in transactions" :key="tx.id" class="flex items-start gap-3 rounded-xl border p-4 text-sm">
-              <span class="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust">
+              <span class="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-terracotta/10 text-brand-terracotta">
                 <component :is="walletReasonIcon(tx.reason)" class="size-4" />
               </span>
               <div class="min-w-0 flex-1">
@@ -78,18 +89,21 @@
                   {{ t('balance_after', 'Balance after: :amount', 'الرصيد بعدها: :amount', { amount: format(tx.balance_after) }) }}
                 </span>
               </div>
+              <!-- Only the two kinds the ledger actually has are signed. Treating
+                   "anything but credit" as a debit would draw a row whose `type` was
+                   missing, or a kind added later, as money taken out. -->
               <span
                 class="shrink-0 font-medium"
-                :class="tx.type === 'credit' ? 'text-success' : 'text-destructive'"
+                :class="{ 'text-success': tx.type === 'credit', 'text-destructive': tx.type === 'debit' }"
                 dir="ltr"
-              >{{ tx.type === 'credit' ? '+' : '−' }}{{ format(tx.amount) }}</span>
+              >{{ tx.type === 'credit' ? '+' : tx.type === 'debit' ? '−' : '' }}{{ format(tx.amount) }}</span>
             </li>
           </ul>
 
           <!-- Real links, so a page is shareable and crawlable rather than a click handler. -->
-          <nav v-if="lastPage > 1" class="mt-6 flex flex-wrap items-center justify-center gap-2">
+          <nav v-if="lastPage > 1" class="mt-12 flex flex-wrap items-center justify-center gap-2">
             <Button v-if="currentPage > 1" as-child size="sm" variant="outline" class="rounded-xl">
-              <NuxtLink :to="linkTo(currentPage - 1)" rel="prev">{{ t('previous', 'Previous', 'السابق') }}</NuxtLink>
+              <NuxtLink :to="linkTo(currentPage - 1)" rel="prev">{{ t('previous', 'Previous', 'السابق', { subGroup: 'general' }) }}</NuxtLink>
             </Button>
             <Button
               v-for="number in pageNumbers"
@@ -102,9 +116,13 @@
               <NuxtLink :to="linkTo(number)" :aria-current="number === currentPage ? 'page' : undefined">{{ number }}</NuxtLink>
             </Button>
             <Button v-if="currentPage < lastPage" as-child size="sm" variant="outline" class="rounded-xl">
-              <NuxtLink :to="linkTo(currentPage + 1)" rel="next">{{ t('next', 'Next', 'التالي') }}</NuxtLink>
+              <NuxtLink :to="linkTo(currentPage + 1)" rel="next">{{ t('next', 'Next', 'التالي', { subGroup: 'general' }) }}</NuxtLink>
             </Button>
           </nav>
+
+          <p v-if="total" class="mt-6 text-center text-sm text-muted-foreground">
+            {{ t('wallet_count', ':total transactions', ':total حركة', { total }) }}
+          </p>
         </section>
       </div>
     </div>
@@ -113,17 +131,25 @@
 
 <script setup>
 definePageMeta({
+  // Entered from somewhere, with its own way back in the header — the site's
   middleware: ['auth-mode', 'require-registered', 'verified'],
   name: 'wallet',
 })
 
 const route = useRoute()
 const { t } = useLang('web', 'account')
+
+// Reached from the profile, so the trail says so — and PageBar's arrow follows it.
+const crumbs = computed(() => [
+  { to: '/', label: t('nav_home', 'Home', 'الرئيسية', { subGroup: 'general' }) },
+  { to: '/profile', label: t('nav_profile', 'Profile', 'حسابي', { subGroup: 'general' }) },
+  { label: t('wallet', 'Wallet', 'المحفظة') },
+])
 const { format } = usePrice()
 const { formatDate } = useDateFormat()
 
 const currentPage = computed(() => Math.max(1, Number(route.query.page ?? 1)))
-const { balance, transactions, lastPage, pending, error, refresh } = useWallet({ page: currentPage, perPage: 10 })
+const { balance, transactions, lastPage, total, pending, error, refresh } = useWallet({ page: currentPage, perPage: 10 })
 
 const pageNumbers = computed(() => {
   const from = Math.max(1, currentPage.value - 2)

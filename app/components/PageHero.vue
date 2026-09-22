@@ -49,22 +49,18 @@
       <!-- 90% of the viewport, not of a centred column: the picture is nearly full width,
            with just enough white ground left either side to frame it. The copy sits over
            it, as it does on the home page. -->
-      <div v-if="image" class="relative mt-4 w-[90%] overflow-hidden rounded-card">
-        <!-- Dynamic storage hands back a `{ type, image|video|file }` wrapper, which only
-             AppMedia unwraps; a record's own picture is a bare Image object, whose `type`
-             is the file extension — AppMedia would read that as a file and render a link. -->
-        <AppImage
-          v-if="isBareImage"
-          :src="image"
-          :alt="title"
-          class="aspect-[16/9] w-full object-cover sm:aspect-[21/6]"
-        />
+      <div v-if="image" class="relative mt-4 w-[90%] overflow-hidden">
+        <!-- Dynamic storage hands back a `{ type, image|video|file }` wrapper; a record's
+             own picture is a bare Image object. AppMedia takes either. -->
         <AppMedia
-          v-else
           :src="image"
           :alt="title"
           class="aspect-[16/9] w-full object-cover sm:aspect-[21/6]"
         />
+
+        <!-- A scrim, not a heavier drop-shadow: the picture behind the title is whatever
+             the CMS holds, and a pale one leaves white type unreadable however it is shadowed. -->
+        <div class="absolute inset-0 bg-black/40" aria-hidden="true" />
 
         <div
           class="absolute inset-0 flex flex-col items-center justify-center px-6 text-center text-white"
@@ -139,8 +135,4 @@ const image = computed(() => {
     ? heroAsset(props.mediaKey, props.fallback)
     : (heroAsset(props.mediaKey) ?? props.fallback);
 });
-
-const isBareImage = computed(
-  () => typeof image.value === "string" || Boolean(image.value?.image_api),
-);
 </script>

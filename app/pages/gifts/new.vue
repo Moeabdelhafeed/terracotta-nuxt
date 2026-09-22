@@ -1,5 +1,5 @@
 <template>
-  <main class="min-h-svh bg-background pb-28">
+  <main class="bg-background">
     <PageBar :crumbs="crumbs" />
 
     <div class="mx-auto max-w-6xl px-6 py-16">
@@ -11,7 +11,7 @@
         class="mx-auto max-w-xl rounded-3xl border bg-card p-6 text-center sm:p-8"
       >
         <span
-          class="mx-auto flex size-12 items-center justify-center rounded-2xl bg-brand-rust/10 text-brand-rust"
+          class="mx-auto flex size-12 items-center justify-center rounded-2xl bg-brand-terracotta/10 text-brand-terracotta"
         >
           <LucideGift class="size-5" />
         </span>
@@ -41,6 +41,14 @@
         </Button>
       </section>
 
+      <!-- A failed read of the gift package is not "gifting is off": say so and offer the
+           retry, rather than leaving a shimmer in the heading for ever. -->
+      <AppLoadError
+        v-else-if="packageStatus === 'error'"
+        class="mx-auto max-w-xl"
+        :retry="refreshPackage"
+      />
+
       <template v-else>
         <header class="mx-auto max-w-xl text-center">
           <p class="text-xs uppercase tracking-[0.2em] text-muted-foreground">
@@ -55,7 +63,7 @@
                 { amount: format(packageAmount) },
               )
             }}</span>
-            <AppSkeleton v-else class="mx-auto h-9 w-64" />
+            <AppSkeleton v-else-if="packageStatus !== 'error'" class="mx-auto h-9 w-64" />
           </h1>
           <p class="mt-3 text-muted-foreground">
             {{
@@ -118,6 +126,7 @@
                 :pay="payGift"
                 restart-to="/gifts/new"
                 @paid="onPaid"
+                @expired="onHoldExpired"
               />
             </div>
           </section>
@@ -275,7 +284,7 @@
 
             <Button
               type="submit"
-              class="h-12 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+              class="h-12 rounded-xl bg-brand-terracotta text-base hover:bg-brand-terracotta/90"
               :disabled="busy || !quote"
             >
               <LucideGift class="size-4" />
@@ -320,7 +329,10 @@
 definePageMeta({
   middleware: ["auth-mode", "require-registered", "verified"],
   name: "gift-new",
-});
+})
+
+useHead({ htmlAttrs: { class: 'gift-tone' } })
+;
 
 const { t } = useLang("web", "gifts");
 const { format } = usePrice();
@@ -337,9 +349,12 @@ const {
   quote: quoteGift,
   create,
   pay,
+  refreshPackage,
 } = useGifts();
 
 const crumbs = computed(() => [
+  { label: t("nav_home", "Home", "الرئيسية", { subGroup: "general" }), to: "/" },
+  { label: t("nav_profile", "Profile", "حسابي", { subGroup: "general" }), to: "/profile" },
   { label: t("gifts_title", "My gifts", "هداياي"), to: "/gifts" },
   { label: t("gift_new_short", "New gift", "هدية جديدة") },
 ]);
@@ -423,6 +438,17 @@ watch(discountCode, (code) => {
 });
 
 onMounted(runQuote);
+
+/**
+ * Put the buyer back on a fresh quote when the hold lapses. Without this the expired
+ * gift stayed in `gift`, so the expired panel kept rendering and its "Start again" button
+ * — a link to the route already on screen — did nothing at all. Only a reload recovered.
+ */
+const onHoldExpired = () => {
+  gift.value = null;
+  quote.value = null;
+  runQuote();
+};
 
 const purchase = async () => {
   try {

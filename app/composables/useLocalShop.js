@@ -10,13 +10,17 @@ export const localCartIds = useLocalStorage("terracotta:cart", []);
 export const localFavoriteIds = useLocalStorage("terracotta:favorites", []);
 
 /**
- * What separates two lines. The same piece in another glaze is another line — the hex
- * string itself is the variant id the cart takes, so it is all there is to key on. A line
- * with no colourway keeps the bare product id, which is what the server's own line id
- * looks like and what every caller already passes.
+ * One product, one line — the same key the server uses.
+ *
+ * A colourway is display metadata on the product (`ShopProductColor`); `shop_cart_items`
+ * has no colour column, `POST /api/shop/cart` does not accept one, and the cart it
+ * returns carries none. Splitting the local basket per colour therefore invented lines
+ * the account could never hold: each one got its own `max_quantity` ceiling, so a
+ * five-in-stock product could reach seven units across two glazes with both lines
+ * reading `in_stock`, and at sign-in the second POST for the same product 422'd and was
+ * dropped.
  */
-const lineKey = (entry) =>
-  entry.color ? `${entry.id}::${entry.color}` : entry.id;
+const lineKey = (entry) => entry.id;
 
 
 /**
@@ -61,12 +65,31 @@ const prune = (id) => {
   );
 };
 
+/**
+ * One id, from whichever shelf it is on.
+ *
+ * The two storefronts share a products table but not an endpoint, and the shop's own
+ * `show()` filters by section — so a bag of clay 404s there. Asking only the shop meant a
+ * guest's saved material was read as "gone" and pruned out of their own storage.
+ *
+ * The answer carries `section` back with it, since nothing else in a local entry says
+ * which shelf it came from and the card has to link somewhere.
+ */
+const fetchStored = async (api, id) => {
+  try {
+    const res = await api(`/api/shop/products/${id}`);
+    return { ...res, data: { section: "shop", ...res?.data } };
+  } catch (err) {
+    if (normalizeApiError(err).status !== 404) throw err;
+    const res = await api(`/api/materials/products/${id}`);
+    return { ...res, data: { section: "materials", ...res?.data } };
+  }
+};
+
 const hydrate = async (api, ids) => {
   if (!ids.length) return;
   pending.value = true;
-  const results = await Promise.allSettled(
-    ids.map((id) => api(`/api/shop/products/${id}`)),
-  );
+  const results = await Promise.allSettled(ids.map((id) => fetchStored(api, id)));
   const fetched = {};
   results.forEach((result, index) => {
     const id = ids[index];
@@ -124,7 +147,6 @@ export const useLocalCart = () => {
         {
           id: lineKey(entry),
           product,
-          color: entry.color ?? null,
           quantity: entry.quantity,
           unit_price: unitPrice,
           line_total: fromHalalas(toHalalas(unitPrice) * entry.quantity),
@@ -159,22 +181,15 @@ export const useLocalCart = () => {
       HARD_MAX_QUANTITY,
     );
 
-  const write = (productId, color, quantity) => {
+  const write = (productId, quantity) => {
     const capped = Math.max(1, Math.min(quantity, maxFor(productId)));
-    const key = lineKey({ id: productId, color });
-    const existing = localCartIds.value.some(
-      (entry) => lineKey(entry) === key,
-    );
+    const key = lineKey({ id: productId });
+    const existing = localCartIds.value.some((entry) => lineKey(entry) === key);
     localCartIds.value = existing
       ? localCartIds.value.map((entry) =>
           lineKey(entry) === key ? { ...entry, quantity: capped } : entry,
         )
-      : [
-          ...localCartIds.value,
-          color
-            ? { id: productId, quantity: capped, color }
-            : { id: productId, quantity: capped },
-        ];
+      : [...localCartIds.value, { id: productId, quantity: capped }];
     return capped;
   };
 
@@ -182,10 +197,10 @@ export const useLocalCart = () => {
     localCartIds.value.find((entry) => lineKey(entry) === lineId);
 
   /** Mirrors `POST /api/shop/cart`: an existing line is incremented, not replaced. */
-  const add = async (productId, quantity = 1, color = null) => {
-    const key = lineKey({ id: productId, color });
+  const add = async (productId, quantity = 1) => {
+    const key = lineKey({ id: productId });
     const existing = entryFor(key);
-    const next = write(productId, color, (existing?.quantity ?? 0) + quantity);
+    const next = write(productId, (existing?.quantity ?? 0) + quantity);
     return {
       success: true,
       message: t(
@@ -200,7 +215,7 @@ export const useLocalCart = () => {
 
   const update = async (lineId, quantity) => {
     const entry = entryFor(lineId);
-    const next = write(entry?.id ?? lineId, entry?.color ?? null, quantity);
+    const next = write(entry?.id ?? lineId, quantity);
     return {
       success: true,
       message: t("cart_updated", "Cart updated.", "تم تحديث العربية."),
@@ -270,8 +285,9 @@ export const useLocalFavorites = () => {
 
 /**
  * Replay the local stores onto a freshly signed-in account. A line the server refuses
- * (gone, or no longer buyable) is dropped rather than blocking the rest — the visitor is
- * mid-login and cannot be asked about it.
+ * (gone, or no longer buyable) does not block the rest — the visitor is mid-login and
+ * cannot be asked about it — but it STAYS on the device: clearing storage wholesale threw
+ * away the only copy of a basket line the customer had, with a toast as the sole trace.
  */
 export const pushLocalShopToServer = async (api) => {
   const lines = [...localCartIds.value];
@@ -295,6 +311,9 @@ export const pushLocalShopToServer = async (api) => {
     }
   };
 
+  const refusedLines = [];
+  const refusedFavorites = [];
+
   for (const line of lines) {
     if (
       await attempt(() =>
@@ -303,22 +322,23 @@ export const pushLocalShopToServer = async (api) => {
           body: {
             shop_product_id: line.id,
             quantity: line.quantity,
-            ...(line.color ? { color: line.color } : {}),
           },
         }),
       )
     )
       pushedLines += 1;
+    else refusedLines.push(line);
   }
   for (const id of favorites) {
     if (
       await attempt(() => api(`/api/shop/favorites/${id}`, { method: "POST" }))
     )
       pushedFavorites += 1;
+    else refusedFavorites.push(id);
   }
 
-  localCartIds.value = [];
-  localFavoriteIds.value = [];
+  localCartIds.value = refusedLines;
+  localFavoriteIds.value = refusedFavorites;
   products.value = {};
   await refreshNuxtData(["cart", "favorites"]);
 

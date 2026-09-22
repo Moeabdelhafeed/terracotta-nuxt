@@ -3,7 +3,7 @@
     <ul
       ref="track"
       v-gsap.whenVisible.once.from.stagger="{ opacity: 0, y: 32, duration: 0.6 }"
-      class="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-ps-6 px-6 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      class="flex snap-x snap-mandatory gap-4 overflow-x-auto scrollbar-none scroll-ps-6 px-6 pb-2"
     >
       <li
         v-for="banner in items"
@@ -50,7 +50,7 @@
     <template v-if="items.length > 1">
       <button
         type="button"
-        class="absolute top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-xl border bg-background/90 text-brand-rust shadow-sm backdrop-blur transition-colors hover:bg-background ltr:left-3 rtl:right-3"
+        class="absolute top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-xl border bg-background/90 text-brand-terracotta shadow-sm backdrop-blur transition-colors hover:bg-background ltr:left-3 rtl:right-3"
         :aria-label="t('previous', 'Previous', 'السابق', { subGroup: 'general' })"
         @click="scrollByCard(-1)"
       >
@@ -59,7 +59,7 @@
 
       <button
         type="button"
-        class="absolute top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-xl border bg-background/90 text-brand-rust shadow-sm backdrop-blur transition-colors hover:bg-background ltr:right-3 rtl:left-3"
+        class="absolute top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-xl border bg-background/90 text-brand-terracotta shadow-sm backdrop-blur transition-colors hover:bg-background ltr:right-3 rtl:left-3"
         :aria-label="t('next', 'Next', 'التالي', { subGroup: 'general' })"
         @click="scrollByCard(1)"
       >

@@ -143,3 +143,31 @@ describe('ShopFavoriteButton', () => {
     expect(wrapper.attributes('aria-pressed')).toBe('true')
   })
 })
+
+/**
+ * The two storefronts share one products table and one favourites endpoint, so a hearted
+ * bag of clay comes back in the same list as a hearted mug. Only `section` says which
+ * shelf it belongs to — and `/api/shop/products/{id}` 404s for a material, so a card that
+ * ignores it sends the customer to an error page.
+ */
+describe('ProductCard — which shelf a favourite links back to', () => {
+  const ProductCard = () => import('~/components/ProductCard.vue').then((m) => m.default)
+
+  const card = async (product, props = {}) =>
+    mountSuspended(await ProductCard(), { props: { product, ...props } })
+
+  it('links a material to the materials shelf, whatever the list default is', async () => {
+    const wrapper = await card({ id: 7, title: 'Stoneware clay', price: '30.00', section: 'materials' })
+    expect(wrapper.find('a').attributes('href')).toMatch(/\/materials\/7$/)
+  })
+
+  it('links a shop piece to the shop', async () => {
+    const wrapper = await card({ id: 7, title: 'Mug', price: '30.00', section: 'shop' })
+    expect(wrapper.find('a').attributes('href')).toMatch(/\/shop\/7$/)
+  })
+
+  it('falls back to the list it was given when the API sends no section', async () => {
+    const wrapper = await card({ id: 7, title: 'Mug', price: '30.00' }, { base: '/materials' })
+    expect(wrapper.find('a').attributes('href')).toMatch(/\/materials\/7$/)
+  })
+})

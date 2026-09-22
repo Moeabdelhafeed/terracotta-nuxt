@@ -1,8 +1,7 @@
-const buildHeaders = (deviceId, platform, fcmToken, langCode, bearer) => {
+const buildHeaders = (deviceId, platform, langCode, bearer) => {
   const h = {}
   if (deviceId) h['X-Device-Id'] = deviceId
   if (platform) h['X-Platform'] = platform
-  if (fcmToken && (platform === 'ios' || platform === 'android')) h['X-FCM-Token'] = fcmToken
   if (langCode) h['Accept-Language'] = langCode
   if (bearer) h['Authorization'] = `Bearer ${bearer}`
   return h
@@ -16,7 +15,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   const cfgState = useState('config', () => ({}))
   const user = useSanctumUser()
   const { baseUrl, translationsMode } = useRuntimeConfig().public
-  const { deviceId, platform, fcmToken } = useDevice()
+  const { deviceId, platform } = useDevice()
   const lang = useCookie('lang')
   const i18nLocale = useCookie('i18n_locale')
 
@@ -30,7 +29,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
       // one; the list it returns is the same whichever locale asks for it.
       const res = await $fetch('/api/languages', {
         baseURL: baseUrl,
-        headers: buildHeaders(deviceId.value, platform.value, fcmToken.value, 'en', null),
+        headers: buildHeaders(deviceId.value, platform.value, 'en', null),
       })
       // Narrowed to an array rather than trusted: a fronted or failing API answers this
       // with an envelope whose `data` is an object, and `.find` on that throws inside a
@@ -84,7 +83,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   // logged-in visitor. Read the same cookie the module itself stores the token in.
   const bearer = useCookie('sanctum.token.cookie', { readonly: true }).value
 
-  const headers = buildHeaders(deviceId.value, platform.value, fcmToken.value, code, bearer)
+  const headers = buildHeaders(deviceId.value, platform.value, code, bearer)
 
   const [cfgRes, userRes] = await Promise.allSettled([
     $fetch('/api/config', { baseURL: baseUrl, headers }),

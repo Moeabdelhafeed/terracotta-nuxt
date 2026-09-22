@@ -48,6 +48,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-brand-ink: var(--brand-ink);
   --color-brand-terracotta: var(--brand-terracotta);
+  --color-chrome: var(--chrome);
   --color-brand-rust: var(--brand-rust);
   --color-brand-forest: var(--brand-forest);
   --color-brand-green: var(--brand-green);
@@ -81,7 +82,15 @@
      Mist is the website's own warm surface tint; it used to be #e4e6e1, which was
      green. Outline is the app's neutral grey and is what every border takes. */
   --brand-ink: oklch(0.1929 0.0578 36.2);
-  --brand-terracotta: oklch(0.428 0.1133 38.5);
+  /* The real hue, and the one the page tone can never move — see `html.gift-tone`.
+     `--brand-terracotta` is what components use and what a tone overrides; anything that
+     must stay terracotta whatever page it is on reads this instead. */
+  --brand-terracotta-base: oklch(0.428 0.1133 38.5);
+  --brand-terracotta: var(--brand-terracotta-base);
+  --chrome: var(--brand-terracotta);
+  /* Darker than the brand terracotta, and no longer the UI's accent: buttons, links and
+     chips all take --brand-terracotta so the site reads as one colour. Kept only as a
+     chart hue. */
   --brand-rust: oklch(0.386 0.106 32.8);
   --brand-forest: oklch(0.264 0.036 135.6);
   --brand-green: oklch(0.5454 0.0779 170.9);
@@ -186,6 +195,34 @@
   --sidebar-ring: oklch(0.6883 0.1327 43.1);
 }
 
+/* The gifting pages are pink, top to bottom.
+
+   One token, not a list of overrides: `--chrome`, `--primary` and `--ring` are all
+   defined as `var(--brand-terracotta)`, and a custom property resolves where it is USED,
+   so redefining the brand hue on <html> carries every one of them with it — buttons,
+   links, focus rings, the top bar, the amount due, and the window scrollbar the browser
+   draws outside the app's own markup. Components keep writing `bg-primary` /
+   `text-brand-terracotta` and need to know nothing about gifting.
+
+   The pages set this class through `useHead({ htmlAttrs })`, so it comes and goes with
+   the route. Deliberately NOT in @layer base: the `:root` block above is unlayered, and
+   unlayered CSS wins over any layer whatever its specificity. */
+html.gift-tone {
+  --brand-terracotta: var(--brand-blush);
+}
+
+/* The floating bottom bar is the one thing a page's tone must not reach: it sits over
+   every route at once, so it stays terracotta even on the pink pages. The footer is part
+   of the page and does take the tone. */
+.chrome-fixed {
+  --brand-terracotta: var(--brand-terracotta-base);
+  /* `--chrome` too, and not just because it is convenient: a custom property inherits the
+     value it already RESOLVED to on the ancestor, so `--chrome: var(--brand-terracotta)`
+     was substituted back at :root. Putting the base hue on `--brand-terracotta` here
+     cannot reach it after the fact — it has to be set outright. */
+  --chrome: var(--brand-terracotta-base);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -198,7 +235,7 @@
      two standard properties; WebKit/Blink needs the pseudo-elements, so both are set. */
   html {
     scrollbar-width: thin;
-    scrollbar-color: var(--brand-terracotta) color-mix(in oklch, var(--brand-mist) 60%, transparent);
+    scrollbar-color: var(--chrome) color-mix(in oklch, var(--brand-mist) 60%, transparent);
   }
 
   *::-webkit-scrollbar {
@@ -211,12 +248,12 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    background: color-mix(in oklch, var(--brand-terracotta) 70%, transparent);
+    background: color-mix(in oklch, var(--chrome) 70%, transparent);
     border-radius: 9999px;
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background: var(--brand-terracotta);
+    background: var(--chrome);
   }
 
   /* Where a scroller sits on the ink ground (the gallery band, the hero strip on dark),
@@ -273,5 +310,88 @@
      still reads as "loading". */
   @media (prefers-reduced-motion: reduce) {
     .skeleton::after { animation: none; }
+  }
+
+  /*
+    Every modal on the site, arriving and leaving.
+
+    One name, used by `<Transition name="sheet">` wherever a panel is teleported to the
+    body — the booking sheets, the confirmations, the terms, the viewer. The scrim fades
+    and the panel comes up to meet it, which is the difference between a dialog that
+    appeared and one that was already there and you only just noticed.
+
+    The panel is reached through `[data-sheet-panel]` rather than a transition of its own,
+    because it is a CHILD of the element being transitioned: two Transitions nested inside
+    one `v-if` never run the inner one, since the whole subtree mounts at once.
+  */
+  .sheet-enter-active,
+  .sheet-leave-active {
+    transition: opacity 0.18s ease-out;
+  }
+
+  .sheet-enter-from,
+  .sheet-leave-to {
+    opacity: 0;
+  }
+
+  .sheet-enter-active [data-sheet-panel],
+  .sheet-leave-active [data-sheet-panel] {
+    transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .sheet-enter-from [data-sheet-panel] {
+    transform: scale(0.96) translateY(8px);
+  }
+
+  .sheet-leave-to [data-sheet-panel] {
+    transform: scale(0.98);
+  }
+
+  /*
+    Every OTHER teleported dialog — the confirmations, the address form, the terms, the
+    sign-in prompt — arriving.
+
+    Driven off `role="dialog"` rather than a wrapper each one has to remember, because a
+    dialog that is not marked as one is a bug in its own right; this way the markup that
+    earns the animation is the markup a screen reader needs anyway. The scrim always
+    carries `fixed`, so `:not(.fixed)` is the panel.
+
+    On mount only. A leave animation needs the element kept alive, which is what
+    `<Transition name="sheet">` is for — `BookingSheet` uses it and opts out with
+    `data-animated`.
+  */
+  [role="dialog"]:not([data-animated]) {
+    animation: dialog-in 0.18s ease-out;
+  }
+
+  [role="dialog"]:not([data-animated]) > *:not(.fixed) {
+    animation: dialog-panel-in 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  @keyframes dialog-in {
+    from { opacity: 0; }
+  }
+
+  @keyframes dialog-panel-in {
+    from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  }
+
+  /*
+    The whole motion layer, off.
+    
+    Not `animation: none` on one class: a reader who asks the operating system for less
+    motion is asking every moving thing on the page to stop, and the site grows new ones
+    faster than a list of them can be kept. `0.01ms` rather than `0` so a transitionend
+    listener still fires and nothing hangs waiting for it.
+  */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }

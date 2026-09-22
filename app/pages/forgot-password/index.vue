@@ -19,8 +19,11 @@
 
       <div class="grid gap-2">
         <Label for="identifier">{{ identifierLabel }}</Label>
+        <!-- Keyed off the selected kind, not `identifierInputType`: that falls back to
+             plain text whenever the project accepts more than one identifier, leaving a
+             phone with no country-code picker and so a number the backend cannot resolve. -->
         <AuthPhoneInput
-          v-if="identifierInputType === 'tel'"
+          v-if="form.type === 'phone'"
           id="identifier"
           v-model="form.identifier"
           :allowed="allowedPhoneCountries"
@@ -29,7 +32,7 @@
           v-else
           id="identifier"
           v-model="form.identifier"
-          :type="identifierInputType"
+          :type="form.type === 'email' ? 'email' : identifierInputType"
           :placeholder="identifierPlaceholder"
           class="h-12 rounded-field text-base"
           required
@@ -58,10 +61,12 @@
         <span v-if="errors.type" class="text-xs text-destructive">{{ errors.type[0] }}</span>
       </div>
 
+      <AuthFormError :message="formError" />
+
       <Button
         type="submit"
         size="lg"
-        class="h-13 w-full rounded-control bg-brand-rust text-base hover:bg-brand-rust/90"
+        class="h-13 w-full rounded-control bg-brand-terracotta text-base hover:bg-brand-terracotta/90"
         :disabled="loading || checking || exists === false || (exists && availableChannels.length === 0)"
       >
         {{ loading ? t('sending', 'Sending...', 'جارٍ الإرسال...') : t('send_otp', 'Verify', 'تحقق') }}
@@ -80,6 +85,8 @@ const { identifierLabel, identifierInputType, identifierPlaceholder, identifierT
 const { t } = useLang('web', 'auth')
 
 const errors = ref({})
+// 429 from the OTP throttle and 403 carry a message and no `errors` map.
+const formError = ref('')
 const loading = ref(false)
 const checking = ref(false)
 const exists = ref(null)
@@ -140,6 +147,7 @@ onUnmounted(() => {
 
 const onSubmit = async () => {
   errors.value = {}
+  formError.value = ''
   loading.value = true
   try {
     const body = { identifier: form.value.identifier, type: form.value.type }
@@ -153,11 +161,16 @@ const onSubmit = async () => {
       query: {
         identifier: form.value.identifier,
         type: form.value.type,
+        // The verify step resends on this channel; without it the server falls back to
+        // its own email-before-phone default and moves the code to another destination.
+        ...(form.value.channel ? { channel: form.value.channel } : {}),
         ...(redirectTarget.value === '/' ? {} : { redirect: redirectTarget.value })
       }
     })
   } catch (error) {
-    errors.value = error.data?.errors ?? {}
+    const normalized = normalizeApiError(error)
+    errors.value = normalized.errors
+    formError.value = Object.keys(normalized.errors).length ? '' : normalized.message
   } finally {
     loading.value = false
   }

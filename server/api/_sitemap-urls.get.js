@@ -1,6 +1,8 @@
 /**
- * The routes only the API knows about: every product, workshop, gallery album and CMS
- * page. `@nuxtjs/sitemap` fetches this and merges it with the file-based routes.
+ * The routes only the API knows about: every shop product, raw material, workshop,
+ * gallery album and CMS page. Materials are a web-only shelf (the app has no materials
+ * storefront, see Storefront::visibleSections), so this sitemap is the only thing that
+ * ever surfaces them to a crawler. `@nuxtjs/sitemap` fetches this and merges it with the file-based routes.
  *
  * Called server-side, so it goes straight to Laravel with the private token rather than
  * through the browser-facing proxy.
@@ -29,8 +31,9 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const [products, workshops, albums, pages] = await Promise.all([
+  const [products, materials, workshops, albums, pages] = await Promise.all([
     get('/api/shop/products?per_page=all'),
+    get('/api/materials/products?per_page=all'),
     get('/api/workshops'),
     get('/api/gallery'),
     get('/api/pages'),
@@ -38,6 +41,7 @@ export default defineEventHandler(async (event) => {
 
   return [
     ...products.map((item) => ({ loc: `/shop/${item.id}`, _sitemap: 'shop' })),
+    ...materials.map((item) => ({ loc: `/materials/${item.id}`, _sitemap: 'materials' })),
     ...workshops.map((item) => ({ loc: `/workshops/${item.id}`, _sitemap: 'workshops' })),
     ...albums.map((item) => ({ loc: `/gallery/${item.id}`, _sitemap: 'gallery' })),
     ...pages.map((item) => ({ loc: `/${item.slug}` })),

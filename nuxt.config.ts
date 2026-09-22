@@ -17,8 +17,10 @@ export default defineNuxtConfig({
   // itself at the real API without the file being edited. The ONE exception is the API
   // token below: this repository is public, so the secret stays in the environment.
   runtimeConfig: {
-    xApiToken: '',        // NUXT_X_API_TOKEN — secret. Never hardcode it; see .env.example.
-    apiBaseUrl: 'http://localhost:8000', // NUXT_API_BASE_URL overrides this on a deploy.
+    xApiToken: 'af72083febcec6bb0332781b14e180cf70075d43313f05efd05568739c235d28',        // NUXT_X_API_TOKEN — secret. Never hardcode it; see .env.example.
+    // The host only — NOT including `/api`. The proxy appends the whole incoming path,
+    // which already starts with `/api`, so a trailing one here asks for `/api/api/...`.
+    apiBaseUrl: 'https://dev-cms.terracotta-ksa.com', // NUXT_API_BASE_URL overrides this on a deploy.
     public: {
       baseUrl: '',        // own origin (relative). Client fetches hit Nitro proxy, not Laravel directly.
       translationsMode: 'remote', // 'remote' | 'local'
@@ -164,7 +166,7 @@ export default defineNuxtConfig({
       '/wallet', '/my-gallery', '/bookings/**', '/cart', '/checkout', '/orders/**', '/favorites', '/addresses',
       '/notifications', '/gifts/**', '/workshops/*/book',
     ],
-    // Products, workshops, albums and CMS pages are only known at runtime — see
+    // Products, materials, workshops, albums and CMS pages are only known at runtime — see
     // server/api/_sitemap-urls.get.js.
     sources: ['/api/_sitemap-urls'],
   },

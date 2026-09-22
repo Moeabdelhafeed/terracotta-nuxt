@@ -34,10 +34,13 @@
           errors.identifier[0]
         }}</span>
       </div>
+
+      <AuthFormError :message="formError" />
+
       <Button
         type="submit"
         size="lg"
-        class="h-13 w-full rounded-control bg-brand-rust text-base hover:bg-brand-rust/90"
+        class="h-13 w-full rounded-control bg-brand-terracotta text-base hover:bg-brand-terracotta/90"
         :disabled="loading || resending || form.otp.length < 6"
       >
         {{
@@ -48,7 +51,7 @@
       </Button>
       <button
         type="button"
-        class="mx-auto rounded-control bg-brand-rust/10 px-4 py-2 text-sm font-medium text-brand-rust transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+        class="mx-auto rounded-control bg-brand-terracotta/10 px-4 py-2 text-sm font-medium text-brand-terracotta transition-colors disabled:cursor-not-allowed disabled:opacity-50"
         :disabled="cooldown > 0 || resending || loading"
         @click="resend"
       >
@@ -79,6 +82,8 @@ const RESEND_COOLDOWN = 120;
 
 const route = useRoute();
 const errors = ref({});
+// 429 from the OTP throttle and 403 carry a message and no `errors` map.
+const formError = ref("");
 const loading = ref(false);
 const resending = ref(false);
 const client = useApi();
@@ -90,6 +95,11 @@ const form = ref({
   type: route.query.type?.toString() ?? "",
   otp: "",
 });
+
+// Where step 1 sent the code. Without it a resend falls back to the server's own
+// email-before-phone default, so a customer who asked for an SMS was silently emailed
+// the new code — and the SMS code they were waiting for was dead by then.
+const channel = route.query.channel?.toString() ?? "";
 
 if (!form.value.identifier) {
   navigateTo({ name: "forgot-password" });
@@ -113,6 +123,11 @@ const startCooldown = () => {
   }, 1000);
 };
 
+// Step 1 has just sent a code, so the button starts on its cooldown rather than live.
+// It sits on the 3-per-5-minutes OTP limiter: an enabled button on arrival let a customer
+// who had not yet seen the SMS spend their remaining sends before typing anything.
+onMounted(startCooldown);
+
 onUnmounted(() => {
   if (timer) clearInterval(timer);
 });
@@ -120,6 +135,7 @@ onUnmounted(() => {
 const onSubmit = async () => {
   if (loading.value) return;
   errors.value = {};
+  formError.value = "";
   loading.value = true;
   try {
     await client("/api/verify-forgot-password-otp", {
@@ -138,7 +154,9 @@ const onSubmit = async () => {
       },
     });
   } catch (error) {
-    errors.value = error.data?.errors ?? {};
+    const normalized = normalizeApiError(error);
+    errors.value = normalized.errors;
+    formError.value = Object.keys(normalized.errors).length ? "" : normalized.message;
   } finally {
     loading.value = false;
   }
@@ -147,16 +165,23 @@ const onSubmit = async () => {
 const resend = async () => {
   if (cooldown.value > 0 || resending.value) return;
   errors.value = {};
+  formError.value = "";
   resending.value = true;
   expired.value = false;
   try {
     await client("/api/forgot-password", {
       method: "POST",
-      body: { identifier: form.value.identifier, type: form.value.type },
+      body: {
+        identifier: form.value.identifier,
+        type: form.value.type,
+        ...(channel ? { channel } : {}),
+      },
     });
     startCooldown();
   } catch (error) {
-    errors.value = error.data?.errors ?? {};
+    const normalized = normalizeApiError(error);
+    errors.value = normalized.errors;
+    formError.value = Object.keys(normalized.errors).length ? "" : normalized.message;
   } finally {
     resending.value = false;
   }

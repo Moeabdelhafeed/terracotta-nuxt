@@ -10,34 +10,20 @@ const props = defineProps({
   booking: { type: Object, required: true },
 })
 
-const { t } = useLang('web', 'bookings')
-
 const state = computed(() => bookingState(props.booking))
 
-const labels = computed(() => ({
-  pending_payment: t('status_pending_payment', 'Awaiting payment', 'بانتظار الدفع'),
-  confirmed: t('status_confirmed', 'Confirmed', 'مؤكد'),
-  attending: t('status_attending', 'Checked in', 'حاضرة'),
-  absent: t('status_absent', 'No-show', 'لم تحضر'),
-  preparing: t('status_preparing', 'Being prepared', 'قيد التحضير'),
-  ready: t('status_ready', 'Piece ready', 'القطعة جاهزة'),
-  awaiting_pickup: t('status_awaiting_pickup', 'Ready for pickup', 'جاهزة للاستلام'),
-  getting_ready: t('status_getting_ready', 'Being packed', 'قيد التجهيز'),
-  on_the_way: t('status_on_the_way', 'Out for delivery', 'خرجت للتوصيل'),
-  delivered: t('status_delivered', 'Delivered', 'مسلمة'),
-  cancelled: t('status_cancelled', 'Cancelled', 'ملغاة'),
-}))
+const labels = useBookingStatusLabels()
 
 const tones = {
   pending_payment: 'bg-amber-100 text-amber-800',
   confirmed: 'bg-brand-green/15 text-brand-green',
   attending: 'bg-brand-green/15 text-brand-green',
   absent: 'bg-muted text-muted-foreground',
-  preparing: 'bg-brand-rust/10 text-brand-rust',
-  ready: 'bg-brand-blush/40 text-brand-rust',
-  awaiting_pickup: 'bg-brand-blush/40 text-brand-rust',
-  getting_ready: 'bg-brand-rust/10 text-brand-rust',
-  on_the_way: 'bg-brand-rust/10 text-brand-rust',
+  preparing: 'bg-brand-terracotta/10 text-brand-terracotta',
+  ready: 'bg-brand-blush/40 text-brand-terracotta',
+  awaiting_pickup: 'bg-brand-blush/40 text-brand-terracotta',
+  getting_ready: 'bg-brand-terracotta/10 text-brand-terracotta',
+  on_the_way: 'bg-brand-terracotta/10 text-brand-terracotta',
   delivered: 'bg-brand-green/15 text-brand-green',
   cancelled: 'bg-destructive/10 text-destructive',
 }

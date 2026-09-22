@@ -1,27 +1,20 @@
 <template>
-  <main class="min-h-svh bg-background pb-28">
+  <main class="bg-background">
+    <PageBar :crumbs="crumbs" />
     <div class="mx-auto max-w-6xl px-6 py-16">
       <div class="flex flex-col gap-5">
-        <div class="flex items-center justify-between">
-          <NuxtLink
-            to="/profile"
-            class="flex size-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground -ms-2 rtl:-scale-x-100"
-            :aria-label="t('back_to_profile', 'Back to profile', 'عودة للملف')"
-          >
-            <LucideArrowLeft class="size-5" />
-          </NuxtLink>
-          <h1 class="font-display text-lg font-semibold text-foreground">{{ t('addresses_title', 'My addresses', 'عناويني') }}</h1>
-          <span class="size-10" />
-        </div>
+        <h1 class="font-display text-3xl font-semibold sm:text-4xl">
+          {{ t('addresses_title', 'My addresses', 'عناويني') }}
+        </h1>
 
         <AppLoadError v-if="loadError" :error="loadError" :retry="refresh" />
 
         <div v-else-if="pending && !addresses.length" class="grid gap-3 lg:grid-cols-2" aria-busy="true">
-          <AppSkeleton v-for="n in 2" :key="n" class="h-32 w-full" />
+          <AppSkeleton v-for="n in 2" :key="n" class="h-32 w-full !rounded-2xl" />
         </div>
 
         <div v-else-if="!addresses.length" class="mx-auto flex w-full max-w-xl flex-col items-center gap-3 rounded-2xl border bg-card p-10 text-center">
-          <span class="flex size-12 items-center justify-center rounded-full bg-brand-rust/10 text-brand-rust">
+          <span class="flex size-12 items-center justify-center rounded-full bg-brand-terracotta/10 text-brand-terracotta">
             <LucideMapPin class="size-5" />
           </span>
           <h2 class="font-display text-lg font-semibold text-foreground">{{ t('no_addresses', 'No addresses yet', 'لا توجد عناوين بعد') }}</h2>
@@ -81,7 +74,7 @@
                 </button>
                 <button
                   type="button"
-                  class="flex size-9 items-center justify-center rounded-xl text-destructive/70 transition-colors hover:bg-destructive/10 hover:text-destructive"
+                  class="flex size-9 items-center justify-center rounded-xl text-destructive/70 transition-colors hover:border-destructive hover:bg-destructive hover:text-white hover:text-destructive"
                   :aria-label="t('delete', 'Delete', 'حذف')"
                   data-test="delete-address"
                   @click="confirming = address"
@@ -93,7 +86,7 @@
           </li>
         </ul>
 
-        <Button data-test="add-address" class="h-12 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90 sm:self-start sm:px-8" @click="openAdd">
+        <Button data-test="add-address" class="h-12 rounded-xl bg-brand-terracotta text-base hover:bg-brand-terracotta/90 sm:self-start sm:px-8" @click="openAdd">
           <LucidePlus class="size-4" />
           {{ t('add_address', 'Add an address', 'إضافة عنوان') }}
         </Button>
@@ -101,12 +94,14 @@
     </div>
 
     <Teleport to="body">
-      <div v-if="formOpen" class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 py-10" role="dialog" aria-modal="true">
-        <div class="absolute inset-0 bg-black/50" @click="formOpen = false" />
-        <div class="relative w-full max-w-md rounded-2xl border bg-background p-6 shadow-lg">
+      <div v-if="formOpen" class="fixed inset-0 z-[60] flex items-center justify-center p-4" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-black/50" @click="formOpen = false" />
+        <!-- Wider than the other dialogs: the national-address form is a dozen fields, and
+             at `max-w-md` they stack into a column taller than any screen. -->
+        <div class="relative max-h-[90svh] w-full max-w-2xl overflow-y-auto rounded-2xl border bg-background p-6 shadow-lg">
           <div class="mb-5 flex items-center justify-between">
             <span class="flex items-center gap-3">
-              <span class="flex size-9 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust"><LucideMapPin class="size-4" /></span>
+              <span class="flex size-9 items-center justify-center rounded-xl bg-brand-terracotta/10 text-brand-terracotta"><LucideMapPin class="size-4" /></span>
               <span class="font-display text-base font-semibold">
                 {{ editing ? t('edit_address', 'Edit address', 'تعديل العنوان') : t('add_address', 'Add an address', 'إضافة عنوان') }}
               </span>
@@ -121,9 +116,9 @@
     </Teleport>
 
     <Teleport to="body">
-      <div v-if="confirming" class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
-        <div class="absolute inset-0 bg-black/50" @click="deleting || (confirming = null)" />
-        <div class="relative w-full max-w-md rounded-2xl border bg-background p-6 shadow-lg">
+      <div v-if="confirming" class="fixed inset-0 z-[60] flex items-center justify-center p-4" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-black/50" @click="deleting || (confirming = null)" />
+        <div class="relative max-h-[90svh] w-full max-w-md overflow-y-auto rounded-2xl border bg-background p-6 shadow-lg">
           <div class="mb-4 flex items-center gap-3">
             <span class="flex size-9 items-center justify-center rounded-xl bg-destructive/10 text-destructive"><LucideTrash2 class="size-4" /></span>
             <span class="font-display text-base font-semibold">{{ t('delete_address', 'Delete this address?', 'حذف هذا العنوان؟') }}</span>
@@ -154,11 +149,19 @@
  * than a local edit of the list.
  */
 definePageMeta({
+  // Entered from somewhere, with its own way back in the header — the site's
   middleware: ['auth-mode', 'require-registered', 'verified'],
   name: 'addresses',
 })
 
 const { t } = useLang('web', 'addresses')
+
+// Reached from the profile, so the trail says so — and PageBar's arrow follows it.
+const crumbs = computed(() => [
+  { to: '/', label: t('nav_home', 'Home', 'الرئيسية', { subGroup: 'general' }) },
+  { to: '/profile', label: t('nav_profile', 'Profile', 'حسابي', { subGroup: 'general' }) },
+  { label: t('addresses_title', 'My addresses', 'عناويني') },
+])
 const { format } = usePrice()
 const toast = useToast()
 const { addresses, pending, error: loadError, refresh, remove, save } = useAddresses()
@@ -193,6 +196,10 @@ const makeDefault = async (address) => {
 }
 
 const confirming = ref(null)
+
+// The page behind a dialog stays where it was left.
+useModalScrollLock(formOpen);
+useModalScrollLock(confirming);
 const deleting = ref(false)
 const deleteError = ref('')
 

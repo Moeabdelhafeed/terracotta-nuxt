@@ -3,7 +3,8 @@
     <div
       v-if="open"
       ref="panel"
-      class="fixed inset-0 z-[60] flex flex-col bg-brand-ink/95"
+      data-animated
+      class="fixed inset-0 z-[60] flex flex-col bg-black/50 duration-200 animate-in fade-in"
       role="dialog"
       aria-modal="true"
       :aria-label="alt"
@@ -38,7 +39,7 @@
           :key="index"
           :src="items[index]"
           :alt="alt"
-          class="max-h-full max-w-full rounded-card object-contain"
+          class="max-h-full max-w-full object-contain"
         />
       </div>
 

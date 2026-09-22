@@ -56,7 +56,7 @@
       <Button
         v-if="restartTo"
         as-child
-        class="h-12 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+        class="h-12 rounded-xl bg-primary text-base hover:bg-primary/90"
       >
         <NuxtLink :to="restartTo">{{
           restartLabel || t("start_again", "Start again", "البدء من جديد")
@@ -69,7 +69,7 @@
       <div class="flex items-center justify-between gap-4">
         <div class="flex items-center gap-3">
           <span
-            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust"
+            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
           >
             <LucideTimer class="size-5" />
           </span>
@@ -113,7 +113,7 @@
 
       <Button
         type="button"
-        class="h-12 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+        class="h-12 w-full rounded-xl bg-primary text-base hover:bg-primary/90"
         :disabled="paying"
         @click="onPay"
       >

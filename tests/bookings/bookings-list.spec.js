@@ -50,7 +50,10 @@ const mount = (query = {}) => {
   })
 }
 
-const lastQuery = () => api.calls.at(-1).query
+// Named, not "the last call": the page's hero fetches its picture from dynamic storage,
+// so the newest request is not necessarily the bookings list.
+const lastQuery = () =>
+  api.calls.filter((call) => call.url.includes('/workshops/bookings')).at(-1)?.query ?? {}
 const statuses = (page) => page.findAll('[data-status]').map((el) => el.attributes('data-status'))
 
 beforeEach(() => {

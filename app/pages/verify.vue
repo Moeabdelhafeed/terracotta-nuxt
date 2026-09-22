@@ -12,7 +12,7 @@
         <h2 data-test="verify-success" class="font-display text-2xl font-semibold text-foreground">
           {{ t('account_created_success', 'Your account is ready', 'تم انشاء الحساب بنجاح') }}
         </h2>
-        <Button as-child size="lg" class="h-13 w-full rounded-control bg-brand-rust text-base hover:bg-brand-rust/90">
+        <Button as-child size="lg" class="h-13 w-full rounded-control bg-brand-terracotta text-base hover:bg-brand-terracotta/90">
           <NuxtLink to="/">{{ t('continue', 'Continue', 'استكمال') }}</NuxtLink>
         </Button>
       </div>
@@ -33,7 +33,7 @@
         <Button
           type="submit"
           size="lg"
-          class="h-13 w-full rounded-control bg-brand-rust text-base hover:bg-brand-rust/90"
+          class="h-13 w-full rounded-control bg-brand-terracotta text-base hover:bg-brand-terracotta/90"
           :disabled="loading || resending || otp.length < OTP_LENGTH"
         >
           {{ loading ? t('verifying', 'Verifying...', 'جارٍ التحقق...') : t('verify', 'Verify', 'تحقق') }}
@@ -42,7 +42,7 @@
         <div class="flex flex-col items-center gap-3 text-sm">
           <button
             type="button"
-            class="font-medium text-brand-rust underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:text-muted-foreground disabled:no-underline"
+            class="font-medium text-brand-terracotta underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:text-muted-foreground disabled:no-underline"
             :disabled="cooldown > 0 || resending || loading"
             @click="resend"
           >
@@ -76,7 +76,8 @@ const OTP_LENGTH = 6
 const RESEND_COOLDOWN = 120
 
 const client = useApi()
-const { user, refreshIdentity, logout } = useSanctumAuth()
+const { user, refreshIdentity } = useSanctumAuth()
+const { signOut } = useSignOut()
 const { t } = useLang('web', 'auth')
 
 const otp = ref('')
@@ -107,13 +108,17 @@ const startCooldown = () => {
   }, 1000)
 }
 
+// A code has just been sent, so the button starts on its cooldown rather than live. It
+// sits on the 3-per-5-minutes OTP limiter: an enabled button on arrival let a customer who
+// had not yet seen the SMS spend their remaining sends before typing anything.
+onMounted(startCooldown)
+
 onUnmounted(() => { if (timer) clearInterval(timer) })
 
 const handleLogout = async () => {
   loggingOut.value = true
   try {
-    await logout()
-    if (import.meta.client) document.cookie = 'current_token_id=; path=/; max-age=0'
+    await signOut()
     navigateTo({ name: 'login' })
   } finally {
     loggingOut.value = false

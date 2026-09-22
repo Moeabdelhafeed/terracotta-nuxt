@@ -1,18 +1,11 @@
 <template>
-  <main class="min-h-svh bg-background pb-28">
+  <main class="bg-background">
+    <PageBar :crumbs="crumbs" />
     <div class="mx-auto max-w-6xl px-6 py-16">
       <div class="flex flex-col gap-5">
-        <div class="flex items-center justify-between">
-          <NuxtLink
-            to="/profile"
-            class="flex size-10 items-center justify-center text-foreground/70 transition-colors hover:text-foreground -ms-2 rtl:-scale-x-100"
-            :aria-label="t('back_to_profile', 'Back to profile', 'عودة للملف')"
-          >
-            <LucideArrowLeft class="size-5" />
-          </NuxtLink>
-          <h1 class="font-display text-lg font-semibold text-foreground">{{ t('notifications_title', 'Notifications', 'الإشعارات') }}</h1>
-          <span class="size-10" />
-        </div>
+        <h1 class="font-display text-3xl font-semibold sm:text-4xl">
+          {{ t('notifications_title', 'Notifications', 'الإشعارات') }}
+        </h1>
 
         <div class="flex flex-wrap items-center justify-between gap-3">
           <!-- The SERVER filters and the SERVER counts: `meta.filter_counts` is the whole
@@ -25,7 +18,7 @@
               :key="tab"
               as-child
               size="sm"
-              class="rounded-control"
+              class="rounded-xl"
               :variant="tab === filter ? 'default' : 'outline'"
             >
               <NuxtLink :to="linkTo(1, tab)" :data-test="`filter-${tab}`">
@@ -36,7 +29,7 @@
           </div>
           <button
             type="button"
-            class="text-sm font-medium text-brand-rust underline-offset-4 hover:underline disabled:opacity-50 disabled:no-underline"
+            class="text-sm font-medium text-brand-terracotta underline-offset-4 hover:underline disabled:opacity-50 disabled:no-underline"
             :disabled="markingAll || unreadCount === 0"
             data-test="mark-all"
             @click="onMarkAll"
@@ -52,7 +45,7 @@
         </div>
 
         <div v-else-if="!notifications.length" class="mx-auto flex w-full max-w-xl flex-col items-center gap-3 rounded-2xl border bg-card p-10 text-center">
-          <span class="flex size-12 items-center justify-center rounded-full bg-brand-rust/10 text-brand-rust">
+          <span class="flex size-12 items-center justify-center rounded-full bg-brand-terracotta/10 text-brand-terracotta">
             <LucideBellOff class="size-5" />
           </span>
           <h2 class="font-display text-lg font-semibold text-foreground">
@@ -63,25 +56,25 @@
           </p>
         </div>
 
-        <ul v-else class="grid gap-3 lg:grid-cols-2">
+        <ul v-else class="grid gap-3 lg:grid-cols-2" data-test="notification-list">
           <li v-for="n in notifications" :key="n.id">
             <button
               type="button"
               class="group flex h-full w-full items-start gap-3 rounded-2xl border bg-card p-4 text-start transition-colors hover:bg-brand-mist/40"
-              :class="n.is_read ? '' : 'border-brand-rust/30 bg-brand-mist/30'"
+              :class="n.is_read ? '' : 'border-brand-terracotta/30 bg-brand-mist/30'"
               :aria-label="notificationTitle(n, t)"
               @click="open(n)"
             >
               <span
                 class="mt-1 flex size-9 shrink-0 items-center justify-center rounded-xl"
-                :class="n.is_read ? 'bg-brand-mist/70 text-foreground/60' : 'bg-brand-rust text-white'"
+                :class="n.is_read ? 'bg-brand-mist/70 text-foreground/60' : 'bg-brand-terracotta text-white'"
               >
                 <component :is="iconFor(n)" class="size-4" />
               </span>
               <span class="min-w-0 flex-1">
                 <span class="flex items-center gap-2">
                   <span class="truncate text-sm text-foreground" :class="n.is_read ? 'font-medium' : 'font-semibold'">{{ notificationTitle(n, t) }}</span>
-                  <span v-if="!n.is_read" class="size-2 shrink-0 rounded-full bg-brand-rust" aria-hidden="true" />
+                  <span v-if="!n.is_read" class="size-2 shrink-0 rounded-full bg-brand-terracotta" aria-hidden="true" />
                 </span>
                 <span class="mt-0.5 block text-sm break-words text-muted-foreground">{{ n.body }}</span>
                 <time class="mt-1 block text-xs text-muted-foreground" :datetime="n.created_at" :title="formatDate(n.created_at)">{{ relative(n.created_at) }}</time>
@@ -91,9 +84,9 @@
           </li>
         </ul>
 
-        <nav v-if="lastPage > 1" class="flex flex-wrap items-center justify-center gap-2">
+        <nav v-if="lastPage > 1" class="mt-12 flex flex-wrap items-center justify-center gap-2">
           <Button v-if="currentPage > 1" as-child size="sm" variant="outline" class="rounded-xl">
-            <NuxtLink :to="linkTo(currentPage - 1)" rel="prev">{{ t('previous', 'Previous', 'السابق') }}</NuxtLink>
+            <NuxtLink :to="linkTo(currentPage - 1)" rel="prev">{{ t('previous', 'Previous', 'السابق', { subGroup: 'general' }) }}</NuxtLink>
           </Button>
           <Button
             v-for="number in pageNumbers"
@@ -106,22 +99,35 @@
             <NuxtLink :to="linkTo(number)" :aria-current="number === currentPage ? 'page' : undefined">{{ number }}</NuxtLink>
           </Button>
           <Button v-if="currentPage < lastPage" as-child size="sm" variant="outline" class="rounded-xl">
-            <NuxtLink :to="linkTo(currentPage + 1)" rel="next">{{ t('next', 'Next', 'التالي') }}</NuxtLink>
+            <NuxtLink :to="linkTo(currentPage + 1)" rel="next">{{ t('next', 'Next', 'التالي', { subGroup: 'general' }) }}</NuxtLink>
           </Button>
         </nav>
+
+        <p v-if="total" class="mt-6 text-center text-sm text-muted-foreground">
+          {{ t('notifications_count', ':total notifications', ':total إشعار', { total }) }}
+        </p>
       </div>
     </div>
   </main>
 </template>
 
 <script setup>
+import { Bell, CalendarDays, Gift, ShoppingBag, Wallet } from 'lucide-vue-next'
 definePageMeta({
+  // Entered from somewhere, with its own way back in the header — the site's
   middleware: ['auth-mode', 'require-registered'],
   name: 'notifications',
 })
 
 const route = useRoute()
 const { t, code } = useLang('web', 'account')
+
+// Reached from the profile, so the trail says so — and PageBar's arrow follows it.
+const crumbs = computed(() => [
+  { to: '/', label: t('nav_home', 'Home', 'الرئيسية', { subGroup: 'general' }) },
+  { to: '/profile', label: t('nav_profile', 'Profile', 'حسابي', { subGroup: 'general' }) },
+  { label: t('notifications_title', 'Notifications', 'الإشعارات') },
+])
 const { formatDate } = useDateFormat()
 const toast = useToast()
 
@@ -133,7 +139,7 @@ const filter = computed(() => {
   return NOTIFICATION_FILTERS.includes(asked) ? asked : 'all'
 })
 
-const { notifications, unreadCount, filterCounts, lastPage, pending, error, markRead, markAllRead, refresh } = useNotifications({ page: currentPage, filter })
+const { notifications, unreadCount, filterCounts, lastPage, total, pending, error, markRead, markAllRead, refresh } = useNotifications({ page: currentPage, filter })
 
 const linkTo = (page, slice = filter.value) => ({
   query: { page: page > 1 ? page : undefined, filter: slice === 'all' ? undefined : slice },
@@ -180,14 +186,19 @@ const pageNumbers = computed(() => {
   return Array.from({ length: to - from + 1 }, (_, i) => from + i)
 })
 
-// Lucide icons are globally registered by nuxt-lucide-icons, so `:is` resolves the name.
+/**
+ * The component itself, not its name. `nuxt-lucide-icons` registers each icon as an
+ * auto-import, which Nuxt resolves by rewriting the NAME where it appears literally in a
+ * template or in `resolveComponent('LucideX')`. A name held in a variable is never
+ * rewritten, so the icon is never bundled and `<component :is>` silently renders nothing.
+ */
 const iconFor = (n) => {
   const type = String(n.data?.type ?? n.type ?? '')
-  if (type.startsWith('shop_order')) return 'LucideShoppingBag'
-  if (type.startsWith('workshop_')) return 'LucideCalendarDays'
-  if (type.startsWith('gift_')) return 'LucideGift'
-  if (type.startsWith('wallet_')) return 'LucideWallet'
-  return 'LucideBell'
+  if (type.startsWith('shop_order')) return ShoppingBag
+  if (type.startsWith('workshop_')) return CalendarDays
+  if (type.startsWith('gift_')) return Gift
+  if (type.startsWith('wallet_')) return Wallet
+  return Bell
 }
 
 // "3 hours ago" for anything inside the last week, the full date after that.

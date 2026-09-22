@@ -50,7 +50,7 @@
 
             <button
               type="button"
-              class="flex size-10 shrink-0 items-center justify-center rounded-control text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+              class="flex size-10 shrink-0 items-center justify-center rounded-control text-muted-foreground transition-colors hover:border-destructive hover:bg-destructive hover:text-white hover:text-destructive"
               :aria-label="t('remove_line', 'Remove from cart', 'إزالة من العربة')"
               :disabled="busy === line.id"
               @click="confirming = line.id"

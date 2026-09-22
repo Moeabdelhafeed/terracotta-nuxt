@@ -42,6 +42,9 @@ const BookPage = (await import('~/pages/workshops/[id]/book.vue')).default
 
 const SLOT = { workshop_slot_id: 13, start_time: '10:00', end_time: '11:00' }
 
+/** Flipped by the one test that needs the slot to be inside its cancellation window. */
+let slotOver = {}
+
 /** Stands in for BookingSlotPicker: one button that picks a day + slot, plus the two
  *  refresh methods `book.vue` reaches for through its template ref. */
 const PickerStub = {
@@ -55,7 +58,7 @@ const PickerStub = {
         onClick: () => {
           emit('update:date', '2026-10-01')
           emit('update:slotId', SLOT.workshop_slot_id)
-          emit('update:slot', SLOT)
+          emit('update:slot', { ...SLOT, ...slotOver })
         },
       }, 'pick'),
       h('button', { 'data-test': 'people-3', onClick: () => emit('update:people', 3) }, 'three'),
@@ -81,6 +84,14 @@ const mount = () => mountSuspended(BookPage, {
     stubs: {
       BookingSlotPicker: PickerStub,
       BookingSheet: { props: ['open', 'title'], template: '<div v-if="open"><slot /><slot name="footer" /></div>' },
+      // Teleports to the body for real, so its confirm button would land outside the
+      // wrapper. The stub keeps the contract the page depends on: the copy, and a control
+      // carrying `confirmLabel` that emits `confirm`.
+      BookingCelebrationSheet: {
+        props: ['open', 'title', 'confirmLabel'],
+        emits: ['close', 'confirm'],
+        template: '<div v-if="open"><slot /><button type="button" @click="$emit(\'confirm\')">{{ confirmLabel }}</button></div>',
+      },
       AppConfetti: true,
       PageBar: true,
     },
@@ -89,8 +100,9 @@ const mount = () => mountSuspended(BookPage, {
 
 const byText = (wrapper, text) => wrapper.findAll('button').find((b) => b.text().includes(text))
 
-/** The highlighted chip in the step rail — where the customer actually is. */
-const currentStep = (wrapper) => wrapper.find('.bg-brand-rust.text-white').text()
+/** The step section that is actually on screen — the rail of chips is gone. */
+const currentStep = (wrapper) =>
+  wrapper.findAll('[data-step]').find((s) => s.attributes('style') !== 'display: none;')?.attributes('data-step')
 
 /** Walk the picker → pay step and settle the debounced quote. */
 const toPayStep = async (wrapper) => {
@@ -212,21 +224,17 @@ describe('workshop booking — the quote follows its inputs', () => {
     expect(createCall().body.use_wallet).toBe(true)
   })
 
-  it('re-quotes when a discount code is applied, and books with it', async () => {
+  // The studio asked for no code box on this flow: a booking is never quoted with one,
+  // and a promo the SERVER applies still shows up in the summary.
+  it('never sends a discount code', async () => {
     const wrapper = await mount()
     await toPayStep(wrapper)
     expect(priceCalls().at(-1).query.discount_code).toBeUndefined()
-
-    await wrapper.find('#discount_code').setValue('welcome10')
-    await byText(wrapper, 'Apply').trigger('click')
-    await vi.advanceTimersByTimeAsync(400)
-    await flushPromises()
-
-    expect(priceCalls().at(-1).query.discount_code).toBe('WELCOME10')
+    expect(wrapper.find('#discount_code').exists()).toBe(false)
 
     await byText(wrapper, 'Confirm the booking and pay').trigger('click')
     await flushPromises()
-    expect(createCall().body.discount_code).toBe('WELCOME10')
+    expect(createCall().body.discount_code).toBeUndefined()
   })
 
   it('one quote per settled burst — the debounce protects the shared throttle', async () => {
@@ -258,7 +266,7 @@ describe('workshop booking — a seat that went while we were looking', () => {
 
     expect(picker.refreshCalendar).toHaveBeenCalled()
     expect(picker.refreshSlots).toHaveBeenCalled()
-    expect(currentStep(wrapper)).toBe('1. Date and time')
+    expect(currentStep(wrapper)).toBe('when')
     expect(wrapper.find('[data-test="picker-errors"]').text()).toContain('Only 1 seat is left in this session.')
   })
 
@@ -274,7 +282,7 @@ describe('workshop booking — a seat that went while we were looking', () => {
     await flushPromises()
 
     expect(picker.refreshCalendar).not.toHaveBeenCalled()
-    expect(currentStep(wrapper)).toBe('2. Payment')
+    expect(currentStep(wrapper)).toBe('pay')
     expect(wrapper.text()).toContain('This code has expired.')
   })
 })
@@ -295,7 +303,7 @@ describe('workshop booking — the hold lapsing', () => {
     await flushPromises()
 
     expect(wrapper.text()).not.toContain('Reserved for you')
-    expect(currentStep(wrapper)).toBe('1. Date and time')
+    expect(currentStep(wrapper)).toBe('when')
     expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('the seat was released'))
     expect(picker.refreshCalendar).toHaveBeenCalled()
     expect(picker.refreshSlots).toHaveBeenCalled()
@@ -331,5 +339,35 @@ describe('workshop booking — the balance after paying', () => {
     expect(api.calls.some((call) => call.url.endsWith('/pay'))).toBe(false)
     expect(sanctum.refreshIdentity).toHaveBeenCalled()
     expect(walletRefresh).toHaveBeenCalled()
+  })
+})
+
+describe('a session that cannot be cancelled', () => {
+  afterEach(() => { slotOver = {} })
+
+  it('asks before the seat is taken, and goes on when the customer says yes', async () => {
+    slotOver = { is_non_cancellable: true }
+    const wrapper = await mount()
+    await flushPromises()
+
+    await wrapper.find('[data-test="pick"]').trigger('click')
+    await byText(wrapper, 'Payment').trigger('click')
+    await flushPromises()
+    // Still on the slot step: the question is the whole point of asking it here.
+    expect(currentStep(wrapper)).toBe('when')
+
+    const anyway = [...document.querySelectorAll('button')].find((b) => b.textContent.includes('Book anyway'))
+    anyway.dispatchEvent(new window.MouseEvent('click', { bubbles: true }))
+    await flushPromises()
+    expect(currentStep(wrapper)).toBe('pay')
+  })
+
+  it('a cancellable session goes straight through', async () => {
+    const wrapper = await mount()
+    await flushPromises()
+    await wrapper.find('[data-test="pick"]').trigger('click')
+    await byText(wrapper, 'Payment').trigger('click')
+    await flushPromises()
+    expect(currentStep(wrapper)).toBe('pay')
   })
 })

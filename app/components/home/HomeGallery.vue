@@ -27,7 +27,7 @@
           <div ref="strips" class="absolute inset-0 will-change-transform">
             <NuxtLink
               v-for="(slide, position) in slidesFor(index)"
-              :key="slide.id"
+              :key="position"
               :to="`/gallery/${slide.category.id}`"
               class="group absolute inset-x-0 block h-full"
               :style="{ top: `${position * 100}%` }"
@@ -76,10 +76,17 @@ const CELLS = [
   'col-span-2 row-span-2 sm:col-span-1 sm:row-span-1',
 ]
 
+// How many albums the wall opens for their photographs. One request per album, on every
+// server render of the front door, put a studio with 20 albums at 21 upstream calls per
+// home page view — all inside that visitor's own throttle:api bucket, since the Nitro
+// proxy forwards their IP — and serialized every photograph of every album into the SSR
+// payload. The wall shows six tiles of four, so there is nothing to spend beyond this.
+const ALBUMS = 6
+
 const { data: pool } = await useAsyncData(
   'gallery-pool',
   async () => {
-    const list = asList((await api('/api/gallery'))?.data)
+    const list = asList((await api('/api/gallery'))?.data).slice(0, ALBUMS)
 
     const details = await Promise.all(
       list.map((category) => api(`/api/gallery/${category.id}`).catch(() => null)),

@@ -56,12 +56,18 @@ export const useCart = () => {
     () => items.value.length > 0 && !hasOutOfStock.value,
   );
 
-  /** `POST` increments an existing line; the server answers the line it touched. */
-  const add = async (productId, quantity = 1, color = null) => {
-    if (!isRegistered.value) return local.add(productId, quantity, color);
+  /**
+   * `POST` increments an existing line; the server answers the line it touched.
+   *
+   * No colour: `shop_cart_items` has no column for one and the endpoint's validator
+   * accepts only `shop_product_id` and `quantity`, so a glaze sent here was silently
+   * dropped. The product's colours are a legend on the detail page, not a variant.
+   */
+  const add = async (productId, quantity = 1) => {
+    if (!isRegistered.value) return local.add(productId, quantity);
     const res = await api("/api/shop/cart", {
       method: "POST",
-      body: { shop_product_id: productId, quantity, ...(color ? { color } : {}) },
+      body: { shop_product_id: productId, quantity },
     });
     await refresh();
     return res;

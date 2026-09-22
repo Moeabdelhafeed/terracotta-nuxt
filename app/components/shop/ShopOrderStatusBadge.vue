@@ -1,6 +1,6 @@
 <template>
   <span
-    class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium"
+    class="inline-flex w-fit items-center rounded-md px-2.5 py-1 text-xs font-medium"
     :class="tone"
     >{{ label }}</span
   >
@@ -36,7 +36,7 @@ const label = computed(
 const tone = computed(
   () =>
     ({
-      awaiting_payment: "bg-brand-blush/40 text-brand-rust",
+      awaiting_payment: "bg-brand-blush/40 text-brand-terracotta",
       pending: "bg-brand-green/10 text-brand-green",
       preparing: "bg-brand-mist text-brand-ink",
       out_for_delivery: "bg-brand-mist text-brand-ink",

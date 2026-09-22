@@ -9,7 +9,7 @@
     />
     <button
       type="button"
-      class="absolute top-1/2 -translate-y-1/2 text-brand-rust/80 transition-colors hover:text-brand-rust ltr:right-4 rtl:left-4"
+      class="absolute top-1/2 grid size-10 -translate-y-1/2 place-items-center text-brand-terracotta/80 transition-colors hover:text-brand-terracotta ltr:right-1.5 rtl:left-1.5"
       :aria-label="visible ? t('hide_password', 'Hide password', 'إخفاء كلمة المرور') : t('show_password', 'Show password', 'إظهار كلمة المرور')"
       @click="visible = !visible"
     >

@@ -1,7 +1,7 @@
 <template>
-  <form class="flex flex-col gap-4" @submit.prevent="onSubmit">
+  <form class="grid gap-4 sm:grid-cols-2" @submit.prevent="onSubmit">
     <!-- Short-address lookup: prefills the form from the national address registry. -->
-    <div v-if="lookupEnabled" class="rounded-2xl bg-brand-mist/40 p-4">
+    <div v-if="lookupEnabled" class="rounded-2xl bg-brand-mist/40 p-4 sm:col-span-2">
       <Label for="lookup_short_address">{{ t('address_short_lookup', 'Have a short address? Look it up', 'لديك عنوان مختصر؟ ابحث عنه') }}</Label>
       <div class="mt-2 flex gap-2">
         <Input
@@ -30,7 +30,7 @@
     <div class="grid gap-2">
       <Label for="delivery_zone_id">{{ t('address_city', 'City', 'المدينة') }}</Label>
       <Select v-model="zoneChoice">
-        <SelectTrigger id="delivery_zone_id" class="h-12 w-full text-base">
+        <SelectTrigger id="delivery_zone_id" class="h-12 w-full rounded-xl text-base">
           {{ zoneById(form.delivery_zone_id)?.name ?? t('address_city_other', 'Other city', 'مدينة أخرى') }}
         </SelectTrigger>
         <SelectContent>
@@ -42,7 +42,7 @@
       <span v-if="err('delivery_zone_id')" class="text-xs text-destructive">{{ err('delivery_zone_id') }}</span>
     </div>
 
-    <div class="grid gap-3 sm:grid-cols-2">
+    <div class="contents">
       <div class="grid gap-2">
         <Label for="building_number">{{ t('address_building', 'Building no.', 'رقم المبنى') }}</Label>
         <Input id="building_number" v-model="form.building_number" type="text" inputmode="numeric" maxlength="4" class="h-12 rounded-xl text-base" placeholder="1234" dir="ltr" />
@@ -55,13 +55,13 @@
       </div>
     </div>
 
-    <div class="grid gap-2">
+    <div class="grid gap-2 sm:col-span-2">
       <Label for="street">{{ t('address_street', 'Street', 'الشارع') }}</Label>
       <Input id="street" v-model="form.street" type="text" maxlength="160" class="h-12 rounded-xl text-base" />
       <span v-if="err('street')" class="text-xs text-destructive">{{ err('street') }}</span>
     </div>
 
-    <div class="grid gap-3 sm:grid-cols-2">
+    <div class="contents">
       <div class="grid gap-2">
         <Label for="district">{{ t('address_district', 'District', 'الحي') }}</Label>
         <Input id="district" v-model="form.district" type="text" maxlength="160" class="h-12 rounded-xl text-base" />
@@ -74,7 +74,7 @@
       </div>
     </div>
 
-    <div class="grid gap-3 sm:grid-cols-2">
+    <div class="contents">
       <div class="grid gap-2">
         <Label for="unit_number">{{ t('address_unit', 'Unit', 'الوحدة') }} <span class="text-xs text-muted-foreground">{{ t('optional', '(optional)', '(اختياري)') }}</span></Label>
         <Input id="unit_number" v-model="form.unit_number" type="text" maxlength="16" class="h-12 rounded-xl text-base" dir="ltr" />
@@ -86,14 +86,14 @@
       </div>
     </div>
 
-    <div class="grid gap-2">
+    <div class="grid gap-2 sm:col-span-2">
       <Label for="address_phone">{{ t('address_phone', 'Phone for delivery', 'رقم الهاتف للتوصيل') }}</Label>
       <AuthPhoneInput id="address_phone" v-model="form.phone" :allowed="allowedPhoneCountries" />
       <span v-if="err('phone')" class="text-xs text-destructive">{{ err('phone') }}</span>
     </div>
 
     <!-- Pin: preview map + coordinates, kept inside the Saudi box the API enforces. -->
-    <div class="grid gap-2">
+    <div class="grid gap-2 sm:col-span-2">
       <Label>{{ t('address_pin', 'Location pin', 'موقعك على الخريطة') }}</Label>
       <div class="overflow-hidden rounded-2xl border bg-brand-mist">
         <iframe
@@ -118,24 +118,24 @@
       <span v-if="err('lat') || err('lng')" class="text-xs text-destructive">{{ err('lat') || err('lng') }}</span>
     </div>
 
-    <div class="grid gap-2">
+    <div class="grid gap-2 sm:col-span-2">
       <Label for="address_notes">{{ t('address_notes', 'Delivery notes', 'ملاحظات التوصيل') }} <span class="text-xs text-muted-foreground">{{ t('optional', '(optional)', '(اختياري)') }}</span></Label>
       <Input id="address_notes" v-model="form.notes" type="text" maxlength="255" class="h-12 rounded-xl text-base" />
       <span v-if="err('notes')" class="text-xs text-destructive">{{ err('notes') }}</span>
     </div>
 
-    <label class="flex items-center gap-2 text-sm">
+    <label class="flex items-center gap-2 text-sm sm:col-span-2">
       <Checkbox v-model="form.is_default" />
       {{ t('address_make_default', 'Make this my default address', 'اجعله عنواني الافتراضي') }}
     </label>
 
-    <span v-if="submitError" class="text-xs text-destructive">{{ submitError }}</span>
+    <span v-if="submitError" class="text-xs text-destructive sm:col-span-2">{{ submitError }}</span>
 
-    <div class="mt-2 flex gap-3">
+    <div class="mt-2 flex gap-3 sm:col-span-2">
       <Button v-if="showCancel" type="button" variant="outline" class="h-12 flex-1 rounded-xl text-base" :disabled="pending" @click="emit('cancel')">
         {{ t('cancel', 'Cancel', 'إلغاء') }}
       </Button>
-      <Button type="submit" class="h-12 flex-1 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90" :disabled="pending">
+      <Button type="submit" class="h-12 flex-1 rounded-xl bg-brand-terracotta text-base hover:bg-brand-terracotta/90" :disabled="pending">
         {{ pending ? t('saving', 'Saving...', 'جارٍ الحفظ...') : t('save_address', 'Save address', 'حفظ العنوان') }}
       </Button>
     </div>

@@ -11,6 +11,9 @@ const { api, lang, refreshNuxtData } = await vi.hoisted(async () => {
       'GET /api/shop/products/11': () => globalThis.__product(11),
       'GET /api/shop/products/12': () => globalThis.__product(12),
       'GET /api/shop/products/{id}': () => notFound(),
+      // The materials shelf answers for ids the shop's own endpoint refuses.
+      'GET /api/materials/products/21': () => ({ success: true, message: 'ok', errors: null, data: { id: 21, title: 'Stoneware clay', price: '30.00', in_stock: true, stock: null, max_quantity: null } }),
+      'GET /api/materials/products/{id}': () => notFound('Material not found.'),
       'POST /api/shop/cart': (opts) => envelope({ id: 1, quantity: opts.body.quantity }, 'Added to cart.'),
       'POST /api/shop/favorites/{id}': envelope(null, 'Added to favorites.'),
     }),
@@ -131,25 +134,32 @@ describe('local cart writes', () => {
     expect(localCartIds.value).toEqual([{ id: 12, quantity: 100 }])
   })
 
-  it('the same piece in another glaze is another line, keyed by the hex', async () => {
+  /**
+   * `shop_cart_items` has no colour column and `POST /api/shop/cart` takes none, so a
+   * per-colour line is one the account can never hold. Splitting them locally gave each
+   * its own `max_quantity` ceiling — two glazes of a five-in-stock piece reached seven
+   * units with both lines reading `in_stock` — and the second POST 422'd at sign-in.
+   */
+  it('keeps one line per product however many glazes are added', async () => {
     const cart = useLocalCart()
     await cart.add(11, 1, '#81341a')
     await cart.add(11, 2, '#345a4a')
-    await cart.add(11, 1, '#81341a')
     await flushPromises()
 
-    expect(localCartIds.value).toEqual([
-      { id: 11, quantity: 2, color: '#81341a' },
-      { id: 11, quantity: 2, color: '#345a4a' },
-    ])
-    expect(cart.items.value.map((line) => line.id)).toEqual(['11::#81341a', '11::#345a4a'])
-    expect(cart.items.value[0].color).toBe('#81341a')
+    expect(localCartIds.value).toEqual([{ id: 11, quantity: 3 }])
+    expect(cart.items.value.map((line) => line.id)).toEqual([11])
+  })
 
-    await cart.update('11::#345a4a', 5)
-    expect(localCartIds.value[1]).toEqual({ id: 11, quantity: 5, color: '#345a4a' })
+  it('caps a product across every add, not per glaze', async () => {
+    const cart = useLocalCart()
+    await cart.add(11, 10, '#81341a')
+    // The ceiling comes off the fetched product, so it only applies once it has loaded.
+    await flushPromises()
+    await cart.add(11, 10, '#345a4a')
+    await flushPromises()
 
-    await cart.remove('11::#81341a')
-    expect(localCartIds.value).toEqual([{ id: 11, quantity: 5, color: '#345a4a' }])
+    // 11's `max_quantity` is 12 in this fixture.
+    expect(localCartIds.value).toEqual([{ id: 11, quantity: 12 }])
   })
 
   it('update sets the quantity outright and remove drops the line', async () => {
@@ -219,20 +229,23 @@ describe('pushLocalShopToServer', () => {
     const result = await pushLocalShopToServer(api.useApi())
 
     expect(result).toEqual({ pushedLines: 1, pushedFavorites: 0, dropped: 2 })
-    expect(localCartIds.value).toEqual([])
+    // The refused line stays on the device — clearing it wholesale threw away the only
+    // copy the customer had, leaving a toast as the sole trace.
+    expect(localCartIds.value).toEqual([{ id: 11, quantity: 2 }])
+    expect(localFavoriteIds.value).toEqual([11])
 
     api.table['POST /api/shop/cart'] = (opts) => ({ success: true, message: 'ok', errors: null, data: { id: 1, quantity: opts.body.quantity } })
     api.table['POST /api/shop/favorites/{id}'] = { success: true, message: 'ok', errors: null, data: null }
   })
 
-  it('replays the glaze with the line', async () => {
-    localCartIds.value = [{ id: 11, quantity: 1, color: '#81341a' }]
+  it('sends no colour, which the cart endpoint does not accept', async () => {
+    localCartIds.value = [{ id: 11, quantity: 1 }]
     await flushPromises()
 
     await pushLocalShopToServer(api.useApi())
 
     expect(api.calls.filter((call) => call.url === '/api/shop/cart').map((call) => call.body)).toEqual([
-      { shop_product_id: 11, quantity: 1, color: '#81341a' },
+      { shop_product_id: 11, quantity: 1 },
     ])
   })
 
@@ -241,5 +254,42 @@ describe('pushLocalShopToServer', () => {
 
     expect(result).toEqual({ pushedLines: 0, pushedFavorites: 0, dropped: 0 })
     expect(refreshNuxtData).not.toHaveBeenCalled()
+  })
+})
+
+/**
+ * The two storefronts share a products table but not an endpoint, and the shop's `show()`
+ * filters by section — so a material 404s there. Treating that as "gone" pruned a guest's
+ * own saved piece out of their storage, which looked from the outside like the heart and
+ * the Add button doing nothing at all.
+ */
+describe('a guest saving from the materials shelf', () => {
+  it('keeps a hearted material and hydrates it from its own shelf', async () => {
+    const favorites = useLocalFavorites()
+    await favorites.toggle({ id: 21 })
+    await flushPromises()
+    await flushPromises()
+
+    expect(localFavoriteIds.value).toEqual([21])
+    expect(favorites.favorites.value).toHaveLength(1)
+    expect(favorites.favorites.value[0]).toMatchObject({ id: 21, title: 'Stoneware clay' })
+  })
+
+  it('remembers which shelf it came from, so the card can link back to it', async () => {
+    const favorites = useLocalFavorites()
+    await favorites.toggle({ id: 21 })
+    await flushPromises()
+    await flushPromises()
+
+    expect(favorites.favorites.value[0].section).toBe('materials')
+  })
+
+  it('still forgets an id that neither shelf has', async () => {
+    const favorites = useLocalFavorites()
+    await favorites.toggle({ id: 99 })
+    await flushPromises()
+    await flushPromises()
+
+    expect(localFavoriteIds.value).toEqual([])
   })
 })

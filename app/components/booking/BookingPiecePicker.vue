@@ -6,66 +6,72 @@
       </h2>
       <p class="mt-2 text-sm text-muted-foreground">{{ boundsNote }}</p>
 
-      <!-- category tabs -->
-      <ul v-if="categories.length" class="mt-6 flex gap-2 overflow-x-auto pb-2">
-        <li v-for="category in categories" :key="category.id" class="shrink-0">
-          <Button
+      <!--
+        The shop's own rails, in the workshop's colour: the customer has already chosen a
+        category this way to browse the studio's shelf, and this is the same act. The
+        pieces they made themselves LEAD, when they have any — what is already theirs is
+        the reason they came back, and the shelf is the alternative.
+      -->
+      <ul class="mt-6 flex gap-3 overflow-x-auto scrollbar-none pb-2" data-test="piece-categories">
+        <li v-for="tab in tabs" :key="tab.id" class="shrink-0">
+          <button
             type="button"
-            size="sm"
-            class="rounded-xl"
-            :variant="categoryId === category.id ? 'default' : 'outline'"
-            :class="
-              categoryId === category.id
-                ? 'bg-brand-rust hover:bg-brand-rust/90'
-                : ''
-            "
-            @click="categoryId = category.id"
-            >{{ category.title }}</Button
+            class="relative flex h-20 w-24 items-center justify-center overflow-hidden rounded-2xl border px-2 text-center transition-colors"
+            :class="categoryId === tab.id ? 'border-primary bg-primary text-white' : 'bg-card hover:border-primary'"
+            :data-category="tab.id"
+            @click="categoryId = tab.id"
           >
+            <CardLineArt
+              v-if="categoryId === tab.id"
+              class="absolute inset-0 size-full scale-125 opacity-40 [filter:brightness(0)_invert(1)]"
+            />
+            <span class="relative line-clamp-2 text-sm" :class="categoryId === tab.id ? 'font-bold' : 'font-medium'">
+              {{ tab.title }}
+            </span>
+          </button>
         </li>
       </ul>
 
-      <!-- sub-category tabs -->
-      <template v-if="category">
-        <p
-          class="mt-6 text-xs uppercase tracking-[0.2em] text-muted-foreground"
-        >
-          {{
-            t("sub_categories_of", "Categories of :name", "فئات :name", {
-              name: category.title,
-            })
-          }}
-        </p>
-        <ul class="mt-3 flex gap-2 overflow-x-auto pb-2">
-          <li
-            v-for="sub in category.sub_categories"
-            :key="sub.id"
-            class="shrink-0"
+      <!--
+        A refinement of the choice above, not a destination of its own — so it is shorter
+        and carries no artwork. One group is no choice at all: its products are already
+        what is on screen, and a lone chip that cannot be turned off reads as a control.
+      -->
+      <ul v-if="subTabs.length > 1" class="mt-3 flex gap-3 overflow-x-auto scrollbar-none pb-2" data-test="piece-sub-categories">
+        <li v-for="option in subTabs" :key="option.id" class="shrink-0">
+          <button
+            type="button"
+            class="relative flex h-13 w-24 items-center justify-center overflow-hidden rounded-2xl border px-2 text-center transition-colors"
+            :class="subId === option.id ? 'border-primary bg-primary text-white' : 'bg-card hover:border-primary'"
+            :data-sub-category="option.id"
+            @click="subId = option.id"
           >
-            <Button
-              type="button"
-              size="sm"
-              class="rounded-xl"
-              :variant="subId === sub.id ? 'default' : 'outline'"
-              :class="
-                subId === sub.id ? 'bg-brand-rust hover:bg-brand-rust/90' : ''
-              "
-              @click="subId = sub.id"
-              >{{ sub.title }}</Button
-            >
-          </li>
-        </ul>
-      </template>
+            <CardLineArt
+              v-if="subId === option.id"
+              class="absolute inset-0 size-full opacity-40 [filter:brightness(0)_invert(1)]"
+            />
+            <span class="relative line-clamp-2 text-xs" :class="subId === option.id ? 'font-bold' : 'font-medium'">
+              {{ option.title }}
+            </span>
+          </button>
+        </li>
+      </ul>
 
-      <ul class="mt-6 flex flex-col gap-3" data-test="product-list">
+      <!-- Both tabs say what their list is. «قطعي» used to and the shelf did not, so the
+           same screen explained itself on one and the silence read as a failed load. -->
+      <p class="mt-6 text-sm text-muted-foreground">
+        {{ isOwnTab
+          ? t('own_pieces_hint', 'Pieces you made yourself, ready to be painted.', 'قطع صنعتها بنفسك وتقدر تلونها الان.')
+          : t('store_pieces_hint', 'Pieces from the studio, ready to paint today.', 'قطع من المتجر جاهزة تلونها اليوم.') }}
+      </p>
+
+      <ul v-if="!isOwnTab" class="mt-4 flex flex-col gap-3" data-test="product-list">
         <li
           v-for="product in products"
           :key="product.id"
           class="flex items-center gap-4 rounded-2xl border bg-card p-4"
         >
-          <div
-            class="size-16 shrink-0 overflow-hidden rounded-xl bg-brand-mist"
-          >
+          <div class="size-16 shrink-0 overflow-hidden rounded-xl bg-brand-mist">
             <AppImage
               v-if="product.images?.[0]"
               :src="product.images[0]"
@@ -75,10 +81,7 @@
           </div>
           <div class="min-w-0 flex-1">
             <p class="truncate font-medium">{{ product.title }}</p>
-            <p
-              v-if="product.subtitle"
-              class="truncate text-xs text-muted-foreground"
-            >
+            <p v-if="product.subtitle" class="truncate text-xs text-muted-foreground">
               {{ product.subtitle }}
             </p>
             <p class="mt-1 font-display font-black text-primary">
@@ -88,7 +91,7 @@
           <Button
             type="button"
             size="icon"
-            class="size-10 shrink-0 rounded-xl bg-brand-rust hover:bg-brand-rust/90"
+            class="size-10 shrink-0 rounded-xl bg-primary hover:bg-primary/90"
             :aria-label="t('add_piece', 'Add', 'اضافة')"
             :data-add-product="product.id"
             @click="addProduct(product)"
@@ -99,72 +102,54 @@
       </ul>
 
       <!-- Pieces the caller made in an earlier session; always quantity 1. -->
-      <section
-        v-if="ownPieces?.pieces?.length"
-        class="mt-10 rounded-3xl border bg-brand-mist/40 p-6"
-      >
-        <h3 class="font-display text-xl font-semibold">
-          {{
-            t(
-              "own_pieces_pick",
-              "Or paint a piece you made",
-              "أو لوّن قطعة صنعتها بنفسك",
-            )
-          }}
-        </h3>
-        <p class="mt-1 text-sm text-muted-foreground">
-          {{
-            t("own_pieces_each", ":price each", ":price للقطعة", {
-              price: format(ownPieces.price),
-            })
-          }}
-        </p>
-        <ul class="mt-4 flex flex-col gap-3">
-          <li
-            v-for="piece in ownPieces.pieces"
-            :key="piece.id"
-            class="flex items-center gap-4 rounded-2xl border bg-card p-4"
+      <ul v-else class="mt-4 flex flex-col gap-3" data-test="own-piece-list">
+        <li
+          v-for="piece in ownPieces.pieces"
+          :key="piece.id"
+          class="flex items-center gap-4 rounded-2xl border bg-card p-4"
+        >
+          <div class="size-16 shrink-0 overflow-hidden rounded-xl bg-brand-mist">
+            <AppImage
+              v-if="piece.images?.[0]"
+              :src="piece.images[0]"
+              :alt="piece.label ?? ''"
+              class="size-full object-cover"
+            />
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="truncate font-medium">
+              {{ piece.label ?? t("your_piece", "Your piece", "قطعتك") }}
+            </p>
+            <p v-if="piece.made_on" class="text-xs text-muted-foreground">
+              {{ t("piece_made_on", "Made :date", "صُنعت في :date", { date: formatBookingDate(piece.made_on, code) }) }}
+            </p>
+            <p class="text-xs text-muted-foreground">
+              {{ t("n_photos", ":n photos", ":n صور", { n: piece.images?.length ?? 0 }) }}
+            </p>
+            <p class="mt-1 font-display font-black text-primary">
+              {{ format(ownPieces.price) }}
+            </p>
+            <p
+              v-if="unavailableNote(piece)"
+              class="mt-1 text-xs text-muted-foreground"
+              :data-piece-unavailable="piece.id"
+            >
+              {{ unavailableNote(piece) }}
+            </p>
+          </div>
+          <Button
+            type="button"
+            size="icon"
+            class="size-10 shrink-0 rounded-xl bg-primary hover:bg-primary/90"
+            :disabled="hasPiece(piece.id) || !!unavailableNote(piece)"
+            :aria-label="t('add_piece', 'Add', 'اضافة')"
+            :data-add-piece="piece.id"
+            @click="addOwnPiece(piece)"
           >
-            <div
-              class="size-16 shrink-0 overflow-hidden rounded-xl bg-brand-mist"
-            >
-              <AppImage
-                v-if="piece.images?.[0]"
-                :src="piece.images[0]"
-                :alt="piece.label ?? ''"
-                class="size-full object-cover"
-              />
-            </div>
-            <div class="min-w-0 flex-1">
-              <p class="truncate font-medium">
-                {{ piece.label ?? t("your_piece", "Your piece", "قطعتك") }}
-              </p>
-              <p v-if="piece.made_on" class="text-xs text-muted-foreground">
-                {{ piece.made_on }}
-              </p>
-              <p
-                v-if="unavailableNote(piece)"
-                class="mt-1 text-xs text-muted-foreground"
-                :data-piece-unavailable="piece.id"
-              >
-                {{ unavailableNote(piece) }}
-              </p>
-            </div>
-            <Button
-              type="button"
-              size="icon"
-              variant="outline"
-              class="size-10 shrink-0 rounded-control"
-              :disabled="hasPiece(piece.id) || !!unavailableNote(piece)"
-              :aria-label="t('add_piece', 'Add', 'اضافة')"
-              :data-add-piece="piece.id"
-              @click="addOwnPiece(piece)"
-            >
-              <LucidePlus class="size-5" />
-            </Button>
-          </li>
-        </ul>
-      </section>
+            <LucidePlus class="size-5" />
+          </Button>
+        </li>
+      </ul>
     </div>
 
     <!-- Selected pieces: the sheet in the frames, a panel on the web. -->
@@ -270,19 +255,27 @@ const props = defineProps({
 
 const lines = defineModel({ type: Array, default: () => [] });
 
-const { t } = useLang("web", "bookings");
+const { t, code } = useLang("web", "bookings");
 const { format } = usePrice();
 
 const categories = computed(() => props.workshop.categories ?? []);
 const ownPieces = computed(() => props.workshop.own_pieces ?? null);
 
-const categoryId = ref(categories.value[0]?.id ?? null);
+/** The customer's own shelf, as a category beside the studio's. */
+const OWN_TAB = -1;
+const tabs = computed(() => [
+  ...(ownPieces.value?.pieces?.length
+    ? [{ id: OWN_TAB, title: t("own_pieces_tab", "My pieces", "قطعي") }]
+    : []),
+  ...categories.value.map((entry) => ({ id: entry.id, title: entry.title })),
+]);
+
+const categoryId = ref(categories.value[0]?.id ?? OWN_TAB);
+const isOwnTab = computed(() => categoryId.value === OWN_TAB);
 const category = computed(
-  () =>
-    categories.value.find((c) => c.id === categoryId.value) ??
-    categories.value[0] ??
-    null,
+  () => categories.value.find((c) => c.id === categoryId.value) ?? null,
 );
+const subTabs = computed(() => category.value?.sub_categories ?? []);
 
 const subId = ref(category.value?.sub_categories?.[0]?.id ?? null);
 watch(category, (value) => {

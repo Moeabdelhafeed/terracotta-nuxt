@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-2xl border bg-brand-mist/40 p-5">
+  <div class="rounded-2xl border bg-card p-5">
     <h3 v-if="title" class="font-display text-base font-semibold text-foreground">{{ title }}</h3>
 
     <dl v-if="quote" class="mt-3 flex flex-col gap-2 text-sm" :class="{ 'mt-0': !title }">
@@ -36,7 +36,7 @@
         {{ t('summary_includes_vat', 'Includes VAT :amount (:rate%)', 'شامل ضريبة القيمة المضافة :amount (:rate%)', { amount: format(quote.vat_amount), rate: vatRate }) }}
       </p>
 
-      <div v-if="hasWallet" class="flex items-center justify-between gap-4 text-brand-rust">
+      <div v-if="hasWallet" class="flex items-center justify-between gap-4 text-primary">
         <dt>{{ t('summary_wallet_applied', 'Paid from wallet', 'مدفوع من المحفظة') }}</dt>
         <dd class="font-medium">−{{ format(quote.wallet_applied) }}</dd>
       </div>

@@ -84,16 +84,16 @@ describe('useCart', () => {
     expect(mutations[1]).toMatchObject({ method: 'PUT', url: '/api/shop/cart/1', body: { quantity: 5 } })
   })
 
-  it('sends the chosen glaze as the variant id, and nothing when there is none', async () => {
+  /** The endpoint's validator takes `shop_product_id` and `quantity` — nothing else. */
+  it('sends the product and the quantity, never a colour', async () => {
     const cart = useCart()
     await flushPromises()
+    // `api.calls` accumulates across this file's cases, so read back the one just made.
+    api.calls.length = 0
     await cart.add(11, 1)
-    const plain = api.calls.find((c) => c.method === 'POST' && c.url === '/api/shop/cart')
-    expect(Object.keys(plain.body)).toEqual(['shop_product_id', 'quantity'])
 
-    await cart.add(11, 1, '#81341a')
-    const glazed = api.calls.filter((c) => c.method === 'POST' && c.url === '/api/shop/cart').at(-1)
-    expect(glazed.body).toEqual({ shop_product_id: 11, quantity: 1, color: '#81341a' })
+    const post = api.calls.find((c) => c.method === 'POST' && c.url === '/api/shop/cart')
+    expect(post.body).toEqual({ shop_product_id: 11, quantity: 1 })
   })
 
   it('blocks checkout while any line cannot be fulfilled', async () => {

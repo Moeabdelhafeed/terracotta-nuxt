@@ -8,6 +8,9 @@
 </template>
 
 <script setup>
+// A piece speaks for itself, and the bar above carries the way back to its shelf — the
+// site's whole navigation under it is noise.
+
 const route = useRoute();
 const { product, error, status } = useProduct(() => route.params.id);
 

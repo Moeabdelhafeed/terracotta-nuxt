@@ -38,8 +38,13 @@
 
           <div class="grid gap-2">
             <Label for="identifier">{{ identifierLabel }}</Label>
+            <!-- Keyed off the kind selected above, not `identifierInputType`: that is
+                 derived from the config and falls back to plain text whenever the project
+                 accepts more than one identifier, which left "Phone" with no country-code
+                 picker. A number typed without its country code normalizes to null on the
+                 backend, so the customer was told their account did not exist. -->
             <AuthPhoneInput
-              v-if="identifierInputType === 'tel'"
+              v-if="identifierType === 'phone'"
               id="identifier"
               v-model="form.identifier"
               :allowed="allowedPhoneCountries"
@@ -48,7 +53,7 @@
               v-else
               id="identifier"
               v-model="form.identifier"
-              :type="identifierInputType"
+              :type="identifierType === 'email' ? 'email' : identifierInputType"
               :placeholder="identifierPlaceholder"
               class="h-12 rounded-field text-base"
               required
@@ -65,28 +70,6 @@
                   "No account with this :field.",
                   "لا يوجد حساب بهذا الـ:field.",
                   { field: identifierLabel.toLowerCase() },
-                )
-              }}</span
-            >
-            <span
-              v-else-if="identifierStatus === 'suspended'"
-              class="text-xs text-destructive"
-              >{{
-                t(
-                  "account_suspended",
-                  "Account suspended. Contact support.",
-                  "الحساب موقوف. تواصل مع الدعم.",
-                )
-              }}</span
-            >
-            <span
-              v-else-if="identifierStatus === 'pending_deletion'"
-              class="text-xs text-warning"
-              >{{
-                t(
-                  "account_pending_deletion_hint",
-                  "Account scheduled for deletion. Log in to restore.",
-                  "الحساب مجدول للحذف. سجّل الدخول لاستعادته.",
                 )
               }}</span
             >
@@ -169,7 +152,7 @@
                       : { redirect: redirectTarget }),
                   },
                 }"
-                class="text-xs font-medium text-brand-rust underline-offset-4 hover:underline"
+                class="text-xs font-medium text-brand-terracotta underline-offset-4 hover:underline"
                 >{{
                   t("forgot_password", "Forgot password?", "نسيت كلمة السر؟")
                 }}</NuxtLink
@@ -180,10 +163,12 @@
               errors.password[0]
             }}</span>
           </div>
+          <AuthFormError :message="formError" />
+
           <Button
             type="submit"
             size="lg"
-            class="h-13 w-full rounded-control bg-brand-rust text-base hover:bg-brand-rust/90"
+            class="h-13 w-full rounded-control bg-brand-terracotta text-base hover:bg-brand-terracotta/90"
             :disabled="submitDisabled"
             >{{ submitLabel }}</Button
           >
@@ -220,7 +205,7 @@
             query:
               redirectTarget === '/' ? {} : { redirect: redirectTarget },
           }"
-          class="font-medium text-brand-rust underline-offset-4 hover:underline"
+          class="font-medium text-brand-terracotta underline-offset-4 hover:underline"
           >{{ t("register", "Register", "إنشاء حساب") }}</NuxtLink
         >
       </p>
@@ -235,7 +220,7 @@
         <button
           type="button"
           data-test="open-terms"
-          class="text-brand-rust underline-offset-4 hover:underline"
+          class="text-brand-terracotta underline-offset-4 hover:underline"
           @click="termsOpen = true"
         >
           {{
@@ -246,61 +231,6 @@
       <AccountTermsModal v-model:open="termsOpen" />
     </AuthScreen>
 
-    <Teleport to="body">
-      <div
-        v-if="restoreDialogOpen"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4"
-        role="dialog"
-        aria-modal="true"
-      >
-        <div
-          class="absolute inset-0 bg-black/50"
-          @click="loading || (restoreDialogOpen = false)"
-        />
-        <div
-          class="relative w-full max-w-md rounded-sheet border bg-background p-6"
-        >
-          <h2 class="text-lg font-semibold">
-            {{
-              t(
-                "account_pending_deletion_title",
-                "Restore account?",
-                "استعادة الحساب؟",
-              )
-            }}
-          </h2>
-          <p class="mt-2 text-sm text-muted-foreground">
-            {{
-              t(
-                "account_pending_deletion_body",
-                "This account is scheduled for deletion. Logging in will restore it.",
-                "هذا الحساب مجدول للحذف. تسجيل الدخول سيستعيده.",
-              )
-            }}
-          </p>
-          <div class="mt-6 flex flex-wrap justify-end gap-2">
-            <Button
-              variant="outline"
-              :disabled="loading"
-              @click="restoreDialogOpen = false"
-            >
-              {{ t("cancel", "Cancel", "إلغاء") }}
-            </Button>
-            <Button :disabled="loading" @click="confirmRestore">
-              {{
-                loading
-                  ? t("signing_in", "Signing in...", "جارٍ تسجيل الدخول...")
-                  : t(
-                      "restore_and_login",
-                      "Restore & log in",
-                      "استعادة وتسجيل الدخول",
-                    )
-              }}
-            </Button>
-          </div>
-        </div>
-      </div>
-    </Teleport>
   </div>
 </template>
 
@@ -338,16 +268,18 @@ watch(
 const { t } = useLang("web", "auth");
 
 const errors = ref({});
+// 429 (the auth throttle), 403 (deactivated account) and 500 all arrive with a `message`
+// and no `errors` map, so reading only `error.data.errors` showed the customer nothing.
+const formError = ref("");
 const loading = ref(false);
 const checking = ref(false);
-const identifierStatus = ref(null); // 'missing' | 'active' | 'pending_deletion' | 'suspended'
+const identifierStatus = ref(null); // 'missing' | 'active'
 const identifierMeta = ref({
   has_password: true,
   social_providers: [],
   verified: false,
   is_guest: false,
 });
-const restoreDialogOpen = ref(false);
 const socialError = ref("");
 const termsOpen = ref(false);
 
@@ -373,7 +305,6 @@ const form = ref({ identifier: "", password: "", name: "" });
 
 const submitDisabled = computed(() => {
   if (loading.value) return true;
-  if (identifierStatus.value === "suspended") return true;
   if (isOtpMode.value) {
     if (identifierStatus.value === "missing" && !form.value.name) return true;
     return false;
@@ -437,11 +368,11 @@ watch(
           verified: !!data.verified,
           is_guest: !!data.is_guest,
         };
-        if (!data.exists) identifierStatus.value = "missing";
-        else if (data.suspended) identifierStatus.value = "suspended";
-        else if (data.pending_deletion)
-          identifierStatus.value = "pending_deletion";
-        else identifierStatus.value = "active";
+        // `exists` is the only verdict this endpoint gives. It reports neither
+        // suspension (that surfaces as a 403 on login, shown via `formError`) nor a
+        // pending deletion — deleting an account here is immediate and permanent, so
+        // there is nothing to restore.
+        identifierStatus.value = data.exists ? "active" : "missing";
       } catch {
         identifierStatus.value = null;
         identifierMeta.value = {
@@ -463,6 +394,7 @@ onUnmounted(() => {
 
 const performLogin = async () => {
   errors.value = {};
+  formError.value = "";
   loading.value = true;
   try {
     clearGuestUser();
@@ -476,7 +408,11 @@ const performLogin = async () => {
     if (redirectTarget.value !== "/")
       await navigateTo(redirectTarget.value, { replace: true });
   } catch (error) {
-    errors.value = error.data?.errors ?? {};
+    const normalized = normalizeApiError(error);
+    errors.value = normalized.errors;
+    formError.value = Object.keys(normalized.errors).length
+      ? ""
+      : normalized.message;
   } finally {
     loading.value = false;
   }
@@ -484,6 +420,7 @@ const performLogin = async () => {
 
 const performOtpRequest = async () => {
   errors.value = {};
+  formError.value = "";
   loading.value = true;
   try {
     const body = {
@@ -504,28 +441,22 @@ const performOtpRequest = async () => {
       },
     });
   } catch (error) {
-    errors.value = error.data?.errors ?? {};
+    const normalized = normalizeApiError(error);
+    errors.value = normalized.errors;
+    formError.value = Object.keys(normalized.errors).length
+      ? ""
+      : normalized.message;
   } finally {
     loading.value = false;
   }
 };
 
 const onSubmit = () => {
-  if (identifierStatus.value === "suspended") return;
   if (isOtpMode.value) {
     performOtpRequest();
     return;
   }
-  if (identifierStatus.value === "pending_deletion") {
-    restoreDialogOpen.value = true;
-    return;
-  }
   performLogin();
-};
-
-const confirmRestore = async () => {
-  await performLogin();
-  restoreDialogOpen.value = false;
 };
 
 const onSocial = async ({ idToken, error }) => {

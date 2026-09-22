@@ -23,7 +23,7 @@ Laravel API at `runtimeConfig.public.baseUrl` (default `http://localhost:8000`).
 
 Auth endpoints (Sanctum module config in [nuxt.config.ts](nuxt.config.ts)):
 - `POST /api/login`, `POST /api/logout`, `GET /api/user` for session.
-- `POST /api/verify-login` (OTP mode only) — `{ identifier, otp }` → `{ token, user, is_verified, token_id, account_restored? }`.
+- `POST /api/verify-login` (OTP mode only) — `{ identifier, type, otp }` → `{ token, user, is_verified, token_id }`.
 - `POST /api/register`, `POST /api/check-identifier`, `POST /api/forgot-password`, `POST /api/verify-forgot-password-otp`, `POST /api/change-forgot-password`, `POST /api/verify-otp`, `POST /api/send-otp`.
 - `PUT /api/update-profile`, `POST /api/change-password`, `POST /api/request-identifier-change`, `POST /api/verify-identifier-change`, `DELETE /api/delete-account`.
 - `GET /api/social-accounts`, `POST /api/link-social-account`, `DELETE /api/unlink-social-account`.
@@ -69,21 +69,29 @@ Render them, never hand-roll an `<img>`:
 
 Response envelope: `{ success, message, errors, data }`. Pages typically read `res?.data ?? res ?? {}` to be tolerant.
 
-`/api/check-identifier` data shape (recent change):
+`/api/check-identifier` data shape:
 ```json
 {
   "exists": true|false,
-  "pending_deletion": true|false,
-  "suspended": true|false,
-  "available_channels": ["email", "phone"]
+  "available_channels": ["email", "phone"],
+  "has_password": true|false,
+  "social_providers": ["google"],
+  "verified": true|false,
+  "is_guest": true|false
 }
 ```
 Branching:
 - `!exists` → free identifier (register flow).
-- `suspended` → block UI ("Account suspended. Contact support."). No login/forgot/register.
-- `pending_deletion` → allow login; backend returns `account_restored: true` after successful login. Show modal confirmation before submit.
-- otherwise → normal active.
-- Pre-submit uniqueness for register/profile: treat any `exists:true` as "taken" regardless of `pending_deletion`/`suspended`.
+- otherwise → normal active; `has_password` / `social_providers` decide which sign-in the form offers.
+- Pre-submit uniqueness for register/profile: treat any `exists:true` as "taken".
+
+**There is no `suspended` or `pending_deletion` here, and no account restoration.**
+`AppUserController::checkIdentifier` returns only the keys above, `App\Models\User` has no
+`SoftDeletes`, and `DELETE /api/delete-account` is immediate and permanent — so nothing can
+be restored and no `account_restored` flag is ever sent. A deactivated account
+(`is_active=false`) is never reported here either: it surfaces as a **403 on login**, which
+is why every auth screen has to render the non-field failures (429 from the throttles, 403,
+500) and not just `errors.<field>` — see `AuthFormError`.
 
 ### Identifier requests always declare a `type`
 
@@ -178,7 +186,7 @@ Selected via `runtimeConfig.public.translationsMode` (override with `NUXT_PUBLIC
 
 [app/plugins/00.bootstrap-config.js](app/plugins/00.bootstrap-config.js) resolves the language *before* `/api/config` and every page fetch, because a cold visit has no `lang` cookie: without it the API calls go out as `en` while the layout takes `dir`/`lang` from the backend default, so an Arabic-first project renders RTL with English copy.
 
-Order on a first visit: `GET /api/languages` (sent with `Accept-Language: en` — the API rejects a request without the header, and the list is the same either way) → pick the visitor's browser language when the project has it, else `is_default`, else the first → write the `lang` + `i18n_locale` cookies → everything else uses that code.
+Order on a first visit: `GET /api/languages` (sent with `Accept-Language: en` — the API rejects a request without the header, and the list is the same either way) → take the project's `is_default`, falling back to the visitor's browser language, then the first in the list → write the `lang` + `i18n_locale` cookies → everything else uses that code. The studio's own default wins over the browser deliberately: an Arabic-first studio should read Arabic to a visitor whose browser merely happens to prefer English.
 
 Two subtleties worth keeping:
 - Nuxt's `useCookie` re-parses the **incoming request header** on every call, so a cookie written in the plugin is invisible to composables that read it later in the same SSR pass. The plugin writes the value back onto `event.node.req.headers.cookie` so the rest of the render sees it.
@@ -292,7 +300,10 @@ upload — `mediaAsset(key, defaultPath)`. Every call site does; the seeds live 
 | `web/heroes/hero_shop`, `hero_gallery`, `hero_workshops`, `hero_materials` | `/seed/hero-*.webp`, passed as `PageHero`'s `fallback` |
 | `web/studio/studio_1…4` | `/seed/studio-N.webp` |
 | `web/home/hero_video` | `/seed/hero-video.mp4` |
+| `web/heroes/hero_about` | `/seed/hero-about.webp`, passed as `PageHero`'s `fallback` |
+| `web/about/about_story`, `about_craft` | `/seed/about-1.webp`, `/seed/about-2.webp` |
 | `web/app/app_screen_1`, `app_screen_2` | `/app-screen-N.png` |
+| `web/workshops/art_make_your_piece`, `art_paint_your_piece`, `art_make_your_candle` | `/make-your-cup-`, `/color-your-cup-`, `/make-your-wax-workshop-illustration.png` — the per-family drawing a workshop falls back to when the CMS has no photograph of it |
 
 Adding a key means adding its seed file, or it can never provision itself — a
 `mediaAsset(key)` with no default renders nothing on a backend that has never seen it.

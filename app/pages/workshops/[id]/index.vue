@@ -23,9 +23,15 @@
   </main>
 
   <main v-else-if="workshop">
-    <PageBar :crumbs="crumbs" />
+    <PageBar :crumbs="crumbs" back="/workshops" />
 
-    <div class="mx-auto max-w-6xl px-6 py-16">
+    <!-- Tinted with the workshop's OWN colour, admin-set per workshop. Overriding
+         `--primary` here re-points every `bg-primary` / `text-primary` below it, so the
+         facts, the CTA and the links all follow without each naming the colour. -->
+    <div
+      class="mx-auto max-w-6xl px-6 py-16"
+      :style="{ '--primary': workshopColour(workshop) }"
+    >
       <div class="grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-start">
         <div ref="content">
           <div
@@ -49,7 +55,7 @@
 
           <div
             v-if="workshop.long_description"
-            class="prose prose-sm mt-6 max-w-none dark:prose-invert [&_a]:text-primary [&_li]:my-1 [&_p]:my-3 [&_ul]:list-disc [&_ul]:ps-6"
+            class="prose prose-sm mt-6 max-w-none rounded-card bg-primary/[0.09] p-5 leading-[1.7] dark:prose-invert [&_a]:text-primary [&_li]:my-1 [&_p]:my-3 [&_ul]:list-disc [&_ul]:ps-6"
             v-html="workshop.long_description"
           />
 
@@ -96,7 +102,7 @@
               :key="category.id"
               class="mt-8"
             >
-              <h3 class="font-display text-lg font-semibold text-brand-rust">
+              <h3 class="font-display text-lg font-semibold text-primary">
                 {{ category.title }}
               </h3>
 
@@ -212,7 +218,7 @@
                     :class="
                       piece.is_available_to_paint === false
                         ? 'bg-success/15 text-success'
-                        : 'bg-brand-rust/10 text-brand-rust'
+                        : 'bg-brand-terracotta/10 text-brand-terracotta'
                     "
                     :data-piece-status="piece.id"
                   >
@@ -240,7 +246,7 @@
             <Button
               v-if="ownPieces.pieces?.length"
               as-child
-              class="mt-5 h-12 rounded-xl bg-brand-rust px-8 text-base hover:bg-brand-rust/90"
+              class="mt-5 h-12 rounded-xl bg-primary px-8 text-base hover:bg-primary/90"
             >
               <NuxtLink :to="`/workshops/${workshop.id}/book`">{{
                 t(
@@ -259,27 +265,22 @@
              #smooth-content, and a transformed ancestor makes sticky behave like static. -->
         <aside ref="aside">
           <div class="rounded-3xl border bg-card p-6">
-            <dl class="grid gap-px overflow-hidden rounded-2xl bg-border">
+            <dl class="grid grid-cols-2 gap-2">
               <div
                 v-for="fact in facts"
                 :key="fact.label"
-                class="bg-card px-6 py-5"
+                class="flex flex-col items-center gap-1 rounded-card bg-primary/[0.09] px-2 py-3 text-center"
               >
-                <dt
-                  class="text-xs uppercase tracking-[0.2em] text-muted-foreground"
-                >
-                  {{ fact.label }}
-                </dt>
-                <dd class="mt-1.5 font-display text-xl font-semibold">
-                  {{ fact.value }}
-                </dd>
+                <component :is="fact.icon" class="size-5 text-primary" />
+                <dt class="sr-only">{{ fact.label }}</dt>
+                <dd class="text-xs leading-snug">{{ fact.value }}</dd>
               </div>
             </dl>
 
             <Button
               as-child
               size="lg"
-              class="mt-4 h-12 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+              class="mt-4 h-12 w-full rounded-xl bg-primary text-base hover:bg-primary/90"
             >
               <NuxtLink :to="`/workshops/${workshop.id}/book`">{{
                 t("book_now", "Book", "احجز")
@@ -293,7 +294,7 @@
               class="mt-3 flex items-start gap-2 text-xs text-muted-foreground"
               data-test="piece-hold-note"
             >
-              <LucideInfo class="mt-px size-3.5 shrink-0" />
+              <LucideInfo class="mt-px size-3.5 shrink-0 text-primary" />
               {{
                 t(
                   "pickup_window_note",
@@ -391,37 +392,68 @@ const perPersonNote = computed(() => {
   });
 });
 
+// The workshop speaks for itself here, and carries its own way back in the bar above —
+// the site's whole navigation under it is noise.
+
+/**
+ * The page bar and the footer belong to the layout, not to this page, so they cannot be
+ * reached by a style on the page's own wrapper. `--chrome` is the one they read; setting
+ * it at the root repaints both for as long as this page is mounted, and Nuxt removes the
+ * rule again on the way out.
+
+ * `:root:root`, not `:root`: on a cold load the stylesheet is served AFTER this tag, and
+ * at equal specificity the last rule wins — so the workshop's colour held on a click-in
+ * and was lost on a refresh. Doubling the selector wins on specificity, whatever the order.
+ */
+useHead(() => ({
+  style: workshop.value
+    ? [{ innerHTML: `:root:root{--chrome:${workshopColour(workshop.value)}}` }]
+    : [],
+}));
+
+/** Priced by the pieces the customer picks, not by the seat. */
+const hasPieceCatalogue = (workshop) =>
+  workshop.type === "paint_your_piece" || workshop.type === "make_your_candle";
+
 const facts = computed(() => {
   const w = workshop.value;
   if (!w) return [];
 
-  const rows = [
+  return [
     {
+      icon: resolveComponent("LucideTag"),
+      label: t("fact_price", "Price", "السعر"),
+      // `paint_your_piece` and `make_your_candle` carry a seat price of "0.00" because the
+      // money is in the pieces the customer picks — printing it reads as free, which is
+      // the opposite of what it costs.
+      value: hasPieceCatalogue(w)
+        ? t("price_from_pieces", "By the pieces", "حسب القطع")
+        : Number(w.price) > 0
+          ? t("price_per_person", ":price per person", ":price للشخص", {
+              price: format(w.price),
+            })
+          : t("not_specified", "Not specified", "غير محدد"),
+    },
+    {
+      icon: resolveComponent("LucideClock"),
       label: t("fact_duration", "A session", "الجلسة"),
       value: t("minutes", ":n min", ":n دقيقة", { n: w.duration_minutes }),
     },
     {
+      icon: resolveComponent("LucideUsers"),
       label: t("fact_seats", "Seats", "المقاعد"),
       value: t("per_session", ":n per session", ":n لكل جلسة", {
         n: w.capacity_per_session,
       }),
     },
     {
+      icon: resolveComponent("LucideUsersRound"),
       label: t("fact_group", "Group size", "حجم المجموعة"),
       value: t("up_to_people", "up to :n", "حتى :n", {
         n: w.max_people_per_booking,
       }),
     },
   ];
-
-  if (Number(w.price) > 0) {
-    rows.unshift({
-      label: t("fact_price", "From", "ابتداءً من"),
-      value: format(w.price),
-    });
-  }
-
-  return rows;
 });
 
 // A page with no picture of its own still gets a card, not a blank one.

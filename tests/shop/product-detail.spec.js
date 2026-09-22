@@ -78,15 +78,25 @@ describe('ProductDetailView', () => {
     expect(text).not.toContain('Length')
   })
 
-  it('hands the buy control the chosen glaze, and the first one until one is picked', async () => {
+  /**
+   * A legend, not a picker: `shop_cart_items` has no colour column and the cart endpoint
+   * accepts none, so there is no variant to choose. Drawn as buttons with a selected
+   * ring, they promised one the studio cannot sell separately.
+   */
+  it('shows the colours a piece comes in, with nothing to press', async () => {
     const wrapper = await mount({ colors: ['#81341a', '#345a4a'] })
-    const buy = wrapper.findComponent({ name: 'ShopAddToCart' })
+    const swatches = wrapper.findAll('[role="tooltip"]')
 
-    // The app sends `colors.first` when nobody touches a swatch — an unglazed line is
-    // never what the customer picked.
-    expect(buy.props('colour')).toBe('#81341a')
+    expect(swatches).toHaveLength(2)
+    expect(wrapper.findAll('button[title]')).toHaveLength(0)
+  })
 
-    await wrapper.findAll('button[title]').at(1).trigger('click')
-    expect(buy.props('colour')).toBe('#345a4a')
+  it('names each colour for a pointer and for a screen reader alike', async () => {
+    const wrapper = await mount({ colors: ['#81341a'] })
+
+    // The hover label and the off-screen copy carry the same name.
+    expect(wrapper.find('[role="tooltip"]').text()).not.toBe('')
+    expect(wrapper.find('.sr-only').text()).toBe(wrapper.find('[role="tooltip"]').text())
   })
 })
+

@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main class="bg-background">
     <HomeSplash />
 
     <!-- A failed `GET /api/home` used to leave hero, banners, categories and both grids
@@ -11,7 +11,6 @@
 
     <HomeHero />
     <HomeLiveStrip />
-    <HomeIntro />
     <HomeBooking />
     <HomeWorkshops />
     <HomeCategories />
@@ -32,7 +31,7 @@
     />
     <HomeGallery />
     <HomeApp />
-    <HomeVisit />
+    <HomeGift />
   </main>
 </template>
 

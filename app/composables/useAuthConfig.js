@@ -4,7 +4,7 @@ export const useAuthConfig = () => {
 
   const refresh = async () => {
     const { baseUrl, translationsMode } = useRuntimeConfig().public;
-    const { deviceId, platform, fcmToken } = useDevice();
+    const { deviceId, platform } = useDevice();
     const lang = useCookie("lang");
     const i18nLocale = useCookie("i18n_locale");
     const code =
@@ -14,12 +14,6 @@ export const useAuthConfig = () => {
     const headers = { "Accept-Language": code };
     if (deviceId.value) headers["X-Device-Id"] = deviceId.value;
     if (platform.value) headers["X-Platform"] = platform.value;
-    if (
-      fcmToken.value &&
-      (platform.value === "ios" || platform.value === "android")
-    ) {
-      headers["X-FCM-Token"] = fcmToken.value;
-    }
     try {
       const res = await $fetch("/api/config", { baseURL: baseUrl, headers });
       cfgState.value = res?.data ?? res ?? {};
@@ -36,9 +30,13 @@ export const useAuthConfig = () => {
   const hasUsername = computed(() => !!cfg.value.has_username_field);
   // Every identifier request declares which kind it carries — the API never guesses from
   // the string, so a phone with no country code is rejected instead of reinterpreted.
-  // `username` is login-only; it is never a registration identifier.
+  // `username` is login-only; it is never a registration identifier. OTP mode excludes it
+  // as well: `loginViaOtp` intersects the kind against email/phone and 422s a username,
+  // so offering it in the picker made every "Send code" fail.
   const identifierTypes = computed(() =>
-    hasUsername.value ? [...identifiers.value, "username"] : identifiers.value,
+    hasUsername.value && !isOtpMode.value
+      ? [...identifiers.value, "username"]
+      : identifiers.value,
   );
   const defaultIdentifierType = computed(() => identifiers.value[0]);
   const hasEmail = computed(() => !!cfg.value.has_email_field);
@@ -106,17 +104,23 @@ export const useAuthConfig = () => {
     return en[k] ? t(`placeholder_${k}`, en[k], ar[k]) : "";
   };
 
+  /**
+   * An "extra" is a profile field that is NOT the login identifier. The backend accepts
+   * `email`/`phone` on register and update-profile only when the matching `has_*_field`
+   * is on AND that kind is not itself an identifier — sending the identifier as a field
+   * is a 422 (`identifier_change_requires_otp`), because changing it needs the OTP flow.
+   * So a kind that IS the identifier must not be rendered a second time or sent at all.
+   */
   const showsExtraField = (kind) => {
+    if (identifiers.value.includes(kind)) return false;
     if (kind === "username") return hasUsername.value;
     if (kind === "email") return hasEmail.value;
     if (kind === "phone") return hasPhone.value;
     return false;
   };
 
-  const isExtraRequired = (kind) => {
-    if (kind === "username") return true;
-    return identifiers.value.includes(kind);
-  };
+  // Only `username` is required by the backend; the other extras are nullable.
+  const isExtraRequired = (kind) => kind === "username";
 
   const identifierLabel = computed(() => {
     const { t } = useLang("web", "auth");

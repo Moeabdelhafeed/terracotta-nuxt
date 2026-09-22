@@ -15,7 +15,7 @@
 
     <Button
       v-if="retry"
-      class="mt-2 h-12 rounded-control px-8 text-base"
+      class="mt-2 h-12 rounded-xl px-8 text-base"
       :disabled="retrying"
       data-test="load-error-retry"
       @click="onRetry"

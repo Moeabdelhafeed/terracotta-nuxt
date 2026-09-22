@@ -1,5 +1,6 @@
 // @vitest-environment nuxt
 import { describe, it, expect, vi } from 'vitest'
+import { CalendarDays, Gift, ShoppingBag, Wallet } from 'lucide-vue-next'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 
 const { api, lang, sanctum } = await vi.hoisted(async () => {
@@ -57,13 +58,19 @@ describe('wallet ledger reasons', () => {
 
   it('falls back to a readable string for a reason the backend adds later', () => {
     expect(walletReasonLabel('moon_phase_bonus', lang.t)).toBe('moon phase bonus')
-    expect(walletReasonIcon('moon_phase_bonus')).toBe('LucideWallet')
+    expect(walletReasonIcon('moon_phase_bonus')).toBe(Wallet)
   })
 
+  /**
+   * The COMPONENT, not its name. `nuxt-lucide-icons` resolves an icon by rewriting its
+   * name where it appears literally in a template; a name held in a variable is never
+   * rewritten, so `<component :is="'LucideWallet'">` rendered an empty
+   * `<lucidewallet></lucidewallet>` element and the ledger showed no icons at all.
+   */
   it('gives each reason group its own icon', () => {
-    expect(walletReasonIcon('booking_payment')).toBe('LucideCalendarDays')
-    expect(walletReasonIcon('shop_order_payment')).toBe('LucideShoppingBag')
-    expect(walletReasonIcon('gift_redeemed')).toBe('LucideGift')
+    expect(walletReasonIcon('booking_payment')).toBe(CalendarDays)
+    expect(walletReasonIcon('shop_order_payment')).toBe(ShoppingBag)
+    expect(walletReasonIcon('gift_redeemed')).toBe(Gift)
   })
 
   it('reads the balance as a decimal string and keeps balance_after per row', async () => {

@@ -24,7 +24,7 @@
         class="h-16 w-auto object-contain sm:h-20"
       />
 
-      <p class="mt-6 text-xs uppercase tracking-[0.25em] text-brand-rust/70">
+      <p class="mt-6 text-xs uppercase tracking-[0.25em] text-brand-terracotta/70">
         {{ t("app_eyebrow", "The app", "التطبيق") }}
       </p>
 

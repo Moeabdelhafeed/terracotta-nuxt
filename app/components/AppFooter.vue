@@ -1,6 +1,6 @@
 <template>
   <footer
-    class="relative isolate mt-auto overflow-hidden bg-brand-terracotta text-white"
+    class="relative isolate mt-auto overflow-hidden bg-chrome text-white"
   >
     <!-- The hero's line, carried through to the close of the page. Decorative only. -->
     <svg
@@ -18,7 +18,11 @@
       />
     </svg>
 
-    <div class="mx-auto max-w-6xl px-6 pb-28 pt-20">
+    <!-- `pb-40` (160px) is the floating bottom bar's clearance for the WHOLE site: the
+         bar is 74px tall and sits 24px off the bottom, so it covers 98px, and the last
+         line of the footer needs room to breathe under that rather than just clear it.
+         No page adds its own bottom padding — this is the only place that reserves it. -->
+    <div class="mx-auto max-w-6xl px-6 pb-40 pt-20">
       <div
         class="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between"
       >

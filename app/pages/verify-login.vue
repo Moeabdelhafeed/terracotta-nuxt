@@ -19,15 +19,13 @@
         <span v-if="errors.device_id" class="text-xs text-destructive">{{ errors.device_id[0] }}</span>
         <span v-if="errors.platform" class="text-xs text-destructive">{{ errors.platform[0] }}</span>
         <span v-if="errors.fcm_token" class="text-xs text-destructive">{{ errors.fcm_token[0] }}</span>
-        <p v-if="restoredNotice" class="text-xs text-success">
-          {{ t('account_restored', 'Account restored.', 'تم استعادة الحساب.') }}
-        </p>
+        <AuthFormError :message="formError" />
       </div>
 
       <Button
         type="submit"
         size="lg"
-        class="h-13 w-full rounded-control bg-brand-rust text-base hover:bg-brand-rust/90"
+        class="h-13 w-full rounded-control bg-brand-terracotta text-base hover:bg-brand-terracotta/90"
         :disabled="loading || resending || otp.length < OTP_LENGTH"
       >
         {{ loading ? t('verifying', 'Verifying...', 'جارٍ التحقق...') : t('verify', 'Verify', 'تحقق') }}
@@ -35,7 +33,7 @@
 
       <button
         type="button"
-        class="mx-auto rounded-control bg-brand-rust/10 px-4 py-2 text-sm font-medium text-brand-rust transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+        class="mx-auto rounded-control bg-brand-terracotta/10 px-4 py-2 text-sm font-medium text-brand-terracotta transition-colors disabled:cursor-not-allowed disabled:opacity-50"
         :disabled="cooldown > 0 || resending || loading"
         @click="resend"
       >
@@ -66,9 +64,10 @@ const identifierType = ref(String(route.query.type ?? ''))
 const redirectTarget = computed(() => safeAuthRedirect(route.query.redirect))
 const otp = ref('')
 const errors = ref({})
+// 429 from the OTP throttle and 403 carry a message and no `errors` map.
+const formError = ref('')
 const loading = ref(false)
 const resending = ref(false)
-const restoredNotice = ref(false)
 const cooldown = ref(0)
 let timer = null
 
@@ -88,6 +87,11 @@ const startCooldown = () => {
   }, 1000)
 }
 
+// A code has just been sent, so the button starts on its cooldown rather than live. It
+// sits on the 3-per-5-minutes OTP limiter: an enabled button on arrival let a customer who
+// had not yet seen the SMS spend their remaining sends before typing anything.
+onMounted(startCooldown)
+
 onUnmounted(() => {
   if (timer) clearInterval(timer)
 })
@@ -104,7 +108,7 @@ const onSubmit = async () => {
     return
   }
   errors.value = {}
-  restoredNotice.value = false
+  formError.value = ''
   loading.value = true
   try {
     if (user.value?.data?.is_guest) user.value = null
@@ -123,11 +127,12 @@ const onSubmit = async () => {
       await sanctum?.tokenStorage?.set?.(useNuxtApp(), data.token)
     }
     persistTokenId(data.token_id)
-    if (data.account_restored) restoredNotice.value = true
     await refreshIdentity()
     navigateTo(redirectTarget.value)
   } catch (error) {
-    errors.value = error.data?.errors ?? {}
+    const normalized = normalizeApiError(error)
+    errors.value = normalized.errors
+    formError.value = Object.keys(normalized.errors).length ? '' : normalized.message
     otp.value = ''
   } finally {
     loading.value = false
@@ -137,6 +142,7 @@ const onSubmit = async () => {
 const resend = async () => {
   if (cooldown.value > 0 || resending.value) return
   errors.value = {}
+  formError.value = ''
   resending.value = true
   try {
     await client('/api/login', {
@@ -145,7 +151,9 @@ const resend = async () => {
     })
     startCooldown()
   } catch (error) {
-    errors.value = error.data?.errors ?? {}
+    const normalized = normalizeApiError(error)
+    errors.value = normalized.errors
+    formError.value = Object.keys(normalized.errors).length ? '' : normalized.message
   } finally {
     resending.value = false
   }

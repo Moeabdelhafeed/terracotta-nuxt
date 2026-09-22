@@ -82,11 +82,29 @@ export const useLang = (group = 'web', subGroup = 'general') => {
           }
         }
       } else {
-        await Promise.all(entries.map(([locale, value]) => client('/api/translations', {
+        // Seed the locale that is actually missing FIRST, on its own. For a key the
+        // backend already knows, POST /api/translations overwrites that locale's stored
+        // value outright — so firing every locale at once reverted copy the studio had
+        // hand-edited in the CMS (an English visitor hitting a key whose `en` was still
+        // the NULL placeholder rewrote the `ar` a human wrote). The response reports
+        // `created: 1` only when the key did not exist, which is the one case where the
+        // other locales hold nothing worth keeping.
+        const current = code.value
+        const mine = entries.find(([locale]) => locale === current) ?? entries[0]
+        const res = await client('/api/translations', {
           method: 'POST',
-          headers: { 'Accept-Language': locale },
-          body: { translations: { [key]: value }, group, sub_group: seedSubGroup },
-        })))
+          headers: { 'Accept-Language': mine[0] },
+          body: { translations: { [key]: mine[1] }, group, sub_group: seedSubGroup },
+        })
+
+        if ((res?.data?.created ?? 0) > 0) {
+          const rest = entries.filter(([locale]) => locale !== mine[0])
+          await Promise.all(rest.map(([locale, value]) => client('/api/translations', {
+            method: 'POST',
+            headers: { 'Accept-Language': locale },
+            body: { translations: { [key]: value }, group, sub_group: seedSubGroup },
+          })))
+        }
         refreshTranslations()
       }
     } catch {

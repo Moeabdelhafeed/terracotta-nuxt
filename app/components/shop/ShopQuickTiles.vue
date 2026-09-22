@@ -5,13 +5,13 @@
         :to="tile.to"
         class="flex h-full flex-col items-center justify-center gap-2 rounded-2xl border bg-card p-3 text-center sm:p-4 transition-colors hover:bg-brand-mist/40"
       >
-        <span class="relative flex size-11 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust">
+        <span class="relative flex size-11 items-center justify-center rounded-xl bg-brand-terracotta/10 text-brand-terracotta">
           <LucideShoppingBag v-if="tile.key === 'cart'" class="size-5" />
           <LucideHeart v-else-if="tile.key === 'favorites'" class="size-5" />
           <LucidePackage v-else class="size-5" />
           <span
             v-if="tile.badge"
-            class="absolute -top-1.5 flex min-w-5 items-center justify-center rounded-full bg-brand-rust px-1.5 text-[10px] font-semibold text-white ltr:-right-1.5 rtl:-left-1.5"
+            class="absolute -top-1.5 flex min-w-5 items-center justify-center rounded-full bg-brand-terracotta px-1.5 text-[10px] font-semibold text-white ltr:-right-1.5 rtl:-left-1.5"
           >{{ tile.badge }}</span>
         </span>
         <span class="text-sm font-medium text-foreground">{{ tile.label }}</span>

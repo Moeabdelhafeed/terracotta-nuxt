@@ -28,7 +28,7 @@
         v-if="!items.length"
         class="mx-auto flex w-full max-w-xl flex-col items-center gap-3 rounded-card border bg-card p-10 text-center"
       >
-        <span class="flex size-12 items-center justify-center rounded-control bg-brand-rust/10 text-brand-rust">
+        <span class="flex size-12 items-center justify-center rounded-control bg-brand-terracotta/10 text-brand-terracotta">
           <LucideImageOff class="size-5" />
         </span>
         <h2 class="font-display text-lg font-semibold text-foreground">

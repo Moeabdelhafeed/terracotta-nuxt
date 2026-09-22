@@ -20,6 +20,7 @@
       </div>
 
       <AppBottomNav />
+      <LoginPrompt />
       <AppToaster />
     </Body>
   </Html>

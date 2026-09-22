@@ -47,10 +47,12 @@ describe('booking helpers', () => {
     ])
   })
 
-  it('renders studio times as the strings the API sent — never a Date', () => {
-    expect(formatSlotTime('13:00', '15:00')).toBe('13:00 – 15:00')
+  it('reads studio wall-clock times back in 12 hours, never shifted by a zone', () => {
+    expect(formatSlotTime('13:00', '15:00', 'en')).toBe('1:00 PM – 3:00 PM')
+    // Latin digits in Arabic too — the app prints «2:30 م», not «٢:٣٠ م».
+    expect(formatSlotTime('14:30', '15:30', 'ar')).toBe('2:30 م – 3:30 م')
     // A date string is a calendar date: the same labels whatever the viewer's timezone.
-    expect(formatBookingDate('2026-07-04', 'en')).toBe('July 4 Saturday')
+    expect(formatBookingDate('2026-07-04', 'en')).toBe('Saturday, July 4')
   })
 
   it('walks the calendar without leaving the studio day', () => {

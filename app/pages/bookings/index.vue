@@ -1,34 +1,31 @@
 <template>
-  <main class="min-h-svh bg-background pb-28">
-    <PageBar :crumbs="crumbs" />
+  <main class="bg-background">
+    <!-- The same hero the booking tab carries: the two are one hub, and losing the
+         picture halfway through reads as landing on a different site. -->
+    <PageHero
+      media-key="hero_workshops"
+      fallback="/seed/hero-workshops.webp"
+      :crumbs="crumbs"
+      :title="t('workshops_title', 'The workshop experience', 'تجربة الورشة')"
+      :subtitle="
+        t(
+          'workshops_subtitle',
+          'Hands-on sessions with an instructor — shape or paint your piece step by step in the studio.',
+          'جلسات عملية بإشراف مدرّبين تصنع أو تلوّن قطعتك خطوة بخطوة داخل الاستوديو',
+        )
+      "
+    />
 
     <div class="mx-auto max-w-6xl px-6 py-16">
-      <h1 class="font-display text-3xl font-semibold sm:text-4xl">
-        {{ t("bookings_title", "My bookings", "ورشاتي") }}
-      </h1>
+      <GiftWalletGiftRow class="mb-8" />
 
-      <ul class="mt-6 flex flex-wrap gap-2">
-        <li>
-          <Button as-child size="sm" variant="outline" class="rounded-xl">
-            <NuxtLink to="/workshops">{{
-              t("tab_book", "Book a workshop", "حجز ورشة")
-            }}</NuxtLink>
-          </Button>
-        </li>
-        <li>
-          <Button
-            size="sm"
-            class="rounded-xl bg-brand-rust hover:bg-brand-rust/90"
-            >{{ t("tab_mine", "My workshops", "ورشاتي") }}</Button
-          >
-        </li>
-      </ul>
+      <WorkshopHubTabs />
 
       <!-- A tab appears once the customer has something in that status; the counts come
            from `meta.status_counts`, which covers the whole history whatever is filtered. -->
       <div class="mt-8 flex flex-wrap items-center gap-3">
         <ul
-          class="-mx-6 flex flex-1 gap-2 overflow-x-auto px-6 pb-1"
+          class="-mx-6 flex flex-1 gap-2 overflow-x-auto scrollbar-none px-6 pb-1"
           data-test="status-tabs"
         >
           <li v-for="tab in tabs" :key="tab.key" class="shrink-0">
@@ -38,7 +35,7 @@
               :variant="tab.key === activeTab ? 'default' : 'outline'"
               :class="
                 tab.key === activeTab
-                  ? 'bg-brand-rust hover:bg-brand-rust/90'
+                  ? 'bg-brand-terracotta hover:bg-brand-terracotta/90'
                   : ''
               "
               :data-status="tab.key"
@@ -66,7 +63,7 @@
         >
           <!-- The label, not <SelectValue>: reka only learns an item's text once its
                portal has mounted, so a closed trigger would render empty on first paint. -->
-          <SelectTrigger id="bookings-sort" data-test="sort-select" class="h-10 text-sm">
+          <SelectTrigger id="bookings-sort" data-test="sort-select" class="h-12 rounded-xl text-sm">
             {{ sortLabel(activeSort) }}
           </SelectTrigger>
           <SelectContent>
@@ -77,13 +74,13 @@
         </Select>
       </div>
 
-      <div
+      <ul
         v-if="pending && !items.length"
-        class="mt-8 grid gap-4 lg:grid-cols-2"
+        class="mt-8 grid auto-rows-fr gap-4 lg:grid-cols-2"
         aria-busy="true"
       >
-        <AppSkeleton v-for="n in 4" :key="n" class="h-32 w-full !rounded-card" />
-      </div>
+        <li v-for="n in 4" :key="n"><WorkshopCardSkeleton /></li>
+      </ul>
 
       <AppLoadError
         v-else-if="error"
@@ -111,24 +108,40 @@
         }}
       </p>
 
-      <ul v-else class="mt-8 grid gap-4 lg:grid-cols-2">
+      <ul v-else class="mt-8 grid auto-rows-fr gap-4 lg:grid-cols-2">
         <li v-for="booking in items" :key="booking.id">
           <BookingCard :booking="booking" />
         </li>
       </ul>
 
-      <nav v-if="lastPage > 1" class="mt-10 flex justify-center gap-2">
+      <!-- Real links, so a page is shareable and crawlable rather than a click handler. -->
+      <nav
+        v-if="lastPage > 1"
+        class="mt-12 flex flex-wrap items-center justify-center gap-2"
+      >
+        <Button v-if="page > 1" as-child size="sm" variant="outline" class="rounded-xl">
+          <NuxtLink :to="linkTo(page - 1)" rel="prev">{{ t('previous', 'Previous', 'السابق', { subGroup: 'general' }) }}</NuxtLink>
+        </Button>
+
         <Button
           v-for="n in pageWindow"
           :key="n"
           as-child
           size="sm"
-          class="rounded-xl"
+          class="min-w-10 rounded-xl"
           :variant="n === page ? 'default' : 'outline'"
         >
-          <NuxtLink :to="linkTo(n)">{{ n }}</NuxtLink>
+          <NuxtLink :to="linkTo(n)" :aria-current="n === page ? 'page' : undefined">{{ n }}</NuxtLink>
+        </Button>
+
+        <Button v-if="page < lastPage" as-child size="sm" variant="outline" class="rounded-xl">
+          <NuxtLink :to="linkTo(page + 1)" rel="next">{{ t('next', 'Next', 'التالي', { subGroup: 'general' }) }}</NuxtLink>
         </Button>
       </nav>
+
+      <p v-if="total" class="mt-6 text-center text-sm text-muted-foreground">
+        {{ t('bookings_count', ':total bookings', ':total حجز', { total }) }}
+      </p>
     </div>
   </main>
 </template>
@@ -153,7 +166,7 @@ const activeSort = computed(() =>
   BOOKING_SORTS.includes(route.query.sort) ? route.query.sort : "newest",
 );
 
-const { items, lastPage, pending, error, refresh, statusCounts } = useBookings({
+const { items, lastPage, total, pending, error, refresh, statusCounts } = useBookings({
   page,
   perPage: 10,
   status: computed(() =>
@@ -234,7 +247,11 @@ const crumbs = computed(() => [
     to: "/",
     label: t("nav_home", "Home", "الرئيسية", { subGroup: "general" }),
   },
-  { label: t("bookings_title", "My bookings", "ورشاتي") },
+  {
+    to: "/workshops",
+    label: t("nav_workshops", "Workshops", "الورشات", { subGroup: "general" }),
+  },
+  { label: t("tab_mine", "My workshops", "ورشاتي") },
 ]);
 
 useSeoMeta({

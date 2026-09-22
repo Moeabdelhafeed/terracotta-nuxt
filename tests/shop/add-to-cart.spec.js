@@ -126,18 +126,24 @@ describe('ShopAddToCart — who may add', () => {
   })
 })
 
-describe('ShopAddToCart — the glaze goes with the line', () => {
-  it('sends the chosen hex as the variant id', async () => {
-    const wrapper = await mount({ colors: ['#81341a', '#345a4a'] }, { colour: '#345a4a' })
+describe('ShopAddToCart — the colours are a legend, not a variant', () => {
+  it('sends the product and the quantity, with no colour on the line', async () => {
+    const wrapper = await mount({ colors: ['#81341a', '#345a4a'] })
 
     await addButton(wrapper).trigger('click')
     await flushPromises()
 
     const post = api.calls.find((call) => call.method === 'POST' && call.url === '/api/shop/cart')
-    expect(post.body).toEqual({ shop_product_id: 11, quantity: 1, color: '#345a4a' })
+    expect(post.body).toEqual({ shop_product_id: 11, quantity: 1 })
   })
 
-  it('keeps two glazes of one piece apart in a guest basket', async () => {
+  /**
+   * The colourway is display metadata on the product: the cart table has no colour
+   * column and the endpoint takes none, so two glazes of one piece are one basket line.
+   * Keeping them apart locally invented a line the account could never hold, and gave
+   * each its own stock ceiling.
+   */
+  it('folds two glazes of one piece into a single guest basket line', async () => {
     sanctum.user.value = null
 
     const first = await mount({}, { colour: '#81341a' })
@@ -148,10 +154,7 @@ describe('ShopAddToCart — the glaze goes with the line', () => {
     await addButton(second).trigger('click')
     await flushPromises()
 
-    expect(localCartIds.value).toEqual([
-      { id: 11, quantity: 1, color: '#81341a' },
-      { id: 11, quantity: 1, color: '#345a4a' },
-    ])
+    expect(localCartIds.value).toEqual([{ id: 11, quantity: 2 }])
   })
 })
 

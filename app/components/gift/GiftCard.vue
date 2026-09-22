@@ -1,7 +1,7 @@
 <template>
   <NuxtLink
     :to="`/gifts/${gift.id}`"
-    class="flex h-full flex-col gap-4 rounded-card border bg-card p-6 transition-colors hover:border-brand-rust/40"
+    class="flex h-full flex-col gap-4 rounded-card border bg-card p-6 transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-brand-terracotta/40 hover:shadow-md active:translate-y-0"
   >
     <div class="flex items-start justify-between gap-4">
       <div class="min-w-0">
@@ -83,7 +83,7 @@ const statusLabel = computed(
 const statusClass = computed(
   () =>
     ({
-      awaiting_payment: "bg-brand-blush/40 text-brand-rust",
+      awaiting_payment: "bg-brand-blush/40 text-brand-terracotta",
       paid: "bg-success/10 text-success",
       cancelled: "bg-brand-mist text-muted-foreground",
     })[props.gift.status] ?? "bg-brand-mist text-muted-foreground",

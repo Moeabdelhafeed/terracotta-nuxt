@@ -1,5 +1,5 @@
 <template>
-  <main class="min-h-svh bg-background pb-28">
+  <main class="bg-background">
     <PageBar :crumbs="crumbs" />
 
     <div class="mx-auto max-w-6xl px-6 py-16">
@@ -19,7 +19,7 @@
             class="h-32 w-full rounded-card!"
           />
         </div>
-        <AppSkeleton class="h-48 w-full rounded-card!" />
+        <AppSkeleton class="h-48 w-full rounded-sheet!" />
       </div>
 
       <!-- A basket that failed to load is not an empty basket: "your cart is empty"
@@ -31,7 +31,7 @@
         class="mx-auto mt-8 max-w-xl rounded-sheet border bg-card p-8 text-center sm:p-12"
       >
         <span
-          class="mx-auto flex size-14 items-center justify-center rounded-card bg-brand-rust/10 text-brand-rust"
+          class="mx-auto flex size-14 items-center justify-center rounded-card bg-brand-terracotta/10 text-brand-terracotta"
         >
           <LucideShoppingBag class="size-6" />
         </span>
@@ -49,7 +49,7 @@
         </p>
         <Button
           as-child
-          class="mt-6 h-12 bg-brand-rust text-base hover:bg-brand-rust/90"
+          class="mt-6 h-12 rounded-xl bg-brand-terracotta text-base hover:bg-brand-terracotta/90"
         >
           <NuxtLink to="/shop">{{
             t("browse_shop", "Browse the shop", "تصفح المتجر")
@@ -100,12 +100,16 @@
           <Button
             type="button"
             :disabled="!canCheckout"
-            class="mt-6 h-12 w-full bg-brand-rust text-base hover:bg-brand-rust/90"
+            class="mt-6 h-12 w-full bg-brand-terracotta text-base hover:bg-brand-terracotta/90"
             @click="onPay"
           >
             {{
               isRegistered
-                ? t("pay_with_total", "Pay :amount", "الدفع :amount", {
+                ? // "Pay" names a figure that is not what gets charged: the cart total is
+                  // goods only — delivery, any discount and the wallet are all settled at
+                  // checkout, so a 200 basket with a 15 delivery fee said "Pay 200" and
+                  // then took 215.
+                  t("checkout_with_total", "Checkout — :amount", "إتمام الشراء — :amount", {
                     amount: format(total),
                   })
                 : t(
@@ -149,8 +153,7 @@ const mounted = useMounted();
  * the account needs verifying, at the payment step is worse than being told now.
  */
 const onPay = () => {
-  if (!isRegistered.value)
-    return navigateTo({ path: "/login", query: { redirect: "/checkout" } });
+  if (!isRegistered.value) return useLoginPrompt().ask("/checkout");
   if (!account.value?.verified_at) return navigateTo({ name: "verify" });
   return navigateTo("/checkout");
 };

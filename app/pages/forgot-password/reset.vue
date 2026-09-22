@@ -20,7 +20,7 @@
       <Button
         type="submit"
         size="lg"
-        class="h-13 w-full rounded-control bg-brand-rust text-base hover:bg-brand-rust/90"
+        class="h-13 w-full rounded-control bg-brand-terracotta text-base hover:bg-brand-terracotta/90"
         :disabled="loading"
       >
         {{ loading ? t('updating', 'Updating...', 'جارٍ التحديث...') : t('update_password', 'Change', 'تغيير') }}

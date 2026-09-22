@@ -4,7 +4,7 @@
     <AppSkeleton class="mt-6 h-64 w-full !rounded-3xl" />
   </main>
 
-  <main v-else-if="booking" class="min-h-svh bg-background pb-28">
+  <main v-else-if="booking" class="bg-background">
     <PageBar :crumbs="crumbs" />
 
     <div class="mx-auto max-w-6xl px-6 py-16">
@@ -33,7 +33,7 @@
                 type="button"
                 class="h-12 flex-1 rounded-xl text-base"
                 :variant="method === 'delivery' ? 'default' : 'outline'"
-                :class="method === 'delivery' ? 'bg-brand-rust hover:bg-brand-rust/90' : ''"
+                :class="method === 'delivery' ? 'bg-brand-terracotta hover:bg-brand-terracotta/90' : ''"
                 @click="method = 'delivery'"
               >{{ t('choose_delivery', 'Have it delivered', 'توصيل') }}</Button>
             </div>
@@ -74,7 +74,7 @@
 
             <Button
               type="button"
-              class="h-12 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+              class="h-12 rounded-xl bg-brand-terracotta text-base hover:bg-brand-terracotta/90"
               :disabled="saving || (method === 'delivery' && !addressId)"
               @click="choose"
             >
@@ -107,7 +107,19 @@ const { t } = useLang('web', 'bookings')
 const { format } = usePrice()
 const toast = useToast()
 
-const { booking, status } = useBooking(() => route.params.id)
+const { booking, status, error } = useBooking(() => route.params.id)
+
+/**
+ * Without this a failed fetch leaves `status === 'error'` with no booking, which is the
+ * same shape the loading branch tests for — so the page sat on an `aria-busy` skeleton
+ * for ever, with nothing said and nothing to retry. Same handling as the booking page
+ * this one is opened from.
+ */
+watchEffect(() => {
+  if (status.value === 'error' || (status.value === 'success' && !booking.value)) {
+    showError({ statusCode: error.value?.statusCode ?? 404, statusMessage: 'Booking not found' })
+  }
+})
 const actions = useBookingActions(() => route.params.id)
 
 // Both surfaces of the balance go stale on every choice: pickup credits the fee back, and

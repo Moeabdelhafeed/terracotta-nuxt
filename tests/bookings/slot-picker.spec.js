@@ -55,16 +55,18 @@ describe('BookingSlotPicker', () => {
     expect(wrapper.findAll('[data-people]')).toHaveLength(2)
   })
 
-  it('disables the blocked dates and lands on the first open one', async () => {
+  /**
+   * Blocked days are dropped from the strip, not dimmed in it: it is a list of choices,
+   * and dates the customer cannot pick are noise to read past. (The SLOTS below are the
+   * opposite — see the full/clash case, where the reason is worth saying.)
+   */
+  it('leaves the blocked dates out and lands on the first open one', async () => {
     const wrapper = await mount()
     await flushPromises()
 
-    const blocked = wrapper.find(`[data-date="${plusDays(1)}"]`)
-    expect(blocked.attributes('disabled')).toBeDefined()
-    expect(wrapper.find(`[data-date="${plusDays(2)}"]`).attributes('disabled')).toBeUndefined()
-    // The first open day is the one selected, not the first day in the strip.
-    expect(wrapper.find(`[data-date="${plusDays(2)}"]`).classes()).toContain('bg-brand-rust')
-    expect(wrapper.find(`[data-date="${plusDays(0)}"]`).classes()).not.toContain('bg-brand-rust')
+    expect(wrapper.find(`[data-date="${plusDays(1)}"]`).exists()).toBe(false)
+    expect(wrapper.find(`[data-date="${plusDays(2)}"]`).exists()).toBe(true)
+    expect(wrapper.find(`[data-date="${plusDays(2)}"]`).classes()).toContain('bg-primary')
     expect(wrapper.emitted('update:date').at(-1)).toEqual([plusDays(2)])
   })
 
@@ -78,8 +80,8 @@ describe('BookingSlotPicker', () => {
     await flushPromises()
 
     expect(calendarCalls()).toBeGreaterThan(before)
-    // The day that was open for one person is blocked for more of them.
-    expect(wrapper.find(`[data-date="${plusDays(2)}"]`).attributes('disabled')).toBeDefined()
+    // The day that was open for one person is blocked for more of them, so it goes.
+    expect(wrapper.find(`[data-date="${plusDays(2)}"]`).exists()).toBe(false)
   })
 
   it('disables a full slot and one that clashes with an existing booking', async () => {
@@ -92,9 +94,9 @@ describe('BookingSlotPicker', () => {
     expect(wrapper.text()).toContain('You are already booked then')
   })
 
-  it('shows the API times verbatim', async () => {
+  it('says the studio times in 12 hours', async () => {
     const wrapper = await mount()
     await flushPromises()
-    expect(wrapper.text()).toContain('Session 10:00 to 11:00')
+    expect(wrapper.text()).toContain('Session 10:00 AM to 11:00 AM')
   })
 })

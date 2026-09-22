@@ -3,21 +3,19 @@
     <!-- Party size. The cap is the server's `max_available_seats` (already capped at
          `max_people_per_booking`) — never a locally derived number. -->
     <section v-if="!lockPeople">
-      <h2 class="font-display text-xl font-semibold">{{ t('booking_people_title', 'How many of you?', 'كم عددكم؟') }}</h2>
-
-      <ul class="mt-4 flex flex-wrap gap-2" data-test="people-options">
-        <li v-for="n in peopleOptions" :key="n">
-          <Button
+      <ul class="flex gap-3 overflow-x-auto scrollbar-none pb-2" data-test="people-options">
+        <li v-for="n in peopleOptions" :key="n" class="shrink-0">
+          <button
             type="button"
-            size="sm"
-            class="rounded-xl"
-            :variant="people === n ? 'default' : 'outline'"
-            :class="people === n ? 'bg-brand-rust hover:bg-brand-rust/90' : ''"
+            class="relative flex h-24 w-24 flex-col items-center justify-center gap-1 overflow-hidden rounded-2xl border text-center transition-colors"
+            :class="people === n ? 'border-primary bg-primary text-white' : 'bg-card hover:border-primary'"
             :data-people="n"
             @click="people = n"
           >
-            {{ t('n_people', ':n people', ':n اشخاص', { n }) }}
-          </Button>
+            <CardLineArt v-if="people === n" class="absolute inset-0 size-full scale-125" />
+            <span class="relative font-display text-2xl font-semibold">{{ n }}</span>
+            <span class="relative text-xs opacity-80">{{ t('n_people_unit', 'people', 'أشخاص') }}</span>
+          </button>
         </li>
       </ul>
 
@@ -43,20 +41,27 @@
         </Button>
       </div>
 
-      <ul v-else class="mt-4 flex gap-3 overflow-x-auto pb-2" data-test="date-strip">
+      <p
+        v-else-if="!days.length"
+        class="mt-4 rounded-2xl border border-dashed p-6 text-center text-sm text-muted-foreground"
+        data-test="no-dates"
+      >
+        {{ t('no_open_dates', 'No open dates for this party size — try fewer people.', 'لا توجد مواعيد متاحة لهذا العدد — جرّب عددًا أقل.') }}
+      </p>
+
+      <ul v-else class="mt-4 flex gap-3 overflow-x-auto scrollbar-none pb-2" data-test="date-strip">
         <li v-for="day in days" :key="day.ymd" class="shrink-0">
           <button
             type="button"
-            class="flex h-24 w-24 flex-col items-center justify-center gap-1 rounded-2xl border text-center transition-colors disabled:cursor-not-allowed disabled:opacity-40"
-            :class="date === day.ymd ? 'border-brand-rust bg-brand-rust text-white' : 'bg-card hover:border-brand-rust'"
-            :disabled="day.blocked"
+            class="relative flex h-24 w-24 flex-col items-center justify-center gap-1 overflow-hidden rounded-2xl border text-center transition-colors"
+            :class="date === day.ymd ? 'border-primary bg-primary text-white' : 'bg-card hover:border-primary'"
             :data-date="day.ymd"
-            :data-blocked="day.blocked ? 'true' : 'false'"
             @click="date = day.ymd"
           >
-            <span class="text-xs opacity-80">{{ day.month }}</span>
-            <span class="font-display text-2xl font-semibold">{{ day.day }}</span>
-            <span class="text-xs opacity-80">{{ day.weekday }}</span>
+            <CardLineArt v-if="date === day.ymd" class="absolute inset-0 size-full scale-125" />
+            <span class="relative text-xs opacity-80">{{ day.month }}</span>
+            <span class="relative font-display text-2xl font-semibold">{{ day.day }}</span>
+            <span class="relative text-xs opacity-80">{{ day.weekday }}</span>
           </button>
         </li>
       </ul>
@@ -66,10 +71,8 @@
     <!-- Slots. `is_full` is relative to the party size and `has_conflict` means the caller
          already has a booking then — both are disabled, never hidden. -->
     <section v-if="date">
-      <h2 class="font-display text-xl font-semibold">{{ t('booking_pick_slot', 'Pick a session', 'اختر الجلسة') }}</h2>
-
       <div v-if="loadingSlots" class="mt-4 flex flex-col gap-3" aria-busy="true">
-        <AppSkeleton v-for="n in 3" :key="n" class="h-16 w-full !rounded-2xl" />
+        <AppSkeleton v-for="n in 3" :key="n" class="h-[88px] w-full !rounded-2xl" />
       </div>
 
       <!-- A failed request is not an empty day: the customer is told which one it was. -->
@@ -88,36 +91,29 @@
         <li v-for="slot in slots" :key="slot.workshop_slot_id">
           <button
             type="button"
-            class="flex w-full flex-col items-start gap-2 rounded-2xl border bg-card p-4 text-start transition-colors disabled:cursor-not-allowed disabled:opacity-40"
-            :class="slotId === slot.workshop_slot_id ? 'border-brand-rust ring-1 ring-brand-rust' : 'hover:border-brand-rust'"
+            class="relative flex w-full flex-col items-start gap-2 overflow-hidden rounded-2xl border px-4 py-6 text-start transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+            :class="slotId === slot.workshop_slot_id ? 'border-primary bg-primary text-white' : 'bg-card hover:border-primary'"
             :disabled="slot.is_full || slot.has_conflict"
             :data-slot="slot.workshop_slot_id"
             @click="slotId = slot.workshop_slot_id"
           >
-            <span class="flex w-full flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+            <CardLineArt
+              v-if="slotId === slot.workshop_slot_id"
+              class="absolute inset-y-0 end-0 aspect-square h-full scale-125"
+            />
+            <span class="relative flex w-full flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
               <span class="font-medium">
-                {{ t('slot_from_to', 'Session :from to :to', 'ورشة من :from الى :to', { from: slot.start_time, to: slot.end_time }) }}
+                {{ t('slot_from_to', 'Session :from to :to', 'ورشة من :from الى :to', { from: formatClock(slot.start_time, code), to: formatClock(slot.end_time, code) }) }}
               </span>
-              <span class="text-sm text-muted-foreground" dir="ltr">
+              <!-- No `dir="ltr"`: the count reads «14 من 14», and forcing the run to LTR
+                   threw the Arabic word to the front of both numbers. -->
+              <span class="text-sm" :class="slotId === slot.workshop_slot_id ? 'text-white/80' : 'text-muted-foreground'">
                 {{ slot.has_conflict
                   ? t('slot_conflict', 'You are already booked then', 'لديك حجز في هذا الوقت')
-                  : t('seats_of', ':left / :capacity people', ':left \\ :capacity اشخاص', { left: slot.remaining, capacity: slot.capacity }) }}
+                  : t('seats_taken_of', ':taken of :capacity', ':taken من :capacity', { taken: slot.capacity - slot.remaining, capacity: slot.capacity }) }}
               </span>
             </span>
 
-            <!-- Booking this session now lands inside its own cancellation window, so the
-                 booking would arrive already uncancellable — said before it is picked. -->
-            <span v-if="slot.is_non_cancellable" class="flex items-start gap-1.5 text-xs text-warning" data-test="slot-no-cancel">
-              <LucideAlertCircle class="mt-px size-3.5 shrink-0" />
-              {{ t('slot_no_cancel', "This session is too close to book and still cancel — you won't be able to cancel or move it.", 'هذه الجلسة قريبة جدًا: لن تتمكن من إلغاء الحجز أو تغيير موعده.') }}
-            </span>
-
-            <!-- Still cancellable, but the window closes before the session does — the
-                 deadline is worth knowing before the seat is taken, not after. -->
-            <span v-else-if="slot.cancel_until" class="flex items-start gap-1.5 text-xs text-muted-foreground" data-test="slot-cancel-until">
-              <LucideClock class="mt-px size-3.5 shrink-0" />
-              {{ t('slot_cancel_until', 'Cancel or move it free until :at.', 'يمكنك الإلغاء أو تغيير الموعد مجانًا حتى :at.', { at: formatDate(slot.cancel_until) }) }}
-            </span>
           </button>
         </li>
       </ul>
@@ -161,11 +157,18 @@ const slotsError = ref('')
 const peopleCap = computed(() => Math.min(props.workshop.max_people_per_booking ?? 1, maxSeats.value))
 const peopleOptions = computed(() => Array.from({ length: Math.max(peopleCap.value, 1) }, (_, i) => i + 1))
 
-const days = computed(() => dateRange(todayInStudio(), props.days).map((ymd) => ({
-  ymd,
-  blocked: blocked.value.includes(ymd),
-  ...dateParts(ymd, code.value),
-})))
+/**
+ * Only the days that can actually be booked.
+ *
+ * A blocked day is dropped, not greyed: the strip is a list of choices, and a row of
+ * dimmed dates the customer cannot pick is noise they have to read past to find the ones
+ * they can. The slots BELOW are the opposite case — `is_full` and `has_conflict` stay on
+ * screen and disabled, because there the reason matters ("that session is full", "you are
+ * already booked then") and hiding it would look like the session does not exist.
+ */
+const days = computed(() => dateRange(todayInStudio(), props.days)
+  .filter((ymd) => !blocked.value.includes(ymd))
+  .map((ymd) => ({ ymd, ...dateParts(ymd, code.value) })))
 
 const loadCalendar = async () => {
   loadingCalendar.value = true
@@ -184,9 +187,16 @@ const loadCalendar = async () => {
     loadingCalendar.value = false
   }
 
-  if (people.value > peopleCap.value && peopleCap.value > 0) people.value = peopleCap.value
+  // Never under `lockPeople`. Availability is computed WITHOUT excluding the booking being
+  // moved, so `max_available_seats` is routinely below that booking's own party size — and
+  // rewriting the model there silently shrank a paid party, recomputed the total and issued
+  // a partial wallet refund the customer never asked for. The picker only greys the slots
+  // that cannot take them.
+  if (!props.lockPeople && people.value > peopleCap.value && peopleCap.value > 0) {
+    people.value = peopleCap.value
+  }
   // A date that was open for one person can be blocked for three.
-  if (!date.value || blocked.value.includes(date.value)) date.value = days.value.find((day) => !day.blocked)?.ymd ?? ''
+  if (!date.value || blocked.value.includes(date.value)) date.value = days.value[0]?.ymd ?? ''
 }
 
 const loadSlots = async () => {

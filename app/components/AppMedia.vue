@@ -39,9 +39,16 @@ const props = defineProps({
   controls: { type: Boolean, default: true },
 });
 
-const type = computed(() =>
-  typeof props.src === "string" ? "image" : (props.src?.type ?? "image"),
-);
+// A wrapper's `type` is the morph kind; a bare Image/Video/File object's `type` is its
+// file extension ("webp", "mp4"), which is why anything unrecognised is an image rather
+// than falling through to the file branch and rendering a download link for a picture.
+const WRAPPER_TYPES = ["image", "video", "file"];
+
+const type = computed(() => {
+  if (typeof props.src === "string") return "image";
+  const t = props.src?.type;
+  return WRAPPER_TYPES.includes(t) ? t : "image";
+});
 
 // `{ type, image|video|file }` wrappers carry the asset under their type key; a bare
 // Image object (app-settings, pages, languages) is already the asset.

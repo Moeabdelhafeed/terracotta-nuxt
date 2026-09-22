@@ -1,15 +1,15 @@
 <template>
-  <main class="min-h-svh bg-background pb-28">
+  <main class="bg-background">
     <div class="mx-auto max-w-6xl px-6 py-16">
-      <div class="flex flex-col gap-3">
-        <h1 class="font-display text-2xl font-bold text-foreground">
+      <div class="flex flex-col gap-5">
+        <h1 class="font-display text-3xl font-semibold sm:text-4xl">
           {{ t("profile", "My account", "حسابي") }}
         </h1>
 
         <div class="rounded-2xl border bg-card p-5">
           <div class="flex items-center gap-3">
             <div
-              class="flex size-14 shrink-0 items-center justify-center rounded-full bg-brand-rust text-lg font-semibold text-white"
+              class="flex size-14 shrink-0 items-center justify-center rounded-full bg-brand-terracotta text-lg font-semibold text-white"
             >
               {{ initials }}
             </div>
@@ -22,17 +22,23 @@
                 </p>
                 <button
                   type="button"
-                  class="text-brand-rust/80 transition-colors hover:text-brand-rust"
+                  class="text-brand-terracotta/80 transition-colors hover:text-brand-terracotta"
                   :aria-label="t('edit_name', 'Edit name', 'تعديل الاسم')"
                   @click="openEditName"
                 >
                   <LucidePencil class="size-4" />
                 </button>
               </div>
-              <p class="truncate text-sm text-muted-foreground" dir="ltr">
-                {{
+              <!-- `<bdi>` rather than `dir="ltr"` on the line: the number has to render
+                   left-to-right (+962770161321, not reversed), but setting the direction
+                   on the paragraph aligned the whole line to the left edge of an RTL
+                   card, so it sat opposite the name instead of under it. The isolate
+                   fixes the number's own direction and leaves the line following the
+                   page's. -->
+              <p class="truncate text-sm text-muted-foreground">
+                <bdi>{{
                   profile?.phone || profile?.email || profile?.username || ""
-                }}
+                }}</bdi>
               </p>
             </div>
           </div>
@@ -44,11 +50,11 @@
             <span
               class="flex items-center gap-2 text-sm font-medium text-foreground"
             >
-              <LucideWallet class="size-4 text-brand-rust" />
+              <LucideWallet class="size-4 text-brand-terracotta" />
               {{ t("my_wallet", "My wallet", "محفظتي") }}
             </span>
             <span
-              class="flex items-center gap-1 text-sm font-semibold text-brand-rust"
+              class="flex items-center gap-1 text-sm font-semibold text-brand-terracotta"
             >
               {{ formatPrice(profile?.wallet_balance) }}
               <LucideChevronRight class="size-4 rtl:-scale-x-100" />
@@ -81,30 +87,14 @@
             <span
               v-if="row.badge"
               data-test="unread-badge"
-              class="min-w-5 rounded-full bg-brand-rust px-1.5 py-0.5 text-center text-xs font-semibold text-white"
+              class="min-w-5 rounded-full bg-brand-terracotta px-1.5 py-0.5 text-center text-xs font-semibold text-white"
               dir="ltr"
               >{{ row.badge }}</span
             >
-            <LucideChevronRight
+            <LucideArrowRight
               class="size-4 text-muted-foreground rtl:-scale-x-100 group-hover:text-accent-foreground"
             />
           </span>
-        </NuxtLink>
-
-        <NuxtLink
-          v-if="multiSession"
-          to="/devices"
-          class="group flex items-center justify-between rounded-2xl border bg-card p-4 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-        >
-          <span class="flex items-center gap-3">
-            <LucideMonitorSmartphone
-              class="size-5 text-foreground/70 group-hover:text-accent-foreground"
-            />
-            {{ t("active_devices", "Active devices", "الأجهزة النشطة") }}
-          </span>
-          <LucideChevronRight
-            class="size-4 text-muted-foreground rtl:-scale-x-100 group-hover:text-accent-foreground"
-          />
         </NuxtLink>
 
         <button
@@ -188,7 +178,7 @@
 
         <button
           type="button"
-          class="flex items-center justify-between rounded-2xl border bg-card p-4 text-start text-sm font-medium text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-50"
+          class="flex items-center justify-between rounded-2xl border bg-card p-4 text-start text-sm font-medium text-destructive transition-colors hover:border-destructive hover:bg-destructive hover:text-white disabled:opacity-50"
           :disabled="deleting"
           @click="deleteDialogOpen = true"
         >
@@ -209,21 +199,21 @@
     <Teleport to="body">
       <div
         v-if="editNameOpen"
-        class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 py-10"
+        class="fixed inset-0 z-[60] flex items-center justify-center p-4"
         role="dialog"
         aria-modal="true"
       >
         <div
-          class="absolute inset-0 bg-black/50"
+          class="fixed inset-0 bg-black/50"
           @click="profileLoading || (editNameOpen = false)"
         />
         <div
-          class="relative w-full max-w-md rounded-2xl border bg-background p-6 shadow-lg"
+          class="relative max-h-[90svh] w-full max-w-md overflow-y-auto rounded-2xl border bg-background p-6 shadow-lg"
         >
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <span
-                class="flex size-9 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust"
+                class="flex size-9 items-center justify-center rounded-xl bg-brand-terracotta/10 text-brand-terracotta"
               >
                 <LucidePencil class="size-4" />
               </span>
@@ -258,7 +248,7 @@
               >
             </div>
 
-            <div v-if="hasUsername" class="grid gap-2">
+            <div v-if="showsExtraField('username')" class="grid gap-2">
               <Label for="profile_username">
                 {{ labelFor("username") }}
                 <span
@@ -281,7 +271,7 @@
               >
             </div>
 
-            <div v-if="hasEmail" class="grid gap-2">
+            <div v-if="showsExtraField('email')" class="grid gap-2">
               <Label for="profile_email">
                 {{ labelFor("email") }}
                 <span
@@ -304,7 +294,7 @@
               >
             </div>
 
-            <div v-if="hasPhone" class="grid gap-2">
+            <div v-if="showsExtraField('phone')" class="grid gap-2">
               <Label for="profile_phone">
                 {{ labelFor("phone") }}
                 <span
@@ -337,7 +327,7 @@
               </Button>
               <Button
                 type="submit"
-                class="h-12 flex-1 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+                class="h-12 flex-1 rounded-xl bg-brand-terracotta text-base hover:bg-brand-terracotta/90"
                 :disabled="profileLoading"
               >
                 {{
@@ -356,21 +346,21 @@
     <Teleport to="body">
       <div
         v-if="changePasswordOpen"
-        class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 py-10"
+        class="fixed inset-0 z-[60] flex items-center justify-center p-4"
         role="dialog"
         aria-modal="true"
       >
         <div
-          class="absolute inset-0 bg-black/50"
+          class="fixed inset-0 bg-black/50"
           @click="passwordLoading || (changePasswordOpen = false)"
         />
         <div
-          class="relative w-full max-w-md rounded-2xl border bg-background p-6 shadow-lg"
+          class="relative max-h-[90svh] w-full max-w-md overflow-y-auto rounded-2xl border bg-background p-6 shadow-lg"
         >
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <span
-                class="flex size-9 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust"
+                class="flex size-9 items-center justify-center rounded-xl bg-brand-terracotta/10 text-brand-terracotta"
               >
                 <LucideLock class="size-4" />
               </span>
@@ -468,7 +458,7 @@
               </Button>
               <Button
                 type="submit"
-                class="h-12 flex-1 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+                class="h-12 flex-1 rounded-xl bg-brand-terracotta text-base hover:bg-brand-terracotta/90"
                 :disabled="passwordLoading"
               >
                 {{
@@ -487,12 +477,12 @@
     <Teleport to="body">
       <div
         v-if="changeIdentifierOpen"
-        class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 py-10"
+        class="fixed inset-0 z-[60] flex items-center justify-center p-4"
         role="dialog"
         aria-modal="true"
       >
         <div
-          class="absolute inset-0 bg-black/50"
+          class="fixed inset-0 bg-black/50"
           @click="
             identifierLoading ||
             identifierVerifying ||
@@ -500,12 +490,12 @@
           "
         />
         <div
-          class="relative w-full max-w-md rounded-2xl border bg-background p-6 shadow-lg"
+          class="relative max-h-[90svh] w-full max-w-md overflow-y-auto rounded-2xl border bg-background p-6 shadow-lg"
         >
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <span
-                class="flex size-9 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust"
+                class="flex size-9 items-center justify-center rounded-xl bg-brand-terracotta/10 text-brand-terracotta"
               >
                 <LucideSmartphone class="size-4" />
               </span>
@@ -595,7 +585,7 @@
                 {{ t("cancel", "Cancel", "إلغاء") }}
               </Button>
               <Button
-                class="h-12 flex-1 rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+                class="h-12 flex-1 rounded-xl bg-brand-terracotta text-base hover:bg-brand-terracotta/90"
                 :disabled="identifierLoading"
                 @click="onRequestIdentifierChange"
               >
@@ -615,7 +605,7 @@
                 >{{ identifierErrors.otp[0] }}</span
               >
               <Button
-                class="h-12 w-full rounded-xl bg-brand-rust text-base hover:bg-brand-rust/90"
+                class="h-12 w-full rounded-xl bg-brand-terracotta text-base hover:bg-brand-terracotta/90"
                 :disabled="identifierVerifying"
                 @click="onVerifyIdentifierChange"
                 >{{
@@ -641,18 +631,18 @@
     <Teleport to="body">
       <div
         v-if="socialOpen"
-        class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 py-10"
+        class="fixed inset-0 z-[60] flex items-center justify-center p-4"
         role="dialog"
         aria-modal="true"
       >
-        <div class="absolute inset-0 bg-black/50" @click="socialOpen = false" />
+        <div class="fixed inset-0 bg-black/50" @click="socialOpen = false" />
         <div
-          class="relative w-full max-w-md rounded-2xl border bg-background p-6 shadow-lg"
+          class="relative max-h-[90svh] w-full max-w-md overflow-y-auto rounded-2xl border bg-background p-6 shadow-lg"
         >
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <span
-                class="flex size-9 items-center justify-center rounded-xl bg-brand-rust/10 text-brand-rust"
+                class="flex size-9 items-center justify-center rounded-xl bg-brand-terracotta/10 text-brand-terracotta"
               >
                 <LucideLink2 class="size-4" />
               </span>
@@ -683,7 +673,7 @@
           <div class="mt-5 flex flex-col gap-3">
             <p
               v-if="!hasPassword"
-              class="rounded-xl bg-brand-rust/10 p-3 text-xs text-brand-rust"
+              class="rounded-xl bg-brand-terracotta/10 p-3 text-xs text-brand-terracotta"
             >
               {{
                 t(
@@ -732,7 +722,7 @@
                 <template v-else>
                   <Button
                     size="sm"
-                    class="rounded-xl bg-brand-rust hover:bg-brand-rust/90"
+                    class="rounded-xl bg-brand-terracotta hover:bg-brand-terracotta/90"
                     :disabled="!canLinkMore || connecting === p"
                     @click="onConnectProvider(p)"
                     >{{
@@ -774,16 +764,16 @@
     <Teleport to="body">
       <div
         v-if="deleteDialogOpen"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        class="fixed inset-0 z-[60] flex items-center justify-center p-4"
         role="dialog"
         aria-modal="true"
       >
         <div
-          class="absolute inset-0 bg-black/50"
+          class="fixed inset-0 bg-black/50"
           @click="deleting || (deleteDialogOpen = false)"
         />
         <div
-          class="relative w-full max-w-md rounded-2xl border bg-background p-6 shadow-lg"
+          class="relative max-h-[90svh] w-full max-w-md overflow-y-auto rounded-2xl border bg-background p-6 shadow-lg"
         >
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -842,12 +832,27 @@
 </template>
 
 <script setup>
+// The components, not their names: `nuxt-lucide-icons` resolves an icon by rewriting its
+// NAME where it appears literally in a template or in `resolveComponent('LucideX')`. A
+// name held in data is never rewritten, so nothing was bundled and every row's
+// `<component :is>` rendered an empty slot where the icon should be.
+import {
+  Bell,
+  CalendarDays,
+  Coffee,
+  Gift,
+  Headset,
+  Heart,
+  MapPin,
+  ReceiptText,
+} from 'lucide-vue-next'
 definePageMeta({
   middleware: ["auth-mode", "require-registered", "verified"],
   name: "profile",
 });
 
-const { user, logout, refreshIdentity } = useSanctumAuth();
+const { user, refreshIdentity } = useSanctumAuth();
+const { signOut, clearLocalSession } = useSignOut();
 const { format: formatPrice } = usePrice();
 const client = useApi();
 const {
@@ -857,13 +862,13 @@ const {
   hasEmail,
   hasPhone,
   isExtraRequired,
+  showsExtraField,
   labelFor,
   inputTypeFor,
   placeholderFor,
   socialAuthAvailable,
   socialProviders,
   maxSocialAccounts,
-  multiSession,
   isOtpMode,
   allowedPhoneCountries,
 } = useAuthConfig();
@@ -910,46 +915,46 @@ const complaintsCount = rowCount("/api/complaints", "complaints");
 const hubRows = computed(() => [
   {
     to: "/orders",
-    icon: "LucideShoppingBag",
+    icon: ReceiptText,
     label: t("my_orders", "My orders", "طلباتي"),
     count: ordersCount.value,
   },
   {
     to: "/bookings",
-    icon: "LucideCalendarDays",
+    icon: CalendarDays,
     label: t("my_bookings", "My workshops", "ورشاتي"),
   },
   {
     to: "/my-gallery",
-    icon: "LucideImages",
-    label: t("my_gallery", "My gallery", "معرضي"),
+    icon: Coffee,
+    label: t("pieces_title", "My pieces", "قطعي"),
   },
   {
     to: "/favorites",
-    icon: "LucideHeart",
+    icon: Heart,
     label: t("my_favorites", "My favourites", "منتجاتي المفضلة"),
     count: favoritesCount.value,
   },
   {
     to: "/gifts",
-    icon: "LucideGift",
+    icon: Gift,
     label: t("my_gifts", "My gifts", "هداياي"),
   },
   {
     to: "/addresses",
-    icon: "LucideMapPin",
+    icon: MapPin,
     label: t("my_addresses", "My addresses", "عناويني"),
     count: addressesCount.value,
   },
   {
     to: "/notifications",
-    icon: "LucideBell",
+    icon: Bell,
     label: t("notifications_title", "Notifications", "الإشعارات"),
     badge: unreadCount.value || 0,
   },
   {
     to: "/complaints",
-    icon: "LucideMessageSquareWarning",
+    icon: Headset,
     label: t("complaints_title", "Complaints", "الشكاوى"),
     count: complaintsCount.value,
   },
@@ -964,9 +969,7 @@ const loggingOut = ref(false);
 const handleLogout = async () => {
   loggingOut.value = true;
   try {
-    await logout();
-    if (import.meta.client)
-      document.cookie = "current_token_id=; path=/; max-age=0";
+    await signOut();
     navigateTo({ name: "login" });
   } finally {
     loggingOut.value = false;
@@ -993,17 +996,20 @@ const openEditName = () => {
   editNameOpen.value = true;
 };
 
+// `showsExtraField` excludes any kind that is itself the login identifier: sending it
+// here is a 422 (`identifier_change_requires_otp`), since changing an identifier goes
+// through request/verify-identifier-change instead. Sending it unconditionally meant a
+// customer on an email-identifier project could never even save their name.
 const buildProfileBody = () => {
   const body = { name: profileForm.value.name };
-  const include = (kind, has) => {
-    if (!has) return false;
+  const include = (kind) => {
+    if (!showsExtraField(kind)) return false;
     if (isExtraRequired(kind)) return true;
     return !!profileForm.value[kind];
   };
-  if (include("username", hasUsername.value))
-    body.username = profileForm.value.username;
-  if (include("email", hasEmail.value)) body.email = profileForm.value.email;
-  if (include("phone", hasPhone.value)) body.phone = profileForm.value.phone;
+  if (include("username")) body.username = profileForm.value.username;
+  if (include("email")) body.email = profileForm.value.email;
+  if (include("phone")) body.phone = profileForm.value.phone;
   return body;
 };
 
@@ -1259,13 +1265,25 @@ onMounted(() => {
 
 const deleting = ref(false);
 const deleteDialogOpen = ref(false);
+
+// Any one of the five holds the page still; without it a scroll inside a dialog chains
+// to the profile behind it, which is then somewhere else when the dialog closes.
+useModalScrollLock(
+  computed(() =>
+    editNameOpen.value ||
+    changePasswordOpen.value ||
+    changeIdentifierOpen.value ||
+    socialOpen.value ||
+    deleteDialogOpen.value,
+  ),
+);
 const confirmDeleteAccount = async () => {
   deleting.value = true;
   try {
     await client("/api/delete-account", { method: "DELETE" });
-    await logout().catch(() => {});
-    if (import.meta.client)
-      document.cookie = "current_token_id=; path=/; max-age=0";
+    // The account is gone, so the tokens are too — clear this browser's session outright
+    // rather than asking the server to end one it no longer has.
+    await clearLocalSession();
     navigateTo({ name: "login" });
   } catch {
     deleting.value = false;

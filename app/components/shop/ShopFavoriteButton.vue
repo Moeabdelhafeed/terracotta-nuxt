@@ -2,7 +2,7 @@
   <button
     type="button"
     class="flex items-center justify-center text-brand-blush transition-transform hover:scale-110 active:scale-95"
-    :class="[sizeClass, pill ? 'rounded-[6px] bg-card/35 backdrop-blur' : 'rounded-control hover:bg-brand-blush/10']"
+    :class="[sizeClass, pill ? 'rounded-lg border bg-card' : 'rounded-control hover:bg-brand-blush/10']"
     :aria-pressed="active"
     :aria-label="active ? t('unfavorite', 'Remove from favorites', 'إزالة من المفضلة') : t('favorite', 'Add to favorites', 'إضافة إلى المفضلة')"
     :disabled="busy"
@@ -14,9 +14,13 @@
 
 <script setup>
 /**
- * The app draws this two ways: a translucent pill over a card's photograph, and a bare
- * heart beside the title on the detail page — where a pill on a card background is a
- * square of nothing. Filled vs outlined carries the state in both.
+ * Two shapes: a solid tile over a card's photograph, and a bare heart beside the title on
+ * the detail page — where a tile on a card background is a square of nothing. Filled vs
+ * outlined carries the state in both.
+ *
+ * The tile is solid rather than the app's 34% wash: the studio asked for it, and a wash
+ * over a pale photograph leaves the heart floating on nothing. The hairline keeps its
+ * edge on a white piece, which is where a plain white tile disappears.
  */
 const props = defineProps({
   product: { type: Object, required: true },

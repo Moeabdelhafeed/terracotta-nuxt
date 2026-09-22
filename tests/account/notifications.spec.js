@@ -111,14 +111,15 @@ describe('/notifications page', () => {
   it('marks a notification read and then routes to its deep link', async () => {
     navigate.mockClear()
     const page = await mount()
-    await vi.waitFor(() => expect(page.findAll('li').length).toBe(3))
+    const rows = () => page.findAll('[data-test="notification-list"] li')
+    await vi.waitFor(() => expect(rows().length).toBe(3))
 
-    await page.findAll('li')[0].find('button').trigger('click')
+    await rows()[0].find('button').trigger('click')
     await vi.waitFor(() => expect(navigate).toHaveBeenCalledWith('/orders/12'))
     expect(api.calls.some((c) => c.method === 'POST' && c.url === '/api/notifications/5/read')).toBe(true)
 
     navigate.mockClear()
-    await page.findAll('li')[1].find('button').trigger('click')
+    await rows()[1].find('button').trigger('click')
     await vi.waitFor(() => expect(navigate).toHaveBeenCalledWith('/bookings/7'))
   })
 

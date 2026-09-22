@@ -1,7 +1,7 @@
 export default defineNuxtPlugin((nuxtApp) => {
   const lang = useCookie('lang')
   const i18nLocale = useCookie('i18n_locale')
-  const { deviceId, platform, fcmToken } = useDevice()
+  const { deviceId, platform } = useDevice()
 
   nuxtApp.hook('sanctum:request', (_app, ctx) => {
     const { translationsMode } = useRuntimeConfig().public
@@ -9,9 +9,6 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     if (deviceId.value) headers.set('X-Device-Id', deviceId.value)
     if (platform.value) headers.set('X-Platform', platform.value)
-    if (fcmToken.value && (platform.value === 'ios' || platform.value === 'android')) {
-      headers.set('X-FCM-Token', fcmToken.value)
-    }
 
     if (!headers.has('Accept-Language')) {
       const code = translationsMode === 'local'

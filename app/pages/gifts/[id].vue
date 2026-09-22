@@ -1,5 +1,5 @@
 <template>
-  <main class="min-h-svh bg-background pb-28">
+  <main class="bg-background">
     <PageBar :crumbs="crumbs" />
 
     <AppConfetti v-if="celebrate" @done="celebrate = false" />
@@ -15,6 +15,16 @@
           <AppSkeleton class="h-40 w-full !rounded-3xl" />
         </div>
       </div>
+
+      <!-- A failed fetch is not an absent gift. Nuxt blanks `data` to the default on any
+           failure, so a 500 or a dropped connection landed in the "not found" branch and
+           told the buyer their own gift was not on their account, with no way to retry. -->
+      <AppLoadError
+        v-else-if="error"
+        :error="error"
+        :retry="refresh"
+        class="mx-auto max-w-xl"
+      />
 
       <section
         v-else-if="!gift"
@@ -219,7 +229,10 @@
 definePageMeta({
   middleware: ["auth-mode", "require-registered", "verified"],
   name: "gift-detail",
-});
+})
+
+useHead({ htmlAttrs: { class: 'gift-tone' } })
+;
 
 const route = useRoute();
 const { t } = useLang("web", "gifts");
@@ -232,7 +245,7 @@ const { list, pay } = useGifts();
 const { refreshIdentity } = useSanctumAuth();
 const { refresh: refreshWallet } = useWallet();
 
-const { items, pending, refresh } = list();
+const { items, pending, error, refresh } = list();
 
 const gift = computed(
   () =>
@@ -258,6 +271,8 @@ onMounted(() => {
 });
 
 const crumbs = computed(() => [
+  { label: t("nav_home", "Home", "الرئيسية", { subGroup: "general" }), to: "/" },
+  { label: t("nav_profile", "Profile", "حسابي", { subGroup: "general" }), to: "/profile" },
   { label: t("gifts_title", "My gifts", "هداياي"), to: "/gifts" },
   {
     label:

@@ -1,5 +1,11 @@
 <template>
-  <div v-if="hero">
+  <!-- Deliberately NOT gated on a banner existing. The promo banner only supplies the
+       overlay copy at the foot of this file; the mark, the film, the studio tiles and the
+       "what is terracotta?" panel are the front door itself. Gating the lot on
+       `banners[0]` left an install with no active banner with no hero at all — and, worse,
+       meant `hero_video` and `studio_1…4` never rendered, so those media keys could never
+       seed themselves. -->
+  <div>
     <div ref="wrapper" class="w-full h-full">
       <div
         ref="last"
@@ -62,6 +68,17 @@
                   )
                 }}
               </p>
+
+              <!-- The panel explains the material; the page that explains the studio is a
+                   tap away rather than only reachable from the bar. `self-start` so the
+                   button is its own width, not the column's. -->
+              <NuxtLink
+                to="/about"
+                class="mt-1 inline-flex items-center gap-2 self-start rounded-control bg-white/95 px-6 py-3 text-sm font-semibold text-brand-ink transition-colors hover:bg-white sm:text-base"
+              >
+                {{ t("about_more", "About Terracotta", "عن تيراكوتا") }}
+                <LucideArrowRight class="size-4 rtl:-scale-x-100" />
+              </NuxtLink>
             </div>
 
             <!-- Studio photographs, held in dynamic storage (group `web`, sub-group
@@ -144,7 +161,7 @@
         <AppMedia
           v-if="heroVideoAsset"
           :src="heroVideoAsset"
-          :alt="hero.title"
+          :alt="hero?.title ?? ''"
           :controls="false"
           autoplay
           loop
@@ -164,14 +181,19 @@
           class="absolute h-full w-full object-cover"
         />
         <AppImage
-          v-else-if="hero.image?.image_api"
+          v-else-if="hero?.image?.image_api"
           :src="hero.image"
           :alt="hero.title"
           class="h-full w-full absolute object-cover"
         />
 
+        <!-- The same scrim the inner pages carry: the film is whatever the studio uploaded,
+             and a bright frame leaves the title unreadable. Below the copy's own z-10. -->
+        <div class="pointer-events-none absolute inset-0 bg-black/40" aria-hidden="true" />
+
         <!-- Centred over the film, static. -->
         <div
+          v-if="hero"
           class="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 px-6 text-center"
         >
           <h1
