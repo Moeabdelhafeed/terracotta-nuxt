@@ -125,6 +125,34 @@ export const useMaterials = (query = {}) =>
 export const useMaterial = (id) =>
   useProduct(id, { base: "/api/materials/products", keyPrefix: "material" });
 
+/**
+ * The same id, on the other shelf.
+ *
+ * The two storefronts share a products table but not an endpoint, and **nothing the API
+ * returns says which shelf a product is on** — `toApiSummary` carries no `section`, so a
+ * cart line or a favourite read back from the server cannot be linked correctly. Every
+ * one of those links therefore guesses `/shop`, and a bag of clay 404s there.
+ *
+ * Rather than guessing better in each place that renders a product, the two detail pages
+ * check the other shelf before giving up. One request, only on a miss, and every wrong
+ * link in the site lands somewhere real.
+ *
+ * @returns {Promise<string|null>} the path to redirect to, or null when it is genuinely gone.
+ */
+export const findOnOtherShelf = async (id, shelf) => {
+  const other =
+    shelf === "/materials"
+      ? { path: "/shop", base: "/api/shop/products" }
+      : { path: "/materials", base: "/api/materials/products" };
+
+  try {
+    const res = await useApi()(`${other.base}/${toValue(id)}`);
+    return res?.data ? `${other.path}/${toValue(id)}` : null;
+  } catch {
+    return null;
+  }
+};
+
 export const useGalleryCategory = (id) => {
   const request = useApiFetch(() => `/api/gallery/${toValue(id)}`, {
     key: () => `gallery-${toValue(id)}`,

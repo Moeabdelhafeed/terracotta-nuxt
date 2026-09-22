@@ -24,16 +24,23 @@ const { product, error, status } = useMaterial(() => route.params.id);
 // Keyed on `status`, not on `pending`: a client-side navigation arrives with the fetch not
 // yet started, where `pending` is still false and the record still null — reading that as
 // "not found" 404s a product that exists, until you refresh.
-watchEffect(() => {
+watchEffect(async () => {
   if (
-    status.value === "error" ||
-    (status.value === "success" && !product.value)
-  ) {
-    showError({
-      statusCode: error.value?.statusCode ?? 404,
-      statusMessage: "Product not found",
-    });
-  }
+    status.value !== "error" &&
+    !(status.value === "success" && !product.value)
+  )
+    return;
+
+  // Nothing the API returns says which shelf a product is on, so every link built from a
+  // cart line or a favourite has to guess — and the guess is `/shop`. Before calling it
+  // gone, look for it on the other one.
+  const elsewhere = await findOnOtherShelf(route.params.id, "/materials");
+  if (elsewhere) return navigateTo(elsewhere, { replace: true });
+
+  showError({
+    statusCode: error.value?.statusCode ?? 404,
+    statusMessage: "Product not found",
+  });
 });
 
 const { t } = useLang("web", "home");

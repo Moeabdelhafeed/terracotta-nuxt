@@ -12,7 +12,7 @@
              link to `/shop/undefined`. -->
         <component
           :is="line.product ? NuxtLink : 'span'"
-          :to="line.product ? `/shop/${line.product.id}` : undefined"
+          :to="line.product ? `${shelfOf(line.product)}/${line.product.id}` : undefined"
           class="block size-20 shrink-0 overflow-hidden rounded-field border bg-brand-mist sm:size-24 md:size-28"
         >
           <AppImage
@@ -30,7 +30,7 @@
             <div class="min-w-0">
               <component
                 :is="line.product ? NuxtLink : 'span'"
-                :to="line.product ? `/shop/${line.product.id}` : undefined"
+                :to="line.product ? `${shelfOf(line.product)}/${line.product.id}` : undefined"
                 class="block truncate font-medium text-foreground"
                 :class="{ 'hover:underline': line.product }"
               >
@@ -101,6 +101,12 @@
 </template>
 
 <script setup>
+/**
+ * Which shelf a line came off. The guest basket stamps `section` on what it stores; a
+ * basket read back from the server carries none, and the detail page sends a wrong guess
+ * on to the right shelf rather than 404ing — see `findOnOtherShelf`.
+ */
+const shelfOf = (product) => (product?.section === "materials" ? "/materials" : "/shop");
 /**
  * The basket's lines with their steppers. A line that can no longer be fulfilled stays on
  * screen, greyed and explained — hiding it would hide the reason checkout is blocked.
