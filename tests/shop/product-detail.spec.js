@@ -53,6 +53,53 @@ const mount = (over) =>
  * it built, and every other suite stayed green — the page simply rendered a picture and
  * nothing else: no title, no price, no way to buy. These assert the parts that vanished.
  */
+describe('the photographs', () => {
+  const shots = {
+    images: [
+      { id: 1, image_api: 'https://example.test/one.webp' },
+      { id: 2, image_api: 'https://example.test/two.webp' },
+      { id: 3, image_api: 'https://example.test/three.webp' },
+    ],
+  }
+
+  const shown = (wrapper) =>
+    wrapper.find('[data-test="shot-next"]').element.parentElement.querySelector('img').getAttribute('src')
+
+  // This used to hold the chosen image OBJECT and ask `shots.includes(it)` — an identity
+  // test that fails the moment the product ref is rebuilt, so the view fell back to the
+  // first photograph and the picker looked like it did nothing at all.
+  it('shows the photograph the reader picked', async () => {
+    const wrapper = await mount(shots)
+
+    await wrapper.find('[data-shot="2"]').trigger('click')
+    expect(shown(wrapper)).toBe('https://example.test/three.webp')
+
+    await wrapper.find('[data-shot="0"]').trigger('click')
+    expect(shown(wrapper)).toBe('https://example.test/one.webp')
+  })
+
+  it('wraps at both ends, so an arrow never dead-ends', async () => {
+    const wrapper = await mount(shots)
+
+    await wrapper.find('[data-test="shot-prev"]').trigger('click')
+    expect(shown(wrapper)).toBe('https://example.test/three.webp')
+
+    await wrapper.find('[data-test="shot-next"]').trigger('click')
+    expect(shown(wrapper)).toBe('https://example.test/one.webp')
+  })
+
+  it('marks which one is showing, and leaves the set alone when there is only one', async () => {
+    const many = await mount(shots)
+    expect(many.findAll('[data-test="shot-indicator"] button')).toHaveLength(3)
+    expect(many.find('[data-shot="0"]').attributes('aria-current')).toBe('true')
+    expect(many.find('[data-shot="1"]').attributes('aria-current')).toBeUndefined()
+
+    const one = await mount()
+    expect(one.find('[data-test="shot-indicator"]').exists()).toBe(false)
+    expect(one.find('[data-test="shot-next"]').exists()).toBe(false)
+  })
+})
+
 describe('ProductDetailView', () => {
   it('renders the piece, its price and a way to buy it', async () => {
     const wrapper = await mount()

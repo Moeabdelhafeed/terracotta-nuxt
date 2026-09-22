@@ -628,6 +628,73 @@ const loadQuote = async () => {
   }
 };
 
+/**
+ * The stepper, kept across a sign-in.
+ *
+ * A guest walks the whole thing and is only stopped at the pay button, which is the first
+ * step that needs an account — and signing in means leaving this page. Coming back
+ * remounted it: party size, day, session and chosen pieces all gone, and the reader was
+ * put back at "pick a date" having already picked one. The redirect was never the
+ * problem; the choices were.
+ *
+ * `sessionStorage`, so it dies with the tab and never outlives the visit, and keyed per
+ * workshop so two open tabs do not overwrite each other. The server object (`booking`) is
+ * deliberately NOT kept: a held seat is the server's to describe, and a stale copy of one
+ * would offer to pay for something that may have expired.
+ */
+const DRAFT_KEY = `terracotta:booking-draft:${route.params.id}`;
+
+const readDraft = () => {
+  try {
+    return JSON.parse(sessionStorage.getItem(DRAFT_KEY) || "null");
+  } catch {
+    // Private browsing, or storage disabled. A lost draft is not worth a broken page.
+    return null;
+  }
+};
+
+const writeDraft = (value) => {
+  try {
+    if (value) sessionStorage.setItem(DRAFT_KEY, JSON.stringify(value));
+    else sessionStorage.removeItem(DRAFT_KEY);
+  } catch {
+    /* as above */
+  }
+};
+
+onMounted(() => {
+  const saved = readDraft();
+  if (!saved) return;
+
+  people.value = saved.people ?? people.value;
+  date.value = saved.date ?? date.value;
+  slotId.value = saved.slotId ?? slotId.value;
+  withCelebration.value = !!saved.withCelebration;
+  payWithWallet.value = !!saved.payWithWallet;
+  lines.value = saved.lines ?? [];
+  step.value = saved.step ?? step.value;
+});
+
+watch(
+  [step, people, date, slotId, withCelebration, payWithWallet, lines],
+  () => {
+    // Booked: there is nothing left to come back to, and a draft left behind would reopen
+    // the stepper over a seat the customer already holds.
+    if (step.value === "done") return writeDraft(null);
+
+    writeDraft({
+      step: step.value,
+      people: people.value,
+      date: date.value,
+      slotId: slotId.value,
+      withCelebration: withCelebration.value,
+      payWithWallet: payWithWallet.value,
+      lines: lines.value,
+    });
+  },
+  { deep: true },
+);
+
 // The price endpoint writes nothing, but it shares the 60/min throttle with everything
 // else on the page — a stepper can blow that in seconds.
 let quoteTimer = null;

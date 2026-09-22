@@ -35,19 +35,55 @@
     <div class="mx-auto max-w-6xl px-6 py-16">
       <div class="grid gap-10 lg:grid-cols-2 lg:items-start">
         <div ref="content">
-          <div class="overflow-hidden rounded-card border bg-brand-container">
+          <div class="relative overflow-hidden rounded-card border bg-brand-container">
             <AppImage v-if="active" :src="active" :alt="product.title" class="aspect-square w-full object-cover" />
+
+            <!-- The arrows mirror with the language: in Arabic "onward" is to the left. -->
+            <template v-if="shots.length > 1">
+              <button
+                type="button"
+                class="absolute top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-background/85 text-foreground shadow-sm backdrop-blur transition hover:bg-background active:scale-95 start-3"
+                :aria-label="t('previous', 'Previous', 'السابق', { subGroup: 'general' })"
+                data-test="shot-prev"
+                @click="stepShot(-1)"
+              >
+                <LucideChevronLeft class="size-5 rtl:-scale-x-100" />
+              </button>
+
+              <button
+                type="button"
+                class="absolute top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-background/85 text-foreground shadow-sm backdrop-blur transition hover:bg-background active:scale-95 end-3"
+                :aria-label="t('next', 'Next', 'التالي', { subGroup: 'general' })"
+                data-test="shot-next"
+                @click="stepShot(1)"
+              >
+                <LucideChevronRight class="size-5 rtl:-scale-x-100" />
+              </button>
+            </template>
           </div>
 
-          <ul v-if="shots.length > 1" class="mt-3 flex gap-3 overflow-x-auto scrollbar-none pb-1">
+          <!--
+            Where you are in the set, drawn as the studio's own mark rather than a row of
+            dots — the same mark the tab and the header wear, so the row reads as this
+            studio's and not as a generic carousel.
+          -->
+          <ul v-if="shots.length > 1" class="mt-4 flex items-center justify-center gap-3" data-test="shot-indicator">
             <li v-for="(shot, index) in shots" :key="index">
               <button
                 type="button"
-                class="size-20 shrink-0 overflow-hidden rounded-field border transition-opacity"
-                :class="active === shot ? 'border-primary' : 'opacity-70 hover:opacity-100'"
-                @click="chosen = shot"
+                class="flex size-9 items-center justify-center rounded-full transition hover:bg-brand-mist/60"
+                :aria-label="t('view_photo_n', 'Photo :n', 'الصورة :n', { n: index + 1 })"
+                :aria-current="index === activeIndex ? 'true' : undefined"
+                :data-shot="index"
+                @click="activeIndex = index"
               >
-                <AppImage :src="shot" :alt="product.title" class="size-full object-cover" />
+                <img
+                  :src="markSrc"
+                  alt=""
+                  aria-hidden="true"
+                  class="size-5 transition-all duration-200"
+                  :class="index === activeIndex ? 'scale-110 opacity-100' : 'opacity-25 grayscale'"
+                />
               </button>
             </li>
           </ul>
@@ -166,16 +202,33 @@ const shots = computed(() => {
 })
 
 /**
- * Derived, not synced. An `immediate` watcher would set this during setup — while the
- * SSR fetch is still in flight and `shots` is empty — and Vue does not flush watchers
- * again before the server render, so the main photo was missing from the SSR HTML
- * entirely and only appeared after hydration (a mismatch, and a late LCP).
- * `chosen` holds a thumbnail the visitor picked; until then the first shot wins.
+ * WHICH shot, not which object.
+ *
+ * This held the chosen image itself and asked `shots.includes(it)`, which is an identity
+ * test: the array is rebuilt whenever the product ref changes, so the picked object was
+ * no longer the one in the list and the view silently fell back to the first photograph.
+ * From the outside the thumbnails simply did nothing. An index cannot go stale that way.
+ *
+ * Derived rather than synced with a watcher: an `immediate` one would run during setup,
+ * while the SSR fetch is still in flight and `shots` is empty, and Vue does not flush
+ * watchers again before the server render — so the main photo was missing from the SSR
+ * HTML entirely and only appeared after hydration (a mismatch, and a late LCP).
  */
-const chosen = ref(null)
-const active = computed(() =>
-  chosen.value && shots.value.includes(chosen.value) ? chosen.value : (shots.value[0] ?? null),
-)
+const activeIndex = ref(0)
+const active = computed(() => shots.value[activeIndex.value] ?? shots.value[0] ?? null)
+
+/** Wraps, so the arrows never dead-end on the first or last photograph. */
+const stepShot = (delta) => {
+  const count = shots.value.length
+  if (count > 1) activeIndex.value = (activeIndex.value + delta + count) % count
+}
+
+// A different product is a different set of photographs; start it at its first.
+watch(() => product.value?.id, () => { activeIndex.value = 0 })
+
+/** The studio's mark, from dynamic storage like every other piece of branding. */
+const { media: brandMedia } = useMedia('web', 'branding')
+const markSrc = computed(() => brandMedia('logo_mark', '/logo-mark.png'))
 
 /**
  * Swatch names, since the API sends bare hex strings. The value is matched to the nearest
