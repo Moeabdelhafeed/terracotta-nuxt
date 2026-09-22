@@ -55,22 +55,30 @@ const storedIds = () => [
     ...localCartIds.value.map((entry) => entry.id),
     ...localFavoriteIds.value,
   ]),
-];
+].filter((id) => !missing.has(id));
 
-/** A product that no longer exists cannot come back — drop it from both stores for good. */
-const prune = (id) => {
-  localCartIds.value = localCartIds.value.filter((entry) => entry.id !== id);
-  localFavoriteIds.value = localFavoriteIds.value.filter(
-    (favorite) => favorite !== id,
-  );
-};
+/**
+ * Ids that answered "gone" on both shelves this session.
+ *
+ * They are NOT deleted from storage. A 404 is the only signal the site has, and it says
+ * more than one thing: a product genuinely removed, a product the studio deactivated for
+ * an afternoon, a request that went out while the device header was missing. Erasing the
+ * only copy of what a customer saved, permanently and with no trace, on the strength of
+ * one refused request is not a trade worth making — and a guest's storage is the only
+ * copy there is.
+ *
+ * In memory rather than in storage, so the id is not asked for twice on this page but a
+ * product put back in the admin returns to its owner on their next visit. Nothing renders
+ * it meanwhile: both lists already skip an id whose product never arrived.
+ */
+const missing = new Set();
 
 /**
  * One id, from whichever shelf it is on.
  *
  * The two storefronts share a products table but not an endpoint, and the shop's own
  * `show()` filters by section — so a bag of clay 404s there. Asking only the shop meant a
- * guest's saved material was read as "gone" and pruned out of their own storage.
+ * guest's saved material was read as "gone" and thrown out of their own storage.
  *
  * The answer carries `section` back with it, since nothing else in a local entry says
  * which shelf it came from and the card has to link somewhere.
@@ -99,7 +107,7 @@ const hydrate = async (api, ids) => {
     }
     const normalized = normalizeApiError(result.reason);
     // Anything but "gone" is this request's problem, not the id's: keep it and retry later.
-    if (normalized.status === 404) prune(id);
+    if (normalized.status === 404) missing.add(id);
     else error.value = normalized;
   });
   products.value = { ...products.value, ...fetched };
@@ -130,6 +138,8 @@ const watchStoredIds = (api) => {
 
 const refreshProducts = (api) => {
   products.value = {};
+  // An explicit refresh is the customer asking again, so the misses go back on the table.
+  missing.clear();
   return hydrate(api, storedIds());
 };
 

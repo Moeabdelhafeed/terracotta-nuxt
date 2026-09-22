@@ -84,14 +84,27 @@ describe('local cart hydration', () => {
     expect(api.calls.filter((call) => call.url === '/api/shop/products/12')).toHaveLength(1)
   })
 
-  it('drops a product the catalogue no longer has, for good', async () => {
+  // A 404 says several things at once — removed, deactivated for the afternoon, asked for
+  // without the device header — and a guest's storage is the only copy of what they saved.
+  // So the row stops rendering and stops being asked for, and the id stays where it is.
+  it('stops rendering a product the catalogue no longer has, without throwing it away', async () => {
     localCartIds.value = [{ id: 12, quantity: 1 }, { id: 99, quantity: 1 }]
     localFavoriteIds.value = [99]
     await flushPromises()
 
-    expect(localCartIds.value).toEqual([{ id: 12, quantity: 1 }])
-    expect(localFavoriteIds.value).toEqual([])
     expect(useLocalCart().items.value).toHaveLength(1)
+    expect(useLocalFavorites().favorites.value).toEqual([])
+    expect(localCartIds.value).toEqual([{ id: 12, quantity: 1 }, { id: 99, quantity: 1 }])
+    expect(localFavoriteIds.value).toEqual([99])
+  })
+
+  it('does not ask for a missing id twice in the same session', async () => {
+    localFavoriteIds.value = [99]
+    await flushPromises()
+    localFavoriteIds.value = [99, 12]
+    await flushPromises()
+
+    expect(api.calls.filter((call) => call.url === '/api/shop/products/99')).toHaveLength(1)
   })
 
   it('keeps the id when the fetch failed for any other reason', async () => {
@@ -284,12 +297,13 @@ describe('a guest saving from the materials shelf', () => {
     expect(favorites.favorites.value[0].section).toBe('materials')
   })
 
-  it('still forgets an id that neither shelf has', async () => {
+  it('shows nothing for an id neither shelf has, and still keeps it', async () => {
     const favorites = useLocalFavorites()
     await favorites.toggle({ id: 99 })
     await flushPromises()
     await flushPromises()
 
-    expect(localFavoriteIds.value).toEqual([])
+    expect(favorites.favorites.value).toEqual([])
+    expect(localFavoriteIds.value).toEqual([99])
   })
 })
