@@ -127,8 +127,6 @@ const RATIOS = [
 ];
 const ratio = (index) => RATIOS[index % RATIOS.length];
 
-// A page with no picture of its own still gets a card, not a blank one.
-const fallbackCard = `${useSiteConfig().url}/og-default.png`;
 
 useSeoMeta({
   title: () => category.value?.title ?? "",
@@ -138,7 +136,6 @@ useSeoMeta({
       "Pieces our guests shaped, glazed and took home.",
       "قطع صنعها ضيوفنا بأيديهم وأخذوها معهم.",
     ),
-  ogImage: () => cover.value?.image_api ?? fallbackCard,
 });
 
 useSchemaOrg([

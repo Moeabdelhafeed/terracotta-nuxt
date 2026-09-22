@@ -135,10 +135,6 @@ const { t } = useLang("web", "home");
 const { format } = usePrice();
 
 
-const { media: heroMedia } = useMedia("web", "heroes");
-
-// A page with no picture of its own still gets a card, not a blank one.
-const fallbackCard = `${useSiteConfig().url}/og-default.png`;
 
 useSeoMeta({
   title: () => t("workshops_title", "Workshops", "الورشات"),
@@ -148,7 +144,6 @@ useSeoMeta({
       "Hands-on sessions with an instructor — shape or paint your piece step by step in the studio.",
       "جلسات عملية بإشراف مدرّبين تصنع أو تلوّن قطعتك خطوة بخطوة داخل الاستوديو",
     ),
-  ogImage: () => heroMedia("hero_workshops") ?? fallbackCard,
 });
 
 useSchemaOrg([

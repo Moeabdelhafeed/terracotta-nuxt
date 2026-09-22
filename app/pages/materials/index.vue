@@ -283,10 +283,6 @@ watch(currentPage, async () => {
   ScrollSmoother.get?.()?.scrollTo(0, true);
 });
 
-const { media: heroMedia } = useMedia("web", "heroes");
-
-// A page with no picture of its own still gets a card, not a blank one.
-const fallbackCard = `${useSiteConfig().url}/og-default.png`;
 
 useSeoMeta({
   title: () =>
@@ -297,7 +293,6 @@ useSeoMeta({
       "Clay, glazes and tools from the studio’s own shelves.",
       "طين وطلاءات وأدوات من رفوف الاستوديو نفسه.",
     ),
-  ogImage: () => heroMedia("hero_materials") ?? fallbackCard,
 });
 
 useSchemaOrg([

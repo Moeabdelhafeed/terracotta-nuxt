@@ -456,13 +456,10 @@ const facts = computed(() => {
   ];
 });
 
-// A page with no picture of its own still gets a card, not a blank one.
-const fallbackCard = `${useSiteConfig().url}/og-default.png`;
 
 useSeoMeta({
   title: () => workshop.value?.title ?? "",
   description: () => workshop.value?.short_description ?? "",
-  ogImage: () => workshop.value?.image?.image_api ?? fallbackCard,
 });
 
 // A workshop is something offered rather than something sold off a shelf, so Service

@@ -68,15 +68,10 @@ const { t } = useLang('web', 'home')
 const RATIOS = ['aspect-square', 'aspect-[6/7]', 'aspect-[3/4]', 'aspect-[7/6]']
 const ratio = (index) => RATIOS[index % RATIOS.length]
 
-const { media: heroMedia } = useMedia('web', 'heroes')
-
-// A page with no picture of its own still gets a card, not a blank one.
-const fallbackCard = `${useSiteConfig().url}/og-default.png`
 
 useSeoMeta({
   title: () => t('gallery_title', 'Gallery', 'المعرض'),
   description: () => t('gallery_subtitle', 'Pieces our guests shaped, glazed and took home.', 'قطع صنعها ضيوفنا بأيديهم وأخذوها معهم.'),
-  ogImage: () => heroMedia('hero_gallery') ?? fallbackCard,
 })
 
 useSchemaOrg([

@@ -45,8 +45,6 @@ const stripTags = (html) =>
     .replace(/\s+/g, " ")
     .trim();
 
-// A page with no picture of its own still gets a card, not a blank one.
-const fallbackCard = `${useSiteConfig().url}/og-default.png`;
 
 useSeoMeta({
   title: () => product.value?.title ?? "",
@@ -57,7 +55,6 @@ useSeoMeta({
       "Clay, glazes and tools from the studio’s own shelves.",
       "طين وطلاءات وأدوات من رفوف الاستوديو نفسه.",
     ),
-  ogImage: () => product.value?.image?.image_api ?? fallbackCard,
   ogType: "product",
 });
 

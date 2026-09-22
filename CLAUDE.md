@@ -297,6 +297,7 @@ upload — `mediaAsset(key, defaultPath)`. Every call site does; the seeds live 
 | Key | Seed file |
 |---|---|
 | `web/branding/logo`, `logo_light`, `logo_mark` | `/logo.png`, `/logo-light.png`, `/logo-mark.png` |
+| `web/seo/og_card` | `/og-default.png` — the one card every page shares when its link is posted |
 | `web/heroes/hero_shop`, `hero_gallery`, `hero_workshops`, `hero_materials` | `/seed/hero-*.webp`, passed as `PageHero`'s `fallback` |
 | `web/studio/studio_1…4` | `/seed/studio-N.webp` |
 | `web/home/hero_video` | `/seed/hero-video.mp4` |

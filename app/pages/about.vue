@@ -108,15 +108,10 @@ const { mediaAsset } = useMedia('web', 'about')
 const storyImage = computed(() => mediaAsset('about_story', '/seed/about-1.webp'))
 const craftImage = computed(() => mediaAsset('about_craft', '/seed/about-2.webp'))
 
-const { media: heroMedia } = useMedia('web', 'heroes')
-
-// A page with no picture of its own still gets a card, not a blank one.
-const fallbackCard = `${useSiteConfig().url}/og-default.png`
 
 useSeoMeta({
   title: () => t('about_hero_title', 'About Terracotta', 'عن تيراكوتا'),
   description: () => t('about_hero_subtitle', 'A studio in Amman where clay is shaped by hand.', 'استوديو في عمّان يُشكَّل فيه الطين باليد.'),
-  ogImage: () => heroMedia('hero_about') ?? fallbackCard,
 })
 
 useSchemaOrg([

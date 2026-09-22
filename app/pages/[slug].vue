@@ -52,12 +52,9 @@ const summary = computed(() => String(page.value?.content ?? '')
   .trim()
   .slice(0, 160))
 
-// A page with no picture of its own still gets a card, not a blank one.
-const fallbackCard = `${useSiteConfig().url}/og-default.png`
 
 useSeoMeta({
   title: () => page.value?.name ?? '',
   description: () => summary.value,
-  ogImage: () => page.value?.image?.image_api ?? fallbackCard,
 })
 </script>

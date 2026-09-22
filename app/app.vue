@@ -53,13 +53,31 @@ useSchemaOrg([
   defineWebPage(),
 ])
 
-// Defaults, not decisions: a page that sets its own title/description/image wins.
+/**
+ * ONE card for the whole site, from dynamic storage.
+ *
+ * Every page used to share its own picture — the hero for a listing, the photograph for a
+ * product — which meant the card a link showed was decided in a dozen files and could not
+ * be changed without a deploy. This is the studio's own, editable in the Media CMS like
+ * any other asset, and it seeds itself from `/og-default.png` the first time a page is
+ * opened against a fresh backend.
+ *
+ * Absolute, always: a relative path is what the seed returns before the upload lands, and
+ * a relative og:image is ignored by every scraper that reads it.
+ */
+const { media } = useMedia('web', 'seo')
+const ogCard = () => {
+  const src = media('og_card', '/og-default.png')
+  return src?.startsWith('http') ? src : `${url}${src}`
+}
+
+// Defaults, not decisions: a page that sets its own title/description wins.
 useSeoMeta({
   ogSiteName: name,
   ogType: 'website',
   twitterCard: 'summary_large_image',
   ogLocale: () => (code.value === 'ar' ? 'ar_SA' : 'en_US'),
-  ogImage: `${url}/og-default.png`,
-  twitterImage: `${url}/og-default.png`,
+  ogImage: ogCard,
+  twitterImage: ogCard,
 })
 </script>
