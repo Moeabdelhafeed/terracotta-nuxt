@@ -60,33 +60,35 @@
                 <LucideChevronRight class="size-5 rtl:-scale-x-100" />
               </button>
             </template>
+
+            <!--
+              Where you are in the set, ON the photograph and drawn as the studio's own
+              mark rather than a row of dots. White over the picture, with a soft shadow
+              so it survives a pale one, and the current mark is the only solid one.
+            -->
+            <ul
+              v-if="shots.length > 1"
+              class="pointer-events-none absolute inset-x-0 bottom-4 flex items-center justify-center"
+              data-test="shot-indicator"
+            >
+              <li v-for="(shot, index) in shots" :key="index" class="pointer-events-auto">
+                <button
+                  type="button"
+                  class="flex items-center justify-center px-1 py-2 text-white transition active:scale-90"
+                  :aria-label="t('view_photo_n', 'Photo :n', 'الصورة :n', { n: index + 1 })"
+                  :aria-current="index === activeIndex ? 'true' : undefined"
+                  :data-shot="index"
+                  @click="activeIndex = index"
+                >
+                  <BrandMark
+                    class="h-8 w-auto transition-opacity duration-200"
+                    :class="index === activeIndex ? 'opacity-100' : 'opacity-45'"
+                  />
+                </button>
+              </li>
+            </ul>
           </div>
 
-          <!--
-            Where you are in the set, drawn as the studio's own mark rather than a row of
-            dots — the same mark the tab and the header wear, so the row reads as this
-            studio's and not as a generic carousel.
-          -->
-          <ul v-if="shots.length > 1" class="mt-4 flex items-center justify-center gap-3" data-test="shot-indicator">
-            <li v-for="(shot, index) in shots" :key="index">
-              <button
-                type="button"
-                class="flex size-9 items-center justify-center rounded-full transition hover:bg-brand-mist/60"
-                :aria-label="t('view_photo_n', 'Photo :n', 'الصورة :n', { n: index + 1 })"
-                :aria-current="index === activeIndex ? 'true' : undefined"
-                :data-shot="index"
-                @click="activeIndex = index"
-              >
-                <img
-                  :src="markSrc"
-                  alt=""
-                  aria-hidden="true"
-                  class="size-5 transition-all duration-200"
-                  :class="index === activeIndex ? 'scale-110 opacity-100' : 'opacity-25 grayscale'"
-                />
-              </button>
-            </li>
-          </ul>
         </div>
 
         <!-- Pinned rather than `position: sticky`: ScrollSmoother transforms
@@ -226,9 +228,6 @@ const stepShot = (delta) => {
 // A different product is a different set of photographs; start it at its first.
 watch(() => product.value?.id, () => { activeIndex.value = 0 })
 
-/** The studio's mark, from dynamic storage like every other piece of branding. */
-const { media: brandMedia } = useMedia('web', 'branding')
-const markSrc = computed(() => brandMedia('logo_mark', '/logo-mark.png'))
 
 /**
  * Swatch names, since the API sends bare hex strings. The value is matched to the nearest
