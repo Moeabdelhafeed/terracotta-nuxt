@@ -1,5 +1,8 @@
 <template>
-  <ul class="flex flex-col divide-y">
+  <!-- `min-w-0` for the same reason the cart's list carries it: the item names truncate,
+       so their min-content is the whole name, and a grid cell sized to that grows past
+       the column it sits in. -->
+  <ul class="flex min-w-0 flex-col divide-y">
     <li v-for="item in items" :key="item.id" class="flex items-center gap-3 py-3 first:pt-0 last:pb-0 sm:gap-4">
       <component
         :is="item.product ? NuxtLink : 'span'"

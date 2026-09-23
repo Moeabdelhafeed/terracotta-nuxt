@@ -1,5 +1,13 @@
 <template>
-  <ul class="flex flex-col gap-4">
+  <!--
+    `min-w-0`: the list is a grid cell, and a cell's automatic minimum size is its
+    min-content. Every line's title is `truncate`, which is `whitespace-nowrap`, so its
+    min-content is the WHOLE title — a long one ("طين حجري 1 — كيس ١٠ كغ") made the card
+    388px inside a 342px column and pushed the document wider than the phone, which is
+    what made the cart pan sideways. The wrappers inside already carry `min-w-0`, so once
+    the list may shrink, the title truncates as it was always meant to.
+  -->
+  <ul class="flex min-w-0 flex-col gap-4">
     <li
       v-for="line in items"
       :key="line.id"
