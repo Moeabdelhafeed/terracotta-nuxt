@@ -26,7 +26,24 @@ useHead({
     { rel: 'manifest', href: '/site.webmanifest' },
   ],
   meta: [
-    { name: 'theme-color', content: '#6B2E19' },
+    /*
+     * The brand's own terracotta — the same `--brand-terracotta` the top bar and the
+     * bottom nav are painted with, so a phone's browser chrome continues the site rather
+     * than framing it in a darker brown that appears nowhere else.
+     *
+     * Declared for BOTH schemes. A bare `theme-color` is treated by Chrome on Android as
+     * the light-mode colour only, so a phone set to dark gets the browser's own grey and
+     * the bar looks like the tag was never there. Same hue in both: the site has one
+     * chrome, and it is not a dark-mode surface.
+     */
+    { name: 'theme-color', content: '#81341A', media: '(prefers-color-scheme: light)' },
+    { name: 'theme-color', content: '#81341A', media: '(prefers-color-scheme: dark)' },
+    // Fallback for anything that reads neither media query (older Safari).
+    { name: 'theme-color', content: '#81341A' },
+    // iOS, once the site is on the home screen: the status bar takes the page's own
+    // colour instead of a white band above it.
+    { name: 'apple-mobile-web-app-capable', content: 'yes' },
+    { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
     { name: 'format-detection', content: 'telephone=no' },
   ],
 })

@@ -3,7 +3,7 @@
     <ul
       ref="track"
       v-gsap.whenVisible.once.from.stagger="{ opacity: 0, y: 32, duration: 0.6 }"
-      class="flex snap-x snap-mandatory gap-4 overflow-x-auto scrollbar-none scroll-ps-6 px-6 pb-2"
+      class="flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden scrollbar-none scroll-ps-6 px-6 pb-2"
     >
       <li
         v-for="banner in items"
@@ -47,10 +47,12 @@
 
     <!-- Paging by card, not by pixel. The track is a plain scroller, so RTL flips the
          sign of `scrollBy` — read the resolved direction rather than assuming LTR. -->
+    <!-- Arrows from `sm` up only: a finger drags the rail itself, and two buttons sitting
+         over a 390px-wide banner cover the thing they are there to reveal. -->
     <template v-if="items.length > 1">
       <button
         type="button"
-        class="absolute top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-xl border bg-background/90 text-brand-terracotta shadow-sm backdrop-blur transition-colors hover:bg-background ltr:left-3 rtl:right-3"
+        class="absolute top-1/2 z-10 hidden size-11 -translate-y-1/2 items-center justify-center rounded-xl border bg-background/90 text-brand-terracotta shadow-sm backdrop-blur transition-colors hover:bg-background sm:flex ltr:left-3 rtl:right-3"
         :aria-label="t('previous', 'Previous', 'السابق', { subGroup: 'general' })"
         @click="scrollByCard(-1)"
       >
@@ -59,7 +61,7 @@
 
       <button
         type="button"
-        class="absolute top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center rounded-xl border bg-background/90 text-brand-terracotta shadow-sm backdrop-blur transition-colors hover:bg-background ltr:right-3 rtl:left-3"
+        class="absolute top-1/2 z-10 hidden size-11 -translate-y-1/2 items-center justify-center rounded-xl border bg-background/90 text-brand-terracotta shadow-sm backdrop-blur transition-colors hover:bg-background sm:flex ltr:right-3 rtl:left-3"
         :aria-label="t('next', 'Next', 'التالي', { subGroup: 'general' })"
         @click="scrollByCard(1)"
       >
@@ -88,6 +90,11 @@ const { pages } = usePages()
 const { t } = useLang('web', 'home')
 
 const track = ref()
+
+// No mouse drag here: this rail has arrows, and they are the desktop way through it.
+// What is still wanted is the click guard — a finger that swipes the rail must not open
+// the card it happened to start on.
+useDragScroll(track, { drag: false })
 
 const scrollByCard = (direction) => {
   const el = track.value

@@ -1,6 +1,14 @@
 <template>
-  <!-- Registered only: the balance is an account's, and a guest has no ledger to read. -->
-  <div v-if="isRegistered" class="flex items-stretch gap-4">
+  <!--
+    Shown to everyone, including a guest.
+
+    It used to be registered-only, on the reasoning that a balance belongs to an account —
+    but that hid the wallet and the gift from exactly the people who have not got one yet.
+    Both destinations carry `require-registered`, which opens the sign-in dialog and
+    cancels the navigation, so a guest tapping either is asked for an account at the point
+    they actually need one rather than being shown nothing.
+  -->
+  <div class="flex items-stretch gap-4">
     <!-- The balance is the fact the reader came for; the gift tile is an offer beside it. -->
     <NuxtLink
       to="/wallet"
@@ -10,8 +18,13 @@
         {{ t("terracotta_balance", "Terracotta balance", "رصيد تيراكوتا") }}
       </span>
 
-      <span class="mt-1 font-display text-2xl font-black text-primary">
-        {{ format(balance) }}
+      <!-- No number for a guest: `0.00` is what an empty ledger returns, and printing it
+           to somebody with no account reads as "you have nothing" rather than "sign in". -->
+      <span
+        class="mt-1 font-display font-black text-primary"
+        :class="isRegistered ? 'text-2xl' : 'text-base'"
+      >
+        {{ isRegistered ? format(balance) : t("wallet_sign_in_to_see", "Sign in to see your balance", "سجّل الدخول لعرض رصيدك") }}
       </span>
 
       <!--

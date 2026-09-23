@@ -12,6 +12,11 @@ export const useHome = () => {
     transform: (res) => res?.data ?? {},
     default: () => ({}),
     watch: [lang, i18nLocale],
+    // The server still blocks on it, so the HTML a visitor (or a crawler) lands on is
+    // complete. A move to the home page from inside the site does not: the route paints
+    // at once and the sections fill in, instead of the tap doing nothing until the
+    // studio's whole front door has been fetched.
+    lazy: import.meta.client,
   })
 
   const home = computed(() => data.value ?? {})
@@ -40,6 +45,10 @@ export const useWorkshops = () => {
     transform: (res) => asList(res?.data?.data ?? res?.data),
     default: () => [],
     watch: [lang, i18nLocale],
+    // As `useHome`: blocking on the server, free on a client move. The workshops page
+    // draws skeletons while `pending`, and the home row renders nothing until it has
+    // rows, so neither shows an empty frame.
+    lazy: import.meta.client,
   })
 
   return { workshops: computed(() => asList(data.value)), pending, error, refresh }

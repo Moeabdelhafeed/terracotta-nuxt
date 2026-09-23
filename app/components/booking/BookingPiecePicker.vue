@@ -12,7 +12,7 @@
         pieces they made themselves LEAD, when they have any — what is already theirs is
         the reason they came back, and the shelf is the alternative.
       -->
-      <ul class="mt-6 flex gap-3 overflow-x-auto scrollbar-none pb-2" data-test="piece-categories">
+      <ul ref="categoryRail" class="mt-6 flex cursor-grab gap-3 overflow-x-auto scrollbar-none pb-2" data-test="piece-categories">
         <li v-for="tab in tabs" :key="tab.id" class="shrink-0">
           <button
             type="button"
@@ -37,7 +37,7 @@
         and carries no artwork. One group is no choice at all: its products are already
         what is on screen, and a lone chip that cannot be turned off reads as a control.
       -->
-      <ul v-if="subTabs.length > 1" class="mt-3 flex gap-3 overflow-x-auto scrollbar-none pb-2" data-test="piece-sub-categories">
+      <ul v-if="subTabs.length > 1" ref="subRail" class="mt-3 flex cursor-grab gap-3 overflow-x-auto scrollbar-none pb-2" data-test="piece-sub-categories">
         <li v-for="option in subTabs" :key="option.id" class="shrink-0">
           <button
             type="button"
@@ -256,6 +256,12 @@ const props = defineProps({
 const lines = defineModel({ type: Array, default: () => [] });
 
 const { t, code } = useLang("web", "bookings");
+
+// The shelves scroll sideways; a mouse needs help with that. See `useDragScroll`.
+const categoryRail = ref(null);
+const subRail = ref(null);
+useDragScroll(categoryRail);
+useDragScroll(subRail);
 const { format } = usePrice();
 
 const categories = computed(() => props.workshop.categories ?? []);

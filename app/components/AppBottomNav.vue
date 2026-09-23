@@ -59,6 +59,27 @@
         </NuxtLink>
       </li>
 
+      <li v-if="appUsers">
+        <NuxtLink
+          to="/favorites"
+          class="relative flex size-[54px] items-center justify-center rounded-[5px] transition-colors"
+          :class="
+            isActive('/favorites')
+              ? 'bg-white/15 text-white'
+              : 'text-white/70 hover:bg-white/10 hover:text-white'
+          "
+          :aria-label="t('nav_favorites', 'Favourites', 'المفضلة')"
+        >
+          <LucideHeart class="size-[26px]" />
+          <span
+            v-if="favoriteCount > 0"
+            class="absolute top-2 end-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-blush px-1 text-[10px] font-semibold text-brand-ink"
+            dir="ltr"
+            >{{ favoriteCount > 99 ? "99+" : favoriteCount }}</span
+          >
+        </NuxtLink>
+      </li>
+
       <li>
         <NotificationBell />
       </li>
@@ -144,25 +165,45 @@
 
           <div class="my-3 h-px bg-white/20" aria-hidden="true" />
 
-          <!-- The three controls the bar carries, on one row so the destinations keep
-               the height. -->
-          <div class="flex items-center gap-2">
+          <!-- The controls the bar carries, icon-only on one row so the destinations
+               keep the height. -->
+          <div class="flex items-center gap-1.5">
             <NuxtLink
               to="/cart"
-              class="relative flex h-12 flex-1 items-center justify-center gap-2 rounded-control text-sm transition-colors"
+              class="relative flex size-[54px] items-center justify-center rounded-[5px] transition-colors"
               :class="
                 isActive('/cart')
                   ? 'bg-white/15 text-white'
                   : 'text-white/80 active:bg-white/10'
               "
+              :aria-label="t('nav_cart', 'Cart', 'عربيتي')"
             >
-              <LucideShoppingCart class="size-5" />
-              {{ t("nav_cart", "Cart", "عربيتي") }}
+              <LucideShoppingCart class="size-[26px]" />
               <span
                 v-if="cartCount > 0"
-                class="flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-blush px-1 text-[11px] font-semibold text-brand-ink"
+                class="absolute top-2 end-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-blush px-1 text-[10px] font-semibold text-brand-ink"
                 dir="ltr"
                 >{{ cartCount > 99 ? "99+" : cartCount }}</span
+              >
+            </NuxtLink>
+
+            <NuxtLink
+              v-if="appUsers"
+              to="/favorites"
+              class="relative flex size-[54px] items-center justify-center rounded-[5px] transition-colors"
+              :class="
+                isActive('/favorites')
+                  ? 'bg-white/15 text-white'
+                  : 'text-white/80 active:bg-white/10'
+              "
+              :aria-label="t('nav_favorites', 'Favourites', 'المفضلة')"
+            >
+              <LucideHeart class="size-[26px]" />
+              <span
+                v-if="favoriteCount > 0"
+                class="absolute top-2 end-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-blush px-1 text-[10px] font-semibold text-brand-ink"
+                dir="ltr"
+                >{{ favoriteCount > 99 ? "99+" : favoriteCount }}</span
               >
             </NuxtLink>
 
@@ -198,6 +239,9 @@ const { isRegistered } = useIsRegistered();
 // A visitor without an account has a cart too — it just lives in localStorage until they
 // sign in — so the entry and its badge are shown to everyone.
 const { count: cartCount } = useCart();
+
+// Hearts count for everyone too: a guest's live in localStorage until they sign in.
+const { count: favoriteCount } = useFavorites();
 
 const items = computed(() => [
   { to: "/", label: t("nav_home", "Home", "الرئيسية") },
@@ -257,10 +301,9 @@ watch(
     menuOpen.value = false;
     onScroll?.();
 
-    // ScrollSmoother owns the scroll position, so a route change has to reset it explicitly
-    // or the next page opens part-way down.
-    const { ScrollSmoother } = await import("gsap/all");
-    ScrollSmoother.get?.()?.scrollTo(0, false);
+    // Whatever owns the scroll has to be reset explicitly, or the next page opens
+    // part-way down.
+    await scrollToTop();
   },
 );
 

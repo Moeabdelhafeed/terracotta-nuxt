@@ -1,7 +1,5 @@
 <template>
   <main class="bg-background">
-    <HomeSplash />
-
     <!-- A failed `GET /api/home` used to leave hero, banners, categories and both grids
          silently absent, which reads as a studio with nothing on. Say so, and offer the
          one thing that can fix it. -->
@@ -42,8 +40,21 @@ definePageMeta({
   name: 'home',
 })
 
-const { featuredProducts, offers, error, refresh } = useHome()
+const { featuredProducts, offers, pending, error, refresh } = useHome()
 const { t } = useLang('web', 'home')
+
+/**
+ * `/api/home` no longer blocks a move to this page (see `useHome`), so the banners, the
+ * categories and both product rows drop into a page whose pinned sections have already
+ * measured themselves against a shorter one. One refresh once the sections are in the
+ * DOM puts every trigger back where the reader will actually meet it.
+ */
+watch(pending, async (value) => {
+  if (value || !import.meta.client) return
+  await nextTick()
+  const { ScrollTrigger } = await import('gsap/all')
+  ScrollTrigger.refresh()
+})
 
 useSeoMeta({
   title: () => t('home_meta_title', 'Handmade pottery, workshops and pieces', 'فخار مصنوع يدويًا، ورشات وقطع'),

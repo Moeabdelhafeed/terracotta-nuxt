@@ -27,28 +27,12 @@
       class="relative isolate flex min-h-svh flex-col items-center justify-center overflow-hidden bg-brand-blush px-6 py-16 text-white"
     >
       <!-- The line the rest of the site is drawn with. Decorative only. -->
-      <svg
-        class="pointer-events-none absolute inset-0 -z-10 h-full w-full text-white/40"
-        viewBox="0 0 1601 922"
-        fill="none"
-        preserveAspectRatio="xMidYMid slice"
-        aria-hidden="true"
-      >
-        <path
-          d="M533.499 -308.5C561.499 -140.5 487.899 246.8 -30.5009 452C-678.501 708.5 240.999 -304.5 884.499 -146.5C1528 11.5 1738 466.5 1512 1153.5C1286 1840.5 349.5 489.5 -89.5 497.5"
-          stroke="currentColor"
-          stroke-width="2"
-          vector-effect="non-scaling-stroke"
-        />
-      </svg>
+      <BrandLine class="-z-10 text-white/40" />
 
-      <AppMedia
-        v-if="logo"
-        ref="mark"
-        :src="logo"
-        alt=""
-        class="h-14 w-auto object-contain sm:h-16"
-      />
+      <!-- The glyph, not the CMS's drawn logo: this page is the mark on a colour, exactly
+           as the splash paints it — one filled shape taking the ink around it — and a PNG
+           of the light logo is a picture of a mark rather than the mark. -->
+      <BrandMark ref="mark" class="h-14 w-auto text-white sm:h-16" />
 
       <div
         ref="card"
@@ -303,10 +287,6 @@ useHead({ bodyAttrs: { class: "bg-brand-blush" } });
 const route = useRoute();
 const { t } = useLang("web", "home");
 const { format } = usePrice();
-const { mediaAsset } = useMedia("web", "branding");
-
-// Everything sitting directly on the pink is white, the mark included.
-const logo = computed(() => mediaAsset("logo_light", "/logo-light.png"));
 
 /**
  * Server-rendered on purpose: WhatsApp and iMessage fetch the link to build a preview

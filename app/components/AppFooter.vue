@@ -3,26 +3,14 @@
     class="relative isolate mt-auto overflow-hidden bg-chrome text-white"
   >
     <!-- The hero's line, carried through to the close of the page. Decorative only. -->
-    <svg
-      class="pointer-events-none absolute inset-0 -z-10 h-full w-full text-white/20"
-      viewBox="0 0 1601 922"
-      fill="none"
-      preserveAspectRatio="xMidYMid slice"
-      aria-hidden="true"
-    >
-      <path
-        d="M533.499 -308.5C561.499 -140.5 487.899 246.8 -30.5009 452C-678.501 708.5 240.999 -304.5 884.499 -146.5C1528 11.5 1738 466.5 1512 1153.5C1286 1840.5 349.5 489.5 -89.5 497.5"
-        stroke="currentColor"
-        stroke-width="2"
-        vector-effect="non-scaling-stroke"
-      />
-    </svg>
+    <BrandLine class="-z-10 text-white/20" />
 
-    <!-- `pb-40` (160px) is the floating bottom bar's clearance for the WHOLE site: the
-         bar is 74px tall and sits 24px off the bottom, so it covers 98px, and the last
-         line of the footer needs room to breathe under that rather than just clear it.
-         No page adds its own bottom padding — this is the only place that reserves it. -->
-    <div class="mx-auto max-w-6xl px-6 pb-40 pt-20">
+    <!-- Clearance for the floating navigation, for the WHOLE site — no page adds its
+         own bottom padding. From `sm` the bar is 74px tall and sits 24px off the bottom,
+         so 160px leaves the last line room to breathe under it. On a phone there is only
+         the 56px button in one corner, so the same 160px read as a hole at the end of
+         the page: 80px clears the button and nothing more. -->
+    <div class="mx-auto max-w-6xl px-6 pb-20 pt-20 sm:pb-40">
       <div
         class="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between"
       >

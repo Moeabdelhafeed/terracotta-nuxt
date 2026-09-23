@@ -10,7 +10,7 @@
   <section
     ref="root"
     id="get-app"
-    class="relative flex items-center isolate min-h-[80svh] overflow-hidden bg-brand-mist/40 py-16 sm:py-0"
+    class="relative isolate flex min-h-[80svh] flex-col items-center justify-center overflow-hidden bg-brand-mist/40 py-16 sm:flex-row sm:py-0"
   >
     <div
       class="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-6 text-center sm:-mt-20 sm:pt-[10svh]"
@@ -80,22 +80,32 @@
       </ul>
     </div>
 
-    <!-- The screens sit under the copy in the stack, so the text stays readable where the
-         two overlap at the start of the scroll. -->
-    <img
-      ref="phoneStart"
-      :src="screenOne"
-      alt=""
-      aria-hidden="true"
-      class="pointer-events-none -mt-20 absolute right-30 -z-10 h-[48svh] w-auto drop-shadow-2xl sm:h-[70svh]"
-    />
-    <img
-      ref="phoneEnd"
-      :src="screenTwo"
-      alt=""
-      aria-hidden="true"
-      class="pointer-events-none -mt-20 absolute left-30 -z-10 h-[48svh] w-auto drop-shadow-2xl sm:h-[70svh]"
-    />
+    <!--
+      From `sm` up the screens sit under the copy in the stack, so the text stays readable
+      where the two overlap at the start of the scroll.
+
+      On a phone that composition had both of them 120px in from either edge — which at
+      390 is the middle of the screen, one on top of the other, behind the words. Here
+      they are a pair in the flow under the copy instead, leaning apart, sized to leave
+      the sentence above them room. `sm:contents` drops this wrapper out of the layout so
+      the absolute placement from `sm` up is unchanged.
+    -->
+    <div class="mt-12 flex items-end justify-center sm:contents">
+      <img
+        ref="phoneStart"
+        :src="screenOne"
+        alt=""
+        aria-hidden="true"
+        class="pointer-events-none -me-6 h-[36svh] w-auto -rotate-6 drop-shadow-2xl sm:absolute sm:right-30 sm:-z-10 sm:me-0 sm:-mt-20 sm:h-[70svh] sm:rotate-0"
+      />
+      <img
+        ref="phoneEnd"
+        :src="screenTwo"
+        alt=""
+        aria-hidden="true"
+        class="pointer-events-none -ms-6 h-[36svh] w-auto rotate-6 drop-shadow-2xl sm:absolute sm:left-30 sm:-z-10 sm:ms-0 sm:-mt-20 sm:h-[70svh] sm:rotate-0"
+      />
+    </div>
   </section>
 </template>
 

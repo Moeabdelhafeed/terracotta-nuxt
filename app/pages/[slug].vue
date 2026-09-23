@@ -1,9 +1,20 @@
 <template>
   <main class="bg-background">
+    <!-- The same header every inner page wears — mark, breadcrumb trail, then the picture
+         with the title over it. A CMS page carries its own `image`, so the hero is the
+         one the operator uploaded with the page; a page with no picture falls back to the
+         plain title, which PageHero already draws. -->
+    <PageHero
+      :image="page?.image?.image_api ? page.image : null"
+      :crumbs="[
+        { to: '/', label: t('nav_home', 'Home', 'الرئيسية') },
+        { label: page?.name ?? t('page', 'Page', 'صفحة') },
+      ]"
+      :title="page?.name ?? ''"
+    />
+
     <div class="mx-auto max-w-6xl px-6 py-16">
       <div class="mx-auto flex max-w-3xl flex-col gap-5">
-        <PageBackBar :title="page?.name ?? ''" fallback="/" />
-
         <div v-if="pending" class="flex flex-col gap-3 rounded-2xl border bg-card p-5" aria-busy="true">
           <AppSkeleton class="h-8 w-1/2" />
           <AppSkeleton v-for="n in 6" :key="n" class="h-4" :class="n % 3 === 0 ? 'w-2/3' : 'w-full'" />
@@ -12,12 +23,6 @@
         <AppLoadError v-else-if="status === 'error'" :error="error" :retry="refresh" />
 
         <div v-else-if="page" class="rounded-2xl border bg-card p-5 sm:p-8">
-          <AppImage
-            v-if="page.image?.image_api"
-            :src="page.image"
-            :alt="page.name"
-            class="mb-6 aspect-video w-full rounded-xl object-cover"
-          />
           <div
             class="prose prose-sm max-w-none break-words dark:prose-invert [&_a]:text-brand-terracotta [&_a]:underline [&_h2]:mt-6 [&_h2]:mb-2 [&_h2]:text-xl [&_h2]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2 [&_h3]:font-semibold [&_li]:my-1 [&_p]:my-3 [&_ul]:list-disc [&_ul]:ps-6 [&_img]:h-auto [&_img]:max-w-full [&_pre]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto"
             v-html="page.content"

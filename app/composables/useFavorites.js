@@ -26,6 +26,9 @@ export const useFavorites = () => {
     default: () => [],
     immediate: isRegistered.value,
     watch: [isRegistered],
+    // The navigation carries the heart's count on every page, so this now runs site-wide:
+    // blocking on it would put a round trip in front of every client move.
+    lazy: import.meta.client,
   });
 
   const favorites = computed(() =>
@@ -55,6 +58,7 @@ export const useFavorites = () => {
 
   return {
     favorites,
+    count: computed(() => favorites.value.length),
     isFavorited,
     toggle,
     isRegistered,

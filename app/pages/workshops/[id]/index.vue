@@ -34,16 +34,10 @@
     >
       <div class="grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-start">
         <div ref="content">
-          <div
-            class="relative aspect-[16/10] overflow-hidden rounded-3xl bg-brand-mist"
-          >
-            <AppImage
-              v-if="workshop.image?.image_api"
-              :src="workshop.image"
-              :alt="workshop.title"
-              class="size-full object-cover"
-            />
-          </div>
+          <!-- The workshop's own photograph and the shots from it, as one set: they are
+               pictures of the same room, and a grid underneath made the first one look
+               like the workshop and the rest like an afterthought. -->
+          <AppGallery :items="shots" :alt="workshop.title" />
 
           <h1 class="mt-8 font-display text-3xl font-semibold sm:text-4xl">
             {{ workshop.title }}
@@ -59,24 +53,6 @@
             v-html="workshop.long_description"
           />
 
-          <section v-if="workshop.gallery?.length" class="mt-10">
-            <h2 class="font-display text-xl font-semibold">
-              {{ t("workshop_gallery", "From this workshop", "من هذه الورشة") }}
-            </h2>
-            <ul class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-              <li
-                v-for="(shot, index) in workshop.gallery"
-                :key="index"
-                class="overflow-hidden rounded-2xl border"
-              >
-                <AppImage
-                  :src="shot"
-                  :alt="workshop.title"
-                  class="aspect-square w-full object-cover"
-                />
-              </li>
-            </ul>
-          </section>
 
           <!--
             Catalogue types (paint_your_piece, make_your_candle) carry the pieces a customer
@@ -350,6 +326,20 @@ watchEffect(() => {
 });
 
 const { t } = useLang("web", "home");
+
+/**
+ * The hero photograph first, then the shots from the session. Deduped on the public URL,
+ * since the studio often sets one of the gallery images as the workshop's own and two
+ * identical frames read as a broken carousel.
+ */
+const shots = computed(() => {
+  const all = [workshop.value?.image, ...asList(workshop.value?.gallery)].filter(
+    (shot) => shot?.image_api,
+  )
+  return all.filter(
+    (shot, index) => all.findIndex((other) => other.image_api === shot.image_api) === index,
+  )
+})
 const { format } = usePrice();
 
 const content = ref(null);

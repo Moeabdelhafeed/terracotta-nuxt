@@ -28,8 +28,15 @@
             vector-effect="non-scaling-stroke"
           />
         </svg>
+        <!--
+          `overflow-hidden`, never `auto`. This panel lives inside the PINNED section, so
+          a scrollbar here is one the reader cannot use: every wheel and every touch drives
+          the pinned timeline instead, and the bar sits there advertising a scroll that
+          does nothing. The copy is sized to fit the panel instead — see the padding, which
+          is tight on a phone for exactly that reason.
+        -->
         <div
-          class="mx-auto flex h-full max-w-6xl items-center-safe overflow-y-auto px-6 py-12 sm:py-16"
+          class="mx-auto flex h-full max-w-6xl items-center-safe overflow-hidden px-6 py-6 sm:py-16"
         >
           <div
             class="grid w-full items-center gap-6 sm:gap-10 lg:grid-cols-2 lg:gap-16"
@@ -157,7 +164,19 @@
         />
       </svg>
 
-      <div ref="section" class="w-full overflow-hidden h-svh bg-background">
+      <!--
+        `dvh`: the box the reader can actually see, at whatever size the phone's toolbar
+        currently leaves it. `lvh` is taller than that while the toolbar is out — which is
+        the whole time at the top of the page — so the video was sized against a box bigger
+        than the screen and never squared up on scroll.
+
+        It was `svh` because `dvh` moves under a pin ScrollTrigger has already measured.
+        That is handled rather than avoided now: the trigger invalidates on refresh and
+        `sizeLogo` re-derives the strip from the height the section has at that moment, so
+        a toolbar sliding away resizes the hero instead of leaving a band of background
+        under it.
+      -->
+      <div ref="section" class="w-full overflow-hidden h-dvh bg-background">
         <AppMedia
           v-if="heroVideoAsset"
           :src="heroVideoAsset"
@@ -261,6 +280,19 @@ onMounted(async () => {
   // Not among the plugins v-gsap pre-registers, so it has to be added here.
   gsap.registerPlugin(DrawSVGPlugin);
 
+  // Scaling from the centre opens an equal strip above and below the section:
+  // height x (1 - scale) / 2. The logo is sized to that strip — and re-sized on every
+  // refresh, because the section is `dvh`: the strip is a fraction of a height that
+  // changes as the phone's toolbar comes and goes.
+  const sizeLogo = () => {
+    const height = section.value?.offsetHeight ?? 0;
+
+    gsap.set(logo.value?.$el ?? logo.value, {
+      top: ((height * (1 - 0.8)) / 2 - (height * (1 - 0.87)) / 2) / 2,
+      height: (height * (1 - 0.87)) / 2,
+    });
+  };
+
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: wrapper.value,
@@ -268,18 +300,14 @@ onMounted(async () => {
       end: "+=2000",
       scrub: true,
       pin: true,
+      // The pinned spacer is measured once; `dvh` is not a once. Both are re-taken
+      // together whenever ScrollTrigger refreshes.
+      invalidateOnRefresh: true,
+      onRefresh: sizeLogo,
     },
   });
 
-  // Scaling from the centre opens an equal strip above and below the section:
-  // height x (1 - scale) / 2. The logo is set once to that final strip height.
-  gsap.set(logo.value?.$el ?? logo.value, {
-    top:
-      ((section.value.offsetHeight * (1 - 0.8)) / 2 -
-        (section.value.offsetHeight * (1 - 0.87)) / 2) /
-      2,
-    height: (section.value.offsetHeight * (1 - 0.87)) / 2,
-  });
+  sizeLogo();
 
   tl.to(section.value, {
     borderRadius: 0,

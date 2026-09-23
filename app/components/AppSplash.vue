@@ -53,7 +53,7 @@
  * The launch screen: the mark draws itself on the terracotta ground, fills, then becomes a
  * hole in that ground and opens outward until the site is revealed through it.
  *
- * Shown once per page load, home page only. The guard is a module-level flag rather than
+ * Shown once per page load, on whatever page that load lands. The guard is a module-level flag rather than
  * component state: a full refresh re-evaluates the module and the splash returns, while
  * navigating away and back within the session leaves it alone.
  *
@@ -80,6 +80,10 @@ const hole = ref()
 let safety = null
 
 const dismiss = () => { visible.value = false }
+
+// Nothing to scroll to yet: the site is sealed behind the overlay, and a flick during the
+// animation landed the reader halfway down a page they had not seen the top of.
+useModalScrollLock(visible)
 
 onMounted(async () => {
   if (alreadyShown) {

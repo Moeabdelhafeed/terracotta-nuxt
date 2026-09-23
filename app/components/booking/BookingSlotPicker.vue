@@ -3,7 +3,7 @@
     <!-- Party size. The cap is the server's `max_available_seats` (already capped at
          `max_people_per_booking`) — never a locally derived number. -->
     <section v-if="!lockPeople">
-      <ul class="flex gap-3 overflow-x-auto scrollbar-none pb-2" data-test="people-options">
+      <ul ref="peopleRail" class="flex cursor-grab gap-3 overflow-x-auto scrollbar-none pb-2" data-test="people-options">
         <li v-for="n in peopleOptions" :key="n" class="shrink-0">
           <button
             type="button"
@@ -49,7 +49,7 @@
         {{ t('no_open_dates', 'No open dates for this party size — try fewer people.', 'لا توجد مواعيد متاحة لهذا العدد — جرّب عددًا أقل.') }}
       </p>
 
-      <ul v-else class="mt-4 flex gap-3 overflow-x-auto scrollbar-none pb-2" data-test="date-strip">
+      <ul v-else ref="dateRail" class="mt-4 flex cursor-grab gap-3 overflow-x-auto scrollbar-none pb-2" data-test="date-strip">
         <li v-for="day in days" :key="day.ymd" class="shrink-0">
           <button
             type="button"
@@ -143,6 +143,12 @@ const slotId = defineModel('slotId', { type: Number, default: null })
 const slot = defineModel('slot', { type: Object, default: null })
 
 const { t, code } = useLang('web', 'bookings')
+
+// Both rails are sideways, and a mouse has no sideways. See `useDragScroll`.
+const peopleRail = ref(null)
+const dateRail = ref(null)
+useDragScroll(peopleRail)
+useDragScroll(dateRail)
 const { formatDate } = useDateFormat()
 const availability = useWorkshopBooking(() => props.workshop.id)
 

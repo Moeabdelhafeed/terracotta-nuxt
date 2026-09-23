@@ -278,10 +278,7 @@ const linkTo = (page) => ({
 });
 
 // ScrollSmoother owns the scroll position, so paging has to send the visitor back up.
-watch(currentPage, async () => {
-  const { ScrollSmoother } = await import("gsap/all");
-  ScrollSmoother.get?.()?.scrollTo(0, true);
-});
+watch(currentPage, () => scrollToTop(true));
 
 
 useSeoMeta({

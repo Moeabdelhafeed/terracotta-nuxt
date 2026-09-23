@@ -638,7 +638,8 @@ const loadQuote = async () => {
  * problem; the choices were.
  *
  * `sessionStorage`, so it dies with the tab and never outlives the visit, and keyed per
- * workshop so two open tabs do not overwrite each other. The server object (`booking`) is
+ * workshop so two open tabs do not overwrite each other. It is only ever read back on the
+ * return from that sign-in (`?resume=1`); without the marker the page is a fresh booking. The server object (`booking`) is
  * deliberately NOT kept: a held seat is the server's to describe, and a stale copy of one
  * would offer to pay for something that may have expired.
  */
@@ -663,6 +664,11 @@ const writeDraft = (value) => {
 };
 
 onMounted(() => {
+  // The draft is for one thing only: the sign-in round trip, which comes back here with
+  // `?resume=1` on it. A plain visit is a new booking, so an abandoned draft from earlier
+  // in the tab is dropped rather than dumping the reader back on the pay step.
+  if (!route.query.resume) return writeDraft(null);
+
   const saved = readDraft();
   if (!saved) return;
 
@@ -713,7 +719,10 @@ onBeforeUnmount(() => clearTimeout(quoteTimer));
 const createBooking = async () => {
   // The seat is held against an ACCOUNT, so this is the first step a guest cannot take.
   // Asked here, the answer comes back to this page with the stepper still on screen.
-  if (!isRegistered.value) return useLoginPrompt().ask(route.fullPath);
+  if (!isRegistered.value)
+    return useLoginPrompt().ask(
+      router.resolve({ query: { ...route.query, resume: 1 } }).fullPath,
+    );
 
   creating.value = true;
   createErrors.value = {};

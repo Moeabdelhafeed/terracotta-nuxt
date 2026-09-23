@@ -1,5 +1,19 @@
 <template>
-  <div ref="root" class="relative flex gap-2" dir="ltr">
+  <!--
+    `ltr` for the row: country code then number, the order a phone number is written and
+    dialled in either language.
+
+    `w-full min-w-0` on the row and `size="1"` on the number are what keep the pair the
+    width of every other field. An `<input>` is 20 characters wide by default, and that
+    intrinsic ~219px is its min-content however `min-w-0` is set: every ancestor with an
+    automatic minimum size inherits the floor, so the row would not go under ~334px. On
+    the register form, where the row IS the grid cell, `min-w-0` was enough; on the gift
+    form, two boxes deeper, the whole card grew to 384 inside a 342 column and pushed the
+    document wider than the phone — which is why that page panned sideways. `size` is
+    what actually sets the intrinsic width, and `flex-1` still gives the field the rest of
+    the row, so nothing looks different.
+  -->
+  <div ref="root" class="relative flex w-full min-w-0 gap-2" dir="ltr">
     <button
       type="button"
       class="group flex h-12 shrink-0 items-center gap-1.5 rounded-field border border-input bg-transparent px-3 text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
@@ -19,6 +33,7 @@
       v-model="digits"
       type="tel"
       inputmode="numeric"
+      size="1"
       :placeholder="placeholder"
       class="h-12 min-w-0 flex-1 rounded-field border border-input bg-transparent px-4 text-base outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
       v-bind="$attrs"

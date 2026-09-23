@@ -7,14 +7,15 @@
   <div class="relative isolate flex min-h-svh flex-col overflow-hidden bg-background">
     <!-- The same line the home hero draws behind itself (Vector 17), not the one used
          everywhere else on the site — that one is the DrawSVG reveal, this is the
-         passive background texture. The hero fits it into a wide landscape band, so
-         "slice" only ever crops it a little; a narrow phone screen is tall and narrow
-         enough that "slice" instead zooms into one thin vertical strip of the curve,
-         and a loop's tip landing mid-screen reads as the line just stopping. Matching
-         the box's aspect ratio to the viewBox keeps the whole curve proportional
-         instead — "meet" then has nothing left to crop. -->
+         passive background texture.
+
+         From `sm` up only. The box is fitted to the viewBox's own ratio so the whole
+         curve stays proportional, which on a wide screen sits it comfortably behind the
+         heading; on a phone that same box is nearly as tall as the screen, so the stroke
+         ran straight through the name and phone fields. A narrow screen has no room for
+         a background it is not using. -->
     <svg
-      class="pointer-events-none absolute inset-x-0 top-0 -z-10 aspect-1652/922 w-full text-brand-mist"
+      class="pointer-events-none absolute inset-x-0 top-0 -z-10 hidden aspect-1652/922 w-full text-brand-mist sm:block"
       viewBox="0 0 1652 922"
       fill="none"
       preserveAspectRatio="xMidYMid meet"

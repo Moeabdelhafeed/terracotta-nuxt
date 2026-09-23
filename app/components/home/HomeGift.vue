@@ -2,8 +2,10 @@
   <!-- Off entirely when the studio is not selling gift credit — the same switch every
        other gift surface reads. -->
   <section v-if="packageActive" id="gift" class="relative overflow-hidden bg-[#FC8B8B] py-12 text-white">
-    <!-- The hero's own line, static here: one drawn line runs through the page. -->
-    <CardLineArt class="absolute inset-0 size-full opacity-30" />
+    <!-- The hero's own line, static here: one drawn line runs through the page. The
+         drawn loop used to sit here instead, and a closed circle behind three stacked
+         cards read as a badge the copy was trapped inside. -->
+    <BrandLine class="text-white/25" />
 
     <div class="relative mx-auto grid max-w-6xl gap-8 px-6 lg:grid-cols-2 lg:items-center">
       <div>

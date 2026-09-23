@@ -11,6 +11,10 @@ const SITE_NAME = 'Terracotta'
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+  devServer: {
+    host: '0.0.0.0',
+    port: 3000
+  },
 
   // Everything the project needs to boot lives here, not in a `.env` — Nuxt still lets a
   // deploy override any of it with the matching `NUXT_*` variable, so production points

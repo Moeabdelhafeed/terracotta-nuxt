@@ -221,14 +221,29 @@
           type="button"
           data-test="open-terms"
           class="text-brand-terracotta underline-offset-4 hover:underline"
-          @click="termsOpen = true"
+          @click="openPage = 'terms'"
         >
-          {{
-            t("terms_and_conditions", "Terms & Conditions", "الشروط والأحكام")
-          }}
+          {{ termsTitle }}
+        </button>
+        {{ t("and", "and", "و") }}
+        <!-- Both documents, both opened the same way: they are CMS pages that are always
+             there, and either one is part of what signing in accepts. -->
+        <button
+          type="button"
+          data-test="open-privacy"
+          class="text-brand-terracotta underline-offset-4 hover:underline"
+          @click="openPage = 'privacy'"
+        >
+          {{ privacyTitle }}
         </button>
       </p>
-      <AccountTermsModal v-model:open="termsOpen" />
+      <AccountPageModal
+        v-if="openPage"
+        :key="openPage"
+        :slug="openPage"
+        :title="openPage === 'terms' ? termsTitle : privacyTitle"
+        @close="openPage = null"
+      />
     </AuthScreen>
 
   </div>
@@ -281,7 +296,15 @@ const identifierMeta = ref({
   is_guest: false,
 });
 const socialError = ref("");
-const termsOpen = ref(false);
+const termsTitle = computed(() =>
+  t("terms_and_conditions", "Terms & Conditions", "الشروط والأحكام"),
+);
+const privacyTitle = computed(() =>
+  t("privacy_policy", "Privacy Policy", "سياسة الخصوصية"),
+);
+
+// Which CMS document the dialog is showing, if any: 'terms' | 'privacy' | null.
+const openPage = ref(null);
 
 const linkedProviders = computed(
   () => identifierMeta.value.social_providers ?? [],

@@ -119,24 +119,30 @@
       </div>
       <div class="grid gap-2">
         <div class="flex items-start gap-2">
-        <Checkbox id="policy" v-model="form.policy_agreed" class="mt-0.5" />
-        <Label for="policy" class="text-sm font-normal text-muted-foreground">
+        <Checkbox id="policy" v-model="form.policy_agreed" class="mt-0.5 shrink-0" />
+        <!-- A plain <label>, not the shadcn one: that component is `flex items-center`,
+             so this sentence became three flex items — prefix, terms link, privacy link —
+             each wrapping in its own column, with the "و" stranded between them as a
+             fourth. A sentence has to lay out as a sentence. -->
+        <label for="policy" class="text-sm leading-relaxed font-normal text-muted-foreground">
           {{ t('policy_agreement_prefix', 'I agree to the', 'أوافق على') }}
           <button
             type="button"
             data-test="open-terms"
             class="text-brand-terracotta underline-offset-4 hover:underline"
-            @click.prevent="termsOpen = true"
-          >{{ termsPage?.name || t('terms_and_conditions', 'Terms & Conditions', 'الشروط والأحكام') }}</button>
+            @click.prevent="openPage = 'terms'"
+          >{{ termsPage?.name || termsTitle }}</button>
           {{ t('and', 'and', 'و') }}
-          <NuxtLink
-            v-if="privacyPage"
-            to="/privacy"
-            target="_blank"
+          <!-- The privacy policy opens the same way the terms do: both are CMS pages that
+               are always there, and sending somebody to a new tab mid-registration means
+               coming back to a form they have to fill in again. -->
+          <button
+            type="button"
+            data-test="open-privacy"
             class="text-brand-terracotta underline-offset-4 hover:underline"
-          >{{ privacyPage.name }}</NuxtLink>
-          <span v-else>{{ t('privacy_policy', 'Privacy Policy', 'سياسة الخصوصية') }}</span>
-        </Label>
+            @click.prevent="openPage = 'privacy'"
+          >{{ privacyPage?.name || privacyTitle }}</button>
+        </label>
         </div>
         <span v-if="errors.policy_agreed" class="text-xs text-destructive">{{ errors.policy_agreed[0] }}</span>
       </div>
@@ -161,7 +167,13 @@
         {{ t('sign_in', 'Sign in', 'تسجيل الدخول') }}
       </NuxtLink>
     </p>
-    <AccountTermsModal v-model:open="termsOpen" />
+    <AccountPageModal
+      v-if="openPage"
+      :key="openPage"
+      :slug="openPage"
+      :title="openPage === 'terms' ? termsTitle : privacyTitle"
+      @close="openPage = null"
+    />
   </AuthScreen>
 </template>
 
@@ -177,7 +189,11 @@ const { t } = useLang('web', 'auth')
 const { bySlug } = usePages()
 const termsPage = computed(() => bySlug('terms'))
 const privacyPage = computed(() => bySlug('privacy'))
-const termsOpen = ref(false)
+const termsTitle = computed(() => t('terms_and_conditions', 'Terms & Conditions', 'الشروط والأحكام'))
+const privacyTitle = computed(() => t('privacy_policy', 'Privacy Policy', 'سياسة الخصوصية'))
+
+// Which CMS document the dialog is showing, if any: 'terms' | 'privacy' | null.
+const openPage = ref(null)
 
 const route = useRoute()
 const redirectTarget = computed(() => safeAuthRedirect(route.query.redirect))

@@ -22,6 +22,11 @@
       <AppBottomNav />
       <LoginPrompt />
       <AppToaster />
+
+      <!-- Once per page LOAD, wherever that load lands. It used to live on the home page
+           alone, so arriving on a shared link to a workshop or a piece — which is how most
+           people arrive — never showed the studio's mark at all. -->
+      <AppSplash />
     </Body>
   </Html>
 </template>
@@ -42,11 +47,24 @@ onMounted(() => {
   // for others, and ScrollSmoother has no reduced-motion behaviour of its own.
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
+  // Phones keep their own scrolling. A touch scroll is already inertial, and smoothing it
+  // means every flick is re-driven a frame late through a transform — the lag a thumb
+  // reads as the page not answering. `normalizeScroll` makes it worse: it takes the touch
+  // over entirely. Pins and ScrollTriggers do not need the smoother to work.
+  if (window.matchMedia('(max-width: 639px)').matches) return
+
   smoother = ScrollSmoother.create({
     smooth: 1, // seconds it takes to catch up to the real scroll position
     smoothTouch: 0.1, // touch devices get a much shorter catch-up, or it feels laggy
     effects: true, // enables data-speed / data-lag attributes for parallax
-    normalizeScroll: true, // keeps mobile address-bar resizes from fighting the pins
+    /*
+     * Normalising keeps the mobile address bar from fighting the pins, but it does it by
+     * taking touch over completely — and that stops every nested scroller on the site
+     * working with a finger: the date rail, the seats, the banners, the category shelves.
+     * `allowNestedScroll` hands a touch back to whichever scrollable element it started
+     * in, so those rails pan natively again while the page keeps the normalised scroll.
+     */
+    normalizeScroll: { allowNestedScroll: true },
   })
 })
 

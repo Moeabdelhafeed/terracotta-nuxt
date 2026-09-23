@@ -1,8 +1,56 @@
 <template>
   <section id="gallery" v-if="pool.length" ref="root" class="bg-brand-mist/40">
+    <!--
+      The phone gets no pin and no scrub. The wall's six tiles at 390 were 130px tall
+      apiece, and holding the page still for 1900px of scrubbed timeline — over a
+      normalised touch scroll — is exactly the gesture a thumb reads as a page that has
+      stopped responding. A snapping rail instead: one album per card, native momentum,
+      no JavaScript in the scroll path at all.
+    -->
+    <div class="px-4 py-16 sm:hidden">
+      <!-- Title and "View all" on one line, as the product rows carry them: the same
+           header, so the phone's sections read as one column of sections. -->
+      <header>
+        <div class="flex items-end justify-between gap-4">
+          <h2 class="font-display text-3xl font-semibold">
+            {{ t('gallery_title', 'From the studio', 'من الاستوديو') }}
+          </h2>
+          <NuxtLink to="/gallery" class="shrink-0 text-sm font-medium text-primary underline-offset-4 hover:underline">
+            {{ t('view_all', 'View all', 'عرض الكل') }}
+          </NuxtLink>
+        </div>
+        <p class="mt-2 text-muted-foreground">
+          {{ t('gallery_subtitle', 'Pieces our guests shaped, glazed and took home.', 'قطع صنعها ضيوفنا بأيديهم وأخذوها معهم.') }}
+        </p>
+      </header>
+
+      <!-- Bleeding to both edges: the card the thumb has not reached yet is visible at
+           the screen's edge, which is what says the rail moves. -->
+      <ul class="-mx-4 mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 scrollbar-none">
+        <li v-for="album in albums" :key="album.category.id" class="w-[72vw] shrink-0 snap-start">
+          <!-- The gallery page's own tile, to the letter: square edges on a mist ground,
+               one blurred scrim over the whole picture with the album's name centred on
+               it. A card here and a card there are the same object, so they are drawn the
+               same way — and a phone has no pointer to ask with, so the scrim that page
+               holds back until hover is simply on. -->
+          <NuxtLink :to="`/gallery/${album.category.id}`" class="relative block aspect-[3/4] overflow-hidden bg-brand-mist">
+            <AppImage :src="album.image" :alt="album.category.title" class="size-full object-cover" />
+
+            <div class="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-brand-ink/30 px-4 text-center text-white backdrop-blur-[3px]">
+              <h3 class="font-display text-xl font-semibold drop-shadow-sm">{{ album.category.title }}</h3>
+              <p class="text-sm text-white/90 drop-shadow-sm">{{ galleryCounts(album.category, t) }}</p>
+            </div>
+          </NuxtLink>
+        </li>
+      </ul>
+
+    </div>
+
     <!-- Exactly one viewport tall: header at the top, the wall taking whatever is left.
          Any spare height here pools above the heading as a gap. -->
-    <div ref="panel" class="flex h-svh w-full flex-col gap-5 px-4 py-12 sm:px-6 sm:py-24">
+    <!-- `svh` like the hero: a pinned panel is measured once, and it has to measure the
+         box the reader can actually see. -->
+    <div ref="panel" class="hidden h-svh w-full flex-col gap-5 px-4 py-12 sm:flex sm:px-6 sm:py-24">
       <header class="mx-auto w-full max-w-[1600px]">
         <h2 class="font-display text-3xl font-semibold sm:text-4xl">
           {{ t('gallery_title', 'From the studio', 'من الاستوديو') }}
@@ -14,7 +62,7 @@
 
       <!-- Bento: fixed cells, changing contents. Each tile keeps its shape while the
            photograph inside it is swapped as the section is scrolled. -->
-      <ul class="mx-auto grid w-full min-h-0 max-w-[1600px] flex-1 grid-cols-2 grid-rows-4 gap-3 sm:grid-cols-4 sm:grid-rows-3 sm:gap-4">
+      <ul class="mx-auto grid w-full min-h-0 max-w-[1600px] flex-1 grid-cols-4 grid-rows-3 gap-4">
         <li
           v-for="(cell, index) in CELLS"
           :key="index"
@@ -103,7 +151,15 @@ const { data: pool } = await useAsyncData(
         .map((item) => ({ ...item, category: { id, title, images_count, videos_count } }))
     })
   },
-  { default: () => [], watch: [lang, i18nLocale] },
+  {
+    default: () => [],
+    watch: [lang, i18nLocale],
+    // Seven requests over two round trips, and the wall is most of a screen down: making
+    // a move to the home page wait for all of them was the bulk of the delay on the tap.
+    // The server render still blocks, so the HTML keeps the whole wall; a client move
+    // paints the page first and the section arrives when its photographs do.
+    lazy: import.meta.client,
+  },
 )
 
 // How many photographs each tile cycles through.
@@ -121,15 +177,24 @@ const slidesFor = (index) => {
   return Array.from({ length: SLIDES }, (_, position) => items[(index * SLIDES + position) % items.length])
 }
 
+// The rail shows albums, not photographs: one card each, the first picture the album
+// has. The wall repeats a category across its tiles, which reads as variety at four
+// columns and as duplication in a list of six cards.
+const albums = computed(() => {
+  const seen = new Map()
+  for (const item of pool.value) {
+    if (!seen.has(item.category.id)) seen.set(item.category.id, item)
+  }
+  return [...seen.values()]
+})
+
 const root = ref()
 const panel = ref()
 const strips = ref([])
 
-let context = null
+let mm = null
 
-onMounted(async () => {
-  if (!pool.value.length) return
-
+const build = async () => {
   const gsap = useGSAP()
   // Imported here rather than at module scope: the plugin touches the document on import,
   // which would take the SSR render down.
@@ -139,7 +204,13 @@ onMounted(async () => {
   await nextTick()
   if (!root.value || !panel.value) return
 
-  context = gsap.context(() => {
+  // The wall — and its pin — exist from `sm` up only; the phone shows the rail above,
+  // which wants the scroll left alone. `matchMedia` also means rotating a tablet builds
+  // or tears the pin down instead of leaving a stale one measured against the other
+  // layout.
+  mm = gsap.matchMedia()
+
+  mm.add('(min-width: 640px)', () => {
     // Stepped rather than continuous: each photograph slides into place, then the
     // timeline holds it there for a stretch of scroll before the next one moves. The
     // hold is an empty tween — a scrubbed timeline maps its own time onto scroll
@@ -163,8 +234,28 @@ onMounted(async () => {
       })
       tl.to({}, { duration: HOLD })
     }
-  }, root.value)
+
+    return () => tl.scrollTrigger?.kill()
+  })
+
+  // The section is `v-if`'d on the pool, so on a client move it appears *after* the
+  // page around it was measured: every trigger below it — the app band's among them —
+  // is now a screen out unless they are all measured again.
+  ScrollTrigger.refresh()
+}
+
+onMounted(() => {
+  if (pool.value.length) return build()
+
+  const stop = watch(pool, (items) => {
+    if (!items.length) return
+    stop()
+    build()
+  })
 })
 
-onBeforeUnmount(() => context?.revert())
+onBeforeUnmount(() => {
+  mm?.revert()
+  mm = null
+})
 </script>

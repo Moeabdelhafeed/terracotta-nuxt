@@ -3,20 +3,7 @@
     <Body class="bg-brand-terracotta">
       <main class="relative isolate flex min-h-svh flex-col items-center justify-center overflow-hidden px-6 py-16 text-center text-white">
         <!-- The line the rest of the site is drawn with. Decorative only. -->
-        <svg
-          class="pointer-events-none absolute inset-0 -z-10 h-full w-full text-white/15"
-          viewBox="0 0 1601 922"
-          fill="none"
-          preserveAspectRatio="xMidYMid slice"
-          aria-hidden="true"
-        >
-          <path
-            d="M533.499 -308.5C561.499 -140.5 487.899 246.8 -30.5009 452C-678.501 708.5 240.999 -304.5 884.499 -146.5C1528 11.5 1738 466.5 1512 1153.5C1286 1840.5 349.5 489.5 -89.5 497.5"
-            stroke="currentColor"
-            stroke-width="2"
-            vector-effect="non-scaling-stroke"
-          />
-        </svg>
+        <BrandLine class="-z-10 text-white/15" />
 
         <img src="/logo-light.png" alt="" class="h-14 w-auto object-contain sm:h-16">
 
