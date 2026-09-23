@@ -110,6 +110,9 @@ describe('/register', () => {
 
     expect(sanctum.login).toHaveBeenCalled()
     expect(navigate).toHaveBeenCalledWith({ name: 'verify' })
+    // The module used to send them to `redirect.onLogin` on its way, so the home page
+    // was painted for a moment first. Nothing but the code screen now.
+    expect(navigate).toHaveBeenCalledTimes(1)
   })
 
   it('says why an unticked consent box blocks the form instead of failing silently', async () => {

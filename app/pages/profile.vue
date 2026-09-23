@@ -6,6 +6,8 @@
           {{ t("profile", "My account", "حسابي") }}
         </h1>
 
+        <AccountVerifyNotice />
+
         <div class="rounded-2xl border bg-card p-5">
           <div class="flex items-center gap-3">
             <div

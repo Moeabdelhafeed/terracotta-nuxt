@@ -61,7 +61,15 @@ export default defineNuxtConfig({
     },
     redirect: {
       keepRequestedRoute: false,
-      onLogin: '/',
+      /*
+       * The module's own `login()` navigates to `redirect.onLogin` and takes no flag to
+       * skip it (`useSanctumAuth.js`: the second argument is `fetchIdentity`, not a
+       * redirect switch). Registering on a verification-required install signs in behind
+       * the scenes, so that redirect painted the HOME page for a moment before the code
+       * screen it was always going to. `false` leaves the destination to the three pages
+       * that sign somebody in — they each know where the customer was heading.
+       */
+      onLogin: false,
       onLogout: '/',
       onAuthOnly: '/login',
       onGuestOnly: '/',

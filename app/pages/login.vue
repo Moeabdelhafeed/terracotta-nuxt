@@ -162,6 +162,21 @@
             <span v-if="errors.password" class="text-xs text-destructive">{{
               errors.password[0]
             }}</span>
+
+            <!-- `remember_me` is what decides how long the token lives: 30 days with it,
+                 one day without (AppUserController::login). Off by default, because the
+                 box is a statement about the device it is ticked on. OTP sign-in does not
+                 carry it — `verify-login` always issues the 30-day token. -->
+            <label
+              for="remember_me"
+              class="mt-1 flex w-fit cursor-pointer items-center gap-2 text-sm font-normal text-muted-foreground"
+            >
+              <Checkbox id="remember_me" v-model="form.remember_me" class="shrink-0" />
+              {{ t("remember_me", "Keep me signed in", "ابقني مسجلاً للدخول") }}
+            </label>
+            <span v-if="errors.remember_me" class="text-xs text-destructive">{{
+              errors.remember_me[0]
+            }}</span>
           </div>
           <AuthFormError :message="formError" />
 
@@ -324,7 +339,12 @@ const providerLabel = (p) =>
   })[p] ?? p;
 
 const client = useApi();
-const form = ref({ identifier: "", password: "", name: "" });
+const form = ref({
+  identifier: "",
+  password: "",
+  name: "",
+  remember_me: false,
+});
 
 const submitDisabled = computed(() => {
   if (loading.value) return true;
@@ -426,10 +446,9 @@ const performLogin = async () => {
       true,
     );
     persistTokenId(res?.data?.token_id ?? res?.token_id);
-    // `login` has already sent them to `redirect.onLogin`; this is the second half of
-    // the journey they were on.
-    if (redirectTarget.value !== "/")
-      await navigateTo(redirectTarget.value, { replace: true });
+    // The module no longer redirects on its own (`redirect.onLogin: false`), so every
+    // sign-in lands where this page decides: back where they were headed, or home.
+    await navigateTo(redirectTarget.value, { replace: true });
   } catch (error) {
     const normalized = normalizeApiError(error);
     errors.value = normalized.errors;

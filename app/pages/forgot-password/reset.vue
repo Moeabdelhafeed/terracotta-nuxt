@@ -100,7 +100,8 @@ const onSubmit = async () => {
       password: form.value.password,
       ...authDeviceMeta()
     })
-    if (redirectTarget.value !== '/') await navigateTo(redirectTarget.value, { replace: true })
+    // `redirect.onLogin` is off, so the destination is this page's to name.
+    await navigateTo(redirectTarget.value, { replace: true })
   } catch {
     // The password DID change; only the convenience sign-in failed. Signing in by hand
     // is honest — saying the reset failed would not be.

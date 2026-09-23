@@ -90,12 +90,14 @@ describe('/forgot-password/reset', () => {
     expect(navigate).toHaveBeenCalledWith('/gift/abc', { replace: true })
   })
 
+  // As on `/login`: the page owns the destination, so a refused redirect lands home.
   it('refuses a redirect to another host', async () => {
     routeQuery.value = { ...routeQuery.value, redirect: 'https://evil.example' }
     const wrapper = await mount()
     await submit(wrapper)
 
-    expect(navigate).not.toHaveBeenCalled()
+    expect(navigate).toHaveBeenCalledWith('/', { replace: true })
+    expect(navigate).not.toHaveBeenCalledWith(expect.stringContaining('evil.example'), expect.anything())
   })
 
   it('sends an expired code back for a fresh one instead of dead-ending', async () => {

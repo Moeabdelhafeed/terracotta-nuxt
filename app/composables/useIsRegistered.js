@@ -14,11 +14,21 @@ export const useIsRegistered = () => {
   const account = computed(() => user.value?.data ?? user.value ?? null);
   const isGuest = computed(() => !!account.value?.is_guest);
 
+  const isRegistered = computed(
+    () => !!user.value && isAuthenticated.value !== false && !isGuest.value,
+  );
+
   return {
     account,
     isGuest,
-    isRegistered: computed(
-      () => !!user.value && isAuthenticated.value !== false && !isGuest.value,
+    isRegistered,
+    /**
+     * A real account that has not yet entered its code. Guests are never "unverified" —
+     * they have nothing to verify — and neither is a visitor with no account at all, so
+     * both answer `false` and nothing asks them to confirm anything.
+     */
+    needsVerification: computed(
+      () => isRegistered.value && !account.value?.verified_at,
     ),
   };
 };

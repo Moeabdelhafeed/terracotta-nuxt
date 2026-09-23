@@ -8,6 +8,14 @@
     </div>
 
     <HomeHero />
+
+    <!-- Under the hero rather than over it: the strip below is where this page turns
+         personal, and this belongs with it. The column is a bare wrapper so a verified
+         account is left with nothing at all here — no empty band above the strip. -->
+    <div class="mx-auto max-w-6xl px-6">
+      <AccountVerifyNotice class="mt-10" />
+    </div>
+
     <HomeLiveStrip />
     <HomeBooking />
     <HomeWorkshops />
