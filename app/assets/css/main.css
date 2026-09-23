@@ -216,6 +216,10 @@ html.gift-tone {
    of the page and does take the tone. */
 .chrome-fixed {
   --brand-terracotta: var(--brand-terracotta-base);
+  /* `--primary` for the same reason as `--chrome` below: it was substituted back at
+     `:root`, so it carries the page's tone into the bar — including the selection
+     colour, which reads `--primary`. */
+  --primary: var(--brand-terracotta-base);
   /* `--chrome` too, and not just because it is convenient: a custom property inherits the
      value it already RESOLVED to on the ancestor, so `--chrome: var(--brand-terracotta)`
      was substituted back at :root. Putting the base hue on `--brand-terracotta` here
@@ -229,6 +233,20 @@ html.gift-tone {
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Dragging over text paints it in the page's own colour.
+
+     `--primary` rather than a selection token of its own, because every page already
+     says what it is with that one: terracotta across the site, pink on the gifting pages
+     (`html.gift-tone` redefines the hue underneath it), and the workshop's own colour on
+     a workshop, its booking flow and its booking — all three already re-point `--primary`
+     for their buttons and links. A custom property resolves where it is USED, so the
+     selection inside those pages reads their value and nowhere has to name a colour
+     twice. White type sits on all of them, which is `--primary-foreground`. */
+  ::selection {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
   }
 
   /* Scrollbars, everywhere: thin, rounded, terracotta on a mist track. Firefox reads the

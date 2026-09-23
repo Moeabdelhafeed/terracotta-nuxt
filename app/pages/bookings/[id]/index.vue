@@ -341,7 +341,9 @@
         v-model:people="reschedulePeople"
         v-model:date="rescheduleDate"
         v-model:slot-id="rescheduleSlotId"
-        :lock-people="isCatalogueType(workshop.type)"
+        lock-people
+        :current-slot-id="booking.workshop_slot_id ?? null"
+        :current-date="booking.booking_date"
         :errors="rescheduleErrors"
       />
       <span v-if="rescheduleError" class="mt-3 block text-xs text-destructive">{{ rescheduleError }}</span>
@@ -766,6 +768,13 @@ const rescheduleError = ref('')
 watch(booking, (value) => { if (value) reschedulePeople.value = value.people_count }, { immediate: true })
 
 const openReschedule = async () => {
+  // The sheet opens on the booking as it stands — same party, same day, same session — so
+  // this reads as an edit of a booking rather than a second one built from nothing. The
+  // picker only reaches for the first open date when it is handed no date at all.
+  reschedulePeople.value = booking.value.people_count
+  rescheduleDate.value = booking.value.booking_date
+  rescheduleSlotId.value = booking.value.workshop_slot_id ?? null
+
   rescheduleOpen.value = true
   if (!workshop.value) {
     const res = await useApi()(`/api/workshops/${booking.value.workshop_id}`)
@@ -778,19 +787,17 @@ const doReschedule = async () => {
   rescheduleErrors.value = {}
   rescheduleError.value = ''
   try {
+    // Day and time only — the API refuses `people_count` here. The party size, the
+    // products and the price are the sale; changing those means cancelling and booking
+    // again. `reschedulePeople` still feeds the picker's availability lookup.
     const res = await actions.reschedule({
       workshop_slot_id: rescheduleSlotId.value,
       booking_date: rescheduleDate.value,
-      people_count: reschedulePeople.value,
     })
     apply(res)
     rescheduleOpen.value = false
     await refreshMoney()
     toast.success(res?.message ?? '')
-    // Growing a paid booking past the wallet drops it back to a fresh hold.
-    if (booking.value?.status === 'pending_payment') {
-      toast.info(t('reschedule_needs_payment', 'The new time costs more than the wallet covers — please pay the difference.', 'الموعد الجديد أعلى مما تغطيه المحفظة — يرجى دفع الفرق.'))
-    }
   } catch (err) {
     const normalized = normalizeApiError(err)
     rescheduleErrors.value = normalized.errors

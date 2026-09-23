@@ -45,7 +45,7 @@ const BookingSlotPicker = (await import('~/components/booking/BookingSlotPicker.
 
 const workshop = { id: 1, max_people_per_booking: 4, type: 'make_your_piece' }
 
-const mount = () => mountSuspended(BookingSlotPicker, { props: { workshop } })
+const mount = (props = {}) => mountSuspended(BookingSlotPicker, { props: { workshop, ...props } })
 
 describe('BookingSlotPicker', () => {
   it('caps the party size at the seats the server says are available', async () => {
@@ -98,5 +98,56 @@ describe('BookingSlotPicker', () => {
     const wrapper = await mount()
     await flushPromises()
     expect(wrapper.text()).toContain('Session 10:00 AM to 11:00 AM')
+  })
+
+  /**
+   * Rescheduling. The sheet opens on the booking as it stands, and availability knows
+   * nothing of the booking being moved — its own seats read as taken and its own session
+   * as a clash with itself. Told which booking it is editing, the picker keeps that day
+   * and that session, and the party is not up for changing at all.
+   */
+  describe('the booking being moved', () => {
+    const current = {
+      lockPeople: true,
+      currentSlotId: 15,
+      currentDate: plusDays(1),
+      date: plusDays(1),
+      slotId: 15,
+      people: 3,
+    }
+
+    it('asks for the sessions of the day it was handed', async () => {
+      const wrapper = await mount(current)
+      await flushPromises()
+
+      expect(api.calls.some((call) => call.query?.date === plusDays(1))).toBe(true)
+      expect(wrapper.findAll('[data-slot]').length).toBe(3)
+    })
+
+    it('keeps its own session selectable, named as theirs', async () => {
+      const wrapper = await mount(current)
+      await flushPromises()
+
+      // 15 comes back `has_conflict` — with this very booking.
+      expect(wrapper.find('[data-slot="15"]').attributes('disabled')).toBeUndefined()
+      expect(wrapper.find('[data-slot="15"]').classes()).toContain('bg-primary')
+      expect(wrapper.text()).toContain('Your current session')
+    })
+
+    it('keeps its own day on the strip though the day reads as blocked', async () => {
+      const wrapper = await mount(current)
+      await flushPromises()
+
+      expect(wrapper.find(`[data-date="${plusDays(1)}"]`).exists()).toBe(true)
+      expect(wrapper.find(`[data-date="${plusDays(1)}"]`).classes()).toContain('bg-primary')
+    })
+
+    it('does not offer the party size at all', async () => {
+      const wrapper = await mount(current)
+      await flushPromises()
+
+      expect(wrapper.find('[data-test="people-options"]').exists()).toBe(false)
+      expect(wrapper.emitted('update:people')).toBeUndefined()
+    })
   })
 })

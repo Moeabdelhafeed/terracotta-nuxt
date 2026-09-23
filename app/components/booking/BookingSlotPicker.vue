@@ -93,7 +93,7 @@
             type="button"
             class="relative flex w-full flex-col items-start gap-2 overflow-hidden rounded-2xl border px-4 py-6 text-start transition-colors disabled:cursor-not-allowed disabled:opacity-40"
             :class="slotId === slot.workshop_slot_id ? 'border-primary bg-primary text-white' : 'bg-card hover:border-primary'"
-            :disabled="slot.is_full || slot.has_conflict"
+            :disabled="(slot.is_full || slot.has_conflict) && !isCurrent(slot)"
             :data-slot="slot.workshop_slot_id"
             @click="slotId = slot.workshop_slot_id"
           >
@@ -108,9 +108,11 @@
               <!-- No `dir="ltr"`: the count reads «14 من 14», and forcing the run to LTR
                    threw the Arabic word to the front of both numbers. -->
               <span class="text-sm" :class="slotId === slot.workshop_slot_id ? 'text-white/80' : 'text-muted-foreground'">
-                {{ slot.has_conflict
-                  ? t('slot_conflict', 'You are already booked then', 'لديك حجز في هذا الوقت')
-                  : t('seats_taken_of', ':taken of :capacity', ':taken من :capacity', { taken: slot.capacity - slot.remaining, capacity: slot.capacity }) }}
+                {{ isCurrent(slot)
+                  ? t('slot_current', 'Your current session', 'موعدك الحالي')
+                  : slot.has_conflict
+                    ? t('slot_conflict', 'You are already booked then', 'لديك حجز في هذا الوقت')
+                    : t('seats_taken_of', ':taken of :capacity', ':taken من :capacity', { taken: slot.capacity - slot.remaining, capacity: slot.capacity }) }}
               </span>
             </span>
 
@@ -132,6 +134,15 @@ const props = defineProps({
   workshop: { type: Object, required: true },
   /** Reschedule of a catalogue booking: the API refuses a party-size change. */
   lockPeople: { type: Boolean, default: false },
+  /**
+   * The session the caller is sitting in already — the booking being moved. Availability
+   * answers for the customer as a whole, so their own session comes back `has_conflict`
+   * ("you are already booked then") and `is_full` on their own seats. Told which one it
+   * is, the picker shows it as theirs and leaves it selectable instead of greying out the
+   * very row the sheet opens on.
+   */
+  currentSlotId: { type: Number, default: null },
+  currentDate: { type: String, default: '' },
   errors: { type: Object, default: () => ({}) },
   days: { type: Number, default: 30 },
 })
@@ -143,6 +154,11 @@ const slotId = defineModel('slotId', { type: Number, default: null })
 const slot = defineModel('slot', { type: Object, default: null })
 
 const { t, code } = useLang('web', 'bookings')
+
+/** The booking's own session, and only on its own day — a weekly slot repeats. */
+const isCurrent = (slot) => !!props.currentSlotId
+  && slot.workshop_slot_id === props.currentSlotId
+  && date.value === props.currentDate
 
 // Both rails are sideways, and a mouse has no sideways. See `useDragScroll`.
 const peopleRail = ref(null)
@@ -173,7 +189,9 @@ const peopleOptions = computed(() => Array.from({ length: Math.max(peopleCap.val
  * already booked then") and hiding it would look like the session does not exist.
  */
 const days = computed(() => dateRange(todayInStudio(), props.days)
-  .filter((ymd) => !blocked.value.includes(ymd))
+  // `currentDate` survives the filter for the same reason its slot stays selectable: the
+  // day is "blocked" because the seats this very booking holds are counted as taken.
+  .filter((ymd) => ymd === props.currentDate || !blocked.value.includes(ymd))
   .map((ymd) => ({ ymd, ...dateParts(ymd, code.value) })))
 
 const loadCalendar = async () => {
@@ -193,16 +211,18 @@ const loadCalendar = async () => {
     loadingCalendar.value = false
   }
 
-  // Never under `lockPeople`. Availability is computed WITHOUT excluding the booking being
-  // moved, so `max_available_seats` is routinely below that booking's own party size — and
-  // rewriting the model there silently shrank a paid party, recomputed the total and issued
-  // a partial wallet refund the customer never asked for. The picker only greys the slots
-  // that cannot take them.
+  // Never under `lockPeople` — which is every reschedule. Availability is computed WITHOUT
+  // excluding the booking being moved, so `max_available_seats` is routinely below that
+  // booking's own party size, and rewriting the model there silently shrank a paid party,
+  // recomputed the total and issued a partial wallet refund the customer never asked for.
+  // The picker only greys the slots that cannot take them.
   if (!props.lockPeople && people.value > peopleCap.value && peopleCap.value > 0) {
     people.value = peopleCap.value
   }
   // A date that was open for one person can be blocked for three.
-  if (!date.value || blocked.value.includes(date.value)) date.value = days.value[0]?.ymd ?? ''
+  if (!date.value || (blocked.value.includes(date.value) && date.value !== props.currentDate)) {
+    date.value = days.value[0]?.ymd ?? ''
+  }
 }
 
 const loadSlots = async () => {
@@ -239,8 +259,13 @@ watch(people, async () => {
 watch(date, loadSlots)
 
 const reload = async () => {
+  const previous = date.value
   await loadCalendar()
-  if (!date.value) slots.value = []
+  if (!date.value) { slots.value = []; return }
+  // A date the parent handed in — the day of the booking being moved — survives the
+  // calendar untouched, so nothing assigned it and the `date` watcher never fired. Its
+  // sessions have to be asked for here, or the sheet opens on a day with no times under it.
+  if (date.value === previous) await loadSlots()
 }
 
 onMounted(reload)
