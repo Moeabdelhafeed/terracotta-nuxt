@@ -22,6 +22,7 @@ mockNuxtImport('useLang', () => () => lang)
 mockNuxtImport('useSanctumAuth', () => () => sanctum)
 mockNuxtImport('usePrice', () => () => ({ format: (v) => `${Number(v)} SAR`, currency: 'SAR' }))
 
+const { envelope: wrap } = await import('../helpers/mockApi')
 const DiscountCodeInput = (await import('~/components/checkout/CheckoutDiscountCodeInput.vue')).default
 
 describe('advertised discount codes', () => {
@@ -45,9 +46,41 @@ describe('advertised discount codes', () => {
     expect(wrapper.emitted('update:modelValue').at(-1)).toEqual(['WELCOME10'])
   })
 
-  it('hides the strip once a code is applied, keeping the manual box for private codes', async () => {
+  it('hides the strip once a code is applied, keeping the box to remove it with', async () => {
     const wrapper = await mountSuspended(DiscountCodeInput, { props: { modelValue: 'HALFCAP' } })
     await vi.waitFor(() => expect(wrapper.text()).toContain('HALFCAP'))
     expect(wrapper.find('[data-test="advertised-codes"]').exists()).toBe(false)
+  })
+
+  // Asking for a code while the studio is advertising none is a question the customer
+  // cannot answer, and it sits in the middle of paying. Every screen that takes a coupon
+  // gets this from the component, so they all behave the same.
+  it('draws nothing at all when there are no codes to be had', async () => {
+    const previous = api.table['GET /api/discount-codes']
+    api.table['GET /api/discount-codes'] = wrap([])
+
+    try {
+      const wrapper = await mountSuspended(DiscountCodeInput)
+      await vi.waitFor(() => expect(api.calls.some((c) => c.url === '/api/discount-codes')).toBe(true))
+
+      expect(wrapper.text()).toBe('')
+      expect(wrapper.find('input').exists()).toBe(false)
+    } finally {
+      api.table['GET /api/discount-codes'] = previous
+    }
+  })
+
+  // A code already in play keeps the box, whether the studio advertises any or not: a
+  // refusal has to be editable and an accepted one removable.
+  it('keeps the box for a code already applied even with nothing advertised', async () => {
+    const previous = api.table['GET /api/discount-codes']
+    api.table['GET /api/discount-codes'] = wrap([])
+
+    try {
+      const wrapper = await mountSuspended(DiscountCodeInput, { props: { modelValue: 'PRIVATE20' } })
+      await vi.waitFor(() => expect(wrapper.text()).toContain('PRIVATE20'))
+    } finally {
+      api.table['GET /api/discount-codes'] = previous
+    }
   })
 })

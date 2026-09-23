@@ -1,5 +1,12 @@
 <template>
-  <div class="flex flex-col gap-2">
+  <!--
+    Nothing at all when the studio is advertising nothing. An empty box asking for a code
+    the customer has no way of having is a question with no answer, and it sits in the
+    middle of the payment step. `applied` keeps the box alive for a code already in play —
+    a refusal has to be editable, and an accepted one has to be removable — so a code
+    carried in from elsewhere still shows its pill.
+  -->
+  <div v-if="hasCodes || applied" class="flex flex-col gap-2">
     <Label :for="id">{{ t('discount_code', 'Discount code', 'رمز الخصم') }}</Label>
 
     <div v-if="applied" class="flex h-12 items-center justify-between rounded-xl border border-brand-green/40 bg-brand-green/10 px-4 text-sm">
@@ -56,6 +63,12 @@
  * (`discount_code`); the parent re-quotes on change and hands back `errors` so the
  * server's field-keyed refusal shows here. Both spellings of the key are read — the
  * validate endpoint says `errors.code`, every quote/create says `errors.discount_code`.
+ *
+ * It draws nothing when `GET /api/discount-codes` is empty. That list is the public,
+ * still-usable codes for THIS customer, so an empty one means the studio is running no
+ * offer they can take — and a private code handed out by hand can no longer be typed in
+ * while that is true. Every screen that takes a coupon (the shop and materials checkout,
+ * the gift) hides it the same way, because the component is what decides.
  */
 const props = defineProps({
   id: { type: String, default: 'discount_code' },
@@ -66,7 +79,7 @@ const props = defineProps({
 const applied = defineModel({ type: String, default: '' })
 const { t } = useLang('web', 'checkout')
 const { format } = usePrice()
-const { codes: offers } = useDiscountCodes()
+const { codes: offers, hasCodes } = useDiscountCodes()
 
 const draft = ref('')
 
