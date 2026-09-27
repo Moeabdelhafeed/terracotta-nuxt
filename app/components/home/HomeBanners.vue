@@ -2,7 +2,7 @@
   <section v-if="items.length" id="banners" class="relative py-16">
     <ul
       ref="track"
-      v-gsap.whenVisible.once.from.stagger="{ opacity: 0, y: 32, duration: 0.6 }"
+      v-gsap.whenVisible.once.from.stagger="entranceFrom({ opacity: 0, y: 32, duration: 0.6 })"
       class="flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden scrollbar-none scroll-ps-6 px-6 pb-2"
     >
       <li

@@ -13,7 +13,7 @@
       </h2>
 
       <ul
-        v-gsap.whenVisible.once.from.stagger="{ opacity: 0, y: 32, duration: 0.6 }"
+        v-gsap.whenVisible.once.from.stagger="entranceFrom({ opacity: 0, y: 32, duration: 0.6 })"
         class="grid grid-cols-2 gap-4 sm:grid-cols-4"
       >
         <li v-for="category in categories" :key="category.id">

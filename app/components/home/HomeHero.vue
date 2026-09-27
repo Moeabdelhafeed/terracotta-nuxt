@@ -6,10 +6,16 @@
        meant `hero_video` and `studio_1…4` never rendered, so those media keys could never
        seed themselves. -->
   <div>
-    <div ref="wrapper" class="w-full h-full">
+    <!-- Two layouts, one markup. On desktop the brown panel lies over the film and is
+         revealed as a pinned scrub shrinks it; on a phone there is no scrub, so the two
+         are simply stacked — film first, brown panel underneath it — and read by
+         scrolling. Left overlapping with the scrub switched off, the panel sat on top of
+         the film and the hero was never seen at all. -->
+    <div ref="wrapper" :class="motion ? 'w-full h-full' : 'flex flex-col'">
       <div
         ref="last"
-        class="bg-brand-terracotta overflow-hidden w-full h-full absolute z-10"
+        class="bg-brand-terracotta overflow-hidden w-full"
+        :class="motion ? 'h-full absolute z-10' : 'relative order-2'"
       >
         <!-- Vector 17, inline so the stroke can be coloured (and drawn) from here.
              Decorative background only. -->
@@ -36,7 +42,8 @@
           is tight on a phone for exactly that reason.
         -->
         <div
-          class="mx-auto flex h-full max-w-6xl items-center-safe overflow-hidden px-6 py-6 sm:py-16"
+          class="mx-auto flex max-w-6xl items-center-safe overflow-hidden px-6 py-6 sm:py-16"
+          :class="motion ? 'h-full' : 'min-h-dvh'"
         >
           <div
             class="grid w-full items-center gap-6 sm:gap-10 lg:grid-cols-2 lg:gap-16"
@@ -127,7 +134,11 @@
       <!-- The mark comes from dynamic storage (group `web`, sub-group `branding`, key
            `logo_mark`), so it is swapped from the CMS. The /public file is the fallback
            and is uploaded automatically the first time the key is missing. -->
+      <!-- Desktop only: GSAP sizes and places this one into the strip the shrinking film
+           opens up. On a phone it is rendered inside the film section instead, where it
+           belongs without a scrub to reveal it. -->
       <AppMedia
+        v-if="motion"
         ref="logo"
         :src="logoMark"
         alt=""
@@ -137,7 +148,10 @@
       <!-- Inline, not an <img>: DrawSVG animates the path's stroke, which only exists as
            a real node in the document. Sits beside the logo, so the scaling section (and
            its video) paints over it and it is revealed as the section shrinks. -->
+      <!-- Drawn by the scrub as the film shrinks. With no scrub there is nothing to
+           reveal them against, and they would sit over the film as stray strokes. -->
       <svg
+        v-if="motion"
         class="absolute inset-0 h-full w-full text-brand-terracotta"
         viewBox="0 0 1601 922"
         fill="none"
@@ -176,7 +190,11 @@
         a toolbar sliding away resizes the hero instead of leaving a band of background
         under it.
       -->
-      <div ref="section" class="w-full overflow-hidden h-dvh bg-background">
+      <div
+        ref="section"
+        class="w-full overflow-hidden h-dvh bg-background"
+        :class="motion ? '' : 'relative order-1'"
+      >
         <AppMedia
           v-if="heroVideoAsset"
           :src="heroVideoAsset"
@@ -209,6 +227,15 @@
         <!-- The same scrim the inner pages carry: the film is whatever the studio uploaded,
              and a bright frame leaves the title unreadable. Below the copy's own z-10. -->
         <div class="pointer-events-none absolute inset-0 bg-black/40" aria-hidden="true" />
+
+        <!-- The mark, white, across the top of the film — the phone's version of the strip
+             the desktop scrub opens. -->
+        <AppMedia
+          v-if="!motion"
+          :src="logoLight"
+          alt=""
+          class="pointer-events-none absolute inset-x-0 top-8 z-10 mx-auto h-12 w-auto object-contain"
+        />
 
         <!-- Centred over the film, static. -->
         <div
@@ -261,6 +288,11 @@ const { mediaAsset } = useMedia("web", "home");
 const { mediaAsset: brandAsset } = useMedia("web", "branding");
 
 const logoMark = computed(() => brandAsset("logo_mark", "/logo-mark.png"));
+
+// The white wordmark, for the phone's film: the coloured mark is drawn for the pale strip
+// the desktop scrub opens, and over a photograph it disappears into it. Same
+// `logo_light` key the footer, the page bar and the curtain already use.
+const logoLight = computed(() => brandAsset("logo_light", "/logo-light.png"));
 const { t } = useLang("web", "home");
 
 const img_list = ref();
@@ -272,10 +304,20 @@ const heart = ref();
 const last = ref();
 const vector17 = ref();
 
+// Desktop gets the pinned scrub; a phone gets the two sections stacked. Read once at
+// setup so the markup and the timeline can never disagree about which layout is on screen.
+const motion = pageMotionEnabled();
+
 const SCALE = 0.8;
 
 onMounted(async () => {
   await nextTick();
+
+  // No pinned scrub on a phone — the film and the panel are two stacked sections there,
+  // so there is nothing to pin and nothing to reveal. See the template and
+  // `pageMotionEnabled()`.
+  if (!motion) return;
+
   const gsap = useGSAP();
   // Not among the plugins v-gsap pre-registers, so it has to be added here.
   gsap.registerPlugin(DrawSVGPlugin);

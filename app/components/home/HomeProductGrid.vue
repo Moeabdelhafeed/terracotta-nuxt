@@ -16,7 +16,7 @@
     </header>
 
     <ul
-      v-gsap.whenVisible.once.from.stagger="{ opacity: 0, y: 36, duration: 0.6 }"
+      v-gsap.whenVisible.once.from.stagger="entranceFrom({ opacity: 0, y: 36, duration: 0.6 })"
       class="grid grid-cols-2 gap-5 lg:grid-cols-4"
     >
       <li v-for="product in products" :key="product.id">

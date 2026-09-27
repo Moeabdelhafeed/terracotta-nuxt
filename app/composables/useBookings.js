@@ -48,10 +48,41 @@ export const daysUntil = (ymd, today = todayInStudio()) => {
 export const hoursUntilSession = (ymd, startTime) => {
   if (!ymd) return null;
   const [y, m, d] = ymd.split("-").map(Number);
-  const [hh = 0, mm = 0] = String(startTime ?? "00:00").split(":").map(Number);
+  const [hh = 0, mm = 0] = String(startTime ?? "00:00")
+    .split(":")
+    .map(Number);
   const at = Date.UTC(y, m - 1, d, hh - 3, mm);
   return Number.isNaN(at) ? null : Math.floor((at - Date.now()) / 3600000);
 };
+
+/**
+ * Arabic plural form for a count, as CLDR defines it — the app's own ARB messages use the
+ * same six-way split, and "1 أيام" (the website's old output) is not one of them.
+ */
+export const arabicPluralForm = (count) => {
+  if (count === 1) return "one";
+  if (count === 2) return "two";
+  const mod100 = count % 100;
+  if (mod100 >= 3 && mod100 <= 10) return "few";
+  if (mod100 >= 11 && mod100 <= 99) return "many";
+  return "other";
+};
+
+/**
+ * Whether a slot the customer already chose can still take them.
+ *
+ * Raising the party size is what makes this a question: a session with three seats left is
+ * `is_full` for a party of four, and it stays in the list when that happens — disabled,
+ * greyed, with its reason printed on it. So "is it still listed" was never the test. A
+ * session picked for one person survived being changed to four, the Next button stayed
+ * enabled, and the customer carried a slot the server was always going to refuse into
+ * checkout.
+ *
+ * The booking being rescheduled is the exception: its own seats are counted against it, so
+ * it reads as full and conflicting with itself, and it must stay selectable.
+ */
+export const slotStillBookable = (slot, isCurrent = false) =>
+  !!slot && (isCurrent || (!slot.is_full && !slot.has_conflict));
 
 /** Weekday / day / month labels for a `YYYY-MM-DD` — a calendar date, so no timezone is involved. */
 export const dateParts = (ymd, code = "en") => {
@@ -105,7 +136,10 @@ export const formatClock = (value, code = "en") => {
 };
 
 export const formatSlotTime = (start, end, code = "en") =>
-  [start, end].filter(Boolean).map((value) => formatClock(value, code)).join(" – ");
+  [start, end]
+    .filter(Boolean)
+    .map((value) => formatClock(value, code))
+    .join(" – ");
 
 /** Σ quantity bounds for a catalogue workshop, scaled by the party size. */
 export const catalogueBounds = (workshop, peopleCount) => {

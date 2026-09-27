@@ -35,11 +35,13 @@
     </header>
 
     <ul
-      v-gsap.whenVisible.once.from.stagger="{
-        opacity: 0,
-        y: 48,
-        duration: 0.7,
-      }"
+      v-gsap.whenVisible.once.from.stagger="
+        entranceFrom({
+          opacity: 0,
+          y: 48,
+          duration: 0.7,
+        })
+      "
       class="grid auto-rows-fr gap-4 sm:grid-cols-2"
     >
       <li v-for="workshop in workshops" :key="workshop.id">

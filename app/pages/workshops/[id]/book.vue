@@ -36,22 +36,32 @@
             )
           }}
         </h1>
-        <!-- A zero window is a real setting: the studio is saying there is no cut-off
-             beyond the session itself. "up to 0 hours before" reads as nonsense. -->
+        <!-- The booking's own `can_cancel` comes first. Quoting the policy at somebody who
+             just booked a session starting in three hours told them they could cancel "up
+             to 24 hours before" — the opposite of the warning the picker had shown them a
+             click earlier, and of what the API would answer.
+             A zero window is a real setting below that: the studio is saying there is no
+             cut-off beyond the session itself. "up to 0 hours before" reads as nonsense. -->
         <p class="mt-3 text-muted-foreground">
           {{
-            workshop.cancellation_window_hours
+            !booking.can_cancel
               ? t(
-                  "booking_done_body",
-                  "You can cancel or move your booking up to :n hours before the session.",
-                  "يمكنك إلغاء الحجز أو تغيير الموعد حتى :n ساعات قبل موعد الجلسة.",
-                  { n: workshop.cancellation_window_hours },
+                  "booking_done_body_locked",
+                  "This booking can't be cancelled or rescheduled — the session is too close.",
+                  "لا يمكن إلغاء هذا الحجز أو تغيير موعده، فموعد الجلسة قريب جدًا.",
                 )
-              : t(
-                  "booking_done_body_no_window",
-                  "You can cancel or move your booking any time before the session starts.",
-                  "يمكنك إلغاء الحجز أو تغيير الموعد في أي وقت قبل بدء الجلسة.",
-                )
+              : workshop.cancellation_window_hours
+                ? t(
+                    "booking_done_body",
+                    "You can cancel or move your booking up to :n hours before the session.",
+                    "يمكنك إلغاء الحجز أو تغيير الموعد حتى :n ساعات قبل موعد الجلسة.",
+                    { n: workshop.cancellation_window_hours },
+                  )
+                : t(
+                    "booking_done_body_no_window",
+                    "You can cancel or move your booking any time before the session starts.",
+                    "يمكنك إلغاء الحجز أو تغيير الموعد في أي وقت قبل بدء الجلسة.",
+                  )
           }}
         </p>
         <Button
@@ -68,7 +78,6 @@
         <h1 class="font-display text-3xl font-semibold sm:text-4xl">
           {{ workshop.title }}
         </h1>
-
 
         <!-- Step 1 — people, date, slot (oDD24 / uA4fJ / Kzosl) -->
         <section v-show="step === 'when'" data-step="when" class="mt-10">
@@ -99,7 +108,12 @@
         </section>
 
         <!-- Step 2 — catalogue pieces (hDFHD / R2fBVR) -->
-        <section v-if="catalogue" v-show="step === 'pieces'" data-step="pieces" class="mt-10">
+        <section
+          v-if="catalogue"
+          v-show="step === 'pieces'"
+          data-step="pieces"
+          class="mt-10"
+        >
           <BookingPiecePicker
             v-model="lines"
             :workshop="workshop"
@@ -156,7 +170,13 @@
               aria-hidden="true"
             />
             <span class="relative flex h-12 mt-1 items-center">
-              {{ t("remove_celebration", "Remove the celebration", "ازالة الاحتفال") }}
+              {{
+                t(
+                  "remove_celebration",
+                  "Remove the celebration",
+                  "ازالة الاحتفال",
+                )
+              }}
             </span>
           </button>
 
@@ -166,24 +186,40 @@
             class="relative z-10 flex min-h-[110px] overflow-hidden rounded-control p-1"
             :style="{ backgroundColor: workshopColour(workshop) }"
           >
-            <div class="flex min-w-0 flex-1 flex-col gap-1 pb-4 pe-2 ps-4 pt-4 text-white">
-              <h3 class="font-display text-xl font-semibold leading-snug">{{ workshop.title }}</h3>
+            <div
+              class="flex min-w-0 flex-1 flex-col gap-1 pb-4 pe-2 ps-4 pt-4 text-white"
+            >
+              <h3 class="font-display text-xl font-semibold leading-snug">
+                {{ workshop.title }}
+              </h3>
 
               <p class="text-xs leading-relaxed text-white/85">
                 {{ t("n_people", ":n people", ":n اشخاص", { n: people }) }} ·
                 {{ formatBookingDate(date, code) }} ·
-                {{ t("slot_from_to", "Session :from to :to", "ورشة من :from الى :to", {
-                  from: formatClock(slot?.start_time, code),
-                  to: formatClock(slot?.end_time, code),
-                }) }}
+                {{
+                  t(
+                    "slot_from_to",
+                    "Session :from to :to",
+                    "ورشة من :from الى :to",
+                    {
+                      from: formatClock(slot?.start_time, code),
+                      to: formatClock(slot?.end_time, code),
+                    },
+                  )
+                }}
               </p>
 
-              <p v-if="quote" class="mt-auto pt-2 font-display text-xl font-bold">
+              <p
+                v-if="quote"
+                class="mt-auto pt-2 font-display text-xl font-bold"
+              >
                 {{ format(quote.total_price) }}
               </p>
             </div>
 
-            <div class="w-[101px] shrink-0 self-stretch overflow-hidden rounded-[6px]">
+            <div
+              class="w-[101px] shrink-0 self-stretch overflow-hidden rounded-[6px]"
+            >
               <AppImage
                 v-if="workshop.image?.image_api"
                 :src="workshop.image"
@@ -203,29 +239,55 @@
 
           <!-- What the price is made of. The celebration is priced in the studio's coral,
                the one colour that is not the workshop's. -->
-          <dl class="flex flex-col gap-3 rounded-2xl border bg-card p-5 text-sm">
-            <div v-if="!catalogue" class="flex items-center justify-between gap-4">
+          <dl
+            class="flex flex-col gap-3 rounded-2xl border bg-card p-5 text-sm"
+          >
+            <div
+              v-if="!catalogue"
+              class="flex items-center justify-between gap-4"
+            >
               <dt>
-                {{ t("line_workshop", ":title for :n people", ":title من :n اشخاص", {
-                  title: workshop.title,
-                  n: people,
-                }) }}
+                {{
+                  t(
+                    "line_workshop",
+                    ":title for :n people",
+                    ":title من :n اشخاص",
+                    {
+                      title: workshop.title,
+                      n: people,
+                    },
+                  )
+                }}
               </dt>
-              <dd class="font-display font-bold text-primary">{{ format(lineTotal(workshop.price, people)) }}</dd>
+              <dd class="font-display font-bold text-primary">
+                {{ format(lineTotal(workshop.price, people)) }}
+              </dd>
             </div>
 
             <div
               v-for="line in lines"
-              :key="line.workshop_product_id ?? `own-${line.workshop_booking_piece_id}`"
+              :key="
+                line.workshop_product_id ??
+                `own-${line.workshop_booking_piece_id}`
+              "
               class="flex items-center justify-between gap-4"
             >
               <dt>{{ line.title }} × {{ line.quantity }}</dt>
-              <dd class="font-display font-bold text-primary">{{ format(lineTotal(line.price, line.quantity)) }}</dd>
+              <dd class="font-display font-bold text-primary">
+                {{ format(lineTotal(line.price, line.quantity)) }}
+              </dd>
             </div>
 
-            <div v-if="withCelebration" class="flex items-center justify-between gap-4">
-              <dt>{{ t("add_celebration", "Add a celebration", "اضافة احتفال") }}</dt>
-              <dd class="font-display font-bold text-brand-blush">{{ format(workshop.celebration_price) }}</dd>
+            <div
+              v-if="withCelebration"
+              class="flex items-center justify-between gap-4"
+            >
+              <dt>
+                {{ t("add_celebration", "Add a celebration", "اضافة احتفال") }}
+              </dt>
+              <dd class="font-display font-bold text-brand-blush">
+                {{ format(workshop.celebration_price) }}
+              </dd>
             </div>
           </dl>
 
@@ -237,7 +299,13 @@
             data-test="pay-no-cancel"
           >
             <LucideLock class="mt-0.5 size-4 shrink-0" />
-            {{ t("slot_no_cancel_short", "This session starts sooner than it can be cancelled or moved.", "موعد هذه الجلسة أقرب من أن تُلغى أو يُغيَّر موعدها.") }}
+            {{
+              t(
+                "slot_no_cancel_short",
+                "This session starts sooner than it can be cancelled or moved.",
+                "موعد هذه الجلسة أقرب من أن تُلغى أو يُغيَّر موعدها.",
+              )
+            }}
           </p>
 
           <CheckoutWalletToggle
@@ -248,7 +316,10 @@
 
           <CheckoutSummary :quote="quote ?? booking" />
 
-          <p v-if="collectionNote" class="flex items-start gap-2 rounded-2xl bg-brand-mist/60 p-4 text-sm text-muted-foreground">
+          <p
+            v-if="collectionNote"
+            class="flex items-start gap-2 rounded-2xl bg-brand-mist/60 p-4 text-sm text-muted-foreground"
+          >
             <LucidePackage class="mt-0.5 size-4 shrink-0" />{{ collectionNote }}
           </p>
 
@@ -259,12 +330,18 @@
               rel="noopener noreferrer"
               class="inline-flex items-center gap-1.5 text-primary underline"
             >
-              <LucideMapPin class="size-4" />{{ t("the_location", "The location", "الموقع") }}
+              <LucideMapPin class="size-4" />{{
+                t("the_location", "The location", "الموقع")
+              }}
             </a>
           </p>
 
-          <span v-if="quoteMessage" class="text-xs text-destructive">{{ quoteMessage }}</span>
-          <span v-if="createError" class="text-xs text-destructive">{{ createError }}</span>
+          <span v-if="quoteMessage" class="text-xs text-destructive">{{
+            quoteMessage
+          }}</span>
+          <span v-if="createError" class="text-xs text-destructive">{{
+            createError
+          }}</span>
 
           <!-- The hold: `amount_due === "0.00"` never gets here, it goes straight to done. -->
           <CheckoutPaymentHold
@@ -288,26 +365,32 @@
               <!-- The sheet's own confetti, a square at each end, so the button reads as
                    the door to it. Decorative, and never in the way of the tap. -->
               <span
-                class="pointer-events-none absolute inset-y-0 start-0 aspect-square bg-[url('/confetti.png')] bg-contain bg-no-repeat  scale-200"
+                class="pointer-events-none absolute inset-y-0 start-0 aspect-square bg-[url('/confetti.png')] bg-contain bg-no-repeat scale-200"
                 aria-hidden="true"
               />
               <span
                 class="pointer-events-none absolute inset-y-0 end-0 aspect-square bg-[url('/confetti.png')] bg-contain bg-no-repeat scale-200"
                 aria-hidden="true"
               />
-              <span class="relative">{{ t("add_celebration", "Add a celebration", "اضافة احتفال") }}</span>
+              <span class="relative">{{
+                t("add_celebration", "Add a celebration", "اضافة احتفال")
+              }}</span>
             </Button>
 
             <Button
               type="button"
               class="h-14 w-full rounded-2xl bg-primary text-base hover:bg-primary/90"
-              :disabled="creating || !quote"
+              :disabled="creating || !quote || !slotId"
               @click="createBooking"
             >
               {{
                 creating
                   ? t("booking_saving", "Booking…", "جارٍ الحجز...")
-                  : t("confirm_and_pay", "Confirm the booking and pay", "تاكيد الحجز و الدفع")
+                  : t(
+                      "confirm_and_pay",
+                      "Confirm the booking and pay",
+                      "تاكيد الحجز و الدفع",
+                    )
               }}
             </Button>
 
@@ -316,7 +399,8 @@
               variant="ghost"
               class="h-12 rounded-2xl"
               @click="step = catalogue ? 'pieces' : 'when'"
-            >{{ t("back", "Back", "رجوع") }}</Button>
+              >{{ t("back", "Back", "رجوع") }}</Button
+            >
           </template>
         </section>
       </template>
@@ -333,10 +417,18 @@
       >
         <div class="fixed inset-0 bg-black/50" @click="noCancelOpen = false" />
 
-        <div class="relative w-full max-w-md rounded-sheet bg-background p-6 shadow-2xl">
+        <div
+          class="relative w-full max-w-md rounded-sheet bg-background p-6 shadow-2xl"
+        >
           <div class="flex items-start justify-between gap-4">
             <h2 class="font-display text-lg font-bold">
-              {{ t("slot_no_cancel_title", "This session cannot be cancelled", "لا يمكن إلغاء هذه الجلسة") }}
+              {{
+                t(
+                  "slot_no_cancel_title",
+                  "This session cannot be cancelled",
+                  "لا يمكن إلغاء هذه الجلسة",
+                )
+              }}
             </h2>
             <button
               type="button"
@@ -363,9 +455,15 @@
               class="h-12 rounded-xl bg-primary text-base hover:bg-primary/90"
               @click="confirmNoCancel"
             >
-              {{ t("slot_no_cancel_confirm", "Book anyway", "احجز على أي حال") }}
+              {{
+                t("slot_no_cancel_confirm", "Book anyway", "احجز على أي حال")
+              }}
             </Button>
-            <Button variant="outline" class="h-12 rounded-xl text-base" @click="noCancelOpen = false">
+            <Button
+              variant="outline"
+              class="h-12 rounded-xl text-base"
+              @click="noCancelOpen = false"
+            >
               {{ t("cancel", "Cancel", "إلغاء") }}
             </Button>
           </div>
@@ -376,7 +474,9 @@
     <!-- Celebration add-on (K7pta / h1Mfn / adW7i) -->
     <BookingCelebrationSheet
       :open="celebrationOpen"
-      :title="t('celebration_title', 'Celebrate with Terracotta', 'احتفل مع تيراكوتا')"
+      :title="
+        t('celebration_title', 'Celebrate with Terracotta', 'احتفل مع تيراكوتا')
+      "
       :confirm-label="
         t('add_amount', 'Add :price', 'اضافة :price', {
           price: format(workshop?.celebration_price),
@@ -388,18 +488,18 @@
       <p>
         {{
           t(
-            'celebration_body_1',
-            'Add a small party to your session: a cake, decorations and a corner set up for the occasion.',
-            'أضف احتفالًا صغيرًا إلى جلستك: كيكة وزينة وركن مجهّز للمناسبة.',
+            "celebration_body_1",
+            "Add a small party to your session: a cake, decorations and a corner set up for the occasion.",
+            "أضف احتفالًا صغيرًا إلى جلستك: كيكة وزينة وركن مجهّز للمناسبة.",
           )
         }}
       </p>
       <p>
         {{
           t(
-            'celebration_body_2',
-            'Tell us the occasion when you arrive and the team will take care of the rest.',
-            'أخبرنا بالمناسبة عند وصولك وسيتكفّل الفريق بالباقي.',
+            "celebration_body_2",
+            "Tell us the occasion when you arrive and the team will take care of the rest.",
+            "أخبرنا بالمناسبة عند وصولك وسيتكفّل الفريق بالباقي.",
           )
         }}
       </p>
@@ -459,7 +559,8 @@ const { format } = usePrice();
 
 // The breakdown has to add up to the total the server charges: printing a unit price
 // beside a "x 3" label showed 35 SAR over a total of 105.
-const lineTotal = (price, quantity) => fromHalalas(toHalalas(price) * (quantity ?? 1));
+const lineTotal = (price, quantity) =>
+  fromHalalas(toHalalas(price) * (quantity ?? 1));
 const toast = useToast();
 const bookingApi = useWorkshopBooking(() => route.params.id);
 
@@ -482,6 +583,7 @@ const quoteErrors = ref({});
 const quoteMessage = ref("");
 const booking = ref(null);
 const creating = ref(false);
+
 const createErrors = ref({});
 const createError = ref("");
 
@@ -496,20 +598,24 @@ const catalogue = computed(() => isCatalogueType(workshop.value?.type));
 watch(
   () => workshop.value,
   (loaded) => {
-    const wanted = Number(route.query.piece)
-    if (!loaded || !wanted || lines.value.length) return
+    const wanted = Number(route.query.piece);
+    if (!loaded || !wanted || lines.value.length) return;
 
-    const block = loaded.own_pieces
-    const piece = asList(block?.pieces).find((candidate) => candidate.id === wanted)
-    if (!piece) return
+    const block = loaded.own_pieces;
+    const piece = asList(block?.pieces).find(
+      (candidate) => candidate.id === wanted,
+    );
+    if (!piece) return;
 
-    lines.value = [{
-      workshop_booking_piece_id: piece.id,
-      quantity: 1,
-      title: piece.label ?? t("your_piece", "Your piece", "قطعتك"),
-      subtitle: null,
-      price: block?.price ?? "0.00",
-    }];
+    lines.value = [
+      {
+        workshop_booking_piece_id: piece.id,
+        quantity: 1,
+        title: piece.label ?? t("your_piece", "Your piece", "قطعتك"),
+        subtitle: null,
+        price: block?.price ?? "0.00",
+      },
+    ];
   },
   { immediate: true },
 );
@@ -579,7 +685,9 @@ const advance = () => {
  * otherwise go on promising a cancellation the customer can no longer make.
  */
 const slotCancellable = (s) =>
-  !!s && !s.is_non_cancellable && (!s.cancel_until || new Date(s.cancel_until) > new Date());
+  !!s &&
+  !s.is_non_cancellable &&
+  (!s.cancel_until || new Date(s.cancel_until) > new Date());
 
 const goNext = () => {
   // Asked once, here — the seat is taken from this step on.
@@ -715,6 +823,15 @@ watch(
   { deep: true },
 );
 onBeforeUnmount(() => clearTimeout(quoteTimer));
+
+// Raising the party size can make the chosen session too small for it, and the picker
+// drops the selection when that happens. On the payment step that would otherwise leave
+// the customer looking at a summary for a session they no longer hold — and the button
+// enabled, carrying a null slot into a checkout the server was always going to refuse. Go
+// back to the sessions and let them pick one that fits.
+watch(slotId, (id) => {
+  if (!id && !booking.value && step.value !== 'when') step.value = 'when'
+})
 
 const createBooking = async () => {
   // The seat is held against an ACCOUNT, so this is the first step a guest cannot take.

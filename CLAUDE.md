@@ -2,6 +2,48 @@
 
 Project conventions and architecture notes for this Nuxt 4 starter. Loaded automatically into Claude's context.
 
+## Phones get no scroll motion at all
+
+`pageMotionEnabled()` (`app/composables/usePageMotion.js`) is the one rule: scroll-driven
+motion runs on desktop widths (≥1024px) with `prefers-reduced-motion` unset, and nowhere
+else. It gates ScrollSmoother in the default layout, the hero's pinned scrub, the entrance
+staggers (through `entranceFrom()`), and the GSAP chunk the modal scroll-lock would
+otherwise fetch.
+
+**The home hero is two layouts, not one layout with the animation removed.** On desktop the
+brown "what is terracotta?" panel lies *over* the film (`absolute z-10`) and the pinned
+scrub shrinks the film to reveal it. Take the scrub away and that panel simply covers the
+film — which is what a phone got the first time this was switched off: no hero at all, just
+the brown panel at the top of the page. On a phone the two are stacked in normal flow
+instead (film `order-1`, panel `order-2`), the film carries the white `logo_light` mark
+across its top where the desktop strip would be, and the drawn SVG lines — which only exist
+to be revealed by the scrub — are not rendered. `motion` is read once in the component and
+drives both the markup and the timeline, so the two can never disagree.
+
+Scroll pinning is the part that actually hurts: a pinned scrub holds the page for hundreds
+of pixels of scroll, which on a phone reads as the page fighting the thumb, and inside the
+app's web view reads as the page being stuck. Smoothing is worse — it re-drives an already
+inertial touch scroll a frame late through a transform.
+
+**Every animated element must be laid out correctly at rest**, because on a phone that is
+all it will ever be: the server's HTML shows it, and the animation only ever moves it
+*from* somewhere. Never write an entrance that starts from `opacity: 0` in CSS and relies
+on GSAP to reveal it — on a phone it would never arrive. `entranceFrom()` exists so the
+`from` object becomes `{}` rather than the directive being removed, which keeps one code
+path for both.
+
+Read once at setup, never on resize: a phone does not become a desktop mid-visit, and
+building a pinned timeline against a page already laid out without one is how you get a
+pin measured against the wrong height.
+
+## Never run Prettier in this repo
+
+There is no Prettier config here and the files are not Prettier-formatted, so
+`npx prettier --write` rewrites whole files — quotes, wrapping, attribute layout — and
+buries a ten-line change in a thousand-line diff. It has happened twice: once across 173
+files, once across four. Match the surrounding style by hand instead, and use
+`--check` on nothing at all.
+
 ## Stack
 
 - **Nuxt 4** + Vue 3 (composition API, `<script setup>`).

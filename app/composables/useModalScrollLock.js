@@ -20,6 +20,10 @@ export const useModalScrollLock = (isOpen) => {
   const lockedRoot = useScrollLock(document.documentElement)
 
   const pauseSmoother = async (paused) => {
+    // No smoother on a phone, so no reason to pull GSAP in behind a modal there — this is
+    // the one place the library would still be fetched on a device that never animates.
+    if (!pageMotionEnabled()) return
+
     const { ScrollSmoother } = await import('gsap/all')
     ScrollSmoother.get?.()?.paused(paused)
   }

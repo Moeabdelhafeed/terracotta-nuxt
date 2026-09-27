@@ -43,15 +43,16 @@ onBeforeMount(() => {
 let smoother = null
 
 onMounted(() => {
-  // Honour the OS setting: smoothing is a comfort feature for some and motion sickness
-  // for others, and ScrollSmoother has no reduced-motion behaviour of its own.
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-
+  // One rule for every scroll effect on the site — see `pageMotionEnabled()`. It covers
+  // the OS reduced-motion setting (smoothing is a comfort feature for some and motion
+  // sickness for others, and ScrollSmoother has none of its own) and every screen below
+  // desktop width.
+  //
   // Phones keep their own scrolling. A touch scroll is already inertial, and smoothing it
   // means every flick is re-driven a frame late through a transform — the lag a thumb
   // reads as the page not answering. `normalizeScroll` makes it worse: it takes the touch
-  // over entirely. Pins and ScrollTriggers do not need the smoother to work.
-  if (window.matchMedia('(max-width: 639px)').matches) return
+  // over entirely.
+  if (!pageMotionEnabled()) return
 
   smoother = ScrollSmoother.create({
     smooth: 1, // seconds it takes to catch up to the real scroll position

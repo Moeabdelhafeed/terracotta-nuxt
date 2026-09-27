@@ -13,8 +13,10 @@
             @click="people = n"
           >
             <CardLineArt v-if="people === n" class="absolute inset-0 size-full scale-125" />
+            <!-- Numeral above, noun below — every tile the same shape, whatever the count.
+                 Only the noun changes: "1 أشخاص" was the bug, not the numeral. -->
             <span class="relative font-display text-2xl font-semibold">{{ n }}</span>
-            <span class="relative text-xs opacity-80">{{ t('n_people_unit', 'people', 'أشخاص') }}</span>
+            <span class="relative text-xs opacity-80">{{ peopleUnit(n) }}</span>
           </button>
         </li>
       </ul>
@@ -103,19 +105,28 @@
             />
             <span class="relative flex w-full flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
               <span class="font-medium">
-                {{ t('slot_from_to', 'Session :from to :to', 'ورشة من :from الى :to', { from: formatClock(slot.start_time, code), to: formatClock(slot.end_time, code) }) }}
+                {{ t('slot_from_to', 'Session :from to :to', 'ورشة من :from إلى :to', { from: formatClock(slot.start_time, code), to: formatClock(slot.end_time, code) }) }}
               </span>
               <!-- No `dir="ltr"`: the count reads «14 من 14», and forcing the run to LTR
                    threw the Arabic word to the front of both numbers. -->
               <span class="text-sm" :class="slotId === slot.workshop_slot_id ? 'text-white/80' : 'text-muted-foreground'">
-                {{ isCurrent(slot)
-                  ? t('slot_current', 'Your current session', 'موعدك الحالي')
-                  : slot.has_conflict
-                    ? t('slot_conflict', 'You are already booked then', 'لديك حجز في هذا الوقت')
-                    : t('seats_taken_of', ':taken of :capacity', ':taken من :capacity', { taken: slot.capacity - slot.remaining, capacity: slot.capacity }) }}
+                {{ slotStatus(slot) }}
               </span>
             </span>
 
+            <!-- A greyed-out slot has to say why it is greyed out. It used to show only
+                 "1 of 4" at 40% opacity, so "full" and "not enough seats for your party"
+                 looked identical — and identical to a slot the customer had simply
+                 mis-tapped. Disabled controls swallow clicks, so the reason is printed on
+                 the slot rather than waiting for a tap that never arrives. -->
+            <span
+              v-if="slotReason(slot)"
+              class="relative text-xs"
+              :class="slotId === slot.workshop_slot_id ? 'text-white/80' : 'text-destructive'"
+              :data-test="`slot-reason-${slot.workshop_slot_id}`"
+            >
+              {{ slotReason(slot) }}
+            </span>
           </button>
         </li>
       </ul>
@@ -159,6 +170,54 @@ const { t, code } = useLang('web', 'bookings')
 const isCurrent = (slot) => !!props.currentSlotId
   && slot.workshop_slot_id === props.currentSlotId
   && date.value === props.currentDate
+
+/**
+ * The noun that goes under the numeral, agreeing with it. Arabic inflects it five ways and
+ * the tile used to print the plural for every count — "1 أشخاص", "2 أشخاص", neither of
+ * which is a thing anyone says. English has its one boundary.
+ */
+const peopleUnit = (n) => {
+  if (code.value !== 'ar') return n === 1 ? t('n_person_unit', 'person', 'شخص') : t('n_people_unit', 'people', 'أشخاص')
+  if (n === 1) return t('n_person_unit', 'person', 'شخص')
+  if (n === 2) return t('n_people_unit_two', 'people', 'شخصان')
+
+  return n % 100 >= 3 && n % 100 <= 10
+    ? t('n_people_unit', 'people', 'أشخاص')
+    : t('n_people_unit_many', 'people', 'شخصًا')
+}
+
+/** The line every slot carries: whose session it is, or how full it is. */
+const slotStatus = (slot) => {
+  if (isCurrent(slot)) return t('slot_current', 'Your current session', 'موعدك الحالي')
+  if (slot.has_conflict) return t('slot_conflict', 'You are already booked then', 'لديك حجز في هذا الوقت')
+  if (slot.remaining <= 0) return t('slot_full', 'Full', 'مكتمل')
+
+  return t('seats_taken_of', ':taken of :capacity', ':taken من :capacity', {
+    taken: slot.capacity - slot.remaining,
+    capacity: slot.capacity,
+  })
+}
+
+/**
+ * Why this slot cannot be picked, when it cannot. `is_full` is answered against the party
+ * size the customer chose, so a slot with three seats left is "full" for a party of four —
+ * two very different sentences that used to render as the same grey box.
+ */
+const slotReason = (slot) => {
+  if (isCurrent(slot) || slot.has_conflict) return null
+  if (slot.remaining <= 0) return t('slot_full_pick_another', 'This session is full — pick another time.', 'هذا الموعد مكتمل، اختر موعدًا آخر.')
+
+  if (slot.is_full) {
+    return t(
+      'slot_not_enough_seats',
+      'Only :remaining seat(s) left here — lower the number of people or pick another time.',
+      'متبقٍ في هذا الموعد :remaining مقاعد فقط، قلّل عدد الأشخاص أو اختر موعدًا آخر.',
+      { remaining: slot.remaining },
+    )
+  }
+
+  return null
+}
 
 // Both rails are sideways, and a mouse has no sideways. See `useDragScroll`.
 const peopleRail = ref(null)
@@ -240,7 +299,14 @@ const loadSlots = async () => {
   } finally {
     loadingSlots.value = false
   }
-  if (!slots.value.some((slot) => slot.workshop_slot_id === slotId.value)) slotId.value = null
+  // Drop a selection this party can no longer take. Clearing it only when the slot
+  // disappears from the list was not enough: a slot that goes `is_full` (or picks up a
+  // conflict) stays listed — disabled, greyed, with its reason on it — so a session chosen
+  // for one person survived being changed to four, the button stayed enabled, and the
+  // customer carried a slot the server was always going to refuse into checkout.
+  const chosen = slots.value.find((slot) => slot.workshop_slot_id === slotId.value)
+
+  if (!slotStillBookable(chosen, chosen ? isCurrent(chosen) : false)) slotId.value = null
 }
 
 watch([slotId, slots], () => {
