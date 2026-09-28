@@ -41,12 +41,24 @@
         <dd class="font-medium">−{{ format(quote.wallet_applied) }}</dd>
       </div>
 
-      <div class="flex items-center justify-between gap-4 border-t pt-2">
+      <!-- A placed purchase: what it cost beyond the wallet, or what came back. -->
+      <div v-if="refunded" class="flex items-center justify-between gap-4 border-t pt-2" data-test="summary-refunded">
+        <dt class="font-semibold text-foreground">{{ t('summary_refunded', 'Refunded to your wallet', 'مسترد إلى محفظتك') }}</dt>
+        <dd class="font-display text-xl font-black text-brand-green sm:text-2xl">{{ format(quote.refunded_amount) }}</dd>
+      </div>
+
+      <div v-else-if="paid" class="flex items-center justify-between gap-4 border-t pt-2" data-test="summary-paid">
+        <dt class="font-semibold text-foreground">{{ t('summary_paid', 'Paid', 'المبلغ المدفوع') }}</dt>
+        <dd class="font-display text-xl font-black text-primary sm:text-2xl">{{ format(paidOutsideWallet) }}</dd>
+      </div>
+
+      <!-- A quote, or an old unpaid purchase: what is still to pay. -->
+      <div v-else class="flex items-center justify-between gap-4 border-t pt-2">
         <dt class="font-semibold text-foreground">{{ t('summary_amount_due', 'Amount due', 'المبلغ المستحق') }}</dt>
         <dd class="font-display text-xl font-black text-primary sm:text-2xl">{{ format(quote.amount_due) }}</dd>
       </div>
 
-      <p v-if="settled" class="rounded-xl bg-brand-green/10 px-3 py-2 text-xs font-medium text-brand-green">
+      <p v-if="coveredByWallet" class="rounded-xl bg-brand-green/10 px-3 py-2 text-xs font-medium text-brand-green">
         {{ t('summary_settled', 'Nothing left to pay — this is covered in full.', 'لا يوجد مبلغ متبقٍ — تمت التغطية بالكامل.') }}
       </p>
     </dl>
@@ -64,9 +76,15 @@
  * them; it never recomputes a total (the free-delivery threshold is post-discount, so a
  * coupon can re-add a fee — only the server knows).
  *
- * `quote` is the `data` of any quote/create/pay response:
+ * `quote` is the `data` of any quote or of a placed purchase:
  * `{ subtotal, discount_amount, discount_code, delivery_fee, delivery_zone?, total_price,
- *    vat_rate?, vat_amount?, wallet_applied, amount_due }`.
+ *    vat_rate?, vat_amount?, wallet_applied, amount_due, payment_status?, refunded_amount? }`.
+ *
+ * A quote carries no `payment_status`; its last line is `amount_due`, the charge placing
+ * will collect. A placed purchase does, and there `amount_due` is `"0.00"` because nothing
+ * is still owed — so reading it would call a 10,000 SAR delivery "covered in full" when the
+ * wallet paid 424. A paid purchase shows what it cost beyond the wallet instead
+ * (`total_price − wallet_applied`, exact in halalas); a refunded one, what came back.
  */
 const props = defineProps({
   quote: { type: Object, default: null },
@@ -82,5 +100,15 @@ const hasWallet = computed(() => !isZeroMoney(props.quote?.wallet_applied))
 const showsDelivery = computed(() => props.quote?.delivery_fee !== null && props.quote?.delivery_fee !== undefined)
 const vatRate = computed(() => String(props.quote?.vat_rate ?? '0').replace(/\.00$/, ''))
 const showsVat = computed(() => props.quote?.vat_rate && !isZeroMoney(props.quote.vat_rate) && !isZeroMoney(props.quote.vat_amount))
-const settled = computed(() => props.quote && isZeroMoney(props.quote.amount_due))
+const paid = computed(() => props.quote?.payment_status === 'paid')
+const refunded = computed(() => props.quote?.payment_status === 'refunded' && !!props.quote.refunded_amount)
+const paidOutsideWallet = computed(() =>
+  fromHalalas(toHalalas(props.quote?.total_price) - toHalalas(props.quote?.wallet_applied)),
+)
+// "Covered in full" is only true when there really was nothing left for anything else
+// to pay: a quote with nothing due, or a purchase the wallet paid for outright.
+const coveredByWallet = computed(() => {
+  if (!props.quote || refunded.value) return false
+  return paid.value ? isZeroMoney(paidOutsideWallet.value) : isZeroMoney(props.quote.amount_due)
+})
 </script>

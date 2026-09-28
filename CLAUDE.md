@@ -414,9 +414,11 @@ piece delivery) already paid. The site's flows are **quote → place → done**:
 no countdown, no "awaiting payment" state to recover from. `CheckoutPaymentHold` and every
 `pay()` helper were deleted; don't bring a pay step back without a real gateway behind it.
 
-- **The confirmation screen renders from the quote.** A placed purchase reports
-  `amount_due: "0.00"` (nothing still owed); the charge the customer agreed to is the
-  quote's `amount_due`.
+- **A placed purchase reports `amount_due: "0.00"`** — nothing is still owed. `CheckoutSummary`
+  therefore switches on `payment_status`: a quote (none) shows *Amount due*; a paid purchase
+  shows *Paid* = `total_price − wallet_applied` (halalas); a refunded one shows
+  `refunded_amount`. "Covered in full" appears only when there was really nothing left for
+  anything but the wallet — reading `amount_due` alone called a 10,000 SAR delivery covered.
 - **Refetch the balance after placing** (`refreshIdentity()` + `useWallet().refresh()`,
   best-effort) — the wallet slice left the moment the create call returned.
 - **Shop checkout refetches the cart after placing**: the server removed the lines it bought.
