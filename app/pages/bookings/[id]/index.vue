@@ -326,18 +326,6 @@
             {{ holdNotice }}
           </p>
 
-          <!-- A held booking still needs paying; the countdown is the server's, not ours. -->
-          <CheckoutPaymentHold
-            v-if="state === 'pending_payment'"
-            :amount-due="booking.amount_due"
-            :payment-status="booking.payment_status"
-            :expires-at="booking.payment_expires_at"
-            :pay="actions.pay"
-            :restart-to="`/workshops/${booking.workshop_id}/book`"
-            @paid="apply"
-            @expired="refresh"
-          />
-
           <!-- Piece ready (rourY / vONkg): pickup or delivery, and the paint-it-again upsell.
                Both ways stay reachable after one is picked — the other takes the place of
                the pair, worded as a switch. -->
@@ -444,22 +432,6 @@
             }}
           </p>
 
-          <p
-            v-if="
-              booking.delivery_fee_amount_due &&
-              !isZeroMoney(booking.delivery_fee_amount_due)
-            "
-            class="rounded-2xl bg-brand-mist/60 p-4 text-sm"
-          >
-            {{
-              t(
-                "delivery_fee_owed",
-                "Delivery fee still owed: :amount — settle it at the studio.",
-                "رسوم توصيل مستحقة: :amount — تُدفع في الاستوديو.",
-                { amount: format(booking.delivery_fee_amount_due) },
-              )
-            }}
-          </p>
         </aside>
       </div>
     </div>

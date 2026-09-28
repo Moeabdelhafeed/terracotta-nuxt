@@ -1,6 +1,6 @@
 /**
  * The API answers every call with the same envelope — `{ success, message, errors, data }` —
- * except that Laravel's own validation (and a few `/pay` refusals) come back bare:
+ * except that Laravel's own validation (and a few refusals) come back bare:
  * `{ message, errors }` with no `success`/`data`, and a 429 carries only `{ success, message }`.
  * Everything below reads both shapes so a page never has to know which one it got.
  */

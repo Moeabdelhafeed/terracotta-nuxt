@@ -96,7 +96,7 @@ describe('/gifts/new', () => {
     expect(quoteCalls()[2].body.discount_code).toBe('WELCOME10')
   })
 
-  it('a gift settled at create skips the pay step entirely', async () => {
+  it('goes straight to the gift after buying — there is no pay step', async () => {
     const wrapper = await mount()
     await flushPromises()
 
@@ -106,59 +106,11 @@ describe('/gifts/new', () => {
 
     expect(api.calls.some((c) => c.method === 'POST' && c.url === '/api/gifts')).toBe(true)
     expect(api.calls.some((c) => c.url.endsWith('/pay'))).toBe(false)
-    expect(wrapper.findComponent({ name: 'CheckoutPaymentHold' }).exists()).toBe(false)
     expect(navigate).toHaveBeenCalledWith({ path: '/gifts/9', query: { new: '1' } })
   })
 
-  it('holds the gift and shows the pay step when there is money left to pay', async () => {
-    const { envelope } = await import('../helpers/mockApi')
-    api.table['POST /api/gifts'] = envelope({
-      id: 10, recipient_name: 'Sara', amount: '200.00', subtotal: '200.00', discount_amount: '0.00',
-      total_price: '200.00', wallet_applied: '0.00', amount_due: '200.00', payment_status: 'unpaid',
-      status: 'awaiting_payment', token: 'tok', share_url: 'https://terracotta-ksa.com/gift/tok',
-      payment_expires_at: new Date(Date.now() + 14 * 60000).toISOString(),
-    })
-
-    const wrapper = await mount()
-    await flushPromises()
-    wrapper.find('#recipient_name').setValue('Sara')
-    await wrapper.find('form').trigger('submit')
-    await flushPromises()
-
-    expect(wrapper.findComponent({ name: 'CheckoutPaymentHold' }).exists()).toBe(true)
-    expect(navigate).not.toHaveBeenCalled()
-  })
-
-  /**
-   * The buyer paid, went to their profile, and read the balance they had before. Both
-   * surfaces the site reads one from have to be refetched the moment the gift settles.
-   */
-  it('refetches the identity and the wallet ledger once the gift is paid', async () => {
-    const { envelope } = await import('../helpers/mockApi')
-    api.table['POST /api/gifts'] = envelope({
-      id: 10, recipient_name: 'Sara', amount: '200.00', subtotal: '200.00', discount_amount: '0.00',
-      total_price: '200.00', wallet_applied: '0.00', amount_due: '200.00', payment_status: 'unpaid',
-      status: 'awaiting_payment', token: 'tok', share_url: 'https://terracotta-ksa.com/gift/tok',
-      payment_expires_at: new Date(Date.now() + 14 * 60000).toISOString(),
-    })
-
-    const wrapper = await mount()
-    await flushPromises()
-    wrapper.find('#recipient_name').setValue('Sara')
-    await wrapper.find('form').trigger('submit')
-    await flushPromises()
-
-    const walletReadsBefore = api.calls.filter((c) => c.url === '/api/wallet/transactions').length
-    await wrapper.findAll('button').find((b) => b.text().includes('Pay now')).trigger('click')
-    await flushPromises()
-
-    expect(api.calls.some((c) => c.url === '/api/gifts/10/pay')).toBe(true)
-    expect(sanctum.refreshIdentity).toHaveBeenCalled()
-    expect(api.calls.filter((c) => c.url === '/api/wallet/transactions').length).toBeGreaterThan(walletReadsBefore)
-    expect(navigate).toHaveBeenCalledWith({ path: '/gifts/10', query: { new: '1' } })
-  })
-
-  it('refetches them for a gift the wallet covered in full, which has no pay step', async () => {
+  /** The buyer paid, went to their profile, and read the balance they had before. */
+  it('refetches the identity and the wallet ledger once the gift is bought', async () => {
     const { envelope } = await import('../helpers/mockApi')
     api.table['POST /api/gifts'] = envelope({
       id: 9, recipient_name: 'Sara', amount: '200.00', subtotal: '200.00', discount_amount: '0.00',

@@ -71,17 +71,6 @@
             </div>
 
             <aside class="flex flex-col gap-5 lg:sticky lg:top-6">
-              <CheckoutPaymentHold
-                v-if="order.status === 'awaiting_payment'"
-                :amount-due="order.amount_due"
-                :payment-status="order.payment_status"
-                :expires-at="order.payment_expires_at"
-                :pay="pay"
-                restart-to="/cart"
-                @paid="onPaid"
-                @expired="refresh"
-              />
-
               <CheckoutSummary :quote="order" :title="t('summary_title', 'Payment', 'الدفع', { subGroup: 'checkout' })" />
 
               <ShopOrderCancelButton :order="order" :cancel="cancel" @cancelled="onCancelled" />
@@ -101,7 +90,7 @@ definePageMeta({
 })
 
 /**
- * One order end to end: the pay hold while it has one, the status timeline, the lines
+ * One order end to end: the status timeline, the lines
  * (whose `product` is null once a piece is deleted), the money the server computed, and
  * the delivery snapshot it took at checkout.
  */
@@ -117,9 +106,7 @@ const crumbs = computed(() => [
 ])
 const { format } = usePrice()
 const { formatDate } = useDateFormat()
-const toast = useToast()
-
-const { order, error, status, refresh, pay, cancel } = useOrder(() => route.params.id)
+const { order, error, status, refresh, cancel } = useOrder(() => route.params.id)
 
 watchEffect(() => {
   if (status.value === 'error' || (status.value === 'success' && !order.value)) {
@@ -127,7 +114,6 @@ watchEffect(() => {
   }
 })
 
-const { refresh: refreshCart } = useCart()
 const { refresh: refreshWallet } = useWallet()
 const { refreshIdentity } = useSanctumAuth()
 
@@ -138,13 +124,6 @@ const { refreshIdentity } = useSanctumAuth()
  */
 const onCancelled = async () => {
   await Promise.all([refresh(), refreshWallet(), refreshIdentity()])
-}
-
-const onPaid = async () => {
-  toast.success(t('payment_done', 'Payment completed.', 'تم الدفع بنجاح.', { subGroup: 'checkout' }))
-  // The cart is emptied at pay time, not at checkout.
-  await refreshCart()
-  await refresh()
 }
 
 const hasDelivery = computed(() => Boolean(

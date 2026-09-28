@@ -1,5 +1,5 @@
 /**
- * Workshop bookings: availability, quote, hold → pay, my bookings, detail actions and the
+ * Workshop bookings: availability, quote → place, my bookings, detail actions and the
  * finished-piece delivery step. Every call goes through `useApi()` / `useApiFetch()`.
  *
  * Dates and times the API returns (`booking_date`, `start_time`, `end_time`) are already
@@ -281,7 +281,6 @@ export const useBookingActions = (bookingId) => {
   const base = () => `/api/workshops/bookings/${toValue(bookingId)}`;
 
   return {
-    pay: () => api(`${base()}/pay`, { method: "POST" }),
     reschedule: (body) => api(base(), { method: "PUT", body }),
     cancel: () => api(base(), { method: "DELETE" }),
     /**

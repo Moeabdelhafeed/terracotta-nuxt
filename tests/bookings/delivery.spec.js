@@ -110,14 +110,16 @@ describe('piece delivery — the quote follows its inputs', () => {
   })
 })
 
-describe('piece delivery — what is still owed', () => {
-  it('says the remainder is settled at handover, there being no online payment for it', async () => {
+describe('piece delivery — confirming pays', () => {
+  it('says confirming pays the fee, with no pay step after', async () => {
     const wrapper = await mount()
     await flushPromises()
 
-    expect(wrapper.text()).toContain('25.00 SAR stays owing and is settled at handover')
-    expect(wrapper.text()).toContain('there is no online payment for the delivery fee')
-    expect(wrapper.findAll('button').some((b) => b.text().includes('Pay now'))).toBe(false)
+    expect(wrapper.text()).toContain('Confirming pays the 25.00 SAR delivery fee')
+    // The copy that shipped before promised the fee was owed at handover, and nothing ever
+    // settled it — so switching to pickup refunded nothing.
+    expect(wrapper.text()).not.toContain('settled at handover')
+    expect(wrapper.text()).not.toContain('paid on the next screen')
   })
 
   it('drops the note once the wallet covers the fee in full', async () => {
@@ -126,7 +128,7 @@ describe('piece delivery — what is still owed', () => {
     const wrapper = await mount()
     await flushPromises()
 
-    expect(wrapper.text()).not.toContain('stays owing')
+    expect(wrapper.text()).not.toContain('Confirming pays')
   })
 
   it('says nothing more is due when the fee was already charged', async () => {
@@ -136,7 +138,7 @@ describe('piece delivery — what is still owed', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain('The delivery fee was already charged')
-    expect(wrapper.text()).not.toContain('stays owing')
+    expect(wrapper.text()).not.toContain('Confirming pays')
   })
 })
 

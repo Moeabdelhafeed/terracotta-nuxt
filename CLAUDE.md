@@ -406,3 +406,24 @@ Never move those two into `nuxt.config.ts`.
 - **Sanctum plugin only sets `Accept-Language` when caller didn't supply one** — lets seed POSTs force a specific locale.
 - **`max_accounts: 0`** means unlimited; check `!canLinkMore && maxAccounts > 0` before showing limit notice.
 - **Cookie `lang` stores object**, `i18n_locale` stores string code. Don't mix them.
+
+## Placing is paying — there is no pay step anywhere
+
+There is no payment gateway, so the API creates every purchase (booking, shop order, gift,
+piece delivery) already paid. The site's flows are **quote → place → done**: no pay panel,
+no countdown, no "awaiting payment" state to recover from. `CheckoutPaymentHold` and every
+`pay()` helper were deleted; don't bring a pay step back without a real gateway behind it.
+
+- **The confirmation screen renders from the quote.** A placed purchase reports
+  `amount_due: "0.00"` (nothing still owed); the charge the customer agreed to is the
+  quote's `amount_due`.
+- **Refetch the balance after placing** (`refreshIdentity()` + `useWallet().refresh()`,
+  best-effort) — the wallet slice left the moment the create call returned.
+- **Shop checkout refetches the cart after placing**: the server removed the lines it bought.
+- **Delivery**: confirming pays the fee; switching to pickup later refunds the whole fee
+  (`delivery_payment_status` is `paid` from the start). Read the delivery's own columns,
+  never the booking's `payment_status`.
+
+History: this site once had a two-phase hold with a pay step on every flow. The delivery pay
+step was never wired up at all, so fees sat unpaid for ever and pickup refunds returned only
+the wallet slice — the bug that prompted removing the hold everywhere.

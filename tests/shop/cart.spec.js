@@ -30,7 +30,6 @@ const { api, lang, sanctum } = await vi.hoisted(async () => {
       'DELETE /api/shop/cart/{id}': envelope(null, 'Removed.'),
       'POST /api/shop/cart/quote': () => envelope(globalThis.__quote),
       'POST /api/shop/cart/checkout': () => globalThis.__checkout(),
-      'POST /api/shop/orders/{id}/pay': () => envelope({ id: 9, status: 'pending', payment_status: 'paid', amount_due: '0.00' }, 'Payment completed successfully.'),
       'GET /api/shop/orders': () => envelope({ data: globalThis.__orders ?? [], current_page: 1, last_page: 1, total: 0 }),
     }),
     lang: createLang('en'),
@@ -209,15 +208,14 @@ describe('useCheckout', () => {
     expect(quotes.at(-1).body).toEqual({ address_id: 4, use_wallet: true, discount_code: 'WELCOME10' })
   })
 
-  it('a fully covered checkout settles on creation and clears the cart — no /pay', async () => {
+  it('a checkout comes back paid and refetches the emptied cart — no /pay', async () => {
     globalThis.__cart = { items: [line()], total_price: '130.00' }
-    localCartIds.value = []
-  sanctum.user.value = { data: { id: 1, name: 'Test', is_guest: false, wallet_balance: '100.00' } }
-  globalThis.__checkout = () => ({ success: true, message: 'ok', errors: null, data: { id: 9, status: 'pending', payment_status: 'paid', amount_due: '0.00', payment_expires_at: null } })
+    globalThis.__checkout = () => ({ success: true, message: 'ok', errors: null, data: { id: 9, status: 'pending', payment_status: 'paid', amount_due: '0.00', payment_expires_at: null } })
     const flow = useCheckout()
     await flow.cart.refresh()
     await flushPromises()
 
+    // Placing is paying: the server removed the lines it bought.
     globalThis.__cart = { items: [], total_price: '0.00' }
     await flow.checkout()
     await flushPromises()
@@ -227,32 +225,13 @@ describe('useCheckout', () => {
     expect(flow.cart.items.value).toHaveLength(0)
   })
 
-  it('the cart survives checkout and is only refetched after /pay', async () => {
+  it('keeps a refused checkout on screen, keyed to its field', async () => {
     globalThis.__cart = { items: [line()], total_price: '130.00' }
-    const flow = useCheckout()
-    await flow.cart.refresh()
-    await flushPromises()
-
-    await flow.checkout()
-    await flushPromises()
-    // Still held: the server keeps the lines until the order is paid.
-    expect(flow.settled.value).toBe(false)
-    expect(flow.cart.items.value).toHaveLength(1)
-
-    globalThis.__cart = { items: [], total_price: '0.00' }
-    await flow.pay()
-    await flushPromises()
-    expect(flow.cart.items.value).toHaveLength(0)
-  })
-
-  it('a second checkout surfaces the open hold with the order it refers to', async () => {
-    globalThis.__cart = { items: [line()], total_price: '130.00' }
-    globalThis.__orders = [{ id: 7, status: 'awaiting_payment', amount_due: '145.00', payment_status: 'unpaid' }]
     globalThis.__checkout = () => {
-      const err = new Error('You already have an order waiting for payment. Pay or cancel it first.')
+      const err = new Error('Only 1 left.')
       err.status = 422
       err.statusCode = 422
-      err.data = { success: false, message: err.message, errors: { cart: ['You already have an order waiting for payment. Pay or cancel it first.'] }, data: null }
+      err.data = { success: false, message: err.message, errors: { cart: ['Only 1 left.'] }, data: null }
       throw err
     }
     const flow = useCheckout()
@@ -260,10 +239,8 @@ describe('useCheckout', () => {
     await flushPromises()
 
     await expect(flow.checkout()).rejects.toMatchObject({ status: 422 })
-    await flushPromises()
 
-    expect(flow.errors.value.cart?.[0]).toContain('already have an order waiting')
-    expect(flow.resumed.value).toBe(true)
-    expect(flow.order.value.id).toBe(7)
+    expect(flow.errors.value.cart?.[0]).toBe('Only 1 left.')
+    expect(flow.order.value).toBeNull()
   })
 })

@@ -67,18 +67,6 @@ describe('useOrder', () => {
     expect(one.order.value.status).toBe('cancelled')
     expect(one.order.value.refunded_amount).toBe('195.00')
   })
-
-  it('pay is a bare POST — the endpoint takes no body', async () => {
-    api.table['POST /api/shop/orders/{id}/pay'] = { success: true, message: 'Payment completed successfully.', errors: null, data: order({ status: 'pending', payment_status: 'paid', amount_due: '0.00' }) }
-    const one = useOrder(() => 9)
-    await flushPromises()
-
-    await one.pay()
-    const call = api.calls.at(-1)
-    expect(call).toMatchObject({ method: 'POST', url: '/api/shop/orders/9/pay' })
-    expect(call.body).toBeUndefined()
-    expect(one.order.value.payment_status).toBe('paid')
-  })
 })
 
 describe('ShopOrderItems', () => {

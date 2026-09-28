@@ -10,7 +10,7 @@ export const toHalalas = (value) => {
   return str.startsWith('-') ? -cents : cents
 }
 
-/** `"0.00"` is settled — the create call already paid it, there is nothing to `/pay`. */
+/** `"0.00"` — no money in it. */
 export const isZeroMoney = (value) => toHalalas(value) === 0
 
 /** Back to the wire format: `12345` → `"123.45"`. */

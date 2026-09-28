@@ -70,7 +70,6 @@ export const useGifts = () => {
 
   const quote = (body) => api('/api/gifts/quote', { method: 'POST', body })
   const create = (body) => api('/api/gifts', { method: 'POST', body })
-  const pay = (id) => api(`/api/gifts/${id}/pay`, { method: 'POST' })
   const redeem = (token) => api(`/api/gifts/${encodeURIComponent(token)}/redeem`, { method: 'POST' })
 
   return {
@@ -84,7 +83,6 @@ export const useGifts = () => {
     history,
     quote,
     create,
-    pay,
     redeem,
   }
 }

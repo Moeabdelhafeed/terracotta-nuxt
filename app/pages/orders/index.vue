@@ -43,9 +43,6 @@
                 <span class="font-display text-lg font-black text-primary">{{ format(order.total_price) }}</span>
               </div>
 
-              <p v-if="order.status === 'awaiting_payment'" class="mt-3 rounded-xl bg-brand-blush/40 px-3 py-2 text-xs font-medium text-brand-terracotta">
-                {{ t('order_awaiting_note', 'Waiting for payment — open it to pay or cancel.', 'بانتظار الدفع — افتحه للدفع أو الإلغاء.') }}
-              </p>
             </NuxtLink>
           </li>
         </ul>

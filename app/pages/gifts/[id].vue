@@ -73,9 +73,6 @@
             <template v-else-if="gift.is_redeemed">{{
               t("gift_used_title", "Redeemed", "تم الاستخدام")
             }}</template>
-            <template v-else-if="held">{{
-              t("gift_pay_title", "Payment", "الدفع")
-            }}</template>
             <template v-else>{{
               t("gift_success_title", "Gift purchased!", "تم شراء الهدية!")
             }}</template>
@@ -97,13 +94,6 @@
                 { date: formatDate(gift.redeemed_at) },
               )
             }}</template>
-            <template v-else-if="held">{{
-              t(
-                "gift_pay_body",
-                "Confirm the gift and pay to get your share link.",
-                "أكّد الهدية وادفع للحصول على رابط المشاركة.",
-              )
-            }}</template>
             <template v-else>{{
               t(
                 "gift_success_body",
@@ -116,22 +106,9 @@
 
         <div class="mt-8 grid gap-6 lg:grid-cols-[1fr_22rem] lg:items-start">
           <div class="flex min-w-0 flex-col gap-6">
-            <!-- The hold is still running: same pay step as the purchase page, so a buyer
-                 who navigated away can finish here. -->
-            <CheckoutPaymentHold
-              v-if="held"
-              :amount-due="gift.amount_due"
-              :payment-status="gift.payment_status"
-              :expires-at="gift.payment_expires_at"
-              :pay="payGift"
-              restart-to="/gifts/new"
-              @paid="onPaid"
-              @expired="refresh()"
-            />
-
             <!-- Paid and unclaimed: the link is the product. -->
             <section
-              v-else-if="!cancelled"
+              v-if="!cancelled"
               class="rounded-3xl border bg-card p-6 sm:p-8"
             >
               <GiftShare
@@ -238,14 +215,9 @@ const route = useRoute();
 const { t } = useLang("web", "gifts");
 const { format } = usePrice();
 const { formatDate } = useDateFormat();
-const { list, pay } = useGifts();
+const { list } = useGifts();
 
-// Paying here spends from the wallet exactly as the purchase page does, so both surfaces
-// the site reads a balance from go stale at the same moment.
-const { refreshIdentity } = useSanctumAuth();
-const { refresh: refreshWallet } = useWallet();
-
-const { items, pending, error, refresh } = list();
+const { items, pending, error } = list();
 
 const gift = computed(
   () =>
@@ -253,12 +225,8 @@ const gift = computed(
     null,
 );
 
+// Only legacy rows: a gift is paid the moment it is bought, and nothing cancels it now.
 const cancelled = computed(() => gift.value?.status === "cancelled");
-const held = computed(
-  () =>
-    gift.value?.status === "awaiting_payment" &&
-    !isZeroMoney(gift.value.amount_due),
-);
 
 // A gift has nothing to deliver; `null` tells the summary to drop the row.
 const summaryQuote = computed(() =>
@@ -267,7 +235,7 @@ const summaryQuote = computed(() =>
 
 const celebrate = ref(false);
 onMounted(() => {
-  if (route.query.new && gift.value && !held.value) celebrate.value = true;
+  if (route.query.new && gift.value) celebrate.value = true;
 });
 
 const crumbs = computed(() => [
@@ -279,14 +247,6 @@ const crumbs = computed(() => [
       gift.value?.recipient_name ?? t("gift_detail_title", "Gift", "الهدية"),
   },
 ]);
-
-const payGift = () => pay(gift.value.id);
-
-const onPaid = async () => {
-  await refresh();
-  celebrate.value = true;
-  Promise.all([refreshIdentity(), refreshWallet()]).catch(() => {});
-};
 
 useSeoMeta({
   title: () => t("gift_detail_title", "Gift", "الهدية"),

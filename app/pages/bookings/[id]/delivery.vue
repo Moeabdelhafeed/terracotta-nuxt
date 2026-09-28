@@ -151,8 +151,8 @@
               }}
             </p>
 
-            <!-- There is no `/pay` route for this fee: the wallet covers what it can and any
-                 remainder is simply owed. -->
+            <!-- Confirming pays: the wallet slice is taken and the rest is collected on the
+                 spot. Said before the button, since there is no separate pay step after. -->
             <p
               v-if="
                 method === 'delivery' && quote && !isZeroMoney(quote.amount_due)
@@ -161,9 +161,9 @@
             >
               {{
                 t(
-                  "delivery_due_note",
-                  ":amount stays owing and is settled at handover — there is no online payment for the delivery fee.",
-                  "يبقى مبلغ :amount مستحقًا يُسدَّد عند التسليم — لا يوجد دفع إلكتروني لرسوم التوصيل.",
+                  "delivery_pay_note",
+                  "Confirming pays the :amount delivery fee. Switch to pickup later and the whole fee comes back to your balance.",
+                  "بالتأكيد تُدفع رسوم التوصيل :amount. وإذا غيّرت إلى الاستلام لاحقًا فستعود الرسوم كاملة إلى رصيدك.",
                   { amount: format(quote.amount_due) },
                 )
               }}
@@ -200,9 +200,8 @@
 
 <script setup>
 /**
- * Pickup or delivery for the finished piece. The fee is charged to the wallet at the moment
- * the choice is made — there is no hold and no `/pay` route, so whatever the wallet does not
- * cover comes back on the booking as `delivery_fee_amount_due`.
+ * Pickup or delivery for the finished piece. The fee is quoted here and paid on confirm,
+ * like every purchase: placing is paying, so there is no pay step afterwards.
  */
 definePageMeta({
   middleware: ["auth-mode", "require-registered", "verified"],
@@ -242,13 +241,11 @@ const { refresh: refreshWallet } = useWallet();
 
 const available = computed(() => hasDeliveryStep(booking.value));
 
-/** A fee is only given back if one was actually charged — see `chooseDelivery(…, pickup)`. */
-// Only the wallet slice is ever taken when delivery is chosen — the rest stays owed, with
-// nothing collecting it — so that slice is the whole of what comes back. Promising the
-// full fee would be promising money the customer never paid.
-// What switching to pickup actually credits back: the whole fee once the delivery was
-// settled, and only the wallet slice while it is still an unpaid hold — the same rule
-// `chooseDelivery(..., 'pickup')` applies server-side.
+/**
+ * What switching to pickup credits back: the whole fee, since a delivery is paid the moment
+ * it is chosen. The wallet-slice branch is for legacy rows whose fee was never settled —
+ * the same rule `chooseDelivery(..., 'pickup')` applies server-side.
+ */
 const refundAmount = computed(() => {
   const b = booking.value;
   if (!b) return null;

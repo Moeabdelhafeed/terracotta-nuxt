@@ -62,20 +62,10 @@ describe('/gifts/[id]', () => {
     expect(wrapper.find('a[href^="https://wa.me/"]').attributes('href')).toMatch(/^https:\/\/wa\.me\/\?text=/)
   })
 
-  it('shows the pay step instead of the link while the hold is running', async () => {
-    const wrapper = await mount({
-      ...paid, status: 'awaiting_payment', payment_status: 'unpaid', amount_due: '200.00',
-      payment_expires_at: new Date(Date.now() + 10 * 60000).toISOString(),
-    })
-    expect(wrapper.findComponent({ name: 'CheckoutPaymentHold' }).exists()).toBe(true)
-    expect(wrapper.findComponent({ name: 'GiftShare' }).exists()).toBe(false)
-  })
-
-  it('a cancelled gift is gone — no link, no pay step', async () => {
+  it('a cancelled gift is gone — no link', async () => {
     const wrapper = await mount({ ...paid, status: 'cancelled', payment_status: 'unpaid' })
     expect(wrapper.text()).toContain('This gift was cancelled')
     expect(wrapper.findComponent({ name: 'GiftShare' }).exists()).toBe(false)
-    expect(wrapper.findComponent({ name: 'CheckoutPaymentHold' }).exists()).toBe(false)
   })
 
   it('a redeemed gift says so, with when', async () => {

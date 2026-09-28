@@ -61,6 +61,32 @@ beforeEach(() => {
   globalThis.__upload = () => ({ success: true, message: 'Photos uploaded.', errors: null, data: globalThis.__booking })
 })
 
+/**
+ * Placing is paying — for the booking and for the delivery fee — so this page never offers
+ * a pay step. The delivery fee once had one here, fed by its own hold; the website had
+ * shipped without it, so every fee sat unpaid and switching to pickup refunded nothing.
+ */
+describe('booking detail — nothing left to pay', () => {
+  it('offers no pay button for a chosen delivery', async () => {
+    globalThis.__booking = booking({
+      status: 'completed',
+      delivery_method: 'delivery',
+      delivery_status: 'getting_ready',
+      delivery_fee: '25.00',
+      delivery_fee_wallet_applied: '0.00',
+      delivery_fee_amount_due: '25.00',
+      delivery_payment_status: 'paid',
+      delivery_payment_expires_at: null,
+    })
+
+    const wrapper = await mountSuspended(BookingPage, { global: { stubs: { PageBar: true, AppImage: true, BookingSlotPicker: true } } })
+    await flushPromises()
+
+    expect(byText(wrapper, 'Pay now')).toBeFalsy()
+    expect(api.calls.some((c) => c.url.endsWith('/pay'))).toBe(false)
+  })
+})
+
 describe('booking detail — what the server permits', () => {
   it('a held booking may be cancelled but never rescheduled', async () => {
     globalThis.__booking = booking({ status: 'pending_payment', payment_status: 'unpaid', amount_due: '190.00', can_cancel: true, can_edit: false })

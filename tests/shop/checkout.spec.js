@@ -12,7 +12,6 @@ const { api, lang, sanctum, toast, navigate } = await vi.hoisted(async () => {
       'POST /api/shop/cart/quote': () => globalThis.__quote(),
       'POST /api/shop/cart/checkout': () => globalThis.__checkout(),
       'GET /api/shop/orders': () => envelope({ data: globalThis.__orders, current_page: 1, last_page: 1, total: globalThis.__orders.length }),
-      'POST /api/shop/orders/{id}/pay': () => envelope({ ...globalThis.__order, payment_status: 'paid', amount_due: '0.00' }),
       'DELETE /api/shop/orders/{id}': () => envelope({ ...globalThis.__order, status: 'cancelled' }),
       'GET /api/wallet/transactions': () => envelope({ balance: '100.00', transactions: [] }),
     }),
@@ -76,7 +75,6 @@ const mount = ({ address = true } = {}) => mountSuspended(CheckoutPage, {
 const placeButton = (wrapper) => wrapper.findAll('button').find((b) => b.text().includes('Confirm payment') || b.text().includes('Placing'))
 const byText = (wrapper, text) => wrapper.findAll('button').find((b) => b.text().includes(text))
 /** The cancel confirmation is teleported to the body, outside the page wrapper. */
-const inBody = (text) => [...document.querySelectorAll('button')].find((b) => b.textContent.includes(text))
 
 beforeEach(() => {
   api.calls.length = 0
@@ -146,78 +144,16 @@ describe('checkout — with no saved address', () => {
   })
 })
 
-describe('checkout — an order already awaiting payment', () => {
-  beforeEach(async () => {
-    const { apiError } = await import('../helpers/mockApi')
-    globalThis.__checkout = () => apiError(422, { cart: ['You already have an order awaiting payment.'] }, 'You already have an order awaiting payment.')
-  })
-
-  it('offers the open hold to be paid or cancelled', async () => {
-    const wrapper = await mount()
-    await flushPromises()
-    await placeButton(wrapper).trigger('click')
-    await flushPromises()
-
-    expect(wrapper.text()).toContain('An order is already waiting for payment')
-    expect(wrapper.text()).toContain('You already have an order awaiting payment.')
-    expect(wrapper.find('a[href$="/orders/9"]').exists()).toBe(true)
-    expect(byText(wrapper, 'Pay now')).toBeDefined()
-    expect(byText(wrapper, 'Cancel order')).toBeDefined()
-  })
-
-  it('paying the open hold sends the customer to the order', async () => {
-    const wrapper = await mount()
-    await flushPromises()
-    await placeButton(wrapper).trigger('click')
-    await flushPromises()
-
-    await byText(wrapper, 'Pay now').trigger('click')
-    await flushPromises()
-
-    expect(api.calls.some((call) => call.url === '/api/shop/orders/9/pay')).toBe(true)
-    expect(navigate).toHaveBeenCalledWith('/orders/9')
-  })
-
-  it('cancelling the open hold puts the customer back on a fresh quote', async () => {
-    const wrapper = await mount()
-    await flushPromises()
-    await placeButton(wrapper).trigger('click')
-    await flushPromises()
-
-    await byText(wrapper, 'Cancel order').trigger('click')
-    inBody('Yes, cancel').click()
-    await flushPromises()
-
-    expect(api.calls.some((call) => call.method === 'DELETE' && call.url === '/api/shop/orders/9')).toBe(true)
-    expect(wrapper.text()).not.toContain('An order is already waiting for payment')
-    expect(placeButton(wrapper)).toBeDefined()
-  })
-})
-
-describe('checkout — the balance after paying', () => {
+describe('checkout — placing is paying', () => {
   /**
    * The customer paid, went to their profile, and read the number they had before. Both
    * surfaces the site reads a balance from — the ledger and the identity every other
-   * screen shows it off — have to be refetched the moment the payment lands.
+   * screen shows it off — have to be refetched the moment the order lands.
    */
   const walletReads = () => api.calls.filter((call) => call.url === '/api/wallet/transactions').length
 
-  it('refetches the identity and the wallet ledger once the order is paid', async () => {
-    const wrapper = await mount()
-    await flushPromises()
-    await placeButton(wrapper).trigger('click')
-    await flushPromises()
-
-    const before = walletReads()
-    await byText(wrapper, 'Pay now').trigger('click')
-    await flushPromises()
-
-    expect(sanctum.refreshIdentity).toHaveBeenCalled()
-    expect(walletReads()).toBeGreaterThan(before)
-  })
-
-  it('does the same for an order the wallet covered in full, which has no pay step', async () => {
-    globalThis.__checkout = () => ({ success: true, message: 'ok', errors: null, data: order({ payment_status: 'paid', amount_due: '0.00', wallet_applied: '215.00' }) })
+  it('confirms the order straight away, with no pay step, and refetches the balance', async () => {
+    globalThis.__checkout = () => ({ success: true, message: 'ok', errors: null, data: order({ status: 'pending', payment_status: 'paid', amount_due: '0.00' }) })
 
     const wrapper = await mount()
     await flushPromises()
@@ -227,6 +163,8 @@ describe('checkout — the balance after paying', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain('Your order is placed')
+    expect(byText(wrapper, 'Pay now')).toBeUndefined()
+    expect(api.calls.some((call) => call.url.endsWith('/pay'))).toBe(false)
     expect(sanctum.refreshIdentity).toHaveBeenCalled()
     expect(walletReads()).toBeGreaterThan(before)
   })

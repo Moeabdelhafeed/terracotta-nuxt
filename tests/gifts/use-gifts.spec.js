@@ -46,8 +46,8 @@ describe('useGifts', () => {
     expect(packageActive.value).toBe(true)
   })
 
-  it('quotes, creates, pays and redeems against the documented paths', async () => {
-    const { quote, create, pay, redeem } = useGifts()
+  it('quotes, creates and redeems against the documented paths', async () => {
+    const { quote, create, redeem } = useGifts()
 
     const quoted = await quote({ use_wallet: false, discount_code: 'WELCOME10' })
     expect(quoted.data.gift_value).toBe('200.00')
@@ -56,13 +56,11 @@ describe('useGifts', () => {
     const created = await create({ recipient_name: 'Sara' })
     expect(created.data.id).toBe(9)
 
-    await pay(9)
     await redeem('18d08cb9-0843-4865-9c40-11a470b183db')
 
     const paths = api.calls.map((c) => `${c.method} ${c.url}`)
     expect(paths).toContain('POST /api/gifts/quote')
     expect(paths).toContain('POST /api/gifts')
-    expect(paths).toContain('POST /api/gifts/9/pay')
     expect(paths).toContain('POST /api/gifts/18d08cb9-0843-4865-9c40-11a470b183db/redeem')
   })
 

@@ -76,70 +76,8 @@
           </p>
         </header>
 
-        <!-- Step two of the same purchase, not a new page: the hold is already placed and
-             the countdown is running, so the form is out of the way but the summary stays. -->
-        <div
-          v-if="gift"
-          class="mx-auto mt-10 grid max-w-4xl gap-6 lg:grid-cols-[1fr_22rem] lg:items-start"
-        >
-          <section class="rounded-3xl border bg-card p-6 sm:p-8">
-            <h2 class="font-display text-2xl font-semibold">
-              {{ t("gift_pay_title", "Payment", "الدفع") }}
-            </h2>
-            <p class="mt-2 text-sm text-muted-foreground">
-              {{
-                t(
-                  "gift_pay_body",
-                  "Confirm the gift and pay to get your share link.",
-                  "أكّد الهدية وادفع للحصول على رابط المشاركة.",
-                )
-              }}
-            </p>
-
-            <dl
-              class="mt-6 flex flex-col gap-2 rounded-2xl bg-brand-mist/40 p-4 text-sm"
-            >
-              <div class="flex items-center justify-between gap-4">
-                <dt class="text-muted-foreground">
-                  {{ t("gift_recipient", "For", "المهدى له") }}
-                </dt>
-                <dd class="font-medium">{{ gift.recipient_name }}</dd>
-              </div>
-              <div
-                v-if="gift.recipient_phone"
-                class="flex items-center justify-between gap-4"
-              >
-                <dt class="text-muted-foreground">
-                  {{ t("gift_recipient_phone", "Phone", "رقم الهاتف") }}
-                </dt>
-                <dd class="font-medium" dir="ltr">
-                  {{ gift.recipient_phone }}
-                </dd>
-              </div>
-            </dl>
-
-            <div class="mt-6">
-              <CheckoutPaymentHold
-                :amount-due="gift.amount_due"
-                :payment-status="gift.payment_status"
-                :expires-at="gift.payment_expires_at"
-                :pay="payGift"
-                restart-to="/gifts/new"
-                @paid="onPaid"
-                @expired="onHoldExpired"
-              />
-            </div>
-          </section>
-
-          <CheckoutSummary
-            :quote="summaryQuote"
-            :title="t('gift_summary', 'Gift summary', 'ملخص الهدية')"
-          />
-        </div>
-
-        <!-- Step one: who it is for, what it says, and what it costs. -->
+        <!-- Who it is for, what it says, and what it costs. Confirming pays. -->
         <form
-          v-else
           class="mx-auto mt-10 grid max-w-4xl gap-6 lg:grid-cols-[1fr_22rem] lg:items-start"
           @submit.prevent="purchase"
         >
@@ -315,16 +253,15 @@
 <script setup>
 /**
  * Buying gift credit. The package is a fixed amount decided by the backend, so the only
- * things the buyer chooses are who it is for, what it says, and how it is paid — which
- * makes this the shortest of the four two-phase checkouts: quote → create (hold) → pay.
+ * things the buyer chooses are who it is for, what it says, and how it is paid: quote,
+ * then place. Placing is paying, so the gift comes back paid with its share link live.
  *
  * The frame labels a single field «اسم المهدى له» and prefills it with a phone number.
  * The API takes both — `recipient_name` (required) and `recipient_phone` (optional) —
  * and they mean different things, so the one field is split into two here.
  *
  * There is no payment gateway: the frame's Apple Pay / G Pay / VISA tiles have nothing
- * behind them, and `POST /api/gifts/{id}/pay` settles on its own. `<CheckoutPaymentHold>` is the
- * whole pay step.
+ * behind them.
  */
 definePageMeta({
   middleware: ["auth-mode", "require-registered", "verified"],
@@ -339,7 +276,7 @@ const { format } = usePrice();
 const { allowedPhoneCountries } = useAuthConfig();
 
 // Buying a gift spends from the wallet, so both surfaces the site reads a balance from —
-// the ledger and the identity every other screen shows the number off — go stale on pay.
+// the ledger and the identity every other screen shows the number off — go stale.
 const { refreshIdentity } = useSanctumAuth();
 const { refresh: refreshWallet } = useWallet();
 const {
@@ -348,7 +285,6 @@ const {
   packageStatus,
   quote: quoteGift,
   create,
-  pay,
   refreshPackage,
 } = useGifts();
 
@@ -364,7 +300,6 @@ const discountCode = ref("");
 const payFromWallet = ref(false);
 
 const quote = ref(null);
-const gift = ref(null);
 const quoting = ref(false);
 const discountErrors = ref({});
 const quoteError = ref("");
@@ -439,17 +374,6 @@ watch(discountCode, (code) => {
 
 onMounted(runQuote);
 
-/**
- * Put the buyer back on a fresh quote when the hold lapses. Without this the expired
- * gift stayed in `gift`, so the expired panel kept rendering and its "Start again" button
- * — a link to the route already on screen — did nothing at all. Only a reload recovered.
- */
-const onHoldExpired = () => {
-  gift.value = null;
-  quote.value = null;
-  runQuote();
-};
-
 const purchase = async () => {
   try {
     const { data } = await submitCreate(() =>
@@ -462,32 +386,16 @@ const purchase = async () => {
       }),
     );
 
-    quote.value = { ...quote.value, ...data };
-
-    // Settled at create — the wallet or a discount covered the whole package. There is
-    // no hold and nothing to pay: `/pay` must not be called.
-    if (isZeroMoney(data.amount_due)) {
-      // Best-effort: a stale balance must not read as a failed purchase.
-      await Promise.all([refreshIdentity(), refreshWallet()]).catch(() => {});
-      await navigateTo({ path: `/gifts/${data.id}`, query: { new: "1" } });
-      return;
-    }
-
-    gift.value = data;
+    // Placing is paying — straight to the gift and its share link. Best-effort on the
+    // balance: a stale number must not read as a failed purchase.
+    await Promise.all([refreshIdentity(), refreshWallet()]).catch(() => {});
+    await navigateTo({ path: `/gifts/${data.id}`, query: { new: "1" } });
   } catch (err) {
     // `errors.gift` on create is `gift_unavailable` — gifting went off between the quote
     // and the button. The whole form is moot, so the page flips to the off state.
     if (fieldError(err, "gift")) unavailableMessage.value = err.message;
     discountErrors.value = err?.errors ?? {};
   }
-};
-
-const payGift = () => pay(gift.value.id);
-
-const onPaid = async (res) => {
-  await Promise.all([refreshIdentity(), refreshWallet()]).catch(() => {});
-  await navigateTo({ path: `/gifts/${gift.value.id}`, query: { new: "1" } });
-  return res;
 };
 
 useSeoMeta({

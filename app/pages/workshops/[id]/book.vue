@@ -343,19 +343,7 @@
             createError
           }}</span>
 
-          <!-- The hold: `amount_due === "0.00"` never gets here, it goes straight to done. -->
-          <CheckoutPaymentHold
-            v-if="booking"
-            :amount-due="booking.amount_due"
-            :payment-status="booking.payment_status"
-            :expires-at="booking.payment_expires_at"
-            :pay="payBooking"
-            :restart-to="`/workshops/${workshop.id}/book`"
-            @paid="onPaid"
-            @expired="onExpired"
-          />
-
-          <template v-else>
+          <template v-if="!booking">
             <Button
               v-if="hasCelebration && !withCelebration"
               type="button"
@@ -561,7 +549,6 @@ const { format } = usePrice();
 // beside a "x 3" label showed 35 SAR over a total of 105.
 const lineTotal = (price, quantity) =>
   fromHalalas(toHalalas(price) * (quantity ?? 1));
-const toast = useToast();
 const bookingApi = useWorkshopBooking(() => route.params.id);
 
 const step = ref("when");
@@ -854,9 +841,8 @@ const createBooking = async () => {
       ...(catalogue.value ? { products: productsBody(lines.value) } : {}),
     });
     booking.value = res?.data ?? null;
-    // Wallet or a full discount covered it: the server already marked it paid.
-    if (booking.value && isZeroMoney(booking.value.amount_due))
-      step.value = "done";
+    // Placing is paying — the booking comes back confirmed, with no pay step.
+    if (booking.value) step.value = "done";
   } catch (err) {
     const normalized = normalizeApiError(err);
     createErrors.value = normalized.errors;
@@ -880,40 +866,14 @@ const createBooking = async () => {
   }
 };
 
-const payBooking = () =>
-  useApi()(`/api/workshops/bookings/${booking.value.id}/pay`, {
-    method: "POST",
-  });
-
 // Both surfaces of the balance go stale the moment the wallet pays for anything: the
 // toggle reads it off the Sanctum identity, the wallet page off its own ledger.
 const { refreshIdentity } = useSanctumAuth();
 const { refresh: refreshWallet } = useWallet();
 
-const onPaid = (res) => {
-  booking.value = res?.data ?? booking.value;
-  step.value = "done";
-};
-
-const onExpired = async () => {
-  booking.value = null;
-  quote.value = null;
-  step.value = "when";
-  toast.error(
-    t(
-      "hold_lapsed",
-      "The payment window closed and the seat was released. Please pick a time again.",
-      "انتهت مهلة الدفع وتم تحرير المقعد. يرجى اختيار الموعد من جديد.",
-    ),
-  );
-  await nextTick();
-  await picker.value?.refreshCalendar();
-  await picker.value?.refreshSlots();
-};
-
-// Landing on `done` is the one seam both paid paths cross — `/pay`, and a create the
-// wallet or a full discount already settled. Own pieces are claimed at booking, so the
-// workshop detail behind us is stale; so is the balance, on both surfaces that show it.
+// Landing on `done` means the booking was placed and paid. Own pieces are claimed at
+// booking, so the workshop detail behind us is stale; so is the balance, on both surfaces
+// that show it.
 watch(
   () => step.value === "done",
   (done) => {

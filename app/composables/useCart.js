@@ -1,11 +1,11 @@
 /**
- * The basket (`/api/shop/cart`) and the quote → checkout → pay flow on top of it.
+ * The basket (`/api/shop/cart`) and the quote → checkout flow on top of it.
  *
  * One line per product AND colourway — the hex string is the variant id the cart takes,
  * so the same piece in another glaze is another line. The cart is not a reservation: every
  * fetch re-reads `line.in_stock` / `available_stock`, and checkout is blocked while any
- * line cannot be fulfilled. Lines are kept through checkout — the server empties the cart
- * only when the order is paid (or settled on creation), so that is when we refetch.
+ * line cannot be fulfilled. Placing is paying: checkout comes back already paid and the
+ * server removes the lines it bought, so that is when we refetch.
  */
 export const HARD_MAX_QUANTITY = 100;
 
@@ -137,9 +137,8 @@ export const useCheckout = () => {
   const errors = ref({});
   const error = ref("");
 
-  /** The order this session created, or the open hold found when checkout was refused. */
+  /** The order this session placed. */
   const order = ref(null);
-  const resumed = ref(false);
 
   const body = () => ({
     address_id: addressId.value ?? undefined,
@@ -191,61 +190,20 @@ export const useCheckout = () => {
   const checkout = async () => {
     errors.value = {};
     error.value = "";
-    resumed.value = false;
     try {
       const res = await api("/api/shop/cart/checkout", {
         method: "POST",
         body: body(),
       });
       order.value = res?.data ?? null;
-      // Covered in full by the wallet or a coupon: the server settled it and emptied the cart.
-      if (settled.value) await cart.refresh();
+      await cart.refresh();
       return order.value;
     } catch (err) {
       const normalized = normalizeApiError(err);
       errors.value = normalized.errors;
       error.value = normalized.message;
-      if (normalized.errors.cart) {
-        const open = await findAwaitingPayment();
-        if (open) {
-          order.value = open;
-          resumed.value = true;
-        }
-      }
       throw normalized;
     }
-  };
-
-  /** Only one hold is open at a time, so the newest page is enough to find it. */
-  const findAwaitingPayment = async () => {
-    try {
-      const res = await api("/api/shop/orders", { query: { per_page: 5 } });
-      return (
-        unwrapList(res?.data).items.find(
-          (candidate) => candidate.status === "awaiting_payment",
-        ) ?? null
-      );
-    } catch {
-      return null;
-    }
-  };
-
-  const pay = async () => {
-    const res = await api(`/api/shop/orders/${order.value.id}/pay`, {
-      method: "POST",
-    });
-    order.value = res?.data ?? order.value;
-    await cart.refresh();
-    return res;
-  };
-
-  /** After the open hold is cancelled the basket is untouched — back to a fresh quote. */
-  const reset = () => {
-    order.value = null;
-    resumed.value = false;
-    errors.value = {};
-    error.value = "";
-    return requote();
   };
 
   return {
@@ -258,11 +216,8 @@ export const useCheckout = () => {
     errors,
     error,
     order,
-    resumed,
     settled,
     requote,
     checkout,
-    pay,
-    reset,
   };
 };

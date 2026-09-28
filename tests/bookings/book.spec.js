@@ -4,7 +4,6 @@ import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import { h, ref } from 'vue'
 
-const inMinutes = (m) => new Date(Date.now() + m * 60000).toISOString()
 
 const { api, lang, sanctum, toast, showError, refreshNuxtData, picker, walletRefresh } = await vi.hoisted(async () => {
   const { vi: v } = await import('vitest')
@@ -14,7 +13,6 @@ const { api, lang, sanctum, toast, showError, refreshNuxtData, picker, walletRef
       'GET /api/workshops/{id}': () => envelope(globalThis.__workshop),
       'GET /api/workshops/{id}/price': () => globalThis.__quote(),
       'POST /api/workshops/{id}/bookings': () => globalThis.__create(),
-      'POST /api/workshops/bookings/{id}/pay': () => envelope({ ...globalThis.__booking, payment_status: 'paid', amount_due: '0.00' }),
       'GET /api/wallet/transactions': () => envelope({ balance: '125.00', transactions: [] }),
     }),
     lang: createLang('en'),
@@ -128,9 +126,11 @@ beforeEach(() => {
 
 afterEach(() => { vi.useRealTimers() })
 
-describe('workshop booking — create then pay', () => {
-  it('a create that comes back settled skips the hold and lands on done', async () => {
-    globalThis.__booking = { id: 55, ...quote({ wallet_applied: '190.00', amount_due: '0.00' }), payment_status: 'paid', payment_expires_at: null }
+describe('workshop booking — placing is paying', () => {
+  it('lands on done straight from the create, with no pay step', async () => {
+    // Money still going through `amount_due` on the quote, collected on placing: the
+    // booking comes back confirmed and paid.
+    globalThis.__booking = { id: 55, ...quote({ amount_due: '0.00' }), status: 'confirmed', payment_status: 'paid', payment_expires_at: null }
 
     const wrapper = await mount()
     await toPayStep(wrapper)
@@ -141,34 +141,6 @@ describe('workshop booking — create then pay', () => {
     expect(wrapper.text()).not.toContain('Reserved for you')
     expect(api.calls.some((call) => call.url.endsWith('/pay'))).toBe(false)
     expect(wrapper.find('a[href$="/bookings/55"]').exists()).toBe(true)
-  })
-
-  it('a create that still owes money renders the hold with its countdown', async () => {
-    globalThis.__booking = { id: 55, ...quote({ amount_due: '190.00' }), payment_status: 'unpaid', payment_expires_at: inMinutes(14) }
-
-    const wrapper = await mount()
-    await toPayStep(wrapper)
-    await byText(wrapper, 'Confirm the booking and pay').trigger('click')
-    await flushPromises()
-
-    expect(wrapper.text()).toContain('Reserved for you')
-    expect(wrapper.text()).toMatch(/13:5\d|14:00/)
-    expect(wrapper.text()).not.toContain('Your booking is confirmed!')
-  })
-
-  it('paying the hold finishes the booking', async () => {
-    globalThis.__booking = { id: 55, ...quote({ amount_due: '190.00' }), payment_status: 'unpaid', payment_expires_at: inMinutes(14) }
-
-    const wrapper = await mount()
-    await toPayStep(wrapper)
-    await byText(wrapper, 'Confirm the booking and pay').trigger('click')
-    await flushPromises()
-
-    await byText(wrapper, 'Pay now').trigger('click')
-    await flushPromises()
-
-    expect(api.calls.some((call) => call.url === '/api/workshops/bookings/55/pay')).toBe(true)
-    expect(wrapper.text()).toContain('Your booking is confirmed!')
   })
 })
 
@@ -287,48 +259,9 @@ describe('workshop booking — a seat that went while we were looking', () => {
   })
 })
 
-describe('workshop booking — the hold lapsing', () => {
-  it('clears the held booking and the quote and goes back to the slot step', async () => {
-    globalThis.__booking = { id: 55, ...quote({ amount_due: '190.00' }), payment_status: 'unpaid', payment_expires_at: inMinutes(0.2) }
-
-    const wrapper = await mount()
-    await toPayStep(wrapper)
-    await byText(wrapper, 'Confirm the booking and pay').trigger('click')
-    await flushPromises()
-    expect(wrapper.text()).toContain('Reserved for you')
-
-    picker.refreshCalendar.mockClear()
-    picker.refreshSlots.mockClear()
-    await vi.advanceTimersByTimeAsync(14000)
-    await flushPromises()
-
-    expect(wrapper.text()).not.toContain('Reserved for you')
-    expect(currentStep(wrapper)).toBe('when')
-    expect(toast.error).toHaveBeenCalledWith(expect.stringContaining('the seat was released'))
-    expect(picker.refreshCalendar).toHaveBeenCalled()
-    expect(picker.refreshSlots).toHaveBeenCalled()
-  })
-})
-
 describe('workshop booking — the balance after paying', () => {
   /** The customer paid, went to their profile, and read the number they had before. */
-  it('re-asks for the balance when the hold is settled at /pay', async () => {
-    globalThis.__booking = { id: 55, ...quote({ amount_due: '190.00' }), payment_status: 'unpaid', payment_expires_at: inMinutes(14) }
-
-    const wrapper = await mount()
-    await toPayStep(wrapper)
-    await byText(wrapper, 'Confirm the booking and pay').trigger('click')
-    await flushPromises()
-    expect(sanctum.refreshIdentity).not.toHaveBeenCalled()
-
-    await byText(wrapper, 'Pay now').trigger('click')
-    await flushPromises()
-
-    expect(sanctum.refreshIdentity).toHaveBeenCalled()
-    expect(walletRefresh).toHaveBeenCalled()
-  })
-
-  it('re-asks for it on a create the wallet already settled — there is no /pay on that path', async () => {
+  it('re-asks for the balance once the booking is placed', async () => {
     globalThis.__booking = { id: 55, ...quote({ wallet_applied: '190.00', amount_due: '0.00' }), payment_status: 'paid', payment_expires_at: null }
 
     const wrapper = await mount()

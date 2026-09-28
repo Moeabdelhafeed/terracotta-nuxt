@@ -5,35 +5,9 @@
     <div class="mx-auto max-w-6xl px-6 py-16">
       <h1 class="font-display text-3xl font-semibold sm:text-4xl">{{ t('checkout_title', 'Checkout', 'الدفع') }}</h1>
 
-      <!-- The open hold the server refused a second checkout for: pay it or cancel it. -->
-      <section v-if="resumed && order" class="mt-8 rounded-3xl border border-brand-terracotta/40 bg-brand-mist/40 p-6 sm:p-8">
-        <h2 class="font-display text-xl font-semibold">{{ t('open_hold_title', 'An order is already waiting for payment', 'لديك طلب بانتظار الدفع') }}</h2>
-        <p class="mt-2 text-sm text-muted-foreground">{{ error || t('open_hold_body', 'Pay or cancel it before placing a new one.', 'ادفعه أو ألغِه قبل إنشاء طلب جديد.') }}</p>
-
-        <div class="mt-5 flex flex-wrap items-center gap-3">
-          <NuxtLink :to="`/orders/${order.id}`" class="text-sm font-medium text-brand-terracotta underline-offset-4 hover:underline">
-            {{ t('open_hold_link', 'Order #:id', 'الطلب رقم :id', { id: order.id }) }}
-          </NuxtLink>
-          <ShopOrderStatusBadge :status="order.status" />
-        </div>
-
-        <CheckoutPaymentHold
-          class="mt-5"
-          :amount-due="order.amount_due"
-          :payment-status="order.payment_status"
-          :expires-at="order.payment_expires_at"
-          :pay="pay"
-          restart-to="/cart"
-          @paid="onPaid"
-          @expired="reset"
-        />
-
-        <ShopOrderCancelButton class="mt-4" :order="order" :cancel="cancelOpen" @cancelled="reset" />
-      </section>
-
-      <!-- The order this session created, held and waiting for the pay call. -->
-      <section v-else-if="order" class="mt-8 flex flex-col gap-6">
-        <div v-if="settled" class="rounded-3xl border bg-card p-8 text-center">
+      <!-- Placed, and therefore paid: there is no pay step. -->
+      <section v-if="order" class="mt-8">
+        <div class="rounded-3xl border bg-card p-8 text-center">
           <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-green/10 text-brand-green">
             <LucideCheckCircle2 class="size-6" />
           </span>
@@ -43,24 +17,6 @@
             <NuxtLink :to="`/orders/${order.id}`">{{ t('view_order', 'View the order', 'عرض الطلب') }}</NuxtLink>
           </Button>
         </div>
-
-        <template v-else>
-          <CheckoutSummary :quote="order" :title="t('summary_title', 'Your order', 'طلبك', { subGroup: 'checkout' })" />
-          <CheckoutPaymentHold
-            :amount-due="order.amount_due"
-            :payment-status="order.payment_status"
-            :expires-at="order.payment_expires_at"
-            :pay="pay"
-            restart-to="/cart"
-            @paid="onPaid"
-            @expired="reset"
-          />
-
-          <!-- The hold is sitting on stock, on the wallet slice it took and on a use of
-               the discount code for the whole window. A customer who decides not to pay
-               could only walk away and leave all three locked until it expired. -->
-          <ShopOrderCancelButton :order="order" :cancel="cancelOpen" @cancelled="reset" />
-        </template>
       </section>
 
       <!-- Empty cart: nothing to quote, nothing to place. -->
@@ -139,9 +95,10 @@ definePageMeta({
 })
 
 /**
- * Quote → checkout → pay. The three inputs (address, coupon, wallet) drive a fresh quote
- * on every change, and the create call sends the identical three — so what the customer
- * confirms is what the server charges. The frame's inline map + phone pair is replaced by
+ * Quote → place. The three inputs (address, coupon, wallet) drive a fresh quote on every
+ * change, and the create call sends the identical three — so what the customer confirms is
+ * what the server charges. Placing is paying: there is no gateway, so the order comes back
+ * already paid and there is no pay step. The frame's inline map + phone pair is replaced by
  * the saved-address book, which is what supplies the delivery zone.
  */
 const { t } = useLang('web', 'checkout')
@@ -149,27 +106,13 @@ const toast = useToast()
 
 const {
   cart, addressId, discountCode, useWallet: payFromWallet,
-  quote, quoting, errors, error, order, resumed, settled,
-  checkout, pay, requote, reset,
+  quote, quoting, errors, error, order,
+  checkout, requote,
 } = useCheckout()
 
 const { refreshIdentity } = useSanctumAuth()
 const { refresh: refreshWallet } = useWallet()
 
-/**
- * Paying moves the balance, and the site reads one from two places — the ledger and the
- * identity every other screen shows the number off. Both go stale at that same moment.
- *
- * Hung off `settled` rather than off the pay button: an order the wallet covers in full
- * settles at create with no pay step at all, and on the pay step the hold component is
- * unmounted by this very flip — taking its `paid` event with it.
- */
-watch(settled, (is) => {
-  // Best-effort: a stale balance is not worth failing a payment that already landed.
-  if (is) Promise.all([refreshIdentity(), refreshWallet()]).catch(() => {})
-})
-
-const api = useApi()
 const placing = ref(false)
 
 // `cart` is a plain object of refs, and templates only unwrap top-level ones.
@@ -204,21 +147,16 @@ const place = async () => {
   placing.value = true
   try {
     await checkout()
-    if (settled.value) toast.success(t('order_placed_title', 'Your order is placed', 'تم تأكيد طلبك'))
+    toast.success(t('order_placed_title', 'Your order is placed', 'تم تأكيد طلبك'))
+    // Placing moved the balance, and the site reads it from two places. Best-effort: a
+    // stale number is not worth failing an order that already landed.
+    Promise.all([refreshIdentity(), refreshWallet()]).catch(() => {})
   } catch {
     // errors.cart / errors.discount_code / errors.address_id are already on screen
   } finally {
     placing.value = false
   }
 }
-
-const onPaid = () => {
-  toast.success(t('payment_done', 'Payment completed.', 'تم الدفع بنجاح.'))
-  return navigateTo(`/orders/${order.value.id}`)
-}
-
-/** The recovery panel's cancel — `useCheckout` only knows how to pay. */
-const cancelOpen = (id) => api(`/api/shop/orders/${id}`, { method: 'DELETE' })
 
 const crumbs = computed(() => [
   { to: '/', label: t('nav_home', 'Home', 'الرئيسية', { subGroup: 'general' }) },
