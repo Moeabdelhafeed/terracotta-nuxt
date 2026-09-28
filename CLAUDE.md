@@ -429,3 +429,37 @@ no countdown, no "awaiting payment" state to recover from. `CheckoutPaymentHold`
 History: this site once had a two-phase hold with a pay step on every flow. The delivery pay
 step was never wired up at all, so fees sat unpaid for ever and pickup refunds returned only
 the wallet slice — the bug that prompted removing the hold everywhere.
+
+## A stored translation loses to the code when its placeholders are stale
+
+`useLang().t()` seeds a translation row the first time a key is used and never rewrites it.
+Rename a placeholder in the code later and the stored row keeps the old one, printed raw:
+the booking page read "والمتبقي على موعدها :n أيام" because the row was seeded with `:n` and
+the code passes `:remaining` (QA WEB-01). `isStaleTranslation()` now makes the code default
+win whenever the stored text has a `:token` the default doesn't. Still: **when a sentence's
+placeholders change, give it a new key** — that also re-seeds the Arabic, which the fallback
+alone can't correct for an admin who has edited it.
+
+## Durations are words, from one place
+
+`useDuration()` (`remaining(minutes)`, `counted(n, unit)`, `minutesUntil(iso)`) is the only
+way this site writes a stretch of time: minutes under an hour, hours and minutes under a day,
+days and hours beyond, each correctly inflected in Arabic (one/two/3–10/11+). One `:n`
+template per unit is how "1 ساعات" and "1 أيام" kept shipping. Head counts go through it too
+(`counted(n, 'person')` → شخص واحد / شخصان / 4 أشخاص / 12 شخصًا) — never `:n اشخاص`.
+Time left is rounded **up**, so a fresh three-hour window reads "3 ساعات", not "ساعتان و59
+دقيقة", and an open window never reads zero.
+
+The cancellation window is shown as **time left** from `editable_until` — "أمامك ساعة واحدة
+و20 دقيقة لإلغاء الحجز أو تغيير موعده" — on the confirmation screen and the booking page. The
+window counts from when the booking was made and stops at the session start (server rule);
+never render the workshop's setting as "up to N hours before the session".
+
+## The delivery page shows only the option chosen
+
+Arriving from the booking page's Delivery or Pickup button (`?method=`), the page hides the
+pair and shows that option alone; showing both again read as the choice not having
+registered (QA WEB-03). With no `method` it offers both. The booking page says "Delivery fee
+paid: X" once a delivery is chosen (it once said the fee was due at the studio), and the
+switch-to-pickup note quotes the whole paid fee, not only the wallet slice.
+

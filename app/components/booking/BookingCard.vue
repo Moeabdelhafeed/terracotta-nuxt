@@ -27,7 +27,7 @@
       </div>
 
       <p class="line-clamp-2 text-xs leading-relaxed text-white/85">
-        {{ t('n_people', ':n people', ':n اشخاص', { n: booking.people_count }) }}
+        {{ counted(booking.people_count, 'person') }}
         · {{ formatBookingDate(booking.booking_date, code) }}
         · {{ formatSlotTime(booking.start_time, booking.end_time, code) }}
       </p>
@@ -71,6 +71,7 @@
 const props = defineProps({ booking: { type: Object, required: true } })
 
 const { t, code } = useLang('web', 'bookings')
+const { counted } = useDuration()
 const { format } = usePrice()
 const { workshops } = useWorkshops()
 const { artFor } = useWorkshopArt()

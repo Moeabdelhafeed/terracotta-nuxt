@@ -55,6 +55,15 @@ export const hoursUntilSession = (ymd, startTime) => {
   return Number.isNaN(at) ? null : Math.floor((at - Date.now()) / 3600000);
 };
 
+/** Same instant as {@link hoursUntilSession}, in whole minutes — for "2 hours and 15 minutes". */
+export const minutesUntilSession = (ymd, startTime) => {
+  const hours = hoursUntilSession(ymd, startTime);
+  if (hours === null) return null;
+  const [y, m, d] = ymd.split("-").map(Number);
+  const [hh = 0, mm = 0] = String(startTime ?? "00:00").split(":").map(Number);
+  return Math.floor((Date.UTC(y, m - 1, d, hh - 3, mm) - Date.now()) / 60000);
+};
+
 /**
  * Arabic plural form for a count, as CLDR defines it — the app's own ARB messages use the
  * same six-way split, and "1 أيام" (the website's old output) is not one of them.

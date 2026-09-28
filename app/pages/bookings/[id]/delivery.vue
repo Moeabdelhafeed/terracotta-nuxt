@@ -32,19 +32,36 @@
       </p>
 
       <template v-else>
+        <!-- Worded for the choice already made; the either/or sentence only when the page
+             is offering both. -->
         <p class="mt-3 text-muted-foreground">
           {{
-            t(
-              "delivery_intro",
-              "Pick it up from the studio, or have it delivered to your address.",
-              "استلمها من الاستوديو، أو اطلب توصيلها إلى عنوانك.",
-            )
+            !preselected
+              ? t(
+                  "delivery_intro",
+                  "Pick it up from the studio, or have it delivered to your address.",
+                  "استلمها من الاستوديو، أو اطلب توصيلها إلى عنوانك.",
+                )
+              : method === "delivery"
+                ? t(
+                    "delivery_intro_delivery",
+                    "Choose the address your piece should be delivered to.",
+                    "اختر العنوان الذي نوصل إليه قطعتك.",
+                  )
+                : t(
+                    "delivery_intro_pickup",
+                    "Collect your piece from the studio.",
+                    "استلم قطعتك من الاستوديو.",
+                  )
           }}
         </p>
 
         <div class="mt-8 grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-start">
           <div>
-            <div class="flex flex-wrap gap-3">
+            <!-- The pair only when the customer arrived without choosing. Coming from the
+                 booking page's Delivery (or Pickup) button they already chose, and showing
+                 both again read as the choice not having registered. -->
+            <div v-if="!preselected" class="flex flex-wrap gap-3">
               <Button
                 type="button"
                 class="h-12 flex-1 rounded-xl text-base"
@@ -161,9 +178,9 @@
             >
               {{
                 t(
-                  "delivery_pay_note",
-                  "Confirming pays the :amount delivery fee. Switch to pickup later and the whole fee comes back to your balance.",
-                  "بالتأكيد تُدفع رسوم التوصيل :amount. وإذا غيّرت إلى الاستلام لاحقًا فستعود الرسوم كاملة إلى رصيدك.",
+                  "delivery_paid_now_note",
+                  "The :amount delivery fee is paid now. Nothing is due on delivery.",
+                  "تُدفع رسوم التوصيل :amount الآن، ولا يُطلب منك أي مبلغ عند التسليم.",
                   { amount: format(quote.amount_due) },
                 )
               }}
@@ -259,6 +276,7 @@ const refundable = computed(
   () => !!refundAmount.value && !isZeroMoney(refundAmount.value),
 );
 
+const preselected = ["delivery", "pickup"].includes(route.query.method);
 const method = ref(route.query.method === "delivery" ? "delivery" : "pickup");
 const addressId = ref(null);
 const payWithWallet = ref(false);

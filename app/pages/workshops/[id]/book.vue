@@ -36,12 +36,11 @@
             )
           }}
         </h1>
-        <!-- The booking's own `can_cancel` comes first. Quoting the policy at somebody who
-             just booked a session starting in three hours told them they could cancel "up
-             to 24 hours before" — the opposite of the warning the picker had shown them a
-             click earlier, and of what the API would answer.
-             A zero window is a real setting below that: the studio is saying there is no
-             cut-off beyond the session itself. "up to 0 hours before" reads as nonsense. -->
+        <!-- The booking's own `can_cancel` comes first. The window runs forward from the
+             booking (the workshop's setting, e.g. one hour) and stops at the session start,
+             so the time left is read off `editable_until` — "1 hours before the session"
+             was both the wrong rule and the wrong plural.
+             A zero window is a real setting: no cut-off beyond the session itself. -->
         <p class="mt-3 text-muted-foreground">
           {{
             !booking.can_cancel
@@ -50,12 +49,12 @@
                   "This booking can't be cancelled or rescheduled — the session is too close.",
                   "لا يمكن إلغاء هذا الحجز أو تغيير موعده، فموعد الجلسة قريب جدًا.",
                 )
-              : workshop.cancellation_window_hours
+              : workshop.cancellation_window_hours && editMinutes
                 ? t(
-                    "booking_done_body",
-                    "You can cancel or move your booking up to :n hours before the session.",
-                    "يمكنك إلغاء الحجز أو تغيير الموعد حتى :n ساعات قبل موعد الجلسة.",
-                    { n: workshop.cancellation_window_hours },
+                    "booking_done_window",
+                    "You have :remaining from now to cancel or reschedule this booking.",
+                    "أمامك :remaining من الآن لإلغاء الحجز أو تغيير موعده.",
+                    { remaining: remaining(editMinutes) },
                   )
                 : t(
                     "booking_done_body_no_window",
@@ -194,7 +193,7 @@
               </h3>
 
               <p class="text-xs leading-relaxed text-white/85">
-                {{ t("n_people", ":n people", ":n اشخاص", { n: people }) }} ·
+                {{ counted(people, "person") }} ·
                 {{ formatBookingDate(date, code) }} ·
                 {{
                   t(
@@ -249,12 +248,12 @@
               <dt>
                 {{
                   t(
-                    "line_workshop",
-                    ":title for :n people",
-                    ":title من :n اشخاص",
+                    "line_workshop_party",
+                    ":title for :party",
+                    ":title لـ:party",
                     {
                       title: workshop.title,
-                      n: people,
+                      party: counted(people, "person"),
                     },
                   )
                 }}
@@ -527,6 +526,9 @@ watchEffect(() => {
 });
 
 const { t, code } = useLang("web", "bookings");
+const { counted, remaining, minutesUntil } = useDuration();
+// Read once when the booking lands on `done` — the sentence is "from now".
+const editMinutes = computed(() => minutesUntil(booking.value?.editable_until));
 
 /**
  * The page bar, footer and scrollbar belong to the layout — `--chrome` is what they read.

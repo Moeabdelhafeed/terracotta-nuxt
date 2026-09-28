@@ -1,5 +1,24 @@
 const seededKeys = new Set()
 
+/**
+ * A stored translation is seeded once, from the default the code carried that day, and never
+ * rewritten — so when the code later renames a placeholder the stored row keeps the old one
+ * and the page prints it raw. That is how the booking page came to read
+ * "والمتبقي على موعدها :n أيام": seeded with `:n`, rendered with `:remaining`.
+ *
+ * Stale means the stored text uses a `:token` the code's own default doesn't have; the
+ * default wins then. An admin editing the copy in the CMS keeps the same tokens (the CMS
+ * protects them), and dropping one is still honoured — only a token nothing will ever fill
+ * counts.
+ */
+const placeholderTokens = (text) => new Set(text.match(/:[a-z_][a-z0-9_]*/gi) ?? [])
+
+export const isStaleTranslation = (stored, fallback) => {
+  if (typeof stored !== 'string' || typeof fallback !== 'string') return false
+  const expected = placeholderTokens(fallback)
+  return [...placeholderTokens(stored)].some((token) => !expected.has(token))
+}
+
 export const useLang = (group = 'web', subGroup = 'general') => {
   const lang = useCookie('lang', { default: () => null })
   const transMode = useRuntimeConfig().public.translationsMode ?? 'remote'
@@ -167,10 +186,11 @@ export const useLang = (group = 'web', subGroup = 'general') => {
       value = ready ? slice[key] : undefined
     }
     const has = typeof value === 'string' && value !== ''
+    const fallback = defaults[code.value] ?? defaults.en
     let str
-    if (has) str = value
+    if (has && !isStaleTranslation(value, fallback)) str = value
     else if (defaults[code.value] !== undefined && defaults[code.value] !== null) str = defaults[code.value]
-    else str = key
+    else str = has ? value : key
 
     if (ready && !has && Object.keys(defaults).length && import.meta.client) {
       seedTranslation(key, defaults, effectiveSubGroup)

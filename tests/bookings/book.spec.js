@@ -142,6 +142,21 @@ describe('workshop booking — placing is paying', () => {
     expect(api.calls.some((call) => call.url.endsWith('/pay'))).toBe(false)
     expect(wrapper.find('a[href$="/bookings/55"]').exists()).toBe(true)
   })
+
+  it('says how long there is from now to cancel or reschedule (QA WEB-02)', async () => {
+    globalThis.__booking = {
+      id: 55, ...quote({ amount_due: '0.00' }), status: 'confirmed', payment_status: 'paid', payment_expires_at: null,
+      can_cancel: true, can_edit: true, editable_until: new Date(Date.now() + 60 * 60000 - 30000).toISOString(),
+    }
+
+    const wrapper = await mount()
+    await toPayStep(wrapper)
+    await byText(wrapper, 'Confirm the booking and pay').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('You have 1 hour from now to cancel or reschedule this booking.')
+    expect(wrapper.text()).not.toContain('before the session')
+  })
 })
 
 describe('workshop booking — the quote follows its inputs', () => {

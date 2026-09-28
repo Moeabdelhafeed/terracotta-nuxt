@@ -84,6 +84,46 @@ describe('booking detail — nothing left to pay', () => {
 
     expect(byText(wrapper, 'Pay now')).toBeFalsy()
     expect(api.calls.some((c) => c.url.endsWith('/pay'))).toBe(false)
+    // QA WEB-04: this page said the fee was still due at the studio.
+    expect(wrapper.find('[data-test="delivery-paid"]').text()).toBe('Delivery fee paid: 25.00 SAR.')
+    expect(wrapper.text()).not.toContain('at the studio')
+  })
+
+  it('offers the whole paid fee back on a switch to pickup, not just the wallet slice', async () => {
+    globalThis.__booking = booking({
+      status: 'completed',
+      delivery_method: 'delivery',
+      delivery_status: 'getting_ready',
+      delivery_fee: '25.00',
+      delivery_fee_wallet_applied: '5.00',
+      delivery_payment_status: 'paid',
+    })
+
+    const wrapper = await mountSuspended(BookingPage, { global: { stubs: { PageBar: true, AppImage: true, BookingSlotPicker: true } } })
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="handover-refund"]').text()).toContain('The 25.00 SAR delivery fee goes back')
+  })
+})
+
+describe('booking detail — the cancellation window as time left (QA WEB-01)', () => {
+  it('says how long is left to cancel or reschedule, in hours and minutes', async () => {
+    globalThis.__booking = booking({ editable_until: new Date(Date.now() + 80 * 60000 - 30000).toISOString() })
+
+    const wrapper = await mountSuspended(BookingPage, { global: { stubs: { PageBar: true, AppImage: true, BookingSlotPicker: true } } })
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="edit-window"]').text())
+      .toBe('You have 1 hour and 20 minutes left to cancel or reschedule this booking.')
+  })
+
+  it('says nothing once the window has closed', async () => {
+    globalThis.__booking = booking({ editable_until: null, can_edit: false, can_cancel: false })
+
+    const wrapper = await mountSuspended(BookingPage, { global: { stubs: { PageBar: true, AppImage: true, BookingSlotPicker: true } } })
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="edit-window"]').exists()).toBe(false)
   })
 })
 

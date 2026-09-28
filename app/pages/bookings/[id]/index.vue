@@ -97,11 +97,7 @@
                 {{ t("tile_people", "People", "الأشخاص") }}
               </dt>
               <dd class="font-display text-sm font-semibold text-foreground">
-                {{
-                  t("n_people", ":n people", ":n اشخاص", {
-                    n: booking.people_count,
-                  })
-                }}
+                {{ counted(booking.people_count, "person") }}
               </dd>
             </div>
 
@@ -360,7 +356,24 @@
                 "pickup_refunds_fee",
                 "The :amount delivery fee goes back to your Terracotta balance. Asking for delivery again later is charged at the rate on the day.",
                 "ستعاد رسوم التوصيل :amount إلى رصيدك في تيراكوتا. وإذا طلبت التوصيل لاحقًا فستُحتسب الرسوم من جديد بسعر اليوم.",
-                { amount: format(booking.delivery_fee_wallet_applied) },
+                { amount: format(deliveryRefund) },
+              )
+            }}
+          </p>
+
+          <!-- The fee was paid when delivery was chosen; this page once said it was still
+               due at the studio. -->
+          <p
+            v-if="deliveryPaid"
+            class="rounded-card bg-brand-mist/60 p-4 text-sm"
+            data-test="delivery-paid"
+          >
+            {{
+              t(
+                "delivery_fee_paid",
+                "Delivery fee paid: :amount.",
+                "رسوم التوصيل مدفوعة: :amount.",
+                { amount: format(booking.delivery_fee) },
               )
             }}
           </p>
@@ -419,17 +432,11 @@
           </div>
 
           <p
-            v-if="booking.editable_until"
+            v-if="editWindowText"
             class="text-xs text-muted-foreground"
+            data-test="edit-window"
           >
-            {{
-              t(
-                "editable_until",
-                "You can change or cancel this booking until :at.",
-                "يمكنك تعديل الحجز أو إلغاؤه حتى :at.",
-                { at: formatDate(booking.editable_until) },
-              )
-            }}
+            {{ editWindowText }}
           </p>
 
         </aside>
@@ -869,13 +876,34 @@ const handover = computed(() => {
 });
 
 /** Only the wallet slice was ever taken, so only that slice can come back. */
+/**
+ * What switching to pickup would give back: the whole fee once it was paid (every delivery
+ * chosen since checkout stopped holding), only the wallet slice on an old unpaid row.
+ */
+const deliveryRefund = computed(() => {
+  const b = booking.value;
+  if (!b || b.delivery_method !== "delivery") return null;
+  return b.delivery_payment_status === "paid" ? b.delivery_fee : b.delivery_fee_wallet_applied;
+});
+
 const switchRefund = computed(
   () =>
-    booking.value?.delivery_method === "delivery" &&
     handover.value.length > 0 &&
-    !!booking.value.delivery_fee_wallet_applied &&
-    !isZeroMoney(booking.value.delivery_fee_wallet_applied),
+    !!deliveryRefund.value &&
+    !isZeroMoney(deliveryRefund.value),
 );
+
+/** A delivery the customer chose and paid for — said so, rather than left to guess. */
+const deliveryPaid = computed(() => {
+  const b = booking.value;
+  return (
+    !!b &&
+    b.delivery_method === "delivery" &&
+    b.delivery_payment_status === "paid" &&
+    !!b.delivery_fee &&
+    !isZeroMoney(b.delivery_fee)
+  );
+});
 
 /**
  * How long the studio will still hold the piece, from the booking's own `pickup_deadline`
@@ -952,60 +980,30 @@ const pieceToRemove = ref(null);
 const pieceLabel = (piece) =>
   (piece?.label ?? "").trim() || t("piece_untitled_short", "Piece", "قطعة");
 
-// "3 days", "يومان", "1 day and 6 hours" — one count, correctly inflected. The app's own
-// ARB messages split Arabic six ways (CLDR) and the website used a single `:n أيام`, which
-// reads as "1 أيام" for a single day. English keeps its two forms.
-const countedUnit = (count, unit) => {
-  const forms = {
-    day: {
-      one: () => t("unit_day_one", "1 day", "يوم واحد"),
-      two: () => t("unit_day_two", "2 days", "يومان"),
-      few: () => t("unit_day_few", ":n days", ":n أيام", { n: count }),
-      many: () => t("unit_day_many", ":n days", ":n يومًا", { n: count }),
-      other: () => t("unit_day_other", ":n days", ":n يوم", { n: count }),
-    },
-    hour: {
-      one: () => t("unit_hour_one", "1 hour", "ساعة واحدة"),
-      two: () => t("unit_hour_two", "2 hours", "ساعتان"),
-      few: () => t("unit_hour_few", ":n hours", ":n ساعات", { n: count }),
-      many: () => t("unit_hour_many", ":n hours", ":n ساعة", { n: count }),
-      other: () => t("unit_hour_other", ":n hours", ":n ساعة", { n: count }),
-    },
-  }[unit];
-
-  // English has one plural boundary; Arabic has five. `code` is the rendered locale.
-  const form =
-    code.value === "ar"
-      ? arabicPluralForm(count)
-      : count === 1
-        ? "one"
-        : "other";
-
-  return (forms[form] ?? forms.other)();
-};
-
 // How far off the session is, worded the way a person would: "soon" inside the last hour,
-// hours on the day itself, and days **with their remaining hours** beyond that — the app
-// says "يوم واحد و6 ساعات" and the website used to round that down to "1 أيام".
+// hours and minutes on the day, days and hours beyond that. The key is new on purpose: the
+// old `panel_confirmed_body` row was seeded with `:n أيام` and printed it raw.
+const { counted, remaining, minutesUntil } = useDuration();
+
 const countdownBody = () => {
-  const hours = booking.value
-    ? hoursUntilSession(booking.value.booking_date, booking.value.start_time)
+  const minutes = booking.value
+    ? minutesUntilSession(booking.value.booking_date, booking.value.start_time)
     : null;
 
-  if (hours === null) {
+  if (minutes === null) {
     const days = booking.value
       ? Math.max(daysUntil(booking.value.booking_date), 0)
       : 0;
 
     return t(
-      "panel_confirmed_body",
+      "panel_confirmed_countdown",
       "Please show your code when you arrive at the studio — :remaining to go.",
       "يرجى مسح الرمز عند الوصول إلى موقع الورشة، والمتبقي على موعدها :remaining.",
-      { remaining: countedUnit(days, "day") },
+      { remaining: counted(days, "day") },
     );
   }
 
-  if (hours < 1) {
+  if (minutes < 60) {
     return t(
       "panel_confirmed_body_soon",
       "Please show your code when you arrive at the studio — it starts soon.",
@@ -1013,26 +1011,28 @@ const countdownBody = () => {
     );
   }
 
-  const wholeDays = Math.floor(hours / 24);
-  const leftoverHours = hours % 24;
-
-  const remaining =
-    wholeDays === 0
-      ? countedUnit(leftoverHours, "hour")
-      : leftoverHours === 0
-        ? countedUnit(wholeDays, "day")
-        : t("unit_days_and_hours", ":days and :hours", ":days و:hours", {
-            days: countedUnit(wholeDays, "day"),
-            hours: countedUnit(leftoverHours, "hour"),
-          });
-
   return t(
-    "panel_confirmed_body",
+    "panel_confirmed_countdown",
     "Please show your code when you arrive at the studio — :remaining to go.",
     "يرجى مسح الرمز عند الوصول إلى موقع الورشة، والمتبقي على موعدها :remaining.",
-    { remaining },
+    { remaining: remaining(minutes) },
   );
 };
+
+// How long is left to cancel or reschedule, as time rather than a date: "You have 1 hour
+// and 20 minutes left". The window runs from when the booking was made (the workshop's own
+// setting) and stops at the session start — `editable_until` is that instant.
+const editWindowText = computed(() => {
+  const minutes = minutesUntil(booking.value?.editable_until);
+  if (minutes === null) return "";
+
+  return t(
+    "edit_window_left",
+    "You have :remaining left to cancel or reschedule this booking.",
+    "أمامك :remaining لإلغاء الحجز أو تغيير موعده.",
+    { remaining: remaining(minutes) },
+  );
+});
 
 const panel = computed(() => {
   return {

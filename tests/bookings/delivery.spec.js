@@ -33,7 +33,9 @@ mockNuxtImport('useToast', () => () => toast)
 mockNuxtImport('navigateTo', () => navigate)
 mockNuxtImport('showError', () => vi.fn())
 mockNuxtImport('useWallet', () => () => ({ balance: ref('125.00'), transactions: ref([]), refresh: walletRefresh }))
-mockNuxtImport('useRoute', () => () => ({ params: { id: '55' }, query: { method: 'delivery' } }))
+// Most tests arrive from the booking page's Delivery button; the switching tests arrive
+// with no choice made, which is when the page offers both.
+mockNuxtImport('useRoute', () => () => ({ params: { id: '55' }, query: globalThis.__query ?? { method: 'delivery' } }))
 
 const DeliveryPage = (await import('~/pages/bookings/[id]/delivery.vue')).default
 
@@ -71,7 +73,18 @@ beforeEach(() => {
   sanctum.refreshIdentity.mockClear()
   globalThis.__booking = booking()
   globalThis.__quote = () => ({ success: true, message: 'ok', errors: null, data: quote() })
+  globalThis.__query = undefined
 })
+
+/** Arrive with no choice made and pick delivery by hand, so the pickup button is there too. */
+const mountUndecided = async () => {
+  globalThis.__query = {}
+  const wrapper = await mount()
+  await flushPromises()
+  await wrapper.findAll('button').find((b) => b.text() === 'Have it delivered').trigger('click')
+  await flushPromises()
+  return wrapper
+}
 
 describe('piece delivery — the quote follows its inputs', () => {
   it('re-quotes when the address changes, and sends it', async () => {
@@ -98,8 +111,7 @@ describe('piece delivery — the quote follows its inputs', () => {
   })
 
   it('does not quote at all for pickup — there is no fee to price', async () => {
-    const wrapper = await mount()
-    await flushPromises()
+    const wrapper = await mountUndecided()
     const before = quoteCalls().length
 
     await wrapper.findAll('button').find((b) => b.text() === 'Pick it up').trigger('click')
@@ -115,9 +127,8 @@ describe('piece delivery — confirming pays', () => {
     const wrapper = await mount()
     await flushPromises()
 
-    expect(wrapper.text()).toContain('Confirming pays the 25.00 SAR delivery fee')
-    // The copy that shipped before promised the fee was owed at handover, and nothing ever
-    // settled it — so switching to pickup refunded nothing.
+    expect(wrapper.text()).toContain('The 25.00 SAR delivery fee is paid now. Nothing is due on delivery.')
+    // The copy that shipped before promised the fee was owed at handover (QA WEB-03).
     expect(wrapper.text()).not.toContain('settled at handover')
     expect(wrapper.text()).not.toContain('paid on the next screen')
   })
@@ -128,7 +139,7 @@ describe('piece delivery — confirming pays', () => {
     const wrapper = await mount()
     await flushPromises()
 
-    expect(wrapper.text()).not.toContain('Confirming pays')
+    expect(wrapper.text()).not.toContain('is paid now')
   })
 
   it('says nothing more is due when the fee was already charged', async () => {
@@ -138,7 +149,7 @@ describe('piece delivery — confirming pays', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain('The delivery fee was already charged')
-    expect(wrapper.text()).not.toContain('Confirming pays')
+    expect(wrapper.text()).not.toContain('is paid now')
   })
 })
 
@@ -149,9 +160,8 @@ describe('piece delivery — switching to pickup hands the fee back', () => {
   }
 
   it('says the fee goes back to the wallet before the customer switches', async () => {
-    globalThis.__booking = booking({ delivery_method: 'delivery', delivery_fee: '25.00', delivery_fee_wallet_applied: '25.00' })
-    const wrapper = await mount()
-    await flushPromises()
+    globalThis.__booking = booking({ delivery_method: 'delivery', delivery_fee: '25.00', delivery_fee_wallet_applied: '0.00', delivery_payment_status: 'paid' })
+    const wrapper = await mountUndecided()
     await pickUp(wrapper)
 
     expect(wrapper.find('[data-test="pickup-refund"]').text()).toContain('The 25.00 SAR delivery fee goes back to your Terracotta balance')
@@ -159,8 +169,7 @@ describe('piece delivery — switching to pickup hands the fee back', () => {
   })
 
   it('says nothing about a refund when no fee was ever charged', async () => {
-    const wrapper = await mount()
-    await flushPromises()
+    const wrapper = await mountUndecided()
     await pickUp(wrapper)
 
     expect(wrapper.find('[data-test="pickup-refund"]').exists()).toBe(false)
@@ -168,8 +177,7 @@ describe('piece delivery — switching to pickup hands the fee back', () => {
 
   it('refreshes the balance after the choice, rather than leaving a stale number', async () => {
     globalThis.__booking = booking({ delivery_method: 'delivery', delivery_fee: '25.00' })
-    const wrapper = await mount()
-    await flushPromises()
+    const wrapper = await mountUndecided()
     await pickUp(wrapper)
 
     await wrapper.findAll('button').find((b) => b.text() === 'Confirm pickup').trigger('click')
@@ -179,4 +187,31 @@ describe('piece delivery — switching to pickup hands the fee back', () => {
     expect(sanctum.refreshIdentity).toHaveBeenCalled()
     expect(navigate).toHaveBeenCalledWith('/bookings/55')
   })
+})
+
+describe('piece delivery — the choice already made', () => {
+  it('shows only the option the customer picked on the booking page', async () => {
+    // Arriving from the booking page's Delivery button (QA WEB-03): the pair again read as
+    // the choice not having registered.
+    const wrapper = await mount()
+    await flushPromises()
+
+    const labels = wrapper.findAll('button').map((b) => b.text())
+    expect(labels).not.toContain('Pick it up')
+    expect(labels).not.toContain('Have it delivered')
+    expect(labels).toContain('Confirm the delivery')
+    expect(wrapper.text()).toContain('Choose the address your piece should be delivered to.')
+    expect(wrapper.text()).not.toContain('Pick it up from the studio, or')
+  })
+
+  it('offers both when the customer arrives without choosing', async () => {
+    globalThis.__query = {}
+    const wrapper = await mount()
+    await flushPromises()
+
+    const labels = wrapper.findAll('button').map((b) => b.text())
+    expect(labels).toContain('Pick it up')
+    expect(labels).toContain('Have it delivered')
+  })
+
 })
