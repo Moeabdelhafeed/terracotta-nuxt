@@ -11,12 +11,12 @@
     </div>
 
     <div class="flex flex-col gap-3 sm:flex-row">
-      <Button type="button" class="h-12 flex-1 rounded-xl bg-brand-terracotta text-base hover:bg-brand-terracotta/90" @click="share">
+      <Button type="button" class="h-12 rounded-xl bg-brand-terracotta text-base hover:bg-brand-terracotta/90 sm:flex-1" @click="share">
         <LucideShare2 class="size-4" />
         {{ t('gift_share', 'Share the link', 'مشاركة الرابط') }}
       </Button>
 
-      <Button as-child type="button" variant="outline" class="h-12 flex-1 rounded-xl text-base">
+      <Button as-child type="button" variant="outline" class="h-12 rounded-xl text-base sm:flex-1">
         <a :href="whatsappHref" target="_blank" rel="noopener noreferrer">
           <LucideMessageCircle class="size-4" />
           {{ t('gift_share_whatsapp', 'WhatsApp', 'واتساب') }}

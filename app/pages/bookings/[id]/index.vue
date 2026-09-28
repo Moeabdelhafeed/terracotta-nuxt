@@ -330,11 +330,15 @@
             class="flex flex-col gap-3 sm:flex-row lg:flex-col"
             data-test="handover"
           >
+            <!-- `flex-1` only where the container is a ROW. This one is a column at both
+                 ends of the range (`flex-col … sm:flex-row lg:flex-col`), and on a column
+                 `flex-1` is a rule about HEIGHT: basis 0 and grow, which overrode `h-12`
+                 and left the button squashed to its text. -->
             <Button
               v-for="option in handover"
               :key="option.method"
               as-child
-              class="h-12 flex-1 rounded-xl px-8 text-base"
+              class="h-12 rounded-xl px-8 text-base sm:flex-1 lg:flex-none"
               :class="option.accent"
             >
               <NuxtLink

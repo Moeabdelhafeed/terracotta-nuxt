@@ -36,10 +36,10 @@
           <span v-if="error" class="mt-3 block text-xs text-destructive">{{ error }}</span>
 
           <div class="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Button type="button" variant="outline" class="h-12 flex-1 rounded-xl" :disabled="pending" @click="open = false">
+            <Button type="button" variant="outline" class="h-12 rounded-xl sm:flex-1" :disabled="pending" @click="open = false">
               {{ t('keep_order', 'Keep order', 'الاحتفاظ بالطلب') }}
             </Button>
-            <Button type="button" class="h-12 flex-1 rounded-xl bg-destructive text-base text-white hover:bg-destructive/90" :disabled="pending" @click="onConfirm">
+            <Button type="button" class="h-12 rounded-xl bg-destructive text-base text-white hover:bg-destructive/90 sm:flex-1" :disabled="pending" @click="onConfirm">
               {{ pending ? t('cancelling', 'Cancelling...', 'جارٍ الإلغاء...') : t('confirm_cancel', 'Yes, cancel', 'نعم، إلغاء') }}
             </Button>
           </div>

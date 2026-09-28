@@ -159,10 +159,29 @@ describe('piece delivery — switching to pickup hands the fee back', () => {
     await flushPromises()
   }
 
+  /**
+   * A booking already on delivery opens on the only move left — pickup. Offering delivery
+   * again read as the choice not having registered, and confirming it re-quotes a fee that
+   * is already paid.
+   */
+  it('opens on pickup, and does not offer the delivery already in effect', async () => {
+    globalThis.__booking = booking({ delivery_method: 'delivery', delivery_fee: '25.00', delivery_payment_status: 'paid' })
+    globalThis.__query = {}
+    const wrapper = await mount()
+    await flushPromises()
+
+    const labels = wrapper.findAll('button').map((b) => b.text())
+    expect(labels).not.toContain('Have it delivered')
+    expect(labels).not.toContain('Pick it up')
+    expect(wrapper.text()).toContain('Your piece is set for delivery')
+    expect(wrapper.findAll('button').some((b) => b.text() === 'Confirm pickup')).toBe(true)
+  })
+
   it('says the fee goes back to the wallet before the customer switches', async () => {
     globalThis.__booking = booking({ delivery_method: 'delivery', delivery_fee: '25.00', delivery_fee_wallet_applied: '0.00', delivery_payment_status: 'paid' })
-    const wrapper = await mountUndecided()
-    await pickUp(wrapper)
+    globalThis.__query = {}
+    const wrapper = await mount()
+    await flushPromises()
 
     expect(wrapper.find('[data-test="pickup-refund"]').text()).toContain('The 25.00 SAR delivery fee goes back to your Terracotta balance')
     expect(wrapper.text()).toContain('charged at the rate on the day')
@@ -177,8 +196,9 @@ describe('piece delivery — switching to pickup hands the fee back', () => {
 
   it('refreshes the balance after the choice, rather than leaving a stale number', async () => {
     globalThis.__booking = booking({ delivery_method: 'delivery', delivery_fee: '25.00' })
-    const wrapper = await mountUndecided()
-    await pickUp(wrapper)
+    globalThis.__query = {}
+    const wrapper = await mount()
+    await flushPromises()
 
     await wrapper.findAll('button').find((b) => b.text() === 'Confirm pickup').trigger('click')
     await flushPromises()

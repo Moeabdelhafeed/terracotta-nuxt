@@ -808,7 +808,7 @@
           <div class="mt-6 flex flex-col gap-3 sm:flex-row">
             <Button
               variant="outline"
-              class="h-12 flex-1 rounded-xl text-base"
+              class="h-12 rounded-xl text-base sm:flex-1"
               :disabled="deleting"
               @click="deleteDialogOpen = false"
             >
@@ -816,7 +816,7 @@
             </Button>
             <Button
               variant="destructive"
-              class="h-12 flex-1 rounded-xl text-base"
+              class="h-12 rounded-xl text-base sm:flex-1"
               :disabled="deleting"
               @click="confirmDeleteAccount"
             >

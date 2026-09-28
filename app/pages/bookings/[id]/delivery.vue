@@ -36,23 +36,35 @@
              is offering both. -->
         <p class="mt-3 text-muted-foreground">
           {{
-            !preselected
+            chosen === "delivery"
               ? t(
-                  "delivery_intro",
-                  "Pick it up from the studio, or have it delivered to your address.",
-                  "استلمها من الاستوديو، أو اطلب توصيلها إلى عنوانك.",
+                  "delivery_intro_switch_pickup",
+                  "Your piece is set for delivery. You can collect it from the studio instead.",
+                  "قطعتك مسجّلة للتوصيل. يمكنك استلامها من الاستوديو بدلًا من ذلك.",
                 )
-              : method === "delivery"
+              : chosen === "pickup"
                 ? t(
-                    "delivery_intro_delivery",
-                    "Choose the address your piece should be delivered to.",
-                    "اختر العنوان الذي نوصل إليه قطعتك.",
+                    "delivery_intro_switch_delivery",
+                    "Your piece is set for pickup. You can ask for it to be delivered instead.",
+                    "قطعتك مسجّلة للاستلام. يمكنك طلب توصيلها بدلًا من ذلك.",
                   )
-                : t(
-                    "delivery_intro_pickup",
-                    "Collect your piece from the studio.",
-                    "استلم قطعتك من الاستوديو.",
-                  )
+                : !preselected
+                  ? t(
+                      "delivery_intro",
+                      "Pick it up from the studio, or have it delivered to your address.",
+                      "استلمها من الاستوديو، أو اطلب توصيلها إلى عنوانك.",
+                    )
+                  : method === "delivery"
+                    ? t(
+                        "delivery_intro_delivery",
+                        "Choose the address your piece should be delivered to.",
+                        "اختر العنوان الذي نوصل إليه قطعتك.",
+                      )
+                    : t(
+                        "delivery_intro_pickup",
+                        "Collect your piece from the studio.",
+                        "استلم قطعتك من الاستوديو.",
+                      )
           }}
         </p>
 
@@ -61,7 +73,10 @@
             <!-- The pair only when the customer arrived without choosing. Coming from the
                  booking page's Delivery (or Pickup) button they already chose, and showing
                  both again read as the choice not having registered. -->
-            <div v-if="!preselected" class="flex flex-wrap gap-3">
+            <div
+              v-if="!preselected && options.length > 1"
+              class="flex flex-wrap gap-3"
+            >
               <Button
                 type="button"
                 class="h-12 flex-1 rounded-xl text-base"
@@ -277,7 +292,33 @@ const refundable = computed(
 );
 
 const preselected = ["delivery", "pickup"].includes(route.query.method);
+
+/**
+ * What the piece is already set to leave by, and therefore what this page must NOT offer
+ * again. A booking on delivery has already paid the fee and named an address; putting
+ * "delivery" back on screen as a choice reads as the choice not having registered, and
+ * confirming it re-quotes a fee that is already settled. Once something is chosen the only
+ * move left here is the switch — the same rule the booking page's buttons follow.
+ */
+const chosen = computed(() => booking.value?.delivery_method ?? null);
+
+const options = computed(() =>
+  chosen.value
+    ? [chosen.value === "pickup" ? "delivery" : "pickup"]
+    : ["pickup", "delivery"],
+);
+
 const method = ref(route.query.method === "delivery" ? "delivery" : "pickup");
+
+// The booking arrives after the first render, so the method is corrected when it does —
+// including a link that still carries `?method=` for the option already in effect.
+watch(
+  options,
+  (list) => {
+    if (!list.includes(method.value)) method.value = list[0];
+  },
+  { immediate: true },
+);
 const addressId = ref(null);
 const payWithWallet = ref(false);
 const quote = ref(null);
