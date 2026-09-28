@@ -177,21 +177,16 @@ describe('piece delivery — switching to pickup hands the fee back', () => {
     expect(wrapper.findAll('button').some((b) => b.text() === 'Confirm pickup')).toBe(true)
   })
 
-  it('says the fee goes back to the wallet before the customer switches', async () => {
+  // The page does not promise the fee back any more, on either screen: the switch is made
+  // here and the refund shows up in the wallet, which is where the customer reads it.
+  it('promises nothing back when switching to pickup', async () => {
     globalThis.__booking = booking({ delivery_method: 'delivery', delivery_fee: '25.00', delivery_fee_wallet_applied: '0.00', delivery_payment_status: 'paid' })
     globalThis.__query = {}
     const wrapper = await mount()
     await flushPromises()
 
-    expect(wrapper.find('[data-test="pickup-refund"]').text()).toContain('The 25.00 SAR delivery fee goes back to your Terracotta balance')
-    expect(wrapper.text()).toContain('charged at the rate on the day')
-  })
-
-  it('says nothing about a refund when no fee was ever charged', async () => {
-    const wrapper = await mountUndecided()
-    await pickUp(wrapper)
-
     expect(wrapper.find('[data-test="pickup-refund"]').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('goes back to your Terracotta balance')
   })
 
   it('refreshes the balance after the choice, rather than leaving a stale number', async () => {

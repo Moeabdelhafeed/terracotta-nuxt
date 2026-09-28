@@ -123,24 +123,8 @@
               }}
             </p>
 
-            <p
-              v-if="method === 'pickup' && refundable"
-              class="mt-3 rounded-2xl bg-brand-green/10 p-4 text-sm text-brand-green"
-              data-test="pickup-refund"
-            >
-              {{
-                t(
-                  "pickup_refunds_fee",
-                  "The :amount delivery fee goes back to your Terracotta balance. Asking for delivery again later is charged at the rate on the day.",
-                  "ستعاد رسوم التوصيل :amount إلى رصيدك في تيراكوتا. وإذا طلبت التوصيل لاحقًا فستُحتسب الرسوم من جديد بسعر اليوم.",
-                  { amount: format(refundAmount) },
-                )
-              }}
-            </p>
-
-            <!-- Tied to the method, not chained to the refund note above it: as a `v-else`
-                 the picker appeared under Pickup whenever there was no fee to refund, which
-                 is every first-time choice. -->
+            <!-- Tied to the method rather than chained to anything above it: as a
+                 `v-else` the picker appeared under Pickup on every first-time choice. -->
             <div v-if="method === 'delivery'" class="mt-6">
               <AddressPicker v-model="addressId" />
               <span
@@ -272,24 +256,6 @@ const { refreshIdentity } = useSanctumAuth();
 const { refresh: refreshWallet } = useWallet();
 
 const available = computed(() => hasDeliveryStep(booking.value));
-
-/**
- * What switching to pickup credits back: the whole fee, since a delivery is paid the moment
- * it is chosen. The wallet-slice branch is for legacy rows whose fee was never settled —
- * the same rule `chooseDelivery(..., 'pickup')` applies server-side.
- */
-const refundAmount = computed(() => {
-  const b = booking.value;
-  if (!b) return null;
-
-  return b.delivery_payment_status === "paid"
-    ? b.delivery_fee
-    : b.delivery_fee_wallet_applied;
-});
-
-const refundable = computed(
-  () => !!refundAmount.value && !isZeroMoney(refundAmount.value),
-);
 
 const preselected = ["delivery", "pickup"].includes(route.query.method);
 
