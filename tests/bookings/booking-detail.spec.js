@@ -89,7 +89,7 @@ describe('booking detail — nothing left to pay', () => {
     expect(wrapper.text()).not.toContain('at the studio')
   })
 
-  it('offers the whole paid fee back on a switch to pickup, not just the wallet slice', async () => {
+  it('says nothing about a refund next to a link that only opens the choice', async () => {
     globalThis.__booking = booking({
       status: 'completed',
       delivery_method: 'delivery',
@@ -102,7 +102,9 @@ describe('booking detail — nothing left to pay', () => {
     const wrapper = await mountSuspended(BookingPage, { global: { stubs: { PageBar: true, AppImage: true, BookingSlotPicker: true } } })
     await flushPromises()
 
-    expect(wrapper.find('[data-test="handover-refund"]').text()).toContain('The 25.00 SAR delivery fee goes back')
+    // The promise of the refund lives on the delivery page, next to the button that
+    // actually makes the switch — not under a link that only opens it.
+    expect(wrapper.find('[data-test="handover-refund"]').exists()).toBe(false)
   })
 })
 
@@ -215,7 +217,7 @@ describe('booking detail — the handover choice stays the customer\'s', () => {
     expect(link(wrapper, 'delivery').exists()).toBe(true)
   })
 
-  it('keeps pickup reachable after delivery was chosen, and says what comes back', async () => {
+  it('keeps pickup reachable after delivery was chosen', async () => {
     globalThis.__booking = finished({
       delivery_method: 'delivery', delivery_status: 'getting_ready',
       delivery_fee: '50.00', delivery_fee_wallet_applied: '20.00',
@@ -225,8 +227,6 @@ describe('booking detail — the handover choice stays the customer\'s', () => {
 
     expect(link(wrapper, 'pickup').attributes('href')).toBe('/bookings/55/delivery?method=pickup')
     expect(link(wrapper, 'delivery').exists()).toBe(false)
-    // Only the wallet slice was ever taken, so only that slice is promised back.
-    expect(wrapper.find('[data-test="handover-refund"]').text()).toContain('20.00 SAR')
   })
 
   it('promises nothing back when the wallet paid nothing', async () => {

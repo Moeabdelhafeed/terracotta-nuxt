@@ -332,13 +332,13 @@
           >
             <!-- `flex-1` only where the container is a ROW. This one is a column at both
                  ends of the range (`flex-col … sm:flex-row lg:flex-col`), and on a column
-                 `flex-1` is a rule about HEIGHT: basis 0 and grow, which overrode `h-12`
-                 and left the button squashed to its text. -->
+                 `flex-1` is a rule about HEIGHT: basis 0 and grow, which overrode the
+                 height and left the button squashed to its text. -->
             <Button
               v-for="option in handover"
               :key="option.method"
               as-child
-              class="h-12 rounded-xl px-8 text-base sm:flex-1 lg:flex-none"
+              class="h-14 rounded-xl px-8 text-base sm:flex-1 lg:flex-none"
               :class="option.accent"
             >
               <NuxtLink
@@ -349,21 +349,6 @@
               </NuxtLink>
             </Button>
           </div>
-
-          <p
-            v-if="switchRefund"
-            class="rounded-card bg-success/10 p-4 text-sm text-success"
-            data-test="handover-refund"
-          >
-            {{
-              t(
-                "pickup_refunds_fee",
-                "The :amount delivery fee goes back to your Terracotta balance. Asking for delivery again later is charged at the rate on the day.",
-                "ستعاد رسوم التوصيل :amount إلى رصيدك في تيراكوتا. وإذا طلبت التوصيل لاحقًا فستُحتسب الرسوم من جديد بسعر اليوم.",
-                { amount: format(deliveryRefund) },
-              )
-            }}
-          </p>
 
           <!-- The fee was paid when delivery was chosen; this page once said it was still
                due at the studio. -->
@@ -878,24 +863,6 @@ const handover = computed(() => {
   const other = chosen === "pickup" ? delivery : pickup;
   return [{ ...other, label: other.switchLabel }];
 });
-
-/** Only the wallet slice was ever taken, so only that slice can come back. */
-/**
- * What switching to pickup would give back: the whole fee once it was paid (every delivery
- * chosen since checkout stopped holding), only the wallet slice on an old unpaid row.
- */
-const deliveryRefund = computed(() => {
-  const b = booking.value;
-  if (!b || b.delivery_method !== "delivery") return null;
-  return b.delivery_payment_status === "paid" ? b.delivery_fee : b.delivery_fee_wallet_applied;
-});
-
-const switchRefund = computed(
-  () =>
-    handover.value.length > 0 &&
-    !!deliveryRefund.value &&
-    !isZeroMoney(deliveryRefund.value),
-);
 
 /** A delivery the customer chose and paid for — said so, rather than left to guess. */
 const deliveryPaid = computed(() => {
