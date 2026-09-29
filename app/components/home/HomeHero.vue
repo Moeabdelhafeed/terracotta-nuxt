@@ -1,10 +1,9 @@
 <template>
-  <!-- Deliberately NOT gated on a banner existing. The promo banner only supplies the
-       overlay copy at the foot of this file; the mark, the film, the studio tiles and the
-       "what is terracotta?" panel are the front door itself. Gating the lot on
-       `banners[0]` left an install with no active banner with no hero at all — and, worse,
-       meant `hero_video` and `studio_1…4` never rendered, so those media keys could never
-       seed themselves. -->
+  <!-- Nothing here comes from a banner any more. Banners are the app's carousel and this
+       is the website's front door: its words are translation keys, its film and its studio
+       tiles are media keys, and each seeds itself. The hero used to read `banners[0]`,
+       which meant an install with no active banner had no hero at all — and the copy the
+       site actually shows could only be edited by editing an app banner. -->
   <div>
     <!-- Two layouts, one markup. On desktop the brown panel lies over the film and is
          revealed as a pinned scrub shrinks it; on a phone there is no scrub, so the two
@@ -198,7 +197,7 @@
         <AppMedia
           v-if="heroVideoAsset"
           :src="heroVideoAsset"
-          :alt="hero?.title ?? ''"
+          :alt="t('home_hero_title', 'Terracotta', 'تيراكوتا')"
           :controls="false"
           autoplay
           loop
@@ -217,13 +216,6 @@
           preload="metadata"
           class="absolute h-full w-full object-cover"
         />
-        <AppImage
-          v-else-if="hero?.image?.image_api"
-          :src="hero.image"
-          :alt="hero.title"
-          class="h-full w-full absolute object-cover"
-        />
-
         <!-- The same scrim the inner pages carry: the film is whatever the studio uploaded,
              and a bright frame leaves the title unreadable. Below the copy's own z-10. -->
         <div class="pointer-events-none absolute inset-0 bg-black/40" aria-hidden="true" />
@@ -237,40 +229,36 @@
           class="pointer-events-none absolute inset-x-0 top-8 z-10 mx-auto h-12 w-auto object-contain"
         />
 
-        <!-- Centred over the film, static. -->
+        <!--
+          Centred over the film, static.
+
+          The words are translation keys, not the first banner's `title`/`label`. Banners
+          are the app's carousel: an entry made for a phone screen was being read as this
+          site's headline, so editing the site's own copy in Translations changed nothing
+          and editing the hero meant editing an app banner. `home_hero_title` and
+          `home_hero_subtitle` seed themselves like every other string here.
+        -->
         <div
-          v-if="hero"
           class="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 px-6 text-center"
         >
           <h1
             class="font-display text-4xl font-semibold text-white drop-shadow-lg sm:text-6xl lg:text-7xl"
           >
-            {{ hero.title }}
+            {{ t("home_hero_title", "Terracotta", "تيراكوتا") }}
           </h1>
-          <p
-            v-if="hero.label"
-            class="max-w-xl text-lg text-white/85 drop-shadow"
-          >
-            {{ hero.label }}
+          <p class="max-w-xl text-lg text-white/85 drop-shadow">
+            {{ t("home_hero_subtitle", "Handmade in Amman", "مصنوع يدويًا في عمّان") }}
           </p>
 
           <!-- The overlay itself ignores the pointer so the film underneath keeps its own
-               hover; only the call to action takes a tap. -->
-          <a
-            v-if="heroRoute && heroExternal"
-            :href="heroRoute"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="pointer-events-auto rounded-xl bg-white/95 px-6 py-2.5 text-sm font-semibold text-brand-ink transition-colors hover:bg-white"
-          >
-            {{ hero.cta_text || t("discover", "Discover", "اكتشف") }}
-          </a>
+               hover; only the call to action takes a tap. It leads to the workshops, the
+               studio's own offer — the banner's `link_type` decided this before, which is
+               the app's routing, not this site's. -->
           <NuxtLink
-            v-else-if="heroRoute"
-            :to="heroRoute"
+            to="/workshops"
             class="pointer-events-auto rounded-xl bg-white/95 px-6 py-2.5 text-sm font-semibold text-brand-ink transition-colors hover:bg-white"
           >
-            {{ hero.cta_text || t("discover", "Discover", "اكتشف") }}
+            {{ t("home_hero_cta", "Book a workshop", "احجز ورشة") }}
           </NuxtLink>
         </div>
       </div>
@@ -282,7 +270,6 @@
 import { Section } from "lucide-vue-next";
 import { DrawSVGPlugin } from "gsap/all";
 
-const { banners } = useHome();
 await useApiFetch("/api/media", { key: "media-web", query: { group: "web" } });
 const { mediaAsset } = useMedia("web", "home");
 const { mediaAsset: brandAsset } = useMedia("web", "branding");
@@ -381,7 +368,6 @@ onMounted(async () => {
   }
 });
 
-const hero = computed(() => banners.value[0] ?? null);
 // Three is enough to read as a set; the covers are already Image objects.
 const STUDIO_KEYS = ["studio_1", "studio_2", "studio_3", "studio_4"];
 
@@ -398,12 +384,6 @@ const studioTiles = computed(() =>
     }),
   })).filter((tile) => tile.asset),
 );
-
-// The hero is a banner like any other, so its own `link_type` decides where the call to
-// action goes. The rest of the set is `HomeBanners`.
-const { pages } = usePages();
-const heroRoute = computed(() => bannerRoute(hero.value, pages.value));
-const heroExternal = computed(() => isExternalRoute(heroRoute.value));
 
 /**
  * The uploaded video, or the /public file it seeds itself from. `mediaAsset` hands back a
