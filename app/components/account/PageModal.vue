@@ -3,6 +3,7 @@
     <div class="fixed inset-0 z-[60] flex items-center justify-center p-4" role="dialog" aria-modal="true">
       <div class="fixed inset-0 bg-black/50" @click="emit('close')" />
       <div class="relative max-h-[90svh] w-full max-w-lg overflow-y-auto rounded-2xl border bg-background p-6 shadow-lg">
+      
         <div class="mb-5 flex items-center justify-between">
           <span class="flex items-center gap-3">
             <span class="flex size-9 items-center justify-center rounded-xl bg-brand-terracotta/10 text-brand-terracotta"><LucideFileText class="size-4" /></span>
