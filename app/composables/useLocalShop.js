@@ -285,6 +285,12 @@ export const useLocalFavorites = () => {
 
   return {
     favorites,
+    // From the stored ids, not the fetched products, so a new heart counts before its fetch.
+    count: computed(
+      () =>
+        favoriteEntries.value.filter((id) => products.value[id] || !missing.has(id))
+          .length,
+    ),
     isFavorited,
     toggle,
     pending,

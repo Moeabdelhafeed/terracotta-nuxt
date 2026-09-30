@@ -554,6 +554,9 @@ const lineTotal = (price, quantity) =>
 const bookingApi = useWorkshopBooking(() => route.params.id);
 
 const step = ref("when");
+// Each step replaces the page, so it opens at the top like a page would: paying from
+// half-way down the form used to paint the confirmation half-way down too.
+watch(step, () => scrollToTop());
 // The people who made the pieces are the people coming back to paint them, so a booking
 // that sends its party size here opens on it rather than asking again. The picker's own
 // `max_available_seats` still narrows it.

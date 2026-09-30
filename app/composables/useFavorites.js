@@ -45,6 +45,8 @@ export const useFavorites = () => {
       await api(`/api/shop/favorites/${product.id}`, {
         method: next ? "POST" : "DELETE",
       });
+      // The fetched list has no row for a new heart; the favourites page needs one.
+      if (next) refresh();
     } catch (err) {
       const normalized = normalizeApiError(err);
       // Removing something already gone is the outcome we wanted.
@@ -56,9 +58,20 @@ export const useFavorites = () => {
     return next;
   };
 
+  /**
+   * The badge counts ids, not the fetched list: a heart tapped a moment ago has no row in
+   * that list until the refetch lands, so counting rows left the badge a tap behind.
+   */
+  const count = computed(() => {
+    if (!isRegistered.value) return local.count.value;
+    const ids = new Set(favorites.value.map((product) => String(product.id)));
+    for (const [id, on] of Object.entries(overrides.value)) if (on) ids.add(id);
+    return ids.size;
+  });
+
   return {
     favorites,
-    count: computed(() => favorites.value.length),
+    count,
     isFavorited,
     toggle,
     isRegistered,

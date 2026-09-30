@@ -32,6 +32,12 @@ export default defineNuxtConfig({
       // processes and spawns them lazily, so several PIDs is normal — several *builds* is
       // not, and that is what /api/_build compares.
       buildId: process.env.NUXT_PUBLIC_BUILD_ID || String(Date.now()),
+      // Google Maps JavaScript API key, for every map on the site (QA GEN-01). Read from
+      // `.env` when the site is BUILT, so the build carries it without the host needing a
+      // variable, and it stays out of this public repository. A browser key is visible in
+      // the page anyway — its real protection is the HTTP-referrer restriction in Google
+      // Cloud. NUXT_PUBLIC_GOOGLE_MAPS_KEY on the host still overrides it at runtime.
+      googleMapsKey: process.env.NUXT_PUBLIC_GOOGLE_MAPS_KEY || '',
       firebase: {
         apiKey: '',
         authDomain: '',

@@ -35,6 +35,13 @@
       to="/shop?sale=1"
       :count-query="{ on_sale: 1 }"
     />
+    <HomeProductGrid
+      :products="materials"
+      :title="t('nav_materials', 'Raw materials & tools', 'المواد الخام والأدوات', { subGroup: 'general' })"
+      anchor="materials"
+      to="/materials"
+      base="/materials"
+    />
     <HomeGallery />
     <HomeApp />
     <HomeGift />
@@ -50,6 +57,14 @@ definePageMeta({
 
 const { featuredProducts, offers, pending, error, refresh } = useHome()
 const { t } = useLang('web', 'home')
+
+// `/api/home` is shared with the app, which has no materials shelf, so this row asks the
+// shelf's own endpoint. The studio's catalogue order, like the materials page opens on.
+// Its own key: the materials page keeps `material-products` for its filtered list.
+const { products: materials } = useProducts(
+  { per_page: 8 },
+  { path: '/api/materials/products', key: 'home-materials', lazy: import.meta.client },
+)
 
 /**
  * `/api/home` no longer blocks a move to this page (see `useHome`), so the banners, the

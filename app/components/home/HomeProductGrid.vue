@@ -20,7 +20,7 @@
       class="grid grid-cols-2 gap-5 lg:grid-cols-4"
     >
       <li v-for="product in products" :key="product.id">
-        <ProductCard :product="product" />
+        <ProductCard :product="product" :base="base" />
       </li>
     </ul>
   </section>
@@ -34,6 +34,11 @@ const props = defineProps({
   anchor: { type: String, default: undefined },
   /** Where "View all" lands — the shop, filtered the way this row is. */
   to: { type: String, default: '/shop' },
+  /**
+   * The shelf these products sit on: `/shop` or `/materials`. The list payload does not
+   * say, so the cards link through this and the count asks this shelf's endpoint.
+   */
+  base: { type: String, default: '/shop' },
   /** The filter this row shows a slice of, so the link can say how many it leads to. */
   countQuery: { type: Object, default: () => ({}) },
 })
@@ -42,7 +47,7 @@ const { t } = useLang('web', 'home')
 
 // How many pieces are behind the link, not how many are on screen. One row of a
 // paginator, after hydration only: the front door must not wait on a number.
-const { total } = useApiList('/api/shop/products', {
+const { total } = useApiList(`/api${props.base}/products`, {
   key: `home-count-${props.anchor}`,
   query: { ...props.countQuery, per_page: 1 },
   server: false,

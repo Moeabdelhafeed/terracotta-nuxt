@@ -56,7 +56,7 @@ describe('useFavorites', () => {
     expect(favorites.isFavorited(cold)).toBe(true) // optimistic, before the round trip
     await promise
 
-    expect(api.calls.at(-1)).toMatchObject({ method: 'POST', url: '/api/shop/favorites/12' })
+    expect(api.calls.find((c) => c.url === '/api/shop/favorites/12')).toMatchObject({ method: 'POST' })
   })
 
   it('a DELETE that 404s means it was already gone — the heart stays off', async () => {
@@ -102,6 +102,41 @@ describe('useFavorites', () => {
 
     await favorites.toggle(favorites.favorites.value[0])
     expect(favorites.favorites.value).toHaveLength(0)
+  })
+
+  it('the badge counts a new heart at once and drops an unhearted one (WEB-02)', async () => {
+    const favorites = useFavorites()
+    await flushPromises()
+    const before = favorites.count.value
+
+    const cold = product({ id: 16, is_favorited: false })
+    const promise = favorites.toggle(cold)
+    expect(favorites.count.value).toBe(before + 1) // before the POST lands, and before any refetch
+    await promise
+
+    await favorites.toggle(cold)
+    expect(favorites.count.value).toBe(before)
+  })
+
+  it('a new heart refetches the list so the favourites page shows it', async () => {
+    const favorites = useFavorites()
+    await flushPromises()
+    globalThis.__favorites = [product(), product({ id: 17 })]
+
+    await favorites.toggle(product({ id: 17, is_favorited: false }))
+    await flushPromises()
+
+    expect(favorites.favorites.value.map((p) => p.id)).toContain(17)
+  })
+
+  it('a guest badge counts the heart before its product arrives', async () => {
+    sanctum.user.value = null
+    const favorites = useFavorites()
+    await flushPromises()
+
+    const promise = favorites.toggle(product({ id: 15, is_favorited: false }))
+    expect(favorites.count.value).toBe(1)
+    await promise
   })
 
   it('a guest hearts into the browser rather than being sent to log in', async () => {

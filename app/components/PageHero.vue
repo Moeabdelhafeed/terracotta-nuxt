@@ -3,12 +3,14 @@
     <div class="flex w-full flex-col items-center pt-10">
       <!-- Sized exactly as the home hero's mark: there it fills the strip the scaled
            section opens up, height x (1 - 0.87) / 2, so 6.5% of the viewport. -->
-      <AppMedia
+      <NuxtLink
         v-if="logo"
-        :src="logo"
-        alt=""
-        class="h-[6.5svh] w-auto object-contain"
-      />
+        to="/"
+        class="h-[6.5svh]"
+        :aria-label="t('nav_home', 'Home', 'الرئيسية')"
+      >
+        <AppMedia :src="logo" alt="" class="h-full w-auto object-contain" />
+      </NuxtLink>
 
       <!-- The trail sits on the white ground rather than over the picture, where it would
            compete with the title and lose contrast against a light photograph. -->

@@ -43,7 +43,9 @@
     </div>
 
     <div class="p-3">
-      <p class="truncate text-sm">{{ product.title }}</p>
+      <!-- Wrapped, never cut: "… — 500 ml" is the pack size. Two lines are reserved on
+           every card so a one-line title doesn't lift its price out of the row. -->
+      <p class="min-h-10 break-words text-sm">{{ product.title }}</p>
 
       <p class="mt-1 flex flex-wrap items-baseline gap-x-2">
         <span

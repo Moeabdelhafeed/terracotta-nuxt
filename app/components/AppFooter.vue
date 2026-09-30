@@ -17,12 +17,14 @@
         <div class="max-w-sm">
           <!-- AppMedia, not AppImage: `mediaAsset` hands back the `{ type, image }`
                wrapper (or the /public fallback path), which only AppMedia unwraps. -->
-          <AppMedia
+          <NuxtLink
             v-if="logo"
-            :src="logo"
-            alt=""
-            class="h-12 w-auto object-contain"
-          />
+            to="/"
+            class="inline-block h-12"
+            :aria-label="t('nav_home', 'Home', 'الرئيسية')"
+          >
+            <AppMedia :src="logo" alt="" class="h-full w-auto object-contain" />
+          </NuxtLink>
           <p class="mt-5 text-lg leading-relaxed text-white/80">
             {{
               t(

@@ -65,6 +65,8 @@ describe('productApiQuery', () => {
     expect(productApiQuery({ min_price: '' })).not.toHaveProperty('min_price')
     expect(productApiQuery({ min_price: 'abc' })).not.toHaveProperty('min_price')
     expect(productApiQuery({ min_price: '-5' })).not.toHaveProperty('min_price')
+    expect(productApiQuery({ min_price: '1.5' })).not.toHaveProperty('min_price')
+    expect(productApiQuery({ min_price: '0' })).toMatchObject({ min_price: 0 })
   })
 
   it('drops a maximum under the minimum rather than earning a 422', () => {
@@ -135,6 +137,38 @@ describe('ShopProductFilters price range', () => {
 
     expect(wrapper.emitted('apply')).toBeUndefined()
     expect(wrapper.find('[data-test="price-hint"]').exists()).toBe(true)
+  })
+
+  it('refuses "-" and other non-digits, says so, and never asks with them (WEB-05)', async () => {
+    const wrapper = await mount()
+    vi.useFakeTimers()
+
+    const min = wrapper.find('[data-test="price-min"]')
+    await min.setValue('-')
+    expect(min.element.value).toBe('')
+    expect(wrapper.find('[data-test="price-refused"]').text()).toBe('Please enter a whole number (0 or more).')
+
+    await min.setValue('-1.5e')
+    expect(min.element.value).toBe('15')
+    vi.advanceTimersByTime(1000)
+    await flushPromises()
+    expect(wrapper.emitted('apply').at(-1)[0]).toEqual({ min_price: 15, max_price: null })
+
+    await min.trigger('blur')
+    expect(wrapper.find('[data-test="price-refused"]').exists()).toBe(false)
+  })
+
+  it('reads Arabic-Indic digits as the numbers they are', async () => {
+    const wrapper = await mount()
+    const max = wrapper.find('[data-test="price-max"]')
+    await max.setValue('٥٠')
+    expect(max.element.value).toBe('50')
+    expect(wrapper.find('[data-test="price-refused"]').exists()).toBe(false)
+  })
+
+  it('shows no bound for a negative one in the URL', async () => {
+    const wrapper = await mount({ min_price: '-1' })
+    expect(wrapper.find('[data-test="price-min"]').element.value).toBe('')
   })
 
   it('clears both bounds in one tap', async () => {

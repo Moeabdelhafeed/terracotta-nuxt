@@ -113,6 +113,18 @@ describe('BookingPiecePicker', () => {
     expect(wrapper.find('[data-add-piece="7"]').attributes('disabled')).toBeDefined()
   })
 
+  it('gives a piece with no photo the studio drawing, and keeps it selectable (QA WEB-01)', async () => {
+    const lines = ref([])
+    const wrapper = await openOwnPieces(await mount(1, lines))
+
+    const tile = wrapper.find('[data-test="piece-placeholder"] img')
+    expect(tile.attributes('src')).toBe('/make-your-cup-workshop-illustration.png')
+    expect(wrapper.text()).toContain('0 photos')
+
+    await wrapper.find('[data-add-piece="7"]').trigger('click')
+    expect(lines.value).toHaveLength(1)
+  })
+
   it('refuses a piece that has already been painted, and says so', async () => {
     const lines = ref([])
     const wrapper = await openOwnPieces(await mount(1, lines, withOwnPieces([

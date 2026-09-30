@@ -446,7 +446,12 @@ alone can't correct for an admin who has edited it.
 way this site writes a stretch of time: minutes under an hour, hours and minutes under a day,
 days and hours beyond, each correctly inflected in Arabic (one/two/3–10/11+). One `:n`
 template per unit is how "1 ساعات" and "1 أيام" kept shipping. Head counts go through it too
-(`counted(n, 'person')` → شخص واحد / شخصان / 4 أشخاص / 12 شخصًا) — never `:n اشخاص`.
+(`counted(n, 'person')` → شخص واحد / شخصان / 4 أشخاص / 12 شخصًا) — never `:n اشخاص`, and
+so do photo counts (`counted(n, 'photo')` → صورة واحدة / صورتان / 3 صور).
+
+A customer's own piece with no image renders the make-your-cup drawing in white on
+`bg-brand-terracotta` (`BookingPiecePicker`), matching the placeholder the server records for
+a piece nobody photographed — the two must never look different.
 Time left is rounded **up**, so a fresh three-hour window reads "3 ساعات", not "ساعتان و59
 دقيقة", and an open window never reads zero.
 
@@ -462,4 +467,20 @@ pair and shows that option alone; showing both again read as the choice not havi
 registered (QA WEB-03). With no `method` it offers both. The booking page says "Delivery fee
 paid: X" once a delivery is chosen (it once said the fee was due at the studio), and the
 switch-to-pickup note quotes the whole paid fee, not only the wallet slice.
+
+## Maps are Google Maps
+
+The address form's pin is `AddressMapPicker.vue` on the Google Maps JavaScript API (QA GEN-01 —
+it was a read-only OpenStreetMap embed): tap the map or drag the pin, and typed coordinates,
+"use my location" and the short-address lookup move it. The CMS shows the same pin on the same
+provider. `composables/useGoogleMaps.js` injects the script on first use (no npm dependency).
+
+- **Key**: `runtimeConfig.public.googleMapsKey`, from `NUXT_PUBLIC_GOOGLE_MAPS_KEY` in `.env`
+  **read at build time** in `nuxt.config.ts` — the build carries it without a host variable,
+  and it stays out of this public repo. The host variable still overrides at runtime.
+- **Referrer-restricted.** It loads on `https://terracotta-ksa.com`; it is refused on
+  `www.terracotta-ksa.com` and localhost. Refused, Google paints its own grey box without
+  rejecting anything, so the picker listens for `gm_authFailure` and falls back to "type the
+  coordinates below". Local development shows that fallback unless the dev address is added to
+  the key in Google Cloud.
 

@@ -69,9 +69,8 @@
           :class="cell"
           class="relative overflow-hidden bg-black/5"
         >
-          <!-- A vertical strip of photographs, taller than the tile. Scroll drives its
-               offset, so the pictures slide through the window rather than playing a
-               transition of their own. -->
+          <!-- A vertical strip of photographs, taller than the tile. Scroll picks which
+               one sits in the window; the strip then slides to it and stops there. -->
           <div ref="strips" class="absolute inset-0 will-change-transform">
             <NuxtLink
               v-for="(slide, position) in slidesFor(index)"
@@ -164,9 +163,9 @@ const { data: pool } = await useAsyncData(
 
 // How many photographs each tile cycles through.
 const SLIDES = 4
-// Timeline units: how long a photograph takes to slide in, and how long it then rests.
-const MOVE = 1
-const HOLD = 0.7
+// Pixels of scroll between one photograph and the next — the pin's length is this per
+// change, the same length the section held for when it was scrubbed.
+const STEP = 1054
 
 // Each tile starts at a different point in the pool, so no two windows show the same
 // picture at the same time.
@@ -211,31 +210,32 @@ const build = async () => {
   mm = gsap.matchMedia()
 
   mm.add('(min-width: 640px)', () => {
-    // Stepped rather than continuous: each photograph slides into place, then the
-    // timeline holds it there for a stretch of scroll before the next one moves. The
-    // hold is an empty tween — a scrubbed timeline maps its own time onto scroll
-    // distance, so dead time on the timeline is dwell time on the page.
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: root.value,
-        start: 'top top',
-        end: () => `+=${(SLIDES - 1) * (MOVE + HOLD) * 620}`,
-        pin: panel.value,
-        scrub: true,
-        invalidateOnRefresh: true,
-      },
-    })
-
-    for (let slide = 1; slide < SLIDES; slide++) {
-      tl.to(strips.value, {
-        yPercent: -100 * slide,
-        duration: MOVE,
-        ease: 'power2.inOut',
-      })
-      tl.to({}, { duration: HOLD })
+    // Scroll decides WHICH photograph is showing; the change itself plays on its own
+    // clock. It used to be scrubbed — the strip's offset was the scroll position — so
+    // wherever the reader stopped mid-change, and ScrollSmoother's one-second catch-up
+    // makes that most places, two photographs shared a tile and the wall sat there in
+    // slices. It also moved every tile in lockstep with the smoothed scroll, which is
+    // what read as the images juddering under the wheel.
+    let shown = 0
+    const show = (progress, duration) => {
+      const slide = Math.round(progress * (SLIDES - 1))
+      if (slide === shown && duration) return
+      shown = slide
+      gsap.to(strips.value, { yPercent: -100 * slide, duration, ease: 'power2.inOut', overwrite: true })
     }
 
-    return () => tl.scrollTrigger?.kill()
+    const trigger = ScrollTrigger.create({
+      trigger: root.value,
+      start: 'top top',
+      end: () => `+=${(SLIDES - 1) * STEP}`,
+      pin: panel.value,
+      invalidateOnRefresh: true,
+      onUpdate: (self) => show(self.progress, 0.8),
+      // A reload part-way down lands inside the pin without an update to say where.
+      onRefresh: (self) => show(self.progress, 0),
+    })
+
+    return () => trigger.kill()
   })
 
   // The section is `v-if`'d on the pool, so on a client move it appears *after* the

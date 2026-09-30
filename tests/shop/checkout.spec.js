@@ -168,6 +168,23 @@ describe('checkout — placing is paying', () => {
     expect(sanctum.refreshIdentity).toHaveBeenCalled()
     expect(walletReads()).toBeGreaterThan(before)
   })
+
+  it('celebrates the confirmation without standing between the customer and the order (WEB-11)', async () => {
+    globalThis.__checkout = () => ({ success: true, message: 'ok', errors: null, data: order({ status: 'pending', payment_status: 'paid', amount_due: '0.00' }) })
+
+    // The burst's layer: fixed over the page, and click-through so "View the order"
+    // underneath stays pressable while it plays.
+    const confetti = (wrapper) => wrapper.find('.fixed.inset-0.pointer-events-none[aria-hidden="true"]')
+
+    const wrapper = await mount()
+    await flushPromises()
+    expect(confetti(wrapper).exists()).toBe(false)
+
+    await placeButton(wrapper).trigger('click')
+    await flushPromises()
+
+    expect(confetti(wrapper).exists()).toBe(true)
+  })
 })
 
 describe('checkout — when the quote cannot be had', () => {

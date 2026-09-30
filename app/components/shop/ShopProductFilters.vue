@@ -56,28 +56,38 @@
         <span class="text-sm text-muted-foreground">{{
           t("price_range", "Price", "السعر")
         }}</span>
-        <Input
-          v-model="minInput"
+        <!-- Text, not `type="number"`: a number field takes "-" and "e" and then reports
+             an empty value, so nothing can refuse them or say why. Native rather than
+             <Input>, which keeps its own copy of the value and would paint a refused
+             character back on its next render. -->
+        <input
+          :value="minInput"
           data-test="price-min"
-          type="number"
-          inputmode="decimal"
-          min="0"
-          :max="PRICE_CEILING"
-          class="h-10 w-20 rounded-lg border-0 px-2 text-sm shadow-none focus-visible:ring-0 sm:h-8"
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          maxlength="5"
+          class="h-10 w-20 min-w-0 rounded-lg bg-transparent px-2 text-sm outline-none placeholder:text-muted-foreground sm:h-8"
           :placeholder="t('price_min', 'Min', 'من')"
           :aria-label="t('price_min', 'Min', 'من')"
+          :aria-invalid="priceRefused || undefined"
+          @input="minInput = typePrice($event)"
+          @blur="priceRefused = false"
         />
         <span aria-hidden="true" class="text-muted-foreground">–</span>
-        <Input
-          v-model="maxInput"
+        <input
+          :value="maxInput"
           data-test="price-max"
-          type="number"
-          inputmode="decimal"
-          min="0"
-          :max="PRICE_CEILING"
-          class="h-10 w-20 rounded-lg border-0 px-2 text-sm shadow-none focus-visible:ring-0 sm:h-8"
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          maxlength="5"
+          class="h-10 w-20 min-w-0 rounded-lg bg-transparent px-2 text-sm outline-none placeholder:text-muted-foreground sm:h-8"
           :placeholder="t('price_max', 'Max', 'إلى')"
           :aria-label="t('price_max', 'Max', 'إلى')"
+          :aria-invalid="priceRefused || undefined"
+          @input="maxInput = typePrice($event)"
+          @blur="priceRefused = false"
         />
         <button
           v-if="minInput !== '' || maxInput !== ''"
@@ -92,7 +102,21 @@
       </div>
 
       <span
-        v-if="priceInverted"
+        v-if="priceRefused"
+        data-test="price-refused"
+        role="alert"
+        class="text-xs text-destructive"
+      >
+        {{
+          t(
+            "price_whole_number",
+            "Please enter a whole number (0 or more).",
+            "الرجاء إدخال رقم صحيح",
+          )
+        }}
+      </span>
+      <span
+        v-else-if="priceInverted"
         data-test="price-hint"
         class="text-xs text-destructive"
       >
@@ -146,13 +170,16 @@ export const SORTS = ["newest", "price_asc", "price_desc"];
 /** Nothing above this is a pottery price; it only stops a stray keystroke reaching the API. */
 export const PRICE_CEILING = 99999;
 
+/** A whole number, 0 or more — anything else (a sign, a decimal, a letter) is no bound. */
 const positiveNumber = (value) => {
-  if (value === null || value === undefined || String(value).trim() === "")
-    return undefined;
-  const amount = Number(value);
-  if (!Number.isFinite(amount) || amount < 0) return undefined;
-  return Math.min(amount, PRICE_CEILING);
+  const text = String(value ?? "").trim();
+  if (!/^\d+$/.test(text)) return undefined;
+  return Math.min(Number(text), PRICE_CEILING);
 };
+
+/** Arabic-Indic and Persian digits are digits: an Arabic keyboard types ٥٠, not 50. */
+const latinDigits = (text) =>
+  text.replace(/[٠-٩۰-۹]/g, (digit) => String(digit.charCodeAt(0) & 0xf));
 
 /**
  * The URL's query is the filter state; this is the API query it means.
@@ -225,20 +252,39 @@ const sort = computed({
 
 // Typed values stay local until they settle, so a three-digit budget is one request and
 // one history entry rather than three of each.
+// A hand-edited `?min_price=-1` is no bound, so the field shows none rather than the "-1".
+const boundText = (value) => String(positiveNumber(value) ?? "");
+
 const term = ref(props.query.search ?? "");
-const minInput = ref(props.query.min_price ?? "");
-const maxInput = ref(props.query.max_price ?? "");
+const minInput = ref(boundText(props.query.min_price));
+const maxInput = ref(boundText(props.query.max_price));
 
 watch(
   () => props.query,
   (query) => {
     if ((query.search ?? "") !== term.value) term.value = query.search ?? "";
-    if ((query.min_price ?? "") !== minInput.value)
-      minInput.value = query.min_price ?? "";
-    if ((query.max_price ?? "") !== maxInput.value)
-      maxInput.value = query.max_price ?? "";
+    if (boundText(query.min_price) !== minInput.value)
+      minInput.value = boundText(query.min_price);
+    if (boundText(query.max_price) !== maxInput.value)
+      maxInput.value = boundText(query.max_price);
   },
 );
+
+/** Set when a keystroke or a paste was refused; cleared on leaving the field. */
+const priceRefused = ref(false);
+
+/**
+ * Keep the digits, drop the rest, and say so — a "-" that silently vanished reads as the
+ * field being broken. The element is written back directly: when the refused character
+ * was the only change, the value Vue holds did not move and it would not repaint.
+ */
+const typePrice = (event) => {
+  const typed = latinDigits(event.target.value);
+  const digits = typed.replace(/\D/g, "");
+  if (digits !== typed) priceRefused.value = true;
+  if (digits !== event.target.value) event.target.value = digits;
+  return digits;
+};
 
 const priceInverted = computed(() => {
   const min = positiveNumber(minInput.value);
@@ -265,6 +311,7 @@ watchDebounced(
 const clearPrice = () => {
   minInput.value = "";
   maxInput.value = "";
+  priceRefused.value = false;
 };
 
 const categoryTitle = (id) =>

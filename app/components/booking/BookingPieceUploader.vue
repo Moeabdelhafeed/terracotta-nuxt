@@ -42,7 +42,7 @@
           <div class="min-w-0">
             <p class="truncate font-display font-semibold">{{ pieceLabel(piece) }}</p>
             <p class="text-xs text-muted-foreground">
-              {{ t("n_photos", ":n photos", ":n صور", { n: piece.images?.length ?? 0 }) }}
+              {{ counted(piece.images?.length ?? 0, "photo") }}
             </p>
           </div>
 
@@ -269,6 +269,7 @@ const openPhotos = (images, index) => {
 };
 
 const { t, code } = useLang("web", "bookings");
+const { counted } = useDuration();
 const actions = useBookingActions(() => props.booking.id);
 
 const ERROR_FIELDS = ["piece_labels", "piece_keys", "piece_ids", "images"];

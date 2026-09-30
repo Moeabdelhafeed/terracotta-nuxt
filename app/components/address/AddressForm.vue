@@ -92,22 +92,11 @@
       <span v-if="err('phone')" class="text-xs text-destructive">{{ err('phone') }}</span>
     </div>
 
-    <!-- Pin: preview map + coordinates, kept inside the Saudi box the API enforces. -->
+    <!-- Pin: a Google map to tap or drag, plus the coordinates it writes (still editable),
+         kept inside the Saudi box the API enforces. -->
     <div class="grid gap-2 sm:col-span-2">
       <Label>{{ t('address_pin', 'Location pin', 'موقعك على الخريطة') }}</Label>
-      <div class="overflow-hidden rounded-2xl border bg-brand-mist">
-        <iframe
-          v-if="hasPin"
-          :src="mapSrc"
-          class="h-48 w-full"
-          loading="lazy"
-          referrerpolicy="no-referrer"
-          :title="t('address_map', 'Map', 'خريطة')"
-        />
-        <div v-else class="flex h-48 items-center justify-center text-sm text-muted-foreground">
-          {{ t('address_pin_empty', 'No location yet', 'لم يتم تحديد الموقع بعد') }}
-        </div>
-      </div>
+      <AddressMapPicker :lat="form.lat" :lng="form.lng" @pick="setPin" />
       <div class="grid grid-cols-[1fr_1fr_auto] gap-2">
         <Input v-model="form.lat" type="text" inputmode="decimal" class="h-12 rounded-xl text-base" :placeholder="t('address_lat', 'Latitude', 'خط العرض')" dir="ltr" :aria-label="t('address_lat', 'Latitude', 'خط العرض')" />
         <Input v-model="form.lng" type="text" inputmode="decimal" class="h-12 rounded-xl text-base" :placeholder="t('address_lng', 'Longitude', 'خط الطول')" dir="ltr" :aria-label="t('address_lng', 'Longitude', 'خط الطول')" />
@@ -169,14 +158,11 @@ watch(() => props.address, (address) => { form.value = { ...emptyAddressForm(), 
 const localErrors = ref({})
 const err = (field) => fieldError(errors.value, field) || fieldError(localErrors.value, field)
 
-const hasPin = computed(() => isWithinSaudi(form.value.lat, form.value.lng))
-// OpenStreetMap's embed needs no key and no script — a read-only preview of the pin.
-const mapSrc = computed(() => {
-  const lat = Number(form.value.lat)
-  const lng = Number(form.value.lng)
-  const d = 0.01
-  return `https://www.openstreetmap.org/export/embed.html?bbox=${lng - d},${lat - d},${lng + d},${lat + d}&layer=mapnik&marker=${lat},${lng}`
-})
+/** A tap or a drag on the map writes the pin; the coordinate fields stay the record. */
+const setPin = ({ lat, lng }) => {
+  form.value.lat = lat
+  form.value.lng = lng
+}
 
 /**
  * A city outside the delivery zones is `null` on the record, and the zone ids are numbers,

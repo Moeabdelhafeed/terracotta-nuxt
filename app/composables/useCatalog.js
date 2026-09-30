@@ -60,9 +60,10 @@ export const useMaterialCategories = () =>
  */
 export const useProducts = (
   query = {},
-  { path = "/api/shop/products", key = "shop-products" } = {},
+  { path = "/api/shop/products", key = "shop-products", ...options } = {},
 ) => {
   const { data, pending, error, refresh } = useApiFetch(path, {
+    ...options,
     key,
     query,
     // With a numeric `per_page` the endpoint returns a paginator; with `all` a bare array.

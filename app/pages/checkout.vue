@@ -7,6 +7,8 @@
 
       <!-- Placed, and therefore paid: there is no pay step. -->
       <section v-if="order" class="mt-8">
+        <!-- The booking confirmation's burst: once, click-through, gone in a few seconds. -->
+        <AppConfetti />
         <div class="rounded-3xl border bg-card p-8 text-center">
           <span class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand-green/10 text-brand-green">
             <LucideCheckCircle2 class="size-6" />
@@ -114,6 +116,9 @@ const { refreshIdentity } = useSanctumAuth()
 const { refresh: refreshWallet } = useWallet()
 
 const placing = ref(false)
+
+// The confirmation replaces the form: it opens at the top, not where the button was.
+watch(order, (placed) => { if (placed) scrollToTop() })
 
 // `cart` is a plain object of refs, and templates only unwrap top-level ones.
 const lines = cart.items

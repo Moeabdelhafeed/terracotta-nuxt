@@ -10,11 +10,19 @@
          are simply stacked — film first, brown panel underneath it — and read by
          scrolling. Left overlapping with the scrub switched off, the panel sat on top of
          the film and the hero was never seen at all. -->
-    <div ref="wrapper" :class="motion ? 'w-full h-full' : 'flex flex-col'">
+    <!-- The layout switch is CSS, not `motion`: `lg:motion-safe:` is the same rule as
+         `pageMotionEnabled()` (1024px up, reduced motion off), and a media query applies
+         to the server's HTML as sent, where the window does not exist. Picking them in script
+         rendered the phone layout on the server, and a class mismatch is never repaired
+         on hydration — so a desktop that loaded the home page ran the pinned scrub over
+         the stacked phone layout, and the brown panel jumped around under it. -->
+    <div
+      ref="wrapper"
+      class="flex flex-col lg:motion-safe:block lg:motion-safe:h-full lg:motion-safe:w-full"
+    >
       <div
         ref="last"
-        class="bg-brand-terracotta overflow-hidden w-full"
-        :class="motion ? 'h-full absolute z-10' : 'relative order-2'"
+        class="relative order-2 w-full overflow-hidden bg-brand-terracotta lg:motion-safe:absolute lg:motion-safe:z-10 lg:motion-safe:order-none lg:motion-safe:h-full"
       >
         <!-- Vector 17, inline so the stroke can be coloured (and drawn) from here.
              Decorative background only. -->
@@ -41,8 +49,7 @@
           is tight on a phone for exactly that reason.
         -->
         <div
-          class="mx-auto flex max-w-6xl items-center-safe overflow-hidden px-6 py-6 sm:py-16"
-          :class="motion ? 'h-full' : 'min-h-dvh'"
+          class="mx-auto flex min-h-dvh max-w-6xl items-center-safe overflow-hidden px-6 py-6 sm:py-16 lg:motion-safe:h-full lg:motion-safe:min-h-0"
         >
           <div
             class="grid w-full items-center gap-6 sm:gap-10 lg:grid-cols-2 lg:gap-16"
@@ -136,13 +143,20 @@
       <!-- Desktop only: GSAP sizes and places this one into the strip the shrinking film
            opens up. On a phone it is rendered inside the film section instead, where it
            belongs without a scrub to reveal it. -->
-      <AppMedia
-        v-if="motion"
-        ref="logo"
-        :src="logoMark"
-        alt=""
-        class="absolute top-0 inset-x-0 mx-auto w-auto object-contain"
-      />
+      <!-- The link adds no box of its own: the mark stays absolute against the hero, where
+           GSAP places it. On the home page it is a same-page link, so it scrolls back up. -->
+      <NuxtLink
+        to="/"
+        class="hidden lg:motion-safe:inline"
+        :aria-label="t('nav_home', 'Home', 'الرئيسية')"
+      >
+        <AppMedia
+          ref="logo"
+          :src="logoMark"
+          alt=""
+          class="absolute top-0 inset-x-0 mx-auto w-auto object-contain"
+        />
+      </NuxtLink>
 
       <!-- Inline, not an <img>: DrawSVG animates the path's stroke, which only exists as
            a real node in the document. Sits beside the logo, so the scaling section (and
@@ -150,8 +164,7 @@
       <!-- Drawn by the scrub as the film shrinks. With no scrub there is nothing to
            reveal them against, and they would sit over the film as stray strokes. -->
       <svg
-        v-if="motion"
-        class="absolute inset-0 h-full w-full text-brand-terracotta"
+        class="pointer-events-none absolute inset-0 hidden h-full w-full text-brand-terracotta lg:motion-safe:block"
         viewBox="0 0 1601 922"
         fill="none"
         preserveAspectRatio="xMidYMid slice"
@@ -191,8 +204,7 @@
       -->
       <div
         ref="section"
-        class="w-full overflow-hidden h-dvh bg-background"
-        :class="motion ? '' : 'relative order-1'"
+        class="relative order-1 h-dvh w-full overflow-hidden bg-background lg:motion-safe:static lg:motion-safe:order-none"
       >
         <AppMedia
           v-if="heroVideoAsset"
@@ -222,12 +234,13 @@
 
         <!-- The mark, white, across the top of the film — the phone's version of the strip
              the desktop scrub opens. -->
-        <AppMedia
-          v-if="!motion"
-          :src="logoLight"
-          alt=""
-          class="pointer-events-none absolute inset-x-0 top-8 z-10 mx-auto h-12 w-auto object-contain"
-        />
+        <NuxtLink
+          to="/"
+          class="absolute inset-x-0 top-8 z-20 mx-auto h-12 w-fit lg:motion-safe:hidden"
+          :aria-label="t('nav_home', 'Home', 'الرئيسية')"
+        >
+          <AppMedia :src="logoLight" alt="" class="h-full w-auto object-contain" />
+        </NuxtLink>
 
         <!--
           Centred over the film, static.
@@ -291,8 +304,9 @@ const heart = ref();
 const last = ref();
 const vector17 = ref();
 
-// Desktop gets the pinned scrub; a phone gets the two sections stacked. Read once at
-// setup so the markup and the timeline can never disagree about which layout is on screen.
+// Desktop gets the pinned scrub; a phone gets the two sections stacked. The layout is the
+// template's `lg:motion-safe:` classes, the same rule this reads, so the timeline only
+// ever runs over the layout it was written for.
 const motion = pageMotionEnabled();
 
 const SCALE = 0.8;

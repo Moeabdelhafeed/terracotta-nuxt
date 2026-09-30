@@ -218,11 +218,7 @@
                   {{ pieceLabel(piece) }}
                 </p>
                 <p class="text-xs text-muted-foreground">
-                  {{
-                    t("n_photos", ":n photos", ":n صور", {
-                      n: piece.images?.length ?? 0,
-                    })
-                  }}
+                  {{ counted(piece.images?.length ?? 0, "photo") }}
                 </p>
 
                 <ul

@@ -115,6 +115,16 @@
               :alt="piece.label ?? ''"
               class="size-full object-cover"
             />
+            <!-- A piece with no photo at all still gets a face: the studio's make-your-cup
+                 drawing, white on terracotta — the same art the server records for a piece
+                 nobody photographed, so the two never look different. -->
+            <div v-else class="size-full bg-brand-terracotta" data-test="piece-placeholder">
+              <img
+                :src="workshopArt({ type: 'make_your_piece' })"
+                alt=""
+                class="size-full object-cover opacity-90 [filter:brightness(0)_invert(1)]"
+              />
+            </div>
           </div>
           <div class="min-w-0 flex-1">
             <p class="truncate font-medium">
@@ -124,7 +134,7 @@
               {{ t("piece_made_on", "Made :date", "صُنعت في :date", { date: formatBookingDate(piece.made_on, code) }) }}
             </p>
             <p class="text-xs text-muted-foreground">
-              {{ t("n_photos", ":n photos", ":n صور", { n: piece.images?.length ?? 0 }) }}
+              {{ counted(piece.images?.length ?? 0, "photo") }}
             </p>
             <p class="mt-1 font-display font-black text-primary">
               {{ format(ownPieces.price) }}
@@ -256,6 +266,7 @@ const props = defineProps({
 const lines = defineModel({ type: Array, default: () => [] });
 
 const { t, code } = useLang("web", "bookings");
+const { counted } = useDuration();
 
 // The shelves scroll sideways; a mouse needs help with that. See `useDragScroll`.
 const categoryRail = ref(null);
