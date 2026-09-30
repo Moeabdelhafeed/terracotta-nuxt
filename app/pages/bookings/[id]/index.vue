@@ -363,18 +363,16 @@
             }}
           </p>
 
-          <!-- A piece already on its way somewhere is not also going back to be painted. -->
+          <!-- A piece already on its way somewhere is not also going back to be painted.
+               Same height as the handover pair above it — they are one stack of choices. -->
           <Button
-            v-if="paintable && !booking.delivery_method"
-            as-child
-            class="h-12 w-full rounded-xl bg-primary text-base hover:bg-primary/90"
+            v-if="paintOptions.length && !booking.delivery_method"
+            type="button"
+            class="h-14 w-full rounded-xl bg-primary text-base hover:bg-primary/90"
+            data-test="paint-piece"
+            @click="openPaint"
           >
-            <NuxtLink
-              :to="`/workshops/${paintable.id}/book?people=${booking.people_count}`"
-              >{{
-                t("paint_this_piece", "Paint my piece", "لوني الكوب")
-              }}</NuxtLink
-            >
+            {{ t("paint_this_piece", "Paint my piece", "لوني الكوب") }}
           </Button>
 
           <!-- Actions -->
@@ -673,6 +671,15 @@
         >
       </template>
     </BookingSheet>
+
+    <!-- The app's own sheet, for the same question: which session takes the piece, and at
+         what rate. Never opened for a single option — that one is not a choice. -->
+    <PiecePaintChoiceSheet
+      :open="paintChoosing"
+      :offers="paintOffers"
+      @close="paintChoosing = false"
+      @choose="startPaint($event.workshop.id)"
+    />
   </main>
 </template>
 
@@ -822,9 +829,48 @@ const looseImages = computed(() => {
 });
 
 // An option with no id has no schedule to send anyone to.
-const paintable = computed(
-  () => booking.value?.paintable_at?.find((option) => option.id) ?? null,
+const paintOptions = computed(() =>
+  asList(booking.value?.paintable_at).filter((option) => option.id),
 );
+
+const paintChoosing = ref(false);
+const paintOffers = ref([]);
+
+const startPaint = (workshopId) =>
+  navigateTo(`/workshops/${workshopId}/book?people=${booking.value.people_count}`);
+
+/**
+ * One session that takes the piece is not a choice — go straight there. With more than
+ * one, where it is painted and what that costs is the customer's call, so the app's own
+ * sheet opens instead.
+ *
+ * `paintable_at` carries no price, so the rate is read from each workshop's `own_pieces`
+ * block on open — only then, and only for the handful of options there are.
+ */
+const openPaint = async () => {
+  if (paintOptions.value.length === 1)
+    return startPaint(paintOptions.value[0].id);
+
+  paintOffers.value = paintOptions.value.map((workshop) => ({
+    workshop,
+    price: "0.00",
+  }));
+  paintChoosing.value = true;
+
+  const api = useApi();
+  const details = await Promise.all(
+    paintOptions.value.map((option) =>
+      api(`/api/workshops/${option.id}`).catch(() => null),
+    ),
+  );
+
+  paintOffers.value = sortOffers(
+    details.map((res, index) => ({
+      workshop: res?.data ?? paintOptions.value[index],
+      price: res?.data?.own_pieces?.price ?? "0.00",
+    })),
+  );
+};
 
 /**
  * The ways the finished piece can still leave. Nothing chosen yet draws both; once one is

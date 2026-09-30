@@ -2,28 +2,37 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
+import { ref } from 'vue'
 
-const { api, lang, toast } = await vi.hoisted(async () => {
+const { api, lang, toast, navigate } = await vi.hoisted(async () => {
   const { vi: v } = await import('vitest')
   const { createApiMock, envelope, createLang } = await import('../helpers/mockApi')
   return {
     api: createApiMock({
       'GET /api/workshops/bookings/{id}': () => envelope(globalThis.__booking),
       'POST /api/workshops/bookings/{id}/images': () => globalThis.__upload(),
+      'GET /api/workshops/{id}': (opts) => envelope({
+        id: Number(String(opts.url ?? '').split('/').pop()),
+        title: 'Paint Your Cup',
+        image: null,
+        own_pieces: { price: '60.00' },
+      }),
     }),
     lang: createLang('en'),
     toast: { success: v.fn(), error: v.fn(), info: v.fn() },
+    navigate: v.fn(),
   }
 })
 
 mockNuxtImport('useApi', () => api.useApi)
 mockNuxtImport('useApiFetch', () => api.useApiFetch)
 mockNuxtImport('useLang', () => () => lang)
-mockNuxtImport('usePrice', () => () => ({ format: (v) => `${v} SAR`, currency: 'SAR' }))
+mockNuxtImport('usePrice', () => () => ({ format: (v) => `${v} SAR`, currency: ref('SAR') }))
 mockNuxtImport('useDateFormat', () => () => ({ formatDate: (v) => `on ${String(v).slice(0, 10)}`, formatTime: (v) => v }))
 mockNuxtImport('useToast', () => () => toast)
 mockNuxtImport('showError', () => vi.fn())
 mockNuxtImport('useRoute', () => () => ({ params: { id: '55' }, query: {} }))
+mockNuxtImport('navigateTo', () => navigate)
 
 const BookingPage = (await import('~/pages/bookings/[id]/index.vue')).default
 
@@ -47,7 +56,7 @@ const mount = () => mountSuspended(BookingPage, {
       // inside this sheet, so nothing under test would exist.
       BookingSheet: {
         props: ['open', 'title', 'busy', 'wide'],
-        template: '<div v-if="open"><slot /><slot name="footer" /></div>',
+        template: '<div v-if="open"><h2>{{ title }}</h2><slot /><slot name="footer" /></div>',
       },
     },
   },
@@ -266,18 +275,53 @@ describe('booking detail — the handover choice stays the customer\'s', () => {
     expect(wrapper.find('[data-test="handover"]').exists()).toBe(false)
   })
 
-  it('does not send a piece back to be painted once it is on its way somewhere', async () => {
-    const paintable = [{ id: 4, title: 'Paint Your Cup', image: null }]
-    globalThis.__booking = finished({ paintable_at: paintable, people_count: 3 })
-    const free = await mount()
+  // One session that takes the piece is not a choice: the button goes straight there, no
+  // sheet in the way. The party that made the pieces is the party coming back to paint them.
+  it('goes straight to the only session that takes the piece', async () => {
+    navigate.mockClear()
+    globalThis.__booking = finished({ paintable_at: [{ id: 4, title: 'Paint Your Cup', image: null }], people_count: 3 })
+    const wrapper = await mount()
     await flushPromises()
-    // The party that made the pieces is the party coming back to paint them.
-    expect(free.find('a[href="/workshops/4/book?people=3"]').exists()).toBe(true)
 
-    globalThis.__booking = finished({ paintable_at: paintable, delivery_method: 'pickup', delivery_status: 'awaiting_pickup' })
-    const chosen = await mount()
+    await wrapper.find('[data-test="paint-piece"]').trigger('click')
     await flushPromises()
-    expect(chosen.find('a[href^="/workshops/4/book"]').exists()).toBe(false)
+
+    expect(navigate).toHaveBeenCalledWith('/workshops/4/book?people=3')
+    expect(wrapper.text()).not.toContain('Where to paint it')
+  })
+
+  // Two of them, and where it is painted — and what that costs — is the customer's call,
+  // as it is in the app.
+  it('offers the sessions, priced, when more than one takes the piece', async () => {
+    navigate.mockClear()
+    globalThis.__booking = finished({
+      paintable_at: [{ id: 4, title: 'Paint Your Cup', image: null }, { id: 7, title: 'Glaze Night', image: null }],
+      people_count: 2,
+    })
+    const wrapper = await mount()
+    await flushPromises()
+
+    await wrapper.find('[data-test="paint-piece"]').trigger('click')
+    await flushPromises()
+
+    expect(navigate).not.toHaveBeenCalled()
+    // eslint-disable-next-line no-console
+    expect(wrapper.text()).toContain('Where to paint it')
+    expect(wrapper.text()).toContain('Paint Your Cup')
+    // The rate comes off each workshop's own_pieces block, which `paintable_at` has not got.
+    expect(wrapper.text()).toContain('60 SAR')
+  })
+
+  it('does not send a piece back to be painted once it is on its way somewhere', async () => {
+    globalThis.__booking = finished({
+      paintable_at: [{ id: 4, title: 'Paint Your Cup', image: null }],
+      delivery_method: 'pickup',
+      delivery_status: 'awaiting_pickup',
+    })
+    const wrapper = await mount()
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="paint-piece"]').exists()).toBe(false)
   })
 })
 

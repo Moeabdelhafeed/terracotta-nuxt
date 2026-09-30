@@ -323,6 +323,17 @@ const hasPiece = (id) =>
 
 const boundsNote = computed(() => {
   const { min, max } = bounds.value;
+
+  // A workshop that sells exactly one object has min === max, and "between 1 and 1" is
+  // not a range anybody reads as an instruction.
+  if (Number.isFinite(max) && min === max)
+    return t(
+      "pieces_bounds_exact",
+      "Choose :count in total.",
+      "اختر :count إجمالًا.",
+      { count: counted(min, "piece") },
+    );
+
   return Number.isFinite(max)
     ? t(
         "pieces_bounds",
@@ -331,10 +342,10 @@ const boundsNote = computed(() => {
         { min, max },
       )
     : t(
-        "pieces_bounds_min",
-        "Choose at least :min piece(s).",
-        "اختر :min قطعة على الأقل.",
-        { min },
+        "pieces_bounds_at_least",
+        "Choose at least :count.",
+        "اختر :count على الأقل.",
+        { count: counted(min, "piece") },
       );
 });
 
@@ -342,17 +353,17 @@ const boundsError = computed(() => {
   const { min, max } = bounds.value;
   if (totalQuantity.value && totalQuantity.value < min)
     return t(
-      "pieces_too_few",
-      "Add at least :min piece(s).",
-      "أضف :min قطعة على الأقل.",
-      { min },
+      "pieces_too_few_counted",
+      "Add at least :count.",
+      "أضف :count على الأقل.",
+      { count: counted(min, "piece") },
     );
   if (totalQuantity.value > max)
     return t(
-      "pieces_too_many",
-      "You can choose at most :max piece(s).",
-      "يمكنك اختيار :max قطعة كحد أقصى.",
-      { max },
+      "pieces_too_many_counted",
+      "You can choose at most :count.",
+      "يمكنك اختيار :count كحد أقصى.",
+      { count: counted(max, "piece") },
     );
   return "";
 });

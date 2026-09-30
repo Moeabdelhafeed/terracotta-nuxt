@@ -35,6 +35,13 @@ export const useDuration = () => {
       many: (n) => t('unit_person_many', ':n people', ':n شخصًا', { n }),
       other: (n) => t('unit_person_other', ':n people', ':n شخص', { n }),
     },
+    piece: {
+      one: () => t('unit_piece_one', '1 piece', 'قطعة واحدة'),
+      two: () => t('unit_piece_two', '2 pieces', 'قطعتان'),
+      few: (n) => t('unit_piece_few', ':n pieces', ':n قطع', { n }),
+      many: (n) => t('unit_piece_many', ':n pieces', ':n قطعة', { n }),
+      other: (n) => t('unit_piece_other', ':n pieces', ':n قطعة', { n }),
+    },
     photo: {
       one: () => t('unit_photo_one', '1 photo', 'صورة واحدة'),
       two: () => t('unit_photo_two', '2 photos', 'صورتان'),

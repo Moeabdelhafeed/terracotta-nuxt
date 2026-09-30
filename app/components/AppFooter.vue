@@ -66,7 +66,7 @@
                 v-if="item.image?.image_api"
                 :src="item.image"
                 :alt="item.text"
-                class="size-4 shrink-0 object-contain"
+                class="size-5 shrink-0 object-contain"
               />
               {{ item.text }}
             </a>
@@ -87,13 +87,13 @@
                   target="_blank"
                   rel="noopener noreferrer"
                   :title="item.text"
-                  class="flex size-10 items-center justify-center rounded-full border border-white/25 transition-colors hover:bg-white/15"
+                  class="flex size-10 items-center justify-center overflow-hidden rounded-full border border-white/25 p-1 transition-colors hover:bg-white/15"
                 >
                   <AppImage
                     v-if="item.image?.image_api"
                     :src="item.image"
                     :alt="item.text"
-                    class="size-4 object-contain"
+                    class="size-full object-contain"
                   />
                   <span v-else class="text-xs font-medium">{{
                     initial(item.text)
