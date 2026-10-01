@@ -97,7 +97,7 @@
       </ul>
     </section>
 
-    <section v-if="news.length" class="bg-brand-container" data-test="about-news">
+    <section v-if="news.length" data-test="about-news">
       <div class="mx-auto max-w-6xl px-6 py-20">
         <header class="mb-8 flex items-end justify-between gap-4">
           <div>

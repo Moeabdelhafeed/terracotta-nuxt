@@ -1,5 +1,5 @@
 <template>
-  <main v-if="status !== 'success' && !item" class="mx-auto max-w-4xl px-6 py-16" aria-busy="true">
+  <main v-if="status !== 'success' && !item" class="mx-auto max-w-6xl px-6 py-16" aria-busy="true">
     <AppSkeleton class="h-9 w-2/3" />
     <AppSkeleton class="mt-6 aspect-[16/9] w-full" />
     <AppSkeleton class="mt-6 h-24 w-full" />
@@ -8,10 +8,10 @@
   <main v-else-if="item" class="bg-background">
     <PageHero :image="item.image" :crumbs="crumbs" :title="item.title" :subtitle="[dateRange(item), item.place].filter(Boolean).join(' · ')" />
 
-    <div class="mx-auto max-w-4xl space-y-8 px-6 py-12">
+    <div class="mx-auto max-w-6xl space-y-8 px-6 py-12">
       <span class="inline-block rounded-full bg-brand-terracotta/10 px-3 py-1 text-sm font-medium text-brand-terracotta">{{ newsType(item.type) }}</span>
 
-      <p v-if="item.description" class="whitespace-pre-line text-lg leading-relaxed text-muted-foreground">{{ item.description }}</p>
+      <p v-if="item.description" class="max-w-3xl whitespace-pre-line text-lg leading-relaxed text-muted-foreground">{{ item.description }}</p>
 
       <AboutPhotoWall :photos="photos" :alt="item.title" />
 

@@ -24,7 +24,7 @@
     </ul>
   </section>
 
-  <section v-if="news.length" id="news" class="bg-brand-container" data-test="home-news">
+  <section v-if="news.length" id="news" data-test="home-news">
     <div class="mx-auto max-w-6xl px-6 py-20">
       <header class="mb-8 flex items-end justify-between gap-4">
         <div>

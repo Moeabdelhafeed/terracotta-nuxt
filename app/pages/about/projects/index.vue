@@ -27,14 +27,7 @@
       </div>
 
       <ul v-if="pending && !projects.length" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" aria-busy="true">
-        <li v-for="n in 6" :key="n" class="overflow-hidden rounded-card border bg-card">
-          <AppSkeleton class="aspect-[4/3] w-full !rounded-none" />
-          <div class="space-y-2 p-4">
-            <AppSkeleton class="h-4 w-16" rounded />
-            <AppSkeleton class="h-5 w-3/4" />
-            <AppSkeleton class="h-4 w-1/2" />
-          </div>
-        </li>
+        <li v-for="n in 6" :key="n"><AppSkeleton class="aspect-[4/5] w-full !rounded-card" /></li>
       </ul>
 
       <AppLoadError v-else-if="error && !projects.length" :error="error" :retry="refresh" />

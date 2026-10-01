@@ -8,7 +8,7 @@
       :subtitle="t('news_subtitle', 'Events and conferences we took part in.', 'فعاليات ومؤتمرات شاركنا فيها.')"
     />
 
-    <div class="mx-auto max-w-4xl px-6 py-12">
+    <div class="mx-auto max-w-6xl px-6 py-12">
       <div v-if="kinds.length > 1" class="mb-8 flex flex-wrap gap-2" role="group" :aria-label="t('filter_by_type', 'Filter by type', 'تصفية حسب النوع')">
         <button
           v-for="kind in [null, ...kinds]"
@@ -24,8 +24,8 @@
         </button>
       </div>
 
-      <div v-if="pending && !news.length" class="space-y-4" aria-busy="true">
-        <AppSkeleton v-for="n in 4" :key="n" class="h-28 w-full" />
+      <div v-if="pending && !news.length" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3" aria-busy="true">
+        <AppSkeleton v-for="n in 6" :key="n" class="h-32 w-full" />
       </div>
 
       <AppLoadError v-else-if="error && !news.length" :error="error" :retry="refresh" />
@@ -43,7 +43,7 @@
       <div v-else class="space-y-10">
         <section v-for="group in byYear" :key="group.year" data-test="news-year">
           <h2 class="mb-4 border-b pb-2 font-display text-xl font-bold text-brand-terracotta">{{ group.label }}</h2>
-          <ul class="space-y-3">
+          <ul class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <li v-for="item in group.items" :key="item.id"><AboutNewsCard :item="item" /></li>
           </ul>
         </section>
