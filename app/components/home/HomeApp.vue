@@ -10,10 +10,10 @@
   <section
     ref="root"
     id="get-app"
-    class="relative isolate flex min-h-[80svh] flex-col items-center justify-center overflow-hidden bg-brand-mist/40 py-16 sm:flex-row sm:py-0"
+    class="relative isolate flex min-h-[80svh] flex-col items-center justify-center overflow-hidden bg-brand-mist/40 py-16 2xl:flex-row 2xl:py-0"
   >
     <div
-      class="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-6 text-center sm:-mt-20 sm:pt-[10svh]"
+      class="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-6 text-center 2xl:-mt-20 2xl:pt-[10svh]"
     >
       <!-- AppMedia, not AppImage: `mediaAsset` hands back the `{ type, image }` wrapper
            (or the /public fallback path), which only AppMedia unwraps. -->
@@ -81,29 +81,31 @@
     </div>
 
     <!--
-      From `sm` up the screens sit under the copy in the stack, so the text stays readable
-      where the two overlap at the start of the scroll.
+      Two compositions. From `2xl` (1536px) the screens stand at either edge of the section
+      with the copy between them — sized off the window's WIDTH as well as its height
+      (`min(70svh, 34vw)`, 3vw in from the edge), so however tall the window is they stop
+      short of the text. Below that they are a pair in the flow under the copy, leaning
+      apart and scaled to the space.
 
-      On a phone that composition had both of them 120px in from either edge — which at
-      390 is the middle of the screen, one on top of the other, behind the words. Here
-      they are a pair in the flow under the copy instead, leaning apart, sized to leave
-      the sentence above them room. `sm:contents` drops this wrapper out of the layout so
-      the absolute placement from `sm` up is unchanged.
+      It used to switch at `sm` (640px) with the screens 120px in and 70% of the window
+      tall: on every tablet and laptop that put them behind the heading, the words over
+      the screenshots and the store buttons on top of both (QA WEB-01). `2xl:contents`
+      drops this wrapper out of the layout for the side-by-side placement.
     -->
-    <div class="mt-12 flex items-end justify-center sm:contents">
+    <div class="mt-12 flex items-end justify-center 2xl:contents">
       <img
         ref="phoneStart"
         :src="screenOne"
         alt=""
         aria-hidden="true"
-        class="pointer-events-none -me-6 h-[36svh] w-auto -rotate-6 drop-shadow-2xl sm:absolute sm:right-30 sm:-z-10 sm:me-0 sm:-mt-20 sm:h-[70svh] sm:rotate-0"
+        class="pointer-events-none -me-6 h-[36svh] w-auto -rotate-6 drop-shadow-2xl md:h-[44svh] 2xl:absolute 2xl:right-[3vw] 2xl:-z-10 2xl:me-0 2xl:-mt-20 2xl:h-[min(70svh,34vw)] 2xl:rotate-0"
       />
       <img
         ref="phoneEnd"
         :src="screenTwo"
         alt=""
         aria-hidden="true"
-        class="pointer-events-none -ms-6 h-[36svh] w-auto rotate-6 drop-shadow-2xl sm:absolute sm:left-30 sm:-z-10 sm:ms-0 sm:-mt-20 sm:h-[70svh] sm:rotate-0"
+        class="pointer-events-none -ms-6 h-[36svh] w-auto rotate-6 drop-shadow-2xl md:h-[44svh] 2xl:absolute 2xl:left-[3vw] 2xl:-z-10 2xl:ms-0 2xl:-mt-20 2xl:h-[min(70svh,34vw)] 2xl:rotate-0"
       />
     </div>
   </section>

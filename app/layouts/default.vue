@@ -66,6 +66,14 @@ onMounted(() => {
      * in, so those rails pan natively again while the page keeps the normalised scroll.
      */
     normalizeScroll: { allowNestedScroll: true },
+    /*
+     * ScrollSmoother scrolls to whatever takes focus, so keyboard users land on what they
+     * tabbed to. That only makes sense for the page's own content: the nav bar, its
+     * dropdown, the dialogs and the toasts live OUTSIDE #smooth-content, and "scrolling
+     * to" one of them computes a position that means nothing. Opening the About dropdown
+     * focuses its menu, and every click threw the page up a screen (QA WEB-02).
+     */
+    onFocusIn: (self, event) => self.content().contains(event.target),
   })
 })
 
