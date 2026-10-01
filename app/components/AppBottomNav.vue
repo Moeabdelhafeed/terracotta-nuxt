@@ -24,7 +24,44 @@
       class="chrome-fixed flex max-w-full items-center gap-1.5 overflow-x-auto scrollbar-none rounded-control bg-brand-terracotta p-2.5 text-sm text-white ring-1 ring-white/10"
     >
       <li v-for="item in items" :key="item.to">
+        <!-- A destination with pages under it opens upward. Portalled to the body: the
+             bar scrolls sideways when it runs out of width, and that clips anything that
+             grows out of it. -->
+        <DropdownMenuRoot v-if="item.children" :modal="false">
+          <DropdownMenuTrigger
+            class="flex h-[54px] items-center gap-1.5 whitespace-nowrap rounded-[5px] px-4 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+            :class="
+              isActive(item.to)
+                ? 'bg-white/15 text-white'
+                : 'text-white/70 hover:bg-white/10 hover:text-white data-[state=open]:bg-white/10 data-[state=open]:text-white'
+            "
+            data-test="nav-dropdown"
+          >
+            {{ item.label }}
+            <LucideChevronUp class="size-4 opacity-70" />
+          </DropdownMenuTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuContent
+              side="top"
+              align="center"
+              :side-offset="14"
+              class="chrome-fixed z-[60] min-w-52 rounded-control bg-brand-terracotta p-2 text-sm text-white shadow-2xl ring-1 ring-white/10"
+              data-test="nav-dropdown-menu"
+            >
+              <DropdownMenuItem v-for="child in item.children" :key="child.to" as-child>
+                <NuxtLink
+                  :to="child.to"
+                  class="flex h-11 items-center rounded-[5px] px-4 outline-none transition-colors data-[highlighted]:bg-white/10"
+                  :class="isChildActive(child.to) ? 'bg-white/15 text-white' : 'text-white/80'"
+                  >{{ child.label }}</NuxtLink
+                >
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenuPortal>
+        </DropdownMenuRoot>
+
         <NuxtLink
+          v-else
           :to="item.to"
           class="flex h-[54px] items-center whitespace-nowrap rounded-[5px] px-4 transition-colors"
           :class="
@@ -150,7 +187,26 @@
         >
           <ul class="flex flex-col gap-1">
             <li v-for="item in items" :key="item.to">
+              <!-- The phone has room to show a group open: its name, then its pages. -->
+              <template v-if="item.children">
+                <p class="px-4 pt-2 pb-1 text-xs text-white/50">{{ item.label }}</p>
+                <ul class="flex flex-col gap-1">
+                  <li v-for="child in item.children" :key="child.to">
+                    <NuxtLink
+                      :to="child.to"
+                      class="flex h-12 items-center rounded-control ps-8 pe-4 text-base transition-colors"
+                      :class="
+                        isChildActive(child.to)
+                          ? 'bg-white/15 text-white'
+                          : 'text-white/80 active:bg-white/10'
+                      "
+                      >{{ child.label }}</NuxtLink
+                    >
+                  </li>
+                </ul>
+              </template>
               <NuxtLink
+                v-else
                 :to="item.to"
                 class="flex h-12 items-center rounded-control px-4 text-base transition-colors"
                 :class="
@@ -217,6 +273,14 @@
 </template>
 
 <script setup>
+import {
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuRoot,
+  DropdownMenuTrigger,
+} from "reka-ui";
+
 /**
  * The site's primary navigation. A floating bar with room for every destination from `sm`
  * up; on a phone, one button that opens the same list.
@@ -252,7 +316,17 @@ const items = computed(() => [
     label: t("nav_materials", "Raw materials & tools", "المواد الخام والأدوات"),
   },
   { to: "/gallery", label: t("nav_gallery", "Gallery", "المعرض") },
-  { to: "/about", label: t("nav_about", "About", "عن تيراكوتا") },
+  // The studio, its work for hotels and restaurants, and its news — one entry with three
+  // pages under it, so the bar stays the width it was.
+  {
+    to: "/about",
+    label: t("nav_about", "About", "عن تيراكوتا"),
+    children: [
+      { to: "/about", label: t("nav_about", "About", "عن تيراكوتا") },
+      { to: "/about/projects", label: t("nav_projects", "Our projects", "مشاريعنا") },
+      { to: "/about/news", label: t("nav_news", "Terracotta news", "أخبار تيراكوتا") },
+    ],
+  },
   ...(appUsers.value
     ? [
         isRegistered.value
@@ -264,6 +338,10 @@ const items = computed(() => [
 
 const isActive = (to) =>
   to === "/" ? route.path === "/" : route.path.startsWith(to);
+
+// Inside a group the parent's own page must not light up for its children's pages too.
+const isChildActive = (to) =>
+  to === "/about" ? route.path === "/about" : route.path.startsWith(to);
 
 const menuOpen = ref(false);
 
