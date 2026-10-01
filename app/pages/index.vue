@@ -42,6 +42,7 @@
       to="/materials"
       base="/materials"
     />
+    <HomeAbout />
     <HomeGallery />
     <HomeApp />
     <HomeGift />

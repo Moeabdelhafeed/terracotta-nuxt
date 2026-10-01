@@ -10,7 +10,11 @@ const { api, lang } = await vi.hoisted(async () => {
   return {
     api: createApiMock({
       'GET /api/media': envelope({ group: 'web', media: {} }),
-      'GET /api/about/sections': () => envelope(globalThis.__sections),
+      // `__sectionsDelay` holds the answer back, so a test can see the page mid-load.
+      'GET /api/about/sections': () =>
+        globalThis.__sectionsDelay
+          ? new Promise((resolve) => setTimeout(() => resolve(envelope(globalThis.__sections)), globalThis.__sectionsDelay))
+          : envelope(globalThis.__sections),
       'GET /api/projects': () => envelope(globalThis.__projects),
       'GET /api/news': () => envelope(globalThis.__news),
     }),
@@ -25,6 +29,7 @@ mockNuxtImport('useLang', () => () => lang)
 const AboutPage = (await import('~/pages/about/index.vue')).default
 const ProjectsPage = (await import('~/pages/about/projects/index.vue')).default
 const NewsPage = (await import('~/pages/about/news/index.vue')).default
+const HomeAbout = (await import('~/components/home/HomeAbout.vue')).default
 
 const project = (over = {}) => ({ id: 1, title: 'Breakfast sets', client_type: 'hotel', client_name: null, city: 'Riyadh', year: 2026, logo: null, image: image('cover'), ...over })
 const news = (over = {}) => ({ id: 1, type: 'conference', title: 'Crafts conference', place: 'Riyadh', starts_on: '2026-09-12', ends_on: null, link: null, image: null, ...over })
@@ -33,6 +38,7 @@ beforeEach(() => {
   globalThis.__sections = []
   globalThis.__projects = []
   globalThis.__news = []
+  globalThis.__sectionsDelay = 0
 })
 
 describe('About page', () => {
@@ -117,5 +123,37 @@ describe('News page', () => {
     expect(conferences.text()).toBe('Conference')
     await conferences.trigger('click')
     expect(wrapper.text()).not.toContain('Summer festival')
+  })
+})
+
+describe('Home page — projects and news', () => {
+  it('adds nothing to the front door until there is something to show', async () => {
+    const wrapper = await mountSuspended(HomeAbout)
+    await flushPromises()
+    expect(wrapper.find('[data-test="home-projects"]').exists()).toBe(false)
+    expect(wrapper.find('[data-test="home-news"]').exists()).toBe(false)
+  })
+
+  it('shows each row on its own once it has content', async () => {
+    globalThis.__news = [news()]
+    const wrapper = await mountSuspended(HomeAbout)
+    await flushPromises()
+    expect(wrapper.find('[data-test="home-projects"]').exists()).toBe(false)
+    expect(wrapper.find('[data-test="home-news"] a[href="/about/news/1"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="home-news"] a[href="/about/news"]').exists()).toBe(true)
+  })
+})
+
+describe('About page while it loads', () => {
+  it('shimmers where the sections will land, then shows them', async () => {
+    globalThis.__sections = [{ id: 1, type: 'banner', eyebrow: null, title: 'Everyone can make something', body: null, image: null }]
+    globalThis.__sectionsDelay = 80
+    const wrapper = await mountSuspended(AboutPage)
+    expect(wrapper.find('[data-test="about-loading"]').exists()).toBe(true)
+
+    await new Promise((resolve) => setTimeout(resolve, 120))
+    await flushPromises()
+    expect(wrapper.find('[data-test="about-loading"]').exists()).toBe(false)
+    expect(wrapper.text()).toContain('Everyone can make something')
   })
 })

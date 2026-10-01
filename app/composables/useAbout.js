@@ -19,6 +19,9 @@ export const useAboutSections = () => {
     transform: (res) => asList(res?.data),
     default: () => [],
     watch: localeKeys(),
+    // The server still renders the page whole; a click from inside the site paints the
+    // hero at once and shimmers where the sections will land.
+    lazy: import.meta.client,
   });
 
   return { sections: computed(() => asList(data.value)), pending, error, refresh };

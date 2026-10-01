@@ -11,6 +11,30 @@
       :subtitle="t('about_hero_subtitle', 'A studio in Amman where clay is shaped by hand.', 'استوديو في عمّان يُشكَّل فيه الطين باليد.')"
     />
 
+    <!-- Loading: the shape of the page's usual opening — a picture beside copy, then
+         the band — so the content lands where the shimmer was. -->
+    <div v-if="sectionsPending && !blocks.length" aria-busy="true" data-test="about-loading">
+      <section class="mx-auto max-w-6xl px-6 py-20 sm:py-24">
+        <div class="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+          <AppSkeleton class="aspect-[4/3] w-full !rounded-none" />
+          <div class="space-y-4">
+            <AppSkeleton class="h-3 w-24" />
+            <AppSkeleton class="h-9 w-2/3" />
+            <AppSkeleton class="h-4 w-full" />
+            <AppSkeleton class="h-4 w-full" />
+            <AppSkeleton class="h-4 w-4/5" />
+          </div>
+        </div>
+      </section>
+      <div class="bg-brand-terracotta/10 px-6 py-24">
+        <div class="mx-auto flex max-w-3xl flex-col items-center gap-5">
+          <AppSkeleton class="h-10 w-3/4" />
+          <AppSkeleton class="h-4 w-full" />
+          <AppSkeleton class="h-4 w-2/3" />
+        </div>
+      </div>
+    </div>
+
     <template v-for="block in blocks" :key="block.id">
       <!-- The band: centred copy on terracotta, carrying the same line the hero and the
            footer are drawn with. -->
@@ -107,7 +131,7 @@
  */
 const { t } = useLang('web', 'home')
 
-const { sections } = useAboutSections()
+const { sections, pending: sectionsPending } = useAboutSections()
 const { items: projects } = useProjects({ per_page: 3 }, 'about-projects-teaser')
 const { items: news } = useNews({ per_page: 3 }, 'about-news-teaser')
 
