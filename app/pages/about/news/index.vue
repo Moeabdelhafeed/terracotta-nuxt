@@ -12,15 +12,15 @@
       <div v-if="kinds.length > 1" class="mb-8 flex flex-wrap gap-2" role="group" :aria-label="t('filter_by_type', 'Filter by type', 'تصفية حسب النوع')">
         <button
           v-for="kind in [null, ...kinds]"
-          :key="kind ?? 'all'"
+          :key="kind?.id ?? 'all'"
           type="button"
           class="rounded-full border px-4 py-2 text-sm transition-colors"
-          :class="kind === active ? 'border-brand-ink bg-brand-ink text-white' : 'bg-card hover:bg-brand-mist'"
-          :aria-pressed="kind === active"
+          :class="(kind?.id ?? null) === active ? 'border-brand-ink bg-brand-ink text-white' : 'bg-card hover:bg-brand-mist'"
+          :aria-pressed="(kind?.id ?? null) === active"
           data-test="news-filter"
-          @click="active = kind"
+          @click="active = kind?.id ?? null"
         >
-          {{ kind ? newsType(kind) : t('all', 'All', 'الكل') }}
+          {{ kind ? kind.name : t('all', 'All', 'الكل') }}
         </button>
       </div>
 
@@ -53,18 +53,18 @@
 </template>
 
 <script setup>
-/** Every event and conference, newest first, grouped by year. Fetched whole; the type pills filter on the page. */
-const { t, newsType, day } = useAboutLabels()
+/** Every event and conference, newest first, grouped by year. Fetched whole; the category pills filter on the page. */
+const { t, day } = useAboutLabels()
 const { items: news, pending, error, refresh } = useNews()
 
-const kinds = computed(() => NEWS_TYPES.filter((kind) => news.value.some((item) => item.type === kind)))
+const kinds = computed(() => categoriesOf(news.value))
 const active = ref(null)
 
 // The API already orders newest event first, so grouping keeps that order.
 const byYear = computed(() => {
   const groups = []
   for (const item of news.value) {
-    if (active.value && item.type !== active.value) continue
+    if (active.value && item.category?.id !== active.value) continue
     const year = item.starts_on?.slice(0, 4) ?? ''
     let group = groups.at(-1)
     if (group?.year !== year) {

@@ -2,8 +2,22 @@
   <div v-if="show" class="fixed inset-0 z-[100] overflow-hidden">
     <!-- Physical left/right, not logical start/end: the halves are a seam down the middle
          of the screen, and in RTL a logical grid would swap them under the mark. -->
-    <div ref="left" class="absolute inset-y-0 left-0 w-1/2" :style="{ backgroundColor: color }" />
-    <div ref="right" class="absolute inset-y-0 right-0 w-1/2" :style="{ backgroundColor: color }" />
+    <!-- A soft shadow on each half's seam edge while they part, in the brand ink: the halves
+         are the same colour as the page they uncover, and without it they melt into it.
+         Not while closed — the right half paints over the left's shadow, so a closed
+         curtain would show it on one side of the seam only. -->
+    <div
+      ref="left"
+      class="absolute inset-y-0 left-0 w-1/2"
+      :class="{ 'shadow-[12px_0_32px_-4px_rgba(41,8,2,0.25)]': parting }"
+      :style="{ backgroundColor: color }"
+    />
+    <div
+      ref="right"
+      class="absolute inset-y-0 right-0 w-1/2"
+      :class="{ 'shadow-[-12px_0_32px_-4px_rgba(41,8,2,0.25)]': parting }"
+      :style="{ backgroundColor: color }"
+    />
 
     <div class="absolute inset-0 grid place-items-center">
       <button
@@ -57,6 +71,7 @@ const release = () => document.body.classList.remove('overflow-hidden')
 onBeforeUnmount(release)
 
 let opening = false
+const parting = ref(false)
 
 const open = () => {
   if (opening) return
@@ -74,6 +89,7 @@ const open = () => {
     return
   }
 
+  parting.value = true
   const tl = useGSAP().timeline()
 
   // The mark goes first — it is the thing being pressed, and it would otherwise hang in

@@ -31,8 +31,12 @@ const ProjectsPage = (await import('~/pages/about/projects/index.vue')).default
 const NewsPage = (await import('~/pages/about/news/index.vue')).default
 const HomeAbout = (await import('~/components/home/HomeAbout.vue')).default
 
-const project = (over = {}) => ({ id: 1, title: 'Breakfast sets', client_type: 'hotel', client_name: null, city: 'Riyadh', year: 2026, logo: null, image: image('cover'), ...over })
-const news = (over = {}) => ({ id: 1, type: 'conference', title: 'Crafts conference', place: 'Riyadh', starts_on: '2026-09-12', ends_on: null, link: null, image: null, ...over })
+const HOTEL = { id: 1, name: 'Hotel' }
+const RESTAURANT = { id: 2, name: 'Restaurant' }
+const EVENT = { id: 5, name: 'Event' }
+const CONFERENCE = { id: 6, name: 'Conference' }
+const project = (over = {}) => ({ id: 1, title: 'Breakfast sets', category: HOTEL, client_name: null, city: 'Riyadh', year: 2026, logo: null, image: image('cover'), ...over })
+const news = (over = {}) => ({ id: 1, category: CONFERENCE, title: 'Crafts conference', place: 'Riyadh', starts_on: '2026-09-12', ends_on: null, link: null, image: null, ...over })
 
 beforeEach(() => {
   globalThis.__sections = []
@@ -83,10 +87,11 @@ describe('About page', () => {
 })
 
 describe('Projects page', () => {
-  it('offers a filter only for the kinds of client the studio has worked for', async () => {
+  it('offers a filter only for the categories the studio has filed work under', async () => {
     globalThis.__projects = [
-      project({ id: 1, client_type: 'hotel', title: 'Lobby vases' }),
-      project({ id: 2, client_type: 'restaurant', client_name: 'Al Bait', title: 'Serving plates' }),
+      project({ id: 1, category: RESTAURANT, client_name: 'Al Bait', title: 'Serving plates' }),
+      project({ id: 2, category: HOTEL, title: 'Lobby vases' }),
+      project({ id: 3, category: null, title: 'Uncategorised piece' }),
     ]
 
     const wrapper = await mountSuspended(ProjectsPage)
@@ -99,6 +104,7 @@ describe('Projects page', () => {
     await pills[2].trigger('click')
     expect(wrapper.text()).toContain('Serving plates')
     expect(wrapper.text()).not.toContain('Lobby vases')
+    expect(wrapper.text()).not.toContain('Uncategorised piece')
   })
 })
 
@@ -106,8 +112,8 @@ describe('News page', () => {
   it('groups events by their own year, newest first', async () => {
     globalThis.__news = [
       news({ id: 3, title: 'Crafts conference', starts_on: '2026-09-12' }),
-      news({ id: 2, type: 'event', title: 'Summer festival', starts_on: '2026-08-28' }),
-      news({ id: 1, type: 'event', title: 'Open workshop', starts_on: '2025-12-14' }),
+      news({ id: 2, category: EVENT, title: 'Summer festival', starts_on: '2026-08-28' }),
+      news({ id: 1, category: EVENT, title: 'Open workshop', starts_on: '2025-12-14' }),
     ]
 
     const wrapper = await mountSuspended(NewsPage)

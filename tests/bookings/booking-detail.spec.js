@@ -663,3 +663,32 @@ describe('workshop pricing — where the money actually is', () => {
     expect(hasPieceCatalogue({ type: 'make_your_piece', price: '200.00' })).toBe(false)
   })
 })
+
+describe('booking detail — the coffee menu while in the studio', () => {
+  const menuLink = (wrapper) => wrapper.find('[data-test="booking-coffee-menu"]')
+
+  it('offers the coffee menu once she is checked in, and while the session runs', async () => {
+    globalThis.__booking = booking({ checked_in_at: '2026-10-01T09:55:00+03:00' })
+    let wrapper = await mount()
+    await flushPromises()
+    expect(menuLink(wrapper).exists()).toBe(true)
+    expect(menuLink(wrapper).attributes('href')).toBe('/coffee-house')
+
+    globalThis.__booking = booking({ status: 'attending', checked_in_at: '2026-10-01T09:55:00+03:00' })
+    wrapper = await mount()
+    await flushPromises()
+    expect(menuLink(wrapper).exists()).toBe(true)
+  })
+
+  it('does not offer it before she arrives, or after the session', async () => {
+    globalThis.__booking = booking({ checked_in_at: null })
+    let wrapper = await mount()
+    await flushPromises()
+    expect(menuLink(wrapper).exists()).toBe(false)
+
+    globalThis.__booking = booking({ status: 'preparing', checked_in_at: '2026-10-01T09:55:00+03:00' })
+    wrapper = await mount()
+    await flushPromises()
+    expect(menuLink(wrapper).exists()).toBe(false)
+  })
+})

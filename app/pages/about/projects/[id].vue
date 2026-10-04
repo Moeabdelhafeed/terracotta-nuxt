@@ -28,9 +28,9 @@
             <dt class="text-muted-foreground">{{ t('project_client', 'Client', 'العميل') }}</dt>
             <dd class="text-end font-medium">{{ project.client_name }}</dd>
           </div>
-          <div class="flex justify-between gap-4 py-2.5">
+          <div v-if="project.category" class="flex justify-between gap-4 py-2.5">
             <dt class="text-muted-foreground">{{ t('project_client_type', 'Type', 'النوع') }}</dt>
-            <dd class="text-end font-medium">{{ clientType(project.client_type) }}</dd>
+            <dd class="text-end font-medium">{{ project.category.name }}</dd>
           </div>
           <div v-if="project.city" class="flex justify-between gap-4 py-2.5">
             <dt class="text-muted-foreground">{{ t('project_city', 'City', 'المدينة') }}</dt>
@@ -62,7 +62,7 @@ watchEffect(() => {
   }
 })
 
-const { t, clientType, clientLine } = useAboutLabels()
+const { t, clientLine } = useAboutLabels()
 
 const photos = computed(() => asList(project.value?.images))
 

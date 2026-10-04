@@ -55,45 +55,37 @@ const aboutRecord = (base, id, keyPrefix) => {
   return { record: computed(() => data.value), pending, error, status };
 };
 
-/** `query` may hold refs: `client_type`, `per_page`. */
+/** `query` may hold refs: `category_id`, `per_page`. */
 export const useProjects = (query = {}, key = "projects") =>
   aboutList("/api/projects", query, key);
 
 export const useProject = (id) => aboutRecord("/api/projects", id, "project");
 
-/** `query` may hold refs: `type`, `per_page`. */
+/** `query` may hold refs: `category_id`, `per_page`. */
 export const useNews = (query = {}, key = "news") =>
   aboutList("/api/news", query, key);
 
 export const useNewsItem = (id) => aboutRecord("/api/news", id, "news-item");
 
-export const PROJECT_CLIENT_TYPES = ["hotel", "restaurant", "cafe", "other"];
-export const NEWS_TYPES = ["event", "conference"];
-
 /**
- * Labels for the kinds the API sends as raw values — the display string is the site's,
- * translated like the rest of it.
+ * The categories a list actually uses, in the studio's order (the order they were created
+ * in the CMS). Categories are the studio's own and already arrive named in the reader's
+ * language, so a "Cafés" pill only appears once there is a café to show.
  */
+export const categoriesOf = (items) => {
+  const seen = new Map();
+  for (const item of items ?? []) {
+    if (item?.category && !seen.has(item.category.id)) seen.set(item.category.id, item.category);
+  }
+  return [...seen.values()].sort((a, b) => a.id - b.id);
+};
+
 export const useAboutLabels = () => {
   const { t, code } = useLang("web", "about");
 
-  const clientType = (type) =>
-    ({
-      hotel: t("client_type_hotel", "Hotel", "فندق"),
-      restaurant: t("client_type_restaurant", "Restaurant", "مطعم"),
-      cafe: t("client_type_cafe", "Café", "مقهى"),
-      other: t("client_type_other", "Other", "أخرى"),
-    })[type] ?? type;
-
-  const newsType = (type) =>
-    ({
-      event: t("news_type_event", "Event", "فعالية"),
-      conference: t("news_type_conference", "Conference", "مؤتمر"),
-    })[type] ?? type;
-
   // The client's own name when the studio gave one; otherwise the kind of place and where.
   const clientLine = (project) =>
-    [project?.client_name || clientType(project?.client_type), project?.city]
+    [project?.client_name || project?.category?.name, project?.city]
       .filter(Boolean)
       .join(" · ");
 
@@ -112,5 +104,5 @@ export const useAboutLabels = () => {
     return `${day(item.starts_on)} – ${day(item.ends_on)}`;
   };
 
-  return { t, clientType, newsType, clientLine, day, dateRange };
+  return { t, clientLine, day, dateRange };
 };

@@ -9,20 +9,20 @@
     />
 
     <div class="mx-auto max-w-6xl px-6 py-12">
-      <!-- Only the kinds of client the studio has actually worked for: a "Cafés" pill
+      <!-- Only the categories the studio has actually filed work under: a "Cafés" pill
            that opens an empty grid is a promise the page can't keep. -->
       <div v-if="kinds.length > 1" class="mb-8 flex flex-wrap gap-2" role="group" :aria-label="t('filter_by_client', 'Filter by client', 'تصفية حسب العميل')">
         <button
           v-for="kind in [null, ...kinds]"
-          :key="kind ?? 'all'"
+          :key="kind?.id ?? 'all'"
           type="button"
           class="rounded-full border px-4 py-2 text-sm transition-colors"
-          :class="kind === active ? 'border-brand-ink bg-brand-ink text-white' : 'bg-card hover:bg-brand-mist'"
-          :aria-pressed="kind === active"
+          :class="(kind?.id ?? null) === active ? 'border-brand-ink bg-brand-ink text-white' : 'bg-card hover:bg-brand-mist'"
+          :aria-pressed="(kind?.id ?? null) === active"
           data-test="project-filter"
-          @click="active = kind"
+          @click="active = kind?.id ?? null"
         >
-          {{ kind ? clientType(kind) : t('all', 'All', 'الكل') }}
+          {{ kind ? kind.name : t('all', 'All', 'الكل') }}
         </button>
       </div>
 
@@ -50,17 +50,15 @@
 <script setup>
 /**
  * The studio's portfolio, in the order the studio arranged it. Fetched whole — it is a
- * portfolio, not a feed — so the client-type pills filter on the page without a request.
+ * portfolio, not a feed — so the category pills filter on the page without a request.
  */
-const { t, clientType } = useAboutLabels()
+const { t } = useAboutLabels()
 const { items: projects, pending, error, refresh } = useProjects()
 
-const kinds = computed(() =>
-  PROJECT_CLIENT_TYPES.filter((kind) => projects.value.some((project) => project.client_type === kind)),
-)
+const kinds = computed(() => categoriesOf(projects.value))
 const active = ref(null)
 const shown = computed(() =>
-  active.value ? projects.value.filter((project) => project.client_type === active.value) : projects.value,
+  active.value ? projects.value.filter((project) => project.category?.id === active.value) : projects.value,
 )
 
 const crumbs = computed(() => [

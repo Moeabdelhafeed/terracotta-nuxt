@@ -51,6 +51,20 @@
         <p class="mt-2 max-w-md text-sm text-muted-foreground">
           {{ panel.body }}
         </p>
+        <!-- In the studio now — checked in, or the session under way — so the coffee
+             house is a few steps away. -->
+        <Button
+          v-if="isInStudio"
+          as-child
+          variant="outline"
+          size="lg"
+          class="mt-5 h-12 rounded-control px-6"
+        >
+          <NuxtLink to="/coffee-house" data-test="booking-coffee-menu">
+            <LucideCoffee class="size-4" aria-hidden="true" />
+            {{ t("booking_coffee_menu", "View the coffee menu", "عرض قائمة المقهى") }}
+          </NuxtLink>
+        </Button>
       </section>
 
       <div
@@ -772,6 +786,13 @@ const apply = (res) => {
 };
 
 const state = computed(() => bookingState(booking.value));
+
+/** Checked in at the desk, or attending a session that has started. */
+const isInStudio = computed(
+  () =>
+    state.value === "attending" ||
+    (state.value === "confirmed" && !!booking.value?.checked_in_at),
+);
 const family = computed(() => workshopMatch.value?.type ?? null);
 
 /**

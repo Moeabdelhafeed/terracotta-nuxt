@@ -9,7 +9,7 @@
     <PageHero :image="item.image" :crumbs="crumbs" :title="item.title" :subtitle="[dateRange(item), item.place].filter(Boolean).join(' · ')" />
 
     <div class="mx-auto max-w-6xl space-y-8 px-6 py-12">
-      <span class="inline-block rounded-full bg-brand-terracotta/10 px-3 py-1 text-sm font-medium text-brand-terracotta">{{ newsType(item.type) }}</span>
+      <span v-if="item.category" class="inline-block rounded-full bg-brand-terracotta/10 px-3 py-1 text-sm font-medium text-brand-terracotta">{{ item.category.name }}</span>
 
       <p v-if="item.description" class="max-w-3xl whitespace-pre-line text-lg leading-relaxed text-muted-foreground">{{ item.description }}</p>
 
@@ -48,7 +48,7 @@ watchEffect(() => {
   }
 })
 
-const { t, newsType, dateRange } = useAboutLabels()
+const { t, dateRange } = useAboutLabels()
 
 const photos = computed(() => asList(item.value?.images))
 

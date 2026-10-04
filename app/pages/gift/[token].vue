@@ -1,10 +1,10 @@
 <template>
   <!--
-    The link lands here first: the recipient sees the gift — often their first sight of
-    Terracotta at all — and opening the app is a button they press. With the association
-    files in public/.well-known filled in, a phone that has the app installed skips this
-    page and opens the app directly; the button stays for in-app browsers, which defeat
-    that verification.
+    The link always lands here, app or no app: the curtain, the card and the message ARE the
+    gift — a memory, not a hop on the way to the wallet. So the site deliberately has no
+    Universal Links / App Links for /gift (no public/.well-known association files), which
+    would have sent a phone with the app straight past this page. The app is reached from
+    the Claim button instead (see claimGift()).
   -->
   <div>
     <!-- Opened by hand: the gift is behind it, and tapping the mark is the opening of it. -->
@@ -41,22 +41,7 @@
         <!-- The gift itself. Shown whether or not it can still be claimed: the buyer may be
            checking it landed, or the recipient re-opening their own link. -->
         <template v-if="gift">
-          <p class="text-sm text-muted-foreground">
-            {{
-              gift.from
-                ? t(
-                    "gift_from",
-                    ":name sent you a gift",
-                    ":name أرسل لك هدية",
-                    { name: gift.from },
-                  )
-                : t(
-                    "gift_from_someone",
-                    "You have been sent a gift",
-                    "وصلتك هدية",
-                  )
-            }}
-          </p>
+          <p class="text-sm text-muted-foreground">{{ fromLine }}</p>
 
           <p
             class="mt-4 font-display text-5xl font-black leading-none text-brand-blush"
@@ -76,11 +61,7 @@
             v-if="gift.recipient_name"
             class="mt-4 text-sm text-muted-foreground"
           >
-            {{
-              t("gift_to", "For :name", "إلى :name", {
-                name: gift.recipient_name,
-              })
-            }}
+            {{ toLine }}
           </p>
 
           <div class="my-8 h-px bg-border" />
@@ -136,34 +117,24 @@
           </p>
 
           <template v-else>
-            <!-- The credit lands in a wallet, so there has to be a wallet: a signed-in
-               registered account. A guest session has no ledger of its own. -->
+            <!-- One button, three routes — see claimGift(). The credit lands in a wallet,
+               so on the website there has to be one: a signed-in registered account. -->
             <Button
-              v-if="canRedeem"
               size="lg"
               class="h-14 w-full rounded-2xl bg-brand-blush text-base text-white hover:bg-brand-blush"
-              :disabled="redeeming"
-              @click="claim"
+              :disabled="redeeming || openingApp"
+              @click="claimGift"
             >
               {{
-                redeeming
+                redeeming || openingApp
                   ? t("please_wait", "Please wait...", "يرجى الانتظار...")
-                  : t("gift_redeem", "Claim your gift", "استلام الهدية")
-              }}
-            </Button>
-
-            <Button
-              v-else
-              size="lg"
-              class="h-14 w-full rounded-2xl bg-brand-blush text-base text-white hover:bg-brand-blush"
-              @click="goSignIn"
-            >
-              {{
-                t(
-                  "gift_redeem_sign_in",
-                  "Sign in to claim your gift",
-                  "سجّل الدخول لاستلام الهدية",
-                )
+                  : canRedeem || appLink
+                    ? t("gift_redeem", "Claim your gift", "استلام الهدية")
+                    : t(
+                        "gift_redeem_sign_in",
+                        "Sign in to claim your gift",
+                        "سجّل الدخول لاستلام الهدية",
+                      )
               }}
             </Button>
 
@@ -173,16 +144,6 @@
               {{ redeemError }}
             </p>
 
-            <!-- A phone only: the scheme means nothing on a desktop. -->
-            <Button
-              v-if="appLink"
-              variant="outline"
-              size="lg"
-              class="mt-3 h-12 w-full rounded-2xl text-base"
-              @click="openInApp"
-            >
-              {{ t("gift_open_in_app", "Open in the app", "افتح في التطبيق") }}
-            </Button>
 
             <div v-if="gift.store_links?.length" class="mt-6">
               <p class="text-xs text-muted-foreground">
@@ -262,9 +223,26 @@
         </template>
       </div>
 
+      <!-- A keepsake of the gift, whatever state it is in: the card as a PDF to keep. -->
+      <button
+        v-if="gift"
+        type="button"
+        class="mt-8 inline-flex h-12 items-center gap-2 rounded-2xl border border-white/70 px-6 text-sm font-medium text-white transition-colors hover:bg-white/10 disabled:opacity-60"
+        :disabled="saving"
+        data-test="gift-save-pdf"
+        @click="savePdf"
+      >
+        <LucideDownload class="size-4" aria-hidden="true" />
+        {{
+          saving
+            ? t("gift_pdf_preparing", "Preparing…", "جارٍ التجهيز…")
+            : t("gift_save_pdf", "Save the gift as PDF", "حفظ الهدية بصيغة PDF")
+        }}
+      </button>
+
       <NuxtLink
         to="/"
-        class="mt-8 text-sm text-white/80 underline-offset-4 transition-colors hover:text-white hover:underline"
+        class="mt-6 text-sm text-white/80 underline-offset-4 transition-colors hover:text-white hover:underline"
       >
         {{
           t("gift_explore", "See what Terracotta makes", "تعرّف على تيراكوتا")
@@ -285,7 +263,7 @@ definePageMeta({
 useHead({ bodyAttrs: { class: "bg-brand-blush" } });
 
 const route = useRoute();
-const { t } = useLang("web", "home");
+const { t, dir } = useLang("web", "home");
 const { format } = usePrice();
 
 /**
@@ -303,6 +281,54 @@ const {
 
 const notFound = computed(() => error.value?.statusCode === 404);
 
+const fromLine = computed(() =>
+  gift.value?.from
+    ? t("gift_from", ":name sent you a gift", ":name أرسل لك هدية", {
+        name: gift.value.from,
+      })
+    : t("gift_from_someone", "You have been sent a gift", "وصلتك هدية"),
+);
+
+const toLine = computed(() =>
+  gift.value?.recipient_name
+    ? t("gift_to", "For :name", "إلى :name", { name: gift.value.recipient_name })
+    : "",
+);
+
+/**
+ * The card as a PDF the recipient keeps (see utils/giftPdf.js). The same words the page
+ * shows, in the reader's language, and never the link: the token is the gift.
+ */
+const saving = ref(false);
+
+// The site's own address under the card, so a printed copy says where it came from.
+const siteHost = (() => {
+  try {
+    return new URL(useSiteConfig().url).host;
+  } catch {
+    return "";
+  }
+})();
+
+const savePdf = async () => {
+  if (saving.value || !gift.value) return;
+  saving.value = true;
+  try {
+    await saveGiftPdf(
+      {
+        from: fromLine.value,
+        amount: format(gift.value.amount),
+        message: gift.value.message,
+        to: toLine.value,
+        footer: siteHost,
+      },
+      { dir: dir.value, fileName: "terracotta-gift.pdf" },
+    );
+  } finally {
+    saving.value = false;
+  }
+};
+
 /**
  * Claiming. The face amount lands in the redeemer's wallet — not what the buyer paid,
  * which this page never sees — and it happens exactly once, so the button is disabled for
@@ -311,10 +337,9 @@ const notFound = computed(() => error.value?.statusCode === 404);
 const { redeem } = useGifts();
 
 /**
- * "Open in the app". `deep_link` is the custom scheme (`terracotta://gift/{token}`) the
- * app registers; the OS switches to the app if it is installed and does nothing at all if
- * it is not — no error, no event. So the page waits a moment and, if it is still the one
- * in front, sends the visitor to the store for their platform instead.
+ * `deep_link` is the app's custom scheme (`terracotta://gift/{token}`), null until the app
+ * handles it and GIFT_APP_DEEP_LINK is set. Phones only: the scheme means nothing on a
+ * desktop.
  */
 const { os } = useDevice();
 
@@ -323,20 +348,6 @@ const appLink = computed(() =>
     ? (gift.value?.deep_link ?? null)
     : null,
 );
-
-const storeFor = (device) =>
-  gift.value?.store_links?.find(
-    (link) => link.type === (device === "ios" ? "app_store" : "google_play"),
-  )?.url;
-
-const openInApp = () => {
-  const store = storeFor(os.value);
-  window.location.href = appLink.value;
-  if (!store) return;
-  setTimeout(() => {
-    if (document.visibilityState === "visible") window.location.href = store;
-  }, 1500);
-};
 
 // A guest session is an anonymous device, not an account with a ledger — it cannot hold
 // wallet credit, so it is sent through sign-in like a visitor with no session at all.
@@ -400,6 +411,37 @@ onMounted(() => {
   )
     claim();
 });
+
+/**
+ * The Claim button. Signed in here already → claimed here, in one tap: it is the same
+ * account and the same wallet the app shows, so nothing is lost by not opening the app.
+ * Otherwise, on a phone, the app is tried first and it claims the gift itself. If it
+ * doesn't open (not installed, or she cancelled iOS's "Open in Terracotta?"), she signs
+ * in on the website, and the parked token claims the gift when she comes back here.
+ */
+const openingApp = ref(false);
+
+const claimGift = async () => {
+  if (canRedeem.value) return claim();
+
+  if (appLink.value) {
+    openingApp.value = true;
+    const opened = await openApp(appLink.value);
+    openingApp.value = false;
+    if (opened) {
+      // Back from the app, the page shows what happened there (claimed, most likely).
+      const reload = () => {
+        if (document.visibilityState !== "visible") return;
+        document.removeEventListener("visibilitychange", reload);
+        refresh();
+      };
+      document.addEventListener("visibilitychange", reload);
+      return;
+    }
+  }
+
+  return goSignIn();
+};
 
 const storeLabel = (type) =>
   ({

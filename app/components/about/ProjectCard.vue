@@ -18,13 +18,13 @@
     <span class="absolute inset-0 bg-gradient-to-t from-brand-ink/90 via-brand-ink/30 to-transparent" aria-hidden="true" />
 
     <span class="absolute inset-x-4 top-4 flex items-start justify-between gap-3">
-      <span class="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-brand-terracotta backdrop-blur-sm">
-        {{ clientType(project.client_type) }}
+      <span v-if="project.category" class="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-brand-terracotta backdrop-blur-sm">
+        {{ project.category.name }}
       </span>
       <!-- The client's mark, on white so a logo drawn for a light ground stays legible. -->
       <span
         v-if="project.logo?.image_api"
-        class="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white p-2 shadow-sm"
+        class="ms-auto flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white p-2 shadow-sm"
       >
         <AppImage :src="project.logo" :alt="project.client_name || ''" class="size-full object-contain" />
       </span>
@@ -49,5 +49,5 @@ defineProps({
   project: { type: Object, required: true },
 })
 
-const { t, clientType, clientLine } = useAboutLabels()
+const { t, clientLine } = useAboutLabels()
 </script>

@@ -229,6 +229,7 @@ const sections = computed(() => [
   { to: "/about", label: t("nav_about", "About", "عن تيراكوتا") },
   { to: "/about/projects", label: t("nav_projects", "Our projects", "مشاريعنا") },
   { to: "/about/news", label: t("nav_news", "Terracotta news", "أخبار تيراكوتا") },
+  { to: "/coffee-house", label: t("nav_coffee_house", "Coffee house", "المقهى") },
 ]);
 
 const storeBadges = computed(() => [

@@ -13,8 +13,8 @@
       </span>
 
       <span class="flex min-w-0 flex-1 flex-col gap-1">
-        <span class="self-start rounded-full bg-brand-terracotta/10 px-2.5 py-0.5 text-xs font-medium text-brand-terracotta">
-          {{ newsType(item.type) }}
+        <span v-if="item.category" class="self-start rounded-full bg-brand-terracotta/10 px-2.5 py-0.5 text-xs font-medium text-brand-terracotta">
+          {{ item.category.name }}
         </span>
         <span class="font-display text-base font-semibold leading-snug">{{ item.title }}</span>
         <span class="text-sm text-muted-foreground">
@@ -41,5 +41,5 @@ defineProps({
   item: { type: Object, required: true },
 });
 
-const { newsType, day } = useAboutLabels();
+const { day } = useAboutLabels();
 </script>
