@@ -3,18 +3,21 @@
        the menu is a tap away), and under it the items the studio starred — only when it
        has starred some. -->
   <section id="coffee-house" class="mx-auto max-w-6xl px-6 py-20" data-test="home-coffee">
-    <div class="grid items-center gap-8 overflow-hidden rounded-card bg-brand-mist md:grid-cols-2">
-      <div class="aspect-[4/3] md:aspect-auto md:h-full md:min-h-80">
-        <AppMedia :src="picture" alt="" class="size-full object-cover" />
+    <!-- A fixed height, not the photo's: the picture fills its side (absolute, cropped)
+         instead of setting the card's height, which on a wide screen made the whole
+         section as tall as a portrait photo. -->
+    <div class="grid overflow-hidden rounded-card bg-brand-mist md:h-80 md:grid-cols-5">
+      <div class="relative h-48 sm:h-56 md:col-span-2 md:h-full">
+        <AppMedia :src="picture" alt="" class="absolute inset-0 size-full object-cover" />
       </div>
-      <div class="flex flex-col items-start gap-4 p-8 md:py-12 md:pe-12 md:ps-0">
+      <div class="flex flex-col items-start justify-center gap-3 p-6 sm:p-8 md:col-span-3 md:px-10">
         <span class="text-sm font-medium text-brand-terracotta">
           {{ t('home_coffee_eyebrow', 'Our coffee house', 'مقهى تيراكوتا') }}
         </span>
-        <h2 class="font-display text-3xl font-semibold sm:text-4xl">
+        <h2 class="font-display text-2xl font-semibold sm:text-3xl">
           {{ t('home_coffee_title', 'A coffee while your piece takes shape', 'قهوة بينما تتشكّل قطعتك') }}
         </h2>
-        <p class="text-muted-foreground">
+        <p class="max-w-prose text-muted-foreground">
           {{
             t(
               'home_coffee_body',
@@ -23,7 +26,7 @@
             )
           }}
         </p>
-        <Button as-child size="lg" class="mt-2 h-12 rounded-control px-6">
+        <Button as-child size="lg" class="mt-1 h-11 rounded-control px-6">
           <NuxtLink to="/coffee-house" data-test="home-coffee-menu">
             <LucideCoffee class="size-4" aria-hidden="true" />
             {{ t('home_coffee_menu', 'View the menu', 'عرض القائمة') }}

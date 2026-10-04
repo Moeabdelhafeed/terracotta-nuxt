@@ -296,31 +296,72 @@ const toLine = computed(() =>
 );
 
 /**
- * The card as a PDF the recipient keeps (see utils/giftPdf.js). The same words the page
- * shows, in the reader's language, and never the link: the token is the gift.
+ * The page as a PDF the recipient keeps (see utils/giftPdf.js): the same words, in the
+ * reader's language, the same state, and the same buttons — live links in the PDF. Claim
+ * opens this gift's link, the store buttons the stores. Only the save button is left out.
+ *
+ * The link is the gift (whoever holds it can claim it), so a forwarded PDF forwards the
+ * gift exactly as forwarding the WhatsApp message would. That is the studio's choice: the
+ * file is a copy of a page its holder could already open.
  */
 const saving = ref(false);
-
-// The site's own address under the card, so a printed copy says where it came from.
-const siteHost = (() => {
-  try {
-    return new URL(useSiteConfig().url).host;
-  } catch {
-    return "";
-  }
-})();
 
 const savePdf = async () => {
   if (saving.value || !gift.value) return;
   saving.value = true;
   try {
+    const origin = window.location.origin;
+    const claimable = gift.value.is_claimable && !credited.value;
+    const stores = gift.value.store_links ?? [];
+
     await saveGiftPdf(
       {
         from: fromLine.value,
         amount: format(gift.value.amount),
         message: gift.value.message,
         to: toLine.value,
-        footer: siteHost,
+        claim: claimable
+          ? {
+              label: t("gift_redeem", "Claim your gift", "استلام الهدية"),
+              url: `${origin}/gift/${route.params.token}`,
+            }
+          : null,
+        stores:
+          claimable && stores.length
+            ? {
+                heading: t(
+                  "gift_get_app",
+                  "Do not have the app yet?",
+                  "ليس لديك التطبيق بعد؟",
+                ),
+                items: stores.map((link) => ({
+                  label: storeLabel(link.type),
+                  url: link.url,
+                })),
+              }
+            : null,
+        claimed: claimable
+          ? null
+          : credited.value
+            ? t(
+                "gift_redeem_done",
+                ":amount has been added to your wallet.",
+                "تمت إضافة :amount إلى محفظتك.",
+                { amount: format(credited.value.amount) },
+              )
+            : t(
+                "gift_claimed",
+                "This gift has already been claimed.",
+                "تم استلام هذه الهدية من قبل.",
+              ),
+        explore: {
+          label: t(
+            "gift_explore",
+            "See what Terracotta makes",
+            "تعرّف على تيراكوتا",
+          ),
+          url: `${origin}/`,
+        },
       },
       { dir: dir.value, fileName: "terracotta-gift.pdf" },
     );
