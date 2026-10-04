@@ -233,9 +233,19 @@ const summaryQuote = computed(() =>
   gift.value ? { ...gift.value, delivery_fee: null } : null,
 );
 
+// Fired once the gift is on screen. Arriving from the purchase form, the list is still
+// loading when the page mounts, so checking only at mount never celebrated anything.
 const celebrate = ref(false);
 onMounted(() => {
-  if (route.query.new && gift.value) celebrate.value = true;
+  const stop = watch(
+    gift,
+    (value) => {
+      if (!value || !route.query.new) return;
+      celebrate.value = true;
+      queueMicrotask(() => stop());
+    },
+    { immediate: true },
+  );
 });
 
 const crumbs = computed(() => [

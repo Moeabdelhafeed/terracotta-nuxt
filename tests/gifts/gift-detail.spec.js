@@ -19,7 +19,13 @@ const { api, lang, rows } = await vi.hoisted(async () => {
   const { createApiMock, createLang } = await import('../helpers/mockApi')
   const rows = { value: [] }
   return {
-    api: createApiMock({ 'GET /api/gifts': () => ({ success: true, message: 'ok', errors: null, data: rows.value }) }),
+    // `rows.delay` holds the answer back, as a client-side arrival from the purchase form does.
+    api: createApiMock({
+      'GET /api/gifts': () => {
+        const answer = { success: true, message: 'ok', errors: null, data: rows.value }
+        return rows.delay ? new Promise((resolve) => setTimeout(() => resolve(answer), rows.delay)) : answer
+      },
+    }),
     lang: createLang('en'),
     rows,
   }
@@ -42,7 +48,24 @@ const mount = async (gift) => {
 }
 
 describe('/gifts/[id]', () => {
-  beforeEach(() => { api.calls.length = 0 })
+  beforeEach(() => {
+    api.calls.length = 0
+    rows.delay = 0
+  })
+
+  it('celebrates a gift just bought, once the gift has loaded', async () => {
+    // Arriving from the purchase form the list is still loading when the page mounts;
+    // checking only at mount meant the confetti never fired.
+    rows.value = [paid]
+    rows.delay = 30
+    const wrapper = await mountSuspended(GiftDetail, { global: { stubs: { PageBar: true, AppConfetti: true } } })
+    expect(wrapper.html()).not.toContain('app-confetti-stub')
+
+    await new Promise((resolve) => setTimeout(resolve, 60))
+    await flushPromises()
+    expect(wrapper.text()).toContain('Gift purchased!')
+    expect(wrapper.html()).toContain('app-confetti-stub')
+  })
 
   it('shows the success copy and the share link exactly as the server built it', async () => {
     const wrapper = await mount(paid)
